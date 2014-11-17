@@ -1,0 +1,6 @@
+lin_alg:
+	add -D_OPTIMIZED conditional compilation to all files (elim bounds checks)
+	
+element:
+	add vector element factory. Stores one Element* for each element,
+	so values don't have to be recomputed between timesteps (at expense of storage)
