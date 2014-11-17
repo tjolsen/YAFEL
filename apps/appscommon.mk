@@ -1,0 +1,1 @@
+CFLAGS += -I$(shell pwd)

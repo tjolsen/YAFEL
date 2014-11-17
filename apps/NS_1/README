@@ -1,0 +1,3 @@
+Chorin's projection method for Navier-stokes equations.
+Initially starting with constant viscosity. Should be easy to
+extend for shear-rate dependent viscosity.

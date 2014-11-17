@@ -16,7 +16,7 @@ AR = ar
 
 #compiling and linking flags
 CFLAGS = -O3 -c -march=native -Wall -I$(YAFELDIR)/include/
-LFLAGS = -L$$YAFELDIR -lyafel
+LFLAGS = -L$(YAFELDIR)/lib/ -lyafel
 ARFLAGS = -ru
 
 #output library name

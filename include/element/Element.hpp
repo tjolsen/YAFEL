@@ -38,7 +38,7 @@ public:
   Element(int nsd, int nqp, int dofpn, int dofpe, int vtktype, int nodespe);
 
   // Virtual functions, specialized in child classes
-  virtual ~Element();
+  virtual ~Element() {}
   virtual double shape_value_xi(int node, const Vector &xi) const = 0;
   virtual double shape_grad_xi(int node, int component, const Vector &xi) const = 0;
 

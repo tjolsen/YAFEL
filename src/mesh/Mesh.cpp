@@ -2,6 +2,8 @@
 
 YAFEL_NAMESPACE_OPEN
 
+Mesh::Mesh() {}
+
 Mesh::Mesh(const std::vector<Vector> & nodes,
 	   const std::vector< std::vector<int> > & elems,
 	   const std::vector<int> & eltype) {

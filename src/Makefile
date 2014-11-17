@@ -6,7 +6,6 @@ all: $(LIB) stage
 
 $(LIB): $(SUBDIRS)
 	$(AR) $(ARFLAGS) $@ $(shell find . | grep .o$$)
-	ranlib $@
 
 stage: $(LIB)
 	cp $(LIB) $(YAFELDIR)/lib/

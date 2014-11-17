@@ -2,6 +2,8 @@
 
 YAFEL_NAMESPACE_OPEN
 
+ElementFactory::ElementFactory() {}
+
 ElementFactory::ElementFactory(Mesh &M, int dofPerNode) :
   Mp(&M), dof_per_node(dofPerNode)
 {

@@ -24,18 +24,18 @@
 #include "mesh/MeshReader.hpp"
 
 // Elements
-#include "Element.hpp"
-#include "LinQuad.hpp"
-#include "LinTri.hpp"
-#include "LinTet.hpp"
-#include "ElementFactory.hpp"
+#include "element/Element.hpp"
+#include "element/LinQuad.hpp"
+#include "element/LinTri.hpp"
+#include "element/LinTet.hpp"
+#include "element/ElementFactory.hpp"
 
 // Output
-#include "VTKObject.hpp"
-#include "VTKOutput.hpp"
-#include "VTKScalarData.hpp"
-#include "VTKVectorData.hpp"
-#include "VTKTensorData.hpp"
-#include "VTKMesh.hpp"
+#include "output/VTKObject.hpp"
+#include "output/VTKOutput.hpp"
+#include "output/VTKScalarData.hpp"
+#include "output/VTKVectorData.hpp"
+#include "output/VTKTensorData.hpp"
+#include "output/VTKMesh.hpp"
 
 #endif

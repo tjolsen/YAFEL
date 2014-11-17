@@ -21,6 +21,7 @@ private:
   int n_els;
   
 public:
+  ElementFactory();
   ElementFactory(Mesh &M, int dofPerNode);
   ~ElementFactory();
 

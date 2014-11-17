@@ -1,4 +1,4 @@
-subdirs = src apps #test
+subdirs = NS_1
 
 include $(YAFELDIR)/common.mk
 
@@ -9,6 +9,5 @@ $(subdirs):
 
 clean:
 	for dir in $(subdirs); do $(MAKE) -C $$dir clean; done
-	rm $(YAFELDIR)/lib/$(LIB)
 
-.PHONY: all $(subdirs)
+.PHONY: all clean $(subdirs)
