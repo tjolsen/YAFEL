@@ -1,8 +1,0 @@
-#include "output/VTKObject.hpp"
-
-FECPP_NAMESPACE_OPEN
-
-VTKObject::VTKObject(VTKDataType dt, VTKObjectType ot, const std::string &s) : 
-  DType(dt), OType(ot), name(s) {}
-
-FECPP_NAMESPACE_CLOSE
