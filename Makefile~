@@ -1,0 +1,11 @@
+subdirs = src test apps
+
+all: $(subdirs)
+
+$(subdirs):
+	cd $@ && $(MAKE)
+
+clean:
+	for dir in $(subdirs); do cd $(YAFELDIR)/$$dir && $(MAKE) clean; done
+
+.PHONY: all $(subdirs)

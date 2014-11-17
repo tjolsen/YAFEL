@@ -1,0 +1,15 @@
+#ifndef _FECPP_FECPP_HPP
+#define _FECPP_FECPP_HPP
+
+/*
+
+This header defines any global macros, etc that are used throughout the library
+  
+ */
+
+// project namespace open/close macros
+#define FECPP_NAMESPACE_OPEN namespace fe_cpp {
+#define FECPP_NAMESPACE_CLOSE }
+
+
+#endif // end #ifndef _FECPP_FECPP_HPP

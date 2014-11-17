@@ -1,0 +1,23 @@
+#ifndef _VTKMESH_HPP
+#define _VTKMESH_HPP
+
+#include <cstdio>
+#include "fe_cpp_globals.hpp"
+#include "element/ElementFactory.hpp"
+#include "output/VTKObject.hpp"
+
+FECPP_NAMESPACE_OPEN
+
+class VTKMesh : public VTKObject {
+  
+private:
+  ElementFactory * EFp;
+
+public:
+  VTKMesh(ElementFactory &EF);
+  void write(FILE *fp);
+};
+
+FECPP_NAMESPACE_CLOSE
+
+#endif

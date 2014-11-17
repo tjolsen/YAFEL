@@ -1,0 +1,16 @@
+include $(YAFELDIR)/common.mk
+
+lib = liblinalg.a
+cppfiles = $(shell ls *.cpp)
+obj = $(cppfiles:.cpp=.o) #sparse_coo.o sparse_csr.o Vector.o LUDecomposition.o FullMatrix.o cg_solver.o bicgstab.o
+
+$(lib): $(obj)
+	$(AR) $(ARFLAGS) $@ $(obj)
+
+%.cpp: %.hpp
+
+%.o: %.cpp
+	$(CPP) $(CFLAGS) $<
+
+clean:
+	rm $(obj) $(lib)
