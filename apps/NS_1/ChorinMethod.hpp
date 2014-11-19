@@ -24,11 +24,12 @@ private:
   std::vector<double> bcvals;
 
   Mesh M;
-  ElementFactory EF;
+  ElementFactory EFu, EFp;
   
   //=======================
   bool timestep();
-  void assemble();
+  void assemble_u();
+  void assemble_p();
   void setup();
 
 public:

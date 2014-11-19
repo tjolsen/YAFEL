@@ -4,3 +4,7 @@ lin_alg:
 element:
 	add vector element factory. Stores one Element* for each element,
 	so values don't have to be recomputed between timesteps (at expense of storage)
+
+output:
+	add method to handle time-varying output. (write lots of files, keep track of names,
+	write to .pvd file at end?)

@@ -12,4 +12,4 @@ $(output): $(ofiles)
 	$(CPP) $(CFLAGS) $<
 
 clean:
-	rm $(output) $(ofiles)
+	rm $(output) $(ofiles) *.vtu

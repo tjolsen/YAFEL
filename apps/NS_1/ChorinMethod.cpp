@@ -102,13 +102,33 @@ void ChorinMethod::run() {
 }
 
 // ========= ASSEMBLE =======================================
-void ChorinMethod::assemble() {
+void ChorinMethod::assemble_u() {
+  
 
+  for(unsigned elnum=0; elnum < M.get_n_elems(); ++elnum) {
+    
+    Element *e = EFu.getElement(elnum);
+    if(e==NULL) continue;
+    if(e->n_spacedim != NSD) continue;
+  
+    e->update_element(M,elnum);
+    
+    int Ndof = e->dof_per_el;
+    FullMatrix K_el(Ndof, Ndof, 0.0);
+    Vector R_el(Ndof, 0.0);
+    
+    
+  }
+  
+}
 
-
-
-
-
+void ChorinMethod::assemble_p() {
+  
+  
+  
+  
+  
+  
 }
 
 
