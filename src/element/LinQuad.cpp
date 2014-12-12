@@ -3,7 +3,7 @@
 
 YAFEL_NAMESPACE_OPEN
 
-LinQuad::LinQuad(int dofpn) : Element(2, 4, dofpn, 4*dofpn, 9, 4)
+LinQuad::LinQuad(unsigned dofpn) : Element(2, 4, dofpn, 4*dofpn, 9, 4)
 {
 
   Vector v(n_spaceDim,0.0);
@@ -25,20 +25,20 @@ LinQuad::LinQuad(int dofpn) : Element(2, 4, dofpn, 4*dofpn, 9, 4)
   v(0) = -a; v(1) = a; quad_points.push_back(v); gauss_weights.push_back(1.0);
 }
 
-double LinQuad::shape_value_xi(int node, const Vector &xi) const {
+double LinQuad::shape_value_xi(unsigned node, const Vector &xi) const {
   
   double val = 1.0;
-  for(int i=0; i<n_spaceDim; ++i) {
+  for(unsigned i=0; i<n_spaceDim; ++i) {
     val *= (1.0/2.0) * (xi_0[node](i)*xi(i) + 1);
   }
   
   return val;
 }
 
-double LinQuad::shape_grad_xi(int node, int comp, const Vector &xi) const {
+double LinQuad::shape_grad_xi(unsigned node, unsigned comp, const Vector &xi) const {
   
   double val = 1.0;
-  for(int i=0; i<n_spaceDim; ++i) {
+  for(unsigned i=0; i<n_spaceDim; ++i) {
     if(comp == i)
       continue;
     val *= (1.0/2.0) * (xi_0[node](i)*xi(i)+1);

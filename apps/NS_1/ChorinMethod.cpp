@@ -10,7 +10,8 @@ ChorinMethod::ChorinMethod(const char *meshFileName, const char *obase, unsigned
 {
   //read mesh
   M = MeshReader::gmsh_read(meshFname.c_str());
-  EF = ElementFactory(M, NSD);
+  EFu = ElementFactory(M, NSD);
+  EFp = ElementFactory(M, 1);
 }
 
 // ========= SETUP ========================================
@@ -41,8 +42,8 @@ void ChorinMethod::setup() {
   }
 
   // set initial conditions for fields
-  u_sol = Vector(EF.get_n_dof(), 0.0);
-  P_sol = Vector(M.get_n_nodes(), 0.0);
+  u_sol = Vector(EFu.get_n_dof(), 0.0);
+  P_sol = Vector(EFp.get_n_dof(), 0.0);
 }
 
 void ChorinMethod::run() {
@@ -52,7 +53,7 @@ void ChorinMethod::run() {
   double dt = Tfinal/100; // BS VALUE: WRITE ROUTINE TO ESTIMATE (Mesh will need to return a "characteristic length")
   
   //set up output structures
-  VTKMesh vtkm(EF);
+  VTKMesh vtkm(EFu);
 
   while(time < Tfinal) {
     if((Tfinal - time) < dt) {
@@ -109,16 +110,52 @@ void ChorinMethod::assemble_u() {
     
     Element *e = EFu.getElement(elnum);
     if(e==NULL) continue;
-    if(e->n_spacedim != NSD) continue;
+    if(e->n_spaceDim != NSD) continue;
   
     e->update_element(M,elnum);
     
-    int Ndof = e->dof_per_el;
+    unsigned Ndof = e->dof_per_el;
     FullMatrix K_el(Ndof, Ndof, 0.0);
     Vector R_el(Ndof, 0.0);
     
+    for(unsigned qpi = 0; qpi < e->n_quadPoints; ++qpi) {
+      
+      Vector qp = e->quad_points[qpi];
+      
+      //get local u values from global vector
+      Vector u_loc(Ndof, 0.0);
+      for(unsigned A=0; A<Ndof; ++A) {
+	u_loc(A) = u_sol(e->global_dofs[A]);
+      }
+      
+      //compute velocies at quadrature point
+      Vector uqp(e->n_spaceDim, 0.0);
+      for(unsigned A=0; A<Ndof; ++A) {
+	int comp = e->getComp(A);
+	uqp(comp) += e->vals[qpi](e->getBase(A)) * u_loc(A);
+      }
+      
+      //compute velocity gradient at quadpoint
+      FullMatrix ugradqp(e->n_spaceDim, e->n_spaceDim, 0.0);
+      for(unsigned A=0; A<Ndof; ++A) {
+	int abase = e->getBase(A);
+	int i = e->getComp(A);
+	for(unsigned j=0; j<e->n_spaceDim; ++j) {
+	  ugradqp(i,j) += e->grads[qpi](abase, j)*u_loc(A);
+	}
+      }
+      
+      // Element tangent
+      
+      
+      // Element Residual
+      for(unsigned A=0; A<Ndof; ++A) {
+	
+      }
+      
+    } //end: quadpoints loop
     
-  }
+  }// end: elements loop
   
 }
 

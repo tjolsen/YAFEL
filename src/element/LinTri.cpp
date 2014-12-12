@@ -2,7 +2,7 @@
 
 YAFEL_NAMESPACE_OPEN
 
-LinTri::LinTri(int dofpn) : Element(2, 1, dofpn, dofpn*3, 5, 3)
+LinTri::LinTri(unsigned dofpn) : Element(2, 1, dofpn, dofpn*3, 5, 3)
 {
   
   Vector v(n_spaceDim,0.0);
@@ -30,7 +30,7 @@ LinTri::LinTri(int dofpn) : Element(2, 1, dofpn, dofpn*3, 5, 3)
   
 }
 
-double LinTri::shape_value_xi(int node, const Vector &xi) const {
+double LinTri::shape_value_xi(unsigned node, const Vector &xi) const {
   
   switch(node) {
   case 0: return (1 - xi(0) - xi(1));
@@ -41,7 +41,7 @@ double LinTri::shape_value_xi(int node, const Vector &xi) const {
   return 0.0;
 }
 
-double LinTri::shape_grad_xi(int node, int comp, const Vector &xi) const {
+double LinTri::shape_grad_xi(unsigned node, unsigned comp, const Vector &xi) const {
   if(node==0)
     return -1;
   else

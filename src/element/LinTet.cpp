@@ -2,7 +2,7 @@
 
 YAFEL_NAMESPACE_OPEN
 
-LinTet::LinTet(int dofpn) : Element(3, 1, dofpn, dofpn*4, 10, 4) {
+LinTet::LinTet(unsigned dofpn) : Element(3, 1, dofpn, dofpn*4, 10, 4) {
   Vector v(n_spaceDim, 0.0);
   
   xi_0.clear();
@@ -20,7 +20,7 @@ LinTet::LinTet(int dofpn) : Element(3, 1, dofpn, dofpn*4, 10, 4) {
 }
 
 
-double LinTet::shape_value_xi(int node, const Vector &xi) const {
+double LinTet::shape_value_xi(unsigned node, const Vector &xi) const {
   
   switch(node) {
   case 0:
@@ -39,7 +39,7 @@ double LinTet::shape_value_xi(int node, const Vector &xi) const {
   return 0;
 }
 
-double LinTet::shape_grad_xi(int node, int component, const Vector &xi) const {
+double LinTet::shape_grad_xi(unsigned node, unsigned component, const Vector &xi) const {
   if(node==0)
     return -1;
   else

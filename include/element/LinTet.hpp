@@ -10,10 +10,10 @@ YAFEL_NAMESPACE_OPEN
 class LinTet : public Element {
 
 public:
-  LinTet(int dofpn);
+  LinTet(unsigned dofpn);
   
-  double shape_value_xi(int node, const Vector &xi) const;
-  double shape_grad_xi(int node, int component, const Vector &xi) const;
+  double shape_value_xi(unsigned node, const Vector &xi) const;
+  double shape_grad_xi(unsigned node, unsigned component, const Vector &xi) const;
 
 };
 

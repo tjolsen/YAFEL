@@ -13,13 +13,13 @@ YAFEL_NAMESPACE_OPEN
 class Element {
   
 public:
-  int n_spaceDim;
-  int n_quadPoints;
-  int dof_per_node;
-  int dof_per_el;
+  unsigned n_spaceDim;
+  unsigned n_quadPoints;
+  unsigned dof_per_node;
+  unsigned dof_per_el;
   int vtk_type;
-  int el_num;
-  int nodes_per_el;
+  unsigned el_num;
+  unsigned nodes_per_el;
   
   std::vector<double> gauss_weights;
   std::vector<Vector> quad_points;
@@ -29,32 +29,33 @@ public:
   // vector of values of dofs at qp's
   // uses Vector object to since dof's often represent a mathematical vector.
   // std::vector is used for general container.
-  std::vector<Vector> vals; //what was i thinking here???
-  std::vector<FullMatrix> grads; //vector of n_qp FullMatrix objects, hold grads of dof at qp's
+  std::vector<Vector> vals; //vector of n_qp vectors. holds values of shape funcs at qp's
+  std::vector<FullMatrix> grads; //vector of n_qp FullMatrix objects, hold grads of shape funcs at qp's
   std::vector<int> element;
   std::vector< Vector > nodal_coords;
-  std::vector<int> global_dofs;
+  std::vector<unsigned> global_dofs;
   
-  Element(int nsd, int nqp, int dofpn, int dofpe, int vtktype, int nodespe);
+  Element(unsigned nsd, unsigned nqp, unsigned dofpn, unsigned dofpe, int vtktype, unsigned nodespe);
 
   // Virtual functions, specialized in child classes
   virtual ~Element() {}
-  virtual double shape_value_xi(int node, const Vector &xi) const = 0;
-  virtual double shape_grad_xi(int node, int component, const Vector &xi) const = 0;
+  virtual double shape_value_xi(unsigned node, const Vector &xi) const = 0;
+  virtual double shape_grad_xi(unsigned node, unsigned component, const Vector &xi) const = 0;
 
   //Functions in base class
   FullMatrix calcJ_xi(Vector xi);
   void calcJacobians(); // calcualte Jacobians at Gauss points and store in 
   void calcGrads(); // calculate shape function gradients (wrt spatial coords) and store in "grads[qpi](A, i)"
-  void update_element(const Mesh & M, int elnum);
-  inline double JxW(int qpi) const { return gauss_weights[qpi]*detJ[qpi]; }
+  void calcVals(); // calculate shape function values and store in "grads[qpi](A, i)"
+  void update_element(const Mesh & M, unsigned elnum);
+  inline double JxW(unsigned qpi) const { return gauss_weights[qpi]*detJ[qpi]; }
   
   
   //utility functions, might need to use in program so make public
-  inline int getComp(int dof) const { return (dof % dof_per_node); }
-  inline int getBase(int dof) const { return (dof/dof_per_node); }
+  inline unsigned getComp(unsigned dof) const { return (dof % dof_per_node); }
+  inline unsigned getBase(unsigned dof) const { return (dof/dof_per_node); }
   
-  double xval(int dof, Vector xi);
+  double xval(unsigned dof, Vector xi);
   
   
 };
