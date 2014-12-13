@@ -31,9 +31,13 @@ public:
   
   double & operator()(int i, int j) const;
   FullMatrix operator*(const FullMatrix & rhs) const;
+  FullMatrix &operator+=(const FullMatrix &rhs);
+  FullMatrix operator+(const FullMatrix &rhs) const;
+  FullMatrix &operator-=(const FullMatrix &rhs);
+  FullMatrix operator-(const FullMatrix &rhs) const;
   Vector operator*(const Vector & rhs) const;
-  int getRows() const { return rows; }
-  int getCols() const { return cols; }
+  int getRows() const { return (!transposed) ? rows : cols; }
+  int getCols() const { return (!transposed) ? cols : rows; }
   double det() const;
   FullMatrix getTransposed() const;
   FullMatrix getInverse() const;

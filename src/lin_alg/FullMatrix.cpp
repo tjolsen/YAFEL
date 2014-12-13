@@ -62,8 +62,8 @@ FullMatrix::FullMatrix(const sparse_csr & csr) {
   this->transposed = false;
   data = new double[rows*cols];
   
-  for(int i=0; i<rows; ++i) {
-    for(int j=0; j<cols; ++j) {
+  for(int i=0; i<getRows(); ++i) {
+    for(int j=0; j<getCols(); ++j) {
       this->operator()(i,j) = csr(i,j);
     }
   }
@@ -94,16 +94,13 @@ double & FullMatrix::operator()(int i, int j) const {
   }
 
   int idx;
-  if(!transposed) {
-    idx = indexOf(i,j);
-  } else {
-    idx = indexOf(j,i);
-  }
+  idx = indexOf(i,j);
+
   return data[idx];
 }
 
 FullMatrix FullMatrix::operator*(const FullMatrix & rhs) const {
-  
+
   if(cols != rhs.rows) {
     printf("FullMatrix::operator* dimension mismatch\n");
     printf("\tlhs\trows = %d\n\t\tcols = %d\n", rows, cols);
@@ -113,14 +110,66 @@ FullMatrix FullMatrix::operator*(const FullMatrix & rhs) const {
 
   FullMatrix ret_mat(rows, rhs.cols, 0.0);
   
-  for(int i=0; i<rows; ++i) {
-    for(int j=0; j<rhs.cols; ++j) {
+  for(int i=0; i<getRows(); ++i) {
+    for(int j=0; j<rhs.getCols(); ++j) {
       for(int k=0; k<cols; ++k) {
-	ret_mat(i,j) += data[indexOf(i,k)] * rhs(k,j);
+	ret_mat(i,j) += (*this)(i,k)*rhs(k,j); //data[indexOf(i,k)] * rhs(k,j);
       }
     }
   }
   
+  return ret_mat;
+}
+
+FullMatrix &FullMatrix::operator+=(const FullMatrix &rhs)  {
+  
+  if(getRows() != rhs.rows || getCols() != rhs.cols) {
+    printf("FullMatrix::operator+= dimension mismatch\n");
+    printf("\tlhs\trows = %d\n\t\tcols = %d\n", rows, cols);
+    printf("\trhs\trows = %d\n\t\tcols = %d\n", rhs.rows, rhs.cols);
+    exit(1);
+  }
+  
+  for(int i=0; i<getRows(); ++i) {
+    for(int j=0; j<getCols(); ++j) {
+      (*this)(i,j) += rhs(i,j);
+    }
+  }
+
+  return *this;
+}
+
+FullMatrix FullMatrix::operator+(const FullMatrix &rhs) const {
+
+  FullMatrix ret_mat(*this);
+  ret_mat += rhs;
+
+  return ret_mat;
+}
+
+FullMatrix &FullMatrix::operator-=(const FullMatrix &rhs) {
+  
+  if(rows != rhs.rows || cols != rhs.cols) {
+    printf("FullMatrix::operator-= dimension mismatch\n");
+    printf("\tlhs\trows = %d\n\t\tcols = %d\n", rows, cols);
+    printf("\trhs\trows = %d\n\t\tcols = %d\n", rhs.rows, rhs.cols);
+    exit(1);
+  }
+  
+  for(int i=0; i<getRows(); ++i) {
+    for(int j=0; j<getCols(); ++j) {
+      (*this)(i,j) -= rhs(i,j);
+    }
+  }
+
+  return *this;
+}
+
+FullMatrix FullMatrix::operator-(const FullMatrix &rhs) const {
+
+  FullMatrix ret_mat(*this);
+  ret_mat -= rhs;
+
   return ret_mat;
 }
 

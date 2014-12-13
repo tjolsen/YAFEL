@@ -14,6 +14,8 @@ private:
   std::string outputBase;
   unsigned NSD;
   double Tfinal;
+  double viscosity;
+  double density;
   
   std::vector<Vector> u_out;
   std::vector<double> P_out;
@@ -27,9 +29,9 @@ private:
   ElementFactory EFu, EFp;
   
   //=======================
-  bool timestep();
-  void assemble_u();
-  void assemble_p();
+  bool timestep(double dt);
+  void assemble_u(double dt);
+  void assemble_p(double dt);
   void setup();
 
 public:

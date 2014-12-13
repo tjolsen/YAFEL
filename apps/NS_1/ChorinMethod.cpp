@@ -16,6 +16,12 @@ ChorinMethod::ChorinMethod(const char *meshFileName, const char *obase, unsigned
 
 // ========= SETUP ========================================
 void ChorinMethod::setup() {
+
+  //set viscosity
+  viscosity = 1.0;
+
+  //set density
+  density = 1000;
   
   //set velocity dirichlet boundary conditions
   for(unsigned i=0; i<M.el_tags.size(); ++i) {
@@ -64,7 +70,7 @@ void ChorinMethod::run() {
     bool goodstep = false;
     while(!goodstep) {
 
-      goodstep = timestep();
+      goodstep = timestep(dt);
       
       //use return value from timestep() to adaptively change dt
       //if residuals are diverging... not sure how to do this yet,
@@ -103,7 +109,7 @@ void ChorinMethod::run() {
 }
 
 // ========= ASSEMBLE =======================================
-void ChorinMethod::assemble_u() {
+void ChorinMethod::assemble_u(double dt) {
   
 
   for(unsigned elnum=0; elnum < M.get_n_elems(); ++elnum) {
@@ -116,6 +122,7 @@ void ChorinMethod::assemble_u() {
     
     unsigned Ndof = e->dof_per_el;
     FullMatrix K_el(Ndof, Ndof, 0.0);
+    FullMatrix M_el(Ndof, Ndof, 0.0);
     Vector R_el(Ndof, 0.0);
     
     for(unsigned qpi = 0; qpi < e->n_quadPoints; ++qpi) {
@@ -144,22 +151,44 @@ void ChorinMethod::assemble_u() {
 	  ugradqp(i,j) += e->grads[qpi](abase, j)*u_loc(A);
 	}
       }
+
+      Vector gradu_u = ugradqp * uqp;
       
       // Element tangent
-      
+      for(unsigned A=0; A<Ndof; ++A) {
+	unsigned i=e->getComp(A);
+	unsigned abase = e->getBase(A);
+	for(unsigned B=0; B<Ndof; ++B) {
+	  unsigned j=e->getComp(B);
+	  unsigned bbase = e->getBase(B);
+
+	  K_el(A,B) += (dt*viscosity/density)*(e->grads[qpi](A,i))*(e->grads[qpi](B,j))*(e->JxW(qpi));
+
+	  M_el(A,B) += (e->vals[qpi](abase))*(e->vals[qpi](bbase))*(e->JxW(qpi));
+	}
+      }
       
       // Element Residual
       for(unsigned A=0; A<Ndof; ++A) {
+	unsigned n = e->getBase(A);
+	unsigned i = e->getComp(A);
 	
+	R_el(A) += (uqp(i) - dt*gradu_u(i))*(e->vals[qpi](n))*(e->JxW(qpi));
       }
       
     } //end: quadpoints loop
+    
+
+    //assemble into global
+    FullMatrix Kfull_el = M_el - K_el;
+
+    
     
   }// end: elements loop
   
 }
 
-void ChorinMethod::assemble_p() {
+void ChorinMethod::assemble_p(double dt) {
   
   
   
@@ -170,7 +199,7 @@ void ChorinMethod::assemble_p() {
 
 
 // =========== TIMESTEP =====================================
-bool ChorinMethod::timestep() {
+bool ChorinMethod::timestep(double dt) {
 
   
   return true;
