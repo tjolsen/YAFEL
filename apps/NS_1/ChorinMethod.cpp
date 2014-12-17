@@ -181,7 +181,7 @@ void ChorinMethod::assemble_u(double dt) {
 
     //assemble into global
     FullMatrix Kfull_el = M_el - K_el;
-
+    
     
     
   }// end: elements loop
