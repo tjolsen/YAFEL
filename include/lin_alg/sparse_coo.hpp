@@ -15,6 +15,7 @@ class sparse_coo {
   friend class sparse_csr;
   
 private:
+  static const int default_capacity = 10;
   int rows;
   int cols;
   int size;
@@ -37,6 +38,7 @@ public:
   sparse_coo(const sparse_coo & src);
   sparse_coo(const sparse_csr & csr);
   ~sparse_coo();
+  sparse_coo & operator=(const sparse_coo &rhs);
   int getRows() const {return rows;}
   int getCols() const {return cols;}
   int getSize() const {return size;}

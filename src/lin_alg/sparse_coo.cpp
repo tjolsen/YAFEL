@@ -39,6 +39,45 @@ sparse_coo::sparse_coo(const sparse_coo & src) {
   consistentNNZ = src.consistentNNZ;
 }
 
+sparse_coo & sparse_coo::operator=(const sparse_coo & rhs) {
+
+  if(this == &rhs) {
+    return *this;
+  }
+  
+  int *tmp_ri, *tmp_ci;
+  double *tmp_data;
+  int sz = rhs.getSize();
+  
+  tmp_ri = new int[sz];
+  tmp_ci = new int[sz];
+  tmp_data = new double[sz];
+  
+  for(int i=0; i<sz; ++i) {
+    tmp_ri[i] = rhs.row_index[i];
+    tmp_ci[i] = rhs.col_index[i];
+    tmp_data[i] = rhs.data[i];
+  }
+  
+  delete row_index;
+  delete col_index;
+  delete data;
+  
+  rows = rhs.getRows();
+  cols = rhs.getCols();
+  size = sz;
+  capacity = sz;
+  oldNNZ = rhs.oldNNZ;
+  isSorted = rhs.isSorted;
+  consistentNNZ = rhs.consistentNNZ;
+  row_index = tmp_ri;
+  col_index = tmp_ci;
+  data = tmp_data;
+  
+  return *this;
+}
+
+
 sparse_coo::sparse_coo(const sparse_csr & csr) {
   
   init();
@@ -64,13 +103,13 @@ sparse_coo::~sparse_coo() {
 }
 
 void sparse_coo::init() {
-  row_index = new int[10];
-  col_index = new int[10];
-  data  = new double[10];
+  row_index = new int[default_capacity];
+  col_index = new int[default_capacity];
+  data  = new double[default_capacity];
   rows = 0;
   cols = 0;
   size = 0;
-  capacity = 10;
+  capacity = default_capacity;
   isSorted = true;
   consistentNNZ = true;
   oldNNZ = 0;

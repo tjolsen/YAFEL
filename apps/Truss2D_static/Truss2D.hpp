@@ -17,11 +17,15 @@ private:
   double Axsection;
   double rho;
   Mesh M;
-  
+  sparse_coo Kcoo;
+  Vector Fsys;
+  Vector Usol;
+
 public:
   Truss2D(const char *Mfname, const char *outFname);
   void setup();
   void assemble();
   void solve();
   void output();
+  void run();
 };

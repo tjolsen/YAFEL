@@ -1,4 +1,4 @@
-lc = 10;
+lc = 100;
 
 Point(1) = {0,0,0,lc};
 Point(2) = {1,0,0,lc};
@@ -16,8 +16,8 @@ Line(6) = {2,5};
 Line(7) = {3,6};
 Line(8) = {2,6};
 Line(9) = {3,5};
-Line(10) = {5,6};
+//Line(10) = {5,6};
 
 Physical Point(1) = {1};
 Physical Point(2) = {4};
-Physical Line(3) = {1,2,3,4,5,6,7,8,9,10};
+Physical Line(3) = {1,2,3,4,5,6,7,8,9};//,10};

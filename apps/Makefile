@@ -1,4 +1,4 @@
-subdirs = NS_1
+subdirs = NS_1 Truss2D_static
 
 include $(YAFELDIR)/common.mk
 
