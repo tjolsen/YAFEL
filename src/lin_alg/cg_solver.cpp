@@ -30,6 +30,11 @@ Vector cg_solve(const sparse_csr & A, const Vector & rhs, const Vector &x0) {
   
   double rTr_old = r.dot(r);
   double rTr_0 = rTr_old;
+  
+  if(rTr_old == 0.0) {
+    return x;
+  }
+  
   int k = 0;
   while( k < x.getLength()*2) {
     Vector Ap = A*p;

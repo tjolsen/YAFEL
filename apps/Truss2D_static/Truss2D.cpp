@@ -5,9 +5,9 @@
 Truss2D::Truss2D(const char *Mfname, const char *outFname) :
 MeshFilename(Mfname), OutputFilename(outFname)
 {
-  Eyoungs = 200e9; // 200 GPa
-  Axsection = 1.0e-4; //m^2
-  rho = 8000; //density kg/m^3
+  Eyoungs = 1; // 200 GPa
+  Axsection = 1; //m^2
+  rho = 1; //density kg/m^3
 }
 
 void Truss2D::setup() {
@@ -79,7 +79,8 @@ void Truss2D::assemble() {
     for(unsigned i=0; i<nsd; ++i) {
       Cdir(i) = dx(i)/L;
     }
-
+    Cdir.print();
+    
     FullMatrix Kloc(dof, dof, 0.0);
     Vector LoadVec(dof,0.0);
     for(unsigned A=0; A<dof; ++A) {
@@ -87,13 +88,13 @@ void Truss2D::assemble() {
       unsigned acomp = A%nsd;
       for(unsigned B=0; B<dof; ++B) {
 	unsigned bbase = B/2;
-
+	unsigned bcomp = B%nsd;
 	int factor = (abase==bbase) ? 1 : -1;
 
-	Kloc(A,B) += factor*Cdir(abase)*Cdir(bbase)*Eyoungs*Axsection/L;
+	Kloc(A,B) += factor*Cdir(acomp)*Cdir(bcomp)*Eyoungs*Axsection/L;
       }
       if(acomp == 1) {
-	//LoadVec(A) += -Grav*rho*L*Axsection;
+	//LoadVec(A) += -Grav*rho*L*Axsection/2;
       }
     }
 
@@ -112,11 +113,12 @@ void Truss2D::assemble() {
       F(globaldof[A]) += LoadVec(A);
     }
     
+    Kloc.print();
   }
 
   Kcoo = Ksys_coo;
   Fsys = F;
-
+  //Kcoo.print_sparse();
   std::cout << "Assembly done!" << std::endl;
 }
 
@@ -125,36 +127,34 @@ void Truss2D::solve() {
   sparse_csr Ksys_csr(Kcoo);
   sparse_csr Ksys_nobc(Ksys_csr);
   Vector Ubc(2*M.get_n_nodes(),0.0);
-  
+
   //apply BCs
   for(unsigned i=0; i<bcvals.size(); ++i) {
-    std::cout << i << std::endl;
     unsigned dof = 2*bcnodes[i] + bccomps[i];
 
-    Ubc(i) = bcvals[i];
+    Ubc(dof) = bcvals[i];
     
-    Ksys_csr.zero_row(dof);
-    Ksys_csr.zero_col(dof);
-    Ksys_csr.assign(dof,dof,1.0);
-    
+    Ksys_csr.zero_row(dof); //cheap
+    Ksys_csr.zero_col(dof); //expensive
+    Ksys_csr.assign(dof,dof,1.0); //potentially expensive
+
   }
 
-  Ksys_csr.print_sparse();
+  //Ksys_csr.print_sparse();
 
-  std::cout << "BCs done\n";
-  Vector rhs = Fsys - Ksys_nobc*Ubc;
 
+  Vector rhs = Fsys - Ksys_nobc*Ubc;  
   for(unsigned i=0; i<bcvals.size(); ++i) {
     unsigned dof = 2*bcnodes[i] + bccomps[i];
-    
     rhs(dof) = bcvals[i];
   }
 
-  rhs.print();
-  FullMatrix Full(Ksys_csr);
+  FullMatrix Full(Ksys_nobc);
   Full.print();
   
-  Vector u = pcg_solve(Ksys_csr, rhs, Ubc);
+  rhs.print();
+  std::cout << std::endl;
+  Vector u = cg_solve(Ksys_csr, rhs, Ubc);
   Usol = u;
 }
 
