@@ -13,5 +13,6 @@ int main(int argc, char **argv) {
 
   T2D.run();
 
+  //std::cout << "Done with T2D.run()\n";
   return 0;
 }

@@ -20,12 +20,14 @@ private:
   sparse_coo Kcoo;
   Vector Fsys;
   Vector Usol;
-
+  std::vector<double> stress; // MPa
+  
 public:
   Truss2D(const char *Mfname, const char *outFname);
   void setup();
   void assemble();
   void solve();
+  void postprocess();
   void output();
   void run();
 };

@@ -147,6 +147,37 @@ void Truss2D::solve() {
   Usol = u;
 }
 
+void Truss2D::postprocess() {
+  
+  stress.clear();
+  
+  for(unsigned elnum=0; elnum < M.get_n_elems(); ++elnum) {
+    if(M.element_type[elnum] != 1)  {
+      continue;
+    }
+
+    unsigned n1 = M.elements[elnum][0];
+    unsigned n2 = M.elements[elnum][1];
+    Vector u1(3,0.0);
+    u1(0) = Usol(2*n1);
+    u1(1) = Usol(2*n1 + 1);
+    Vector u2(3,0.0);
+    u2(0) = Usol(2*n2);
+    u2(1) = Usol(2*n2 + 1);
+    
+    Vector dx = M.nodal_coords[n1] - M.nodal_coords[n2];
+    double L0 = dx.dot(dx);
+    
+    Vector dx_curr = dx + u1 - u2;
+    double L = dx_curr.dot(dx_curr);
+    
+    double strain = (L - L0)/L0;
+    
+    stress.push_back(Eyoungs * strain / 1.0e6); //MPa
+    
+  }
+
+}
 
 void Truss2D::output() {
   
@@ -165,9 +196,13 @@ void Truss2D::output() {
   VTKOutput VO;
   VTKVectorData vtku(uout, VTKObject::VTKPOINTDATA, std::string("U"));
   VTKMesh vtkm(EF);
+  VTKScalarData vtkstress(stress, VTKObject::VTKCELLDATA, std::string("stress"));
+  
   VO.addVTKObject(&vtkm);
   VO.addVTKObject(&vtku);
+  VO.addVTKObject(&vtkstress);
   VO.write(OutputFilename.c_str());
+
 }
 
 
@@ -176,6 +211,7 @@ void Truss2D::run() {
   setup();
   assemble();
   solve();
+  //postprocess();
   output();
 
 }

@@ -59,9 +59,9 @@ sparse_coo & sparse_coo::operator=(const sparse_coo & rhs) {
     tmp_data[i] = rhs.data[i];
   }
   
-  delete row_index;
-  delete col_index;
-  delete data;
+  delete[] row_index;
+  delete[] col_index;
+  delete[] data;
   
   rows = rhs.getRows();
   cols = rhs.getCols();
@@ -97,9 +97,9 @@ sparse_coo::sparse_coo(const sparse_csr & csr) {
 
 
 sparse_coo::~sparse_coo() {
-  delete[]row_index;
-  delete[]col_index;
-  delete[]data;
+  delete[] row_index;
+  delete[] col_index;
+  delete[] data;
 }
 
 void sparse_coo::init() {

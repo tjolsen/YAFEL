@@ -13,7 +13,7 @@ void VTKMesh::write(FILE *fp) {
   for(unsigned i=0; i < Mp->get_n_elems(); ++i) {
     Element *e = EFp->getElement(i);
     if(e != NULL)
-      nCells += 1;
+      ++nCells;
   }
   
   fprintf(fp, "%s\n", "<UnstructuredGrid>");
@@ -27,8 +27,8 @@ void VTKMesh::write(FILE *fp) {
   for(unsigned nodeNum=0; nodeNum < Mp->get_n_nodes(); ++nodeNum) {
     fprintf(fp, "%f %f %f\n",
 	    Mp->nodal_coords[nodeNum](0),
-	    Mp->nodal_coords[nodeNum](1),
-	    Mp->nodal_coords[nodeNum](2));
+	    ((Mp->nodal_coords[nodeNum]).getLength() >= 2) ? Mp->nodal_coords[nodeNum](1) : 0.0,
+	    ((Mp->nodal_coords[nodeNum]).getLength() >= 3) ? Mp->nodal_coords[nodeNum](2) : 0.0);
   }
   fprintf(fp, "</DataArray>\n");
   fprintf(fp, "</Points>\n");
