@@ -32,3 +32,6 @@
 
 #gmsh meshes
 *.msh
+
+#paraview (VTK) output files
+*.vtu

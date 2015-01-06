@@ -12,11 +12,14 @@ ElementFactory::ElementFactory(Mesh &M, int dofPerNode) :
   lq = new LinQuad(dof_per_node);
   ltri = new LinTri(dof_per_node);
   ltet = new LinTet(dof_per_node);
+  lline = new LinLine(dof_per_node);
 }
 
 ElementFactory::~ElementFactory() {
   delete lq;
   delete ltri;
+  delete ltet;
+  delete lline;
 }
 
 Element *ElementFactory::getElement(int elnum) {
@@ -24,7 +27,7 @@ Element *ElementFactory::getElement(int elnum) {
   int eltype = Mp->element_type[elnum];
   
   switch(eltype) {
-  case 1: break; //2-node line
+  case 1: return lline; //2-node line
   case 2: return ltri; //3-node triangle
   case 3: return lq; //4-node quad
   case 4: return ltet; // 4-node tetrahedron (will be implemented)

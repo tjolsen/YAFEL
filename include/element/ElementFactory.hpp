@@ -6,6 +6,7 @@
 #include "element/LinQuad.hpp"
 #include "element/LinTri.hpp"
 #include "element/LinTet.hpp"
+#include "element/LinLine.hpp"
 #include "mesh/Mesh.hpp"
 
 YAFEL_NAMESPACE_OPEN
@@ -17,6 +18,7 @@ private:
   LinQuad *lq;
   LinTri *ltri;
   LinTet *ltet;
+  LinLine *lline;
   int dof_per_node;
   int n_els;
   

@@ -79,7 +79,6 @@ void Truss2D::assemble() {
     for(unsigned i=0; i<nsd; ++i) {
       Cdir(i) = dx(i)/L;
     }
-    Cdir.print();
     
     FullMatrix Kloc(dof, dof, 0.0);
     Vector LoadVec(dof,0.0);
@@ -113,12 +112,10 @@ void Truss2D::assemble() {
       F(globaldof[A]) += LoadVec(A);
     }
     
-    Kloc.print();
   }
 
   Kcoo = Ksys_coo;
   Fsys = F;
-  //Kcoo.print_sparse();
   std::cout << "Assembly done!" << std::endl;
 }
 
@@ -149,11 +146,6 @@ void Truss2D::solve() {
     rhs(dof) = bcvals[i];
   }
 
-  FullMatrix Full(Ksys_nobc);
-  Full.print();
-  
-  rhs.print();
-  std::cout << std::endl;
   Vector u = cg_solve(Ksys_csr, rhs, Ubc);
   Usol = u;
 }
@@ -161,8 +153,24 @@ void Truss2D::solve() {
 
 void Truss2D::output() {
   
-  Usol.print();
+  std::vector<Vector> uout;
+  uout.clear();
   
+  for(int i=0; i<Usol.getLength(); i+=2) {
+    Vector v(2,0.0);
+    v(0) = Usol(i);
+    v(1) = Usol(i+1);
+    uout.push_back(v);
+  }
+  
+  ElementFactory EF(M, 2);
+  
+  VTKOutput VO;
+  VTKVectorData vtku(uout, VTKObject::VTKPOINTDATA, std::string("U"));
+  VTKMesh vtkm(EF);
+  VO.addVTKObject(&vtkm);
+  VO.addVTKObject(&vtku);
+  VO.write(OutputFilename.c_str());
 }
 
 
