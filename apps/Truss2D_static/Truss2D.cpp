@@ -60,10 +60,7 @@ void Truss2D::assemble() {
   
   for(unsigned elnum = 0; elnum < M.elements.size(); ++elnum) {
     
-    std::cout << elnum << std::endl;
-
     if(M.element_type[elnum] != 1) { //skip non-line elements
-      std::cout << "Skipping element " << elnum << std::endl;
       continue;
     }    
     
@@ -116,7 +113,7 @@ void Truss2D::assemble() {
 
   Kcoo = Ksys_coo;
   Fsys = F;
-  std::cout << "Assembly done!" << std::endl;
+
 }
 
 void Truss2D::solve() {

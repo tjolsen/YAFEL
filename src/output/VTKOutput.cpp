@@ -65,6 +65,8 @@ void VTKOutput::write(const char *fname) {
   fprintf(fp, "</VTKFile>");
 
   fclose(fp);
+  
+  fprintf(stdout, "VTK Output successfully written to %s\n", fname);
 }
 
 YAFEL_NAMESPACE_CLOSE
