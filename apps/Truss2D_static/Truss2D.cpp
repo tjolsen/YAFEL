@@ -5,9 +5,9 @@
 Truss2D::Truss2D(const char *Mfname, const char *outFname) :
 MeshFilename(Mfname), OutputFilename(outFname)
 {
-  Eyoungs = 1; // 200 GPa
-  Axsection = 1; //m^2
-  rho = 1; //density kg/m^3
+  Eyoungs = 2.0e11; // 200 GPa
+  Axsection = 1.0e-4; //m^2
+  rho = 8000; //density kg/m^3
 }
 
 void Truss2D::setup() {
@@ -37,7 +37,7 @@ void Truss2D::setup() {
       for(unsigned j=0; j<M.elements[i].size(); ++j) {
 	bcnodes.push_back(M.elements[i][j]);
 	bccomps.push_back(0);
-	bcvals.push_back(0.1);
+	bcvals.push_back(0);
 
 	bcnodes.push_back(M.elements[i][j]);
 	bccomps.push_back(1);
@@ -94,7 +94,7 @@ void Truss2D::assemble() {
 	Kloc(A,B) += factor*Cdir(acomp)*Cdir(bcomp)*Eyoungs*Axsection/L;
       }
       if(acomp == 1) {
-	//LoadVec(A) += -Grav*rho*L*Axsection/2;
+	LoadVec(A) += -Grav*rho*L*Axsection/2;
       }
     }
 
