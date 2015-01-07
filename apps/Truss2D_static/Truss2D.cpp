@@ -211,7 +211,7 @@ void Truss2D::run() {
   setup();
   assemble();
   solve();
-  //postprocess();
+  postprocess();
   output();
 
 }
