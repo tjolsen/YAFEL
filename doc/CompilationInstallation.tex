@@ -1,0 +1,10 @@
+\section{Compilation and Installation}
+Upon cloning the YAFEL repository, simply run the ``\texttt{compile.sh}'' script.
+This script simply appends a few lines to the end of your .bashrc file
+and exports an environment variable YAFELDIR, which is necessary to
+compile the library and is useful when linking against the library.
+Compiling the YAFEL library is trivially easy on Linux and Unix-like systems.
+The library is currently designed to compile using the GNU Make utility.
+There are a variety of parameters that can be modified, such as whether 
+to parallelize some linear algebra subroutines with openMP.
+These parameters are in the file ``\texttt{common.mk}'' in the YAFEL root directory.

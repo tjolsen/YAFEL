@@ -1,4 +1,4 @@
-subdirs = src apps #test
+subdirs = src apps doc
 
 include $(YAFELDIR)/common.mk
 

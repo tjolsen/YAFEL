@@ -14,13 +14,21 @@ CC = gcc
 #define archive utility
 AR = ar
 
-#compiling and linking flags
-CFLAGS = -O3 -c -march=native -Wall -I$(YAFELDIR)/include/
+#compiler optimization and linking flags
+CFLAGS = -O3 -march=native -Wall 
 LFLAGS = -L$(YAFELDIR)/lib/ -lyafel
 ARFLAGS = -ru
 
 #output library name
 LIB = libyafel.a
+
+
+#=================================================================
+# DON'T TOUCH ANYTHING BELOW HERE
+#=================================================================
+
+# These will always be necessary, so they're moved away from the configurable line
+CFLAGS += -c -I$(YAFELDIR)/include/
 
 ifeq ($(useOpenMP), true)
 	CFLAGS += -fopenmp
