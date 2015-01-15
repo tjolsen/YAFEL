@@ -3,7 +3,7 @@ useOpenMP = true
 
 #compile lin_alg routines in "optimized" mode:
 #  disables certain bounds checks
-linalg_optimized = true
+linalg_optimized = false
 
 #define C++ compiler
 CPP = g++
@@ -28,7 +28,7 @@ LIB = libyafel.a
 #=================================================================
 
 # These will always be necessary, so they're moved away from the configurable line
-CFLAGS += -c -I$(YAFELDIR)/include/
+CFLAGS += -c -I$(YAFELDIR)/include/ -std=c++11
 
 ifeq ($(useOpenMP), true)
 	CFLAGS += -fopenmp

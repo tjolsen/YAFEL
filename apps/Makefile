@@ -1,4 +1,4 @@
-subdirs = NS_1 Truss2D_static
+subdirs = NS_1 Truss2D_static PoissonSolver
 
 include $(YAFELDIR)/common.mk
 

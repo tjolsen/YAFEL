@@ -90,6 +90,7 @@ void Element::update_element(const Mesh &M, unsigned elnum) {
 
   calcJacobians();
   calcGrads();
+  calcVals();
 }
 
 

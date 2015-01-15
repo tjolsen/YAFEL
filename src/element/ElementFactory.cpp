@@ -22,7 +22,7 @@ ElementFactory::~ElementFactory() {
   delete lline;
 }
 
-Element *ElementFactory::getElement(int elnum) {
+Element *ElementFactory::getElement(unsigned elnum) {
   
   int eltype = Mp->element_type[elnum];
   
