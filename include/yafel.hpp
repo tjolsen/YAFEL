@@ -37,5 +37,6 @@
 #include "output/VTKVectorData.hpp"
 #include "output/VTKTensorData.hpp"
 #include "output/VTKMesh.hpp"
+#include "output/VTKTimeOutput.hpp"
 
 #endif

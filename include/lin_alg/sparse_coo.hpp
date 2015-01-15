@@ -39,10 +39,10 @@ public:
   sparse_coo(const sparse_csr & csr);
   ~sparse_coo();
   sparse_coo & operator=(const sparse_coo &rhs);
-  int getRows() const {return rows;}
-  int getCols() const {return cols;}
-  int getSize() const {return size;}
-  bool isSquare() const {return rows==cols;}
+  inline int getRows() const {return rows;}
+  inline int getCols() const {return cols;}
+  inline int getSize() const {return size;}
+  inline bool isSquare() const {return rows==cols;}
   int nnz();
   void add(int row, int col, double val);
   void sort();

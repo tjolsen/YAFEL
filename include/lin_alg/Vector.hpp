@@ -29,7 +29,7 @@ public:
   Vector operator*(double a) const; 
   void append(double val);
   double dot(const Vector & rhs) const;
-  int getLength() const {return length;}
+  inline int getLength() const {return length;}
   void print();
 };
 

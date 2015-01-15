@@ -24,9 +24,18 @@ void VTKOutput::addVTKObject(VTKObject *VO) {
   }
 }
 
-void VTKOutput::write(const char *fname) {
+void VTKOutput::clearData() {
+  pointData.clear();
+  cellData.clear();
+}
+
+void VTKOutput::clearMesh() {
+  vtkmesh = NULL;
+}
+
+void VTKOutput::write(const std::string &fname) {
   
-  FILE *fp = fopen(fname, "w");
+  FILE *fp = fopen(fname.c_str(), "w");
   if(fp == NULL) {
     perror("VTKOutput::write() : Could not open file.");
     exit(1);
@@ -66,7 +75,7 @@ void VTKOutput::write(const char *fname) {
 
   fclose(fp);
   
-  fprintf(stdout, "VTK Output successfully written to %s\n", fname);
+  fprintf(stdout, "VTK Output successfully written to %s\n", fname.c_str());
 }
 
 YAFEL_NAMESPACE_CLOSE

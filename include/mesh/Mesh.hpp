@@ -23,6 +23,7 @@ class Mesh {
 private:
   unsigned n_elems;
   unsigned n_nodes;
+  double minLength;
   
   public:
   std::vector< Vector > nodal_coords;
@@ -42,9 +43,11 @@ private:
        const std::vector<int> & eltype,
        const std::vector<std::vector<int> > & _tags);
   
+  void compute_min_length();
+
   inline unsigned get_n_nodes() {return this->n_nodes;}
   inline unsigned get_n_elems() {return this->n_elems;}
-  
+  inline double get_minLength() {return this->minLength;}
   // copy ctor -- use default
   //Mesh(const Mesh & m_in);
 

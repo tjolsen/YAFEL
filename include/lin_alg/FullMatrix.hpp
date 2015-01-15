@@ -36,8 +36,8 @@ public:
   FullMatrix &operator-=(const FullMatrix &rhs);
   FullMatrix operator-(const FullMatrix &rhs) const;
   Vector operator*(const Vector & rhs) const;
-  int getRows() const { return (!transposed) ? rows : cols; }
-  int getCols() const { return (!transposed) ? cols : rows; }
+  inline int getRows() const { return (!transposed) ? rows : cols; }
+  inline int getCols() const { return (!transposed) ? cols : rows; }
   double det() const;
   FullMatrix getTransposed() const;
   FullMatrix getInverse() const;

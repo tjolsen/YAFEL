@@ -26,8 +26,8 @@ public:
   sparse_csr(const sparse_csr & src);
   ~sparse_csr();
   void init_from_coo(sparse_coo & src);
-  int getRows() const {return rows;}
-  int getCols() const {return cols;}
+  inline int getRows() const {return rows;}
+  inline int getCols() const {return cols;}
   int getNNZ() const { return nnz;}
   double operator()(int i, int j, bool & flag) const;
   double operator()(int i, int j) const;

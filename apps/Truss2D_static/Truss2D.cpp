@@ -201,7 +201,7 @@ void Truss2D::output() {
   VO.addVTKObject(&vtkm);
   VO.addVTKObject(&vtku);
   VO.addVTKObject(&vtkstress);
-  VO.write(OutputFilename.c_str());
+  VO.write(OutputFilename);
 
 }
 

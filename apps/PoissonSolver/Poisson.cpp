@@ -132,7 +132,7 @@ void Poisson::output(const std::string & outputFilename) {
   vo.addVTKObject(&vtkm);
   vo.addVTKObject(&vtku);
   
-  vo.write(outputFilename.c_str());
+  vo.write(outputFilename);
 }
 
 void Poisson::run(const std::string & outputFilename) {
