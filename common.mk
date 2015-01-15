@@ -3,7 +3,7 @@ useOpenMP = true
 
 #compile lin_alg routines in "optimized" mode:
 #  disables certain bounds checks
-linalg_optimized = false
+linalg_optimized = true
 
 #define C++ compiler
 CPP = g++

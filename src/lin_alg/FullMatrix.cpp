@@ -84,6 +84,7 @@ inline int FullMatrix::indexOf(int i, int j) const {
 }
 
 double & FullMatrix::operator()(int i, int j) const {
+#ifndef _OPTIMIZED
   if ( i<0 || i>=rows) {
     printf("Attempted to index out of bounds: rows\n");
     exit(1);
@@ -92,21 +93,21 @@ double & FullMatrix::operator()(int i, int j) const {
     printf("Attempted to index out of bounds: cols\n");
     exit(1);
   }
+#endif
 
-  int idx;
-  idx = indexOf(i,j);
-
-  return data[idx];
+  return data[indexOf(i,j)];
 }
 
 FullMatrix FullMatrix::operator*(const FullMatrix & rhs) const {
 
+#ifndef _OPTIMIZED
   if(cols != rhs.rows) {
     printf("FullMatrix::operator* dimension mismatch\n");
     printf("\tlhs\trows = %d\n\t\tcols = %d\n", rows, cols);
     printf("\trhs\trows = %d\n\t\tcols = %d\n", rhs.rows, rhs.cols);
     exit(1);
   }
+#endif
 
   FullMatrix ret_mat(rows, rhs.cols, 0.0);
   
@@ -122,14 +123,16 @@ FullMatrix FullMatrix::operator*(const FullMatrix & rhs) const {
 }
 
 FullMatrix &FullMatrix::operator+=(const FullMatrix &rhs)  {
-  
+
+#ifndef _OPTIMIZED  
   if(getRows() != rhs.rows || getCols() != rhs.cols) {
     printf("FullMatrix::operator+= dimension mismatch\n");
     printf("\tlhs\trows = %d\n\t\tcols = %d\n", rows, cols);
     printf("\trhs\trows = %d\n\t\tcols = %d\n", rhs.rows, rhs.cols);
     exit(1);
   }
-  
+#endif
+
   for(int i=0; i<getRows(); ++i) {
     for(int j=0; j<getCols(); ++j) {
       (*this)(i,j) += rhs(i,j);
@@ -141,6 +144,15 @@ FullMatrix &FullMatrix::operator+=(const FullMatrix &rhs)  {
 
 FullMatrix FullMatrix::operator+(const FullMatrix &rhs) const {
 
+#ifndef _OPTIMIZED  
+  if(getRows() != rhs.rows || getCols() != rhs.cols) {
+    printf("FullMatrix::operator+ dimension mismatch\n");
+    printf("\tlhs\trows = %d\n\t\tcols = %d\n", rows, cols);
+    printf("\trhs\trows = %d\n\t\tcols = %d\n", rhs.rows, rhs.cols);
+    exit(1);
+  }
+#endif
+
   FullMatrix ret_mat(*this);
   ret_mat += rhs;
 
@@ -148,13 +160,15 @@ FullMatrix FullMatrix::operator+(const FullMatrix &rhs) const {
 }
 
 FullMatrix &FullMatrix::operator-=(const FullMatrix &rhs) {
-  
+
+#ifndef _OPTIMIZED  
   if(rows != rhs.rows || cols != rhs.cols) {
     printf("FullMatrix::operator-= dimension mismatch\n");
     printf("\tlhs\trows = %d\n\t\tcols = %d\n", rows, cols);
     printf("\trhs\trows = %d\n\t\tcols = %d\n", rhs.rows, rhs.cols);
     exit(1);
   }
+#endif
   
   for(int i=0; i<getRows(); ++i) {
     for(int j=0; j<getCols(); ++j) {
@@ -166,6 +180,15 @@ FullMatrix &FullMatrix::operator-=(const FullMatrix &rhs) {
 }
 
 FullMatrix FullMatrix::operator-(const FullMatrix &rhs) const {
+#ifndef _OPTIMIZED  
+  if(rows != rhs.rows || cols != rhs.cols) {
+    printf("FullMatrix::operator- dimension mismatch\n");
+    printf("\tlhs\trows = %d\n\t\tcols = %d\n", rows, cols);
+    printf("\trhs\trows = %d\n\t\tcols = %d\n", rhs.rows, rhs.cols);
+    exit(1);
+  }
+#endif
+
 
   FullMatrix ret_mat(*this);
   ret_mat -= rhs;
@@ -174,10 +197,12 @@ FullMatrix FullMatrix::operator-(const FullMatrix &rhs) const {
 }
 
 Vector FullMatrix::operator*(const Vector & rhs) const {
+#ifndef _OPTIMIZED
   if(cols != rhs.getLength()) {
     perror("FullMatrix::operator*(const Vector&) dimension mismatch");
     exit(1);
   }
+#endif
 
   Vector ret_vec(rows, 0.0);
   
@@ -208,11 +233,13 @@ FullMatrix FullMatrix::getTransposed() const {
 }
 
 FullMatrix FullMatrix::getInverse() const {
-  
+
+#ifndef _OPTIMIZED  
   if(rows != cols) {
     perror("FullMatrix::getInverse() : must be square matrix");
     exit(1);
   }
+#endif
   
   if(rows == 2) {
     return inverse2x2();
@@ -244,10 +271,12 @@ FullMatrix FullMatrix::getInverse() const {
 
 double FullMatrix::det() const {
 
+#ifndef _OPTIMIZED
   if(getRows() != getCols()) {
     perror("FullMatrix::det() : must be square matrix");
     exit(1);
   }
+#endif
 
   if(getRows() == 2) {
     return (*this)(0,0)*(*this)(1,1) - (*this)(1,0)*(*this)(0,1);
@@ -273,10 +302,10 @@ double FullMatrix::det() const {
 FullMatrix FullMatrix::inverse2x2() const {
   
   double a,b,c,d;
-  a = this->operator()(0,0);
-  b = this->operator()(0,1);
-  c = this->operator()(1,0);
-  d = this->operator()(1,1);
+  a = (*this)(0,0);
+  b = (*this)(0,1);
+  c = (*this)(1,0);
+  d = (*this)(1,1);
 
   double detA = a*d - b*c;
 
@@ -322,27 +351,31 @@ FullMatrix FullMatrix::inverse3x3() const {
 
 
 Vector FullMatrix::slice_col(int col) const {
+#ifndef _OPTIMIZED
   if( (col<0) || (col>=cols)) {
     perror("FullMatrix::slice_col() index out of bounds");
     exit(1);
   }
+#endif
 
   Vector ret_vec(rows, 0.0);
   for(int i=0; i<rows; ++i) {
-    ret_vec(i) = this->operator()(i, col);
+    ret_vec(i) = (*this)(i, col);
   }
   return ret_vec;
 }
 
 Vector FullMatrix::slice_row(int row) const {
+#ifndef _OPTIMIZED
   if( (row<0) || (row>=rows)) {
     perror("FullMatrix::slice_row() index out of bounds");
     exit(1);
   }
+#endif
 
   Vector ret_vec(cols, 0.0);
   for(int i=0; i<cols; ++i) {
-    ret_vec(i) = this->operator()(row, i);
+    ret_vec(i) = (*this)(row, i);
   }
   return ret_vec;
 }

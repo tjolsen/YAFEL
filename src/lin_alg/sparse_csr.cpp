@@ -215,67 +215,19 @@ Vector sparse_csr::slice_row(int row) const {
 
 void sparse_csr::zero_col(int col_to_del) {
 
-  //changing implementation so that it does not modify
-  // sparsity structure of sparse matrix.
-  //Don't want this behavior when applying BC's in FEM.
-
   for(int i=0; i<nnz; ++i) {
     if(col_index[i] == col_to_del)
       data[i] = 0.0;
   }
 
-  /*  
-  sparse_coo coo(this->getRows(), this->getCols());
-  
-  for(int row=0; row<getRows(); ++row) {
-
-    for(int i=row_ptr[row]; i<row_ptr[row+1]; ++i) {
-      int col = col_index[i];
-      if(col == col_to_del) {
-	continue;
-      }
-      coo.add(row, col, data[i]);
-    }
-  }
-  
-  delete[] row_ptr;
-  delete[] col_index;
-  delete[] data;
-  
-  init_from_coo(coo);
-  */
 }
 
 void sparse_csr::zero_row(int row_to_del) {
 
-  //changing implementation so that it does not modify
-  // sparsity structure of sparse matrix.
-  //Don't want this behavior when applying BC's in FEM.
   for(int i=row_ptr[row_to_del]; i<row_ptr[row_to_del+1]; ++i) {
     data[i] = 0.0;
   }
   
-  /*  
-  sparse_coo coo(this->getRows(), this->getCols());
-  
-  for(int row=0; row<getRows(); ++row) {
-    if(row == row_to_del) {
-      continue;
-    }
-
-    for(int i=row_ptr[row]; i<row_ptr[row+1]; ++i) {
-      int col = col_index[i];
-
-      coo.add(row, col, data[i]);
-    }
-  }
-  
-  delete[] row_ptr;
-  delete[] col_index;
-  delete[] data;
-  
-  init_from_coo(coo);
-  */
 }
 
 void sparse_csr::assign(int row, int col, double val) {

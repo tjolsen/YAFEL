@@ -102,7 +102,7 @@ Vector operator*(double a, const Vector & rhs) {
 Vector & Vector::operator+=(const Vector & rhs) {
 #ifndef _OPTIMIZED
   if(length != rhs.getLength()) {
-    perror("operator+= length mismatch");
+    perror("Vector::operator+= length mismatch");
     exit(1);
   }
 #endif
@@ -116,11 +116,13 @@ Vector & Vector::operator+=(const Vector & rhs) {
 }
 
 Vector Vector::operator+(const Vector & rhs) const {
+#ifndef _OPTIMIZED
   if(length != rhs.getLength()) {
-    perror("operator+ length mismatch");
+    perror("Vector::operator+ length mismatch");
     exit(1);
   }
-  
+#endif  
+
   Vector ret(*this);
   ret += rhs;
 
@@ -128,6 +130,13 @@ Vector Vector::operator+(const Vector & rhs) const {
 }
 
 Vector Vector::operator-(const Vector & rhs) const {
+#ifndef _OPTIMIZED
+  if(length != rhs.getLength()) {
+    perror("Vector::operator- length mismatch");
+    exit(1);
+  }
+#endif  
+
   return *this + rhs*(-1);
 }
 
