@@ -8,7 +8,7 @@ YAFEL_NAMESPACE_OPEN
 Vector pcg_solve(const sparse_csr & A, const Vector &rhs, const Vector &x0) {
   // Uses inverse of diag(A) matrix to precondition system
   sparse_coo Dinv_coo;
-  for(int i=0; i<A.getRows(); ++i) {
+  for(unsigned i=0; i<A.getRows(); ++i) {
     Dinv_coo.add(i,i, 1.0/A(i,i));
   }
   
@@ -35,7 +35,7 @@ Vector cg_solve(const sparse_csr & A, const Vector & rhs, const Vector &x0) {
     return x;
   }
   
-  int k = 0;
+  unsigned k = 0;
   while( k < x.getLength()*2) {
     Vector Ap = A*p;
     double alpha = rTr_old/p.dot(Ap);
@@ -74,7 +74,7 @@ Vector cg_solve(const FullMatrix & A, const Vector & rhs) {
   
   double rTr_old = r.dot(r);
   
-  int k = 0;
+  unsigned k = 0;
   while( k < x.getLength()*2) {
     Vector Ap = A*p;
     double alpha = rTr_old/p.dot(Ap);

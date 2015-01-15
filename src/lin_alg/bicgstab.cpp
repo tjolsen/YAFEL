@@ -14,7 +14,7 @@ Vector bicgstab(const sparse_csr & A, const Vector & rhs) {
   
   double rho_old, rho_new, alpha, w_old, w_new;
   
-  int conv_check_freq = std::max(1, rhs.getLength()/100);
+  unsigned conv_check_freq = std::max((unsigned)1, rhs.getLength()/100);
   
   double residual_0 = rhs.dot(rhs);
   
@@ -22,7 +22,7 @@ Vector bicgstab(const sparse_csr & A, const Vector & rhs) {
   alpha= 1.0;
   w_old = 1.0;
   
-  int k=0;
+  unsigned k=0;
   while(true) {
     rho_new = rhat.dot(r_old);
     

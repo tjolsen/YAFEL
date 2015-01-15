@@ -6,13 +6,13 @@ sparse_coo::sparse_coo() {
   init();
 }
 
-sparse_coo::sparse_coo(int n) {
+sparse_coo::sparse_coo(unsigned n) {
   init();
   rows = n;
   cols = n;
 }
 
-sparse_coo::sparse_coo(int m, int n) {
+sparse_coo::sparse_coo(unsigned m, unsigned n) {
   init();
   rows = m;
   cols = n;
@@ -20,11 +20,11 @@ sparse_coo::sparse_coo(int m, int n) {
 
 sparse_coo::sparse_coo(const sparse_coo & src) {
   
-  row_index = new int[src.getSize()];
-  col_index = new int[src.getSize()];
+  row_index = new unsigned[src.getSize()];
+  col_index = new unsigned[src.getSize()];
   data = new double[src.getSize()];
   
-  for(int i=0; i<src.getSize(); i++) {
+  for(unsigned i=0; i<src.getSize(); i++) {
     row_index[i] = src.row_index[i];
     col_index[i] = src.col_index[i];
     data[i] = src.data[i];
@@ -45,15 +45,15 @@ sparse_coo & sparse_coo::operator=(const sparse_coo & rhs) {
     return *this;
   }
   
-  int *tmp_ri, *tmp_ci;
+  unsigned *tmp_ri, *tmp_ci;
   double *tmp_data;
-  int sz = rhs.getSize();
+  unsigned sz = rhs.getSize();
   
-  tmp_ri = new int[sz];
-  tmp_ci = new int[sz];
+  tmp_ri = new unsigned[sz];
+  tmp_ci = new unsigned[sz];
   tmp_data = new double[sz];
   
-  for(int i=0; i<sz; ++i) {
+  for(unsigned i=0; i<sz; ++i) {
     tmp_ri[i] = rhs.row_index[i];
     tmp_ci[i] = rhs.col_index[i];
     tmp_data[i] = rhs.data[i];
@@ -84,9 +84,9 @@ sparse_coo::sparse_coo(const sparse_csr & csr) {
   rows = csr.getRows();
   cols = csr.getCols();
 
-  for(int row=0; row<rows; ++row) {
-    for(int k=csr.row_ptr[row]; k<csr.row_ptr[row+1]; ++k) {
-      int col = csr.col_index[k];
+  for(unsigned row=0; row<rows; ++row) {
+    for(unsigned k=csr.row_ptr[row]; k<csr.row_ptr[row+1]; ++k) {
+      unsigned col = csr.col_index[k];
       double val = csr.data[k];
       
       this->add(row, col, val);
@@ -103,8 +103,8 @@ sparse_coo::~sparse_coo() {
 }
 
 void sparse_coo::init() {
-  row_index = new int[default_capacity];
-  col_index = new int[default_capacity];
+  row_index = new unsigned[default_capacity];
+  col_index = new unsigned[default_capacity];
   data  = new double[default_capacity];
   rows = 0;
   cols = 0;
@@ -115,7 +115,7 @@ void sparse_coo::init() {
   oldNNZ = 0;
 }
 
-int sparse_coo::nnz() {
+unsigned sparse_coo::nnz() {
   
   if(consistentNNZ) {
     return oldNNZ;
@@ -124,8 +124,8 @@ int sparse_coo::nnz() {
   consistentNNZ = true;
   sort();
 
-  int NNZ = (size!=0) ? 1 : 0;
-  for(int i = 1; i<size; i++) {
+  unsigned NNZ = (size!=0) ? 1 : 0;
+  for(unsigned i = 1; i<size; i++) {
     if (!( (row_index[i]==row_index[i-1]) &&
 	   (col_index[i]==col_index[i-1])) ) {
 	++NNZ;
@@ -136,7 +136,7 @@ int sparse_coo::nnz() {
   return NNZ;
 }
 
-void sparse_coo::add(int row, int col, double value) {
+void sparse_coo::add(unsigned row, unsigned col, double value) {
   //track consistency of matrix state
   isSorted = false;
   consistentNNZ = false;
@@ -151,14 +151,14 @@ void sparse_coo::add(int row, int col, double value) {
   
   //memory management
   if(size==capacity) {
-    int *tmp_row = row_index;
-    int *tmp_col = col_index;
+    unsigned *tmp_row = row_index;
+    unsigned *tmp_col = col_index;
     double *tmp_data = data;
     
-    row_index = new int[2*capacity];
-    col_index = new int[2*capacity];
+    row_index = new unsigned[2*capacity];
+    col_index = new unsigned[2*capacity];
     data = new double[2*capacity];
-    for(int i=0; i<size; i++) {
+    for(unsigned i=0; i<size; i++) {
       row_index[i] = tmp_row[i];
       col_index[i] = tmp_col[i];
       data[i] = tmp_data[i];
@@ -181,8 +181,8 @@ void sparse_coo::sort() {
     return;
   }
   isSorted = true;
-  int *Brow = new int[size];
-  int *Bcol = new int[size];
+  unsigned *Brow = new unsigned[size];
+  unsigned *Bcol = new unsigned[size];
   double *Bval = new double[size];
   
   mergeSort(0, size-1, Brow, Bcol, Bval); 
@@ -193,31 +193,31 @@ void sparse_coo::sort() {
   
 }
 
-void sparse_coo::mergeSort(int start, int end, int *Brow, int *Bcol, double *Bval) {
+void sparse_coo::mergeSort(unsigned start, unsigned end, unsigned *Brow, unsigned *Bcol, double *Bval) {
   
   if(end-start < INSERTION_SORT_THRESHOLD) {
     insertionSort(start, end);
     return;
   }
   
-  int middle = start + (end-start)/2;
+  unsigned middle = start + (end-start)/2;
   
   mergeSort(start, middle, Brow, Bcol, Bval);
   mergeSort(middle+1, end, Brow, Bcol, Bval);
   merge(start, middle, end, Brow, Bcol, Bval);
   
-  for(int i=start; i<=end; i++) {
+  for(unsigned i=start; i<=end; i++) {
     row_index[i] = Brow[i];
     col_index[i] = Bcol[i];
     data[i] = Bval[i];
   }
 }
 
-void sparse_coo::merge(int start, int middle, int end, int *Brow, int *Bcol, double *Bval) {
-  int i0 = start;
-  int i1 = middle+1;
+void sparse_coo::merge(unsigned start, unsigned middle, unsigned end, unsigned *Brow, unsigned *Bcol, double *Bval) {
+  unsigned i0 = start;
+  unsigned i1 = middle+1;
 
-  for(int j=start; j<=end; j++) {
+  for(unsigned j=start; j<=end; j++) {
     if(i0 <= middle &&
        (i1>end || row_index[i0]<row_index[i1] ||
 	(row_index[i0]==row_index[i1] && col_index[i0]<col_index[i1]))) {
@@ -237,15 +237,15 @@ void sparse_coo::merge(int start, int middle, int end, int *Brow, int *Bcol, dou
 
 }
 
-void sparse_coo::insertionSort(int start, int end) { 
+void sparse_coo::insertionSort(unsigned start, unsigned end) { 
 
-  for(int i=start; i<=end; i++) {
-    int newRow = row_index[i];
-    int newCol = col_index[i];
+  for(unsigned i=start; i<=end; i++) {
+    unsigned newRow = row_index[i];
+    unsigned newCol = col_index[i];
     double newVal = data[i];
-    int holePos = start;
+    unsigned holePos = start;
 
-    for(int j=i; j> start; j--) {
+    for(unsigned j=i; j> start; j--) {
       if(newRow < row_index[j-1] && j > start) {
 	continue;
       }
@@ -258,7 +258,7 @@ void sparse_coo::insertionSort(int start, int end) {
       }
     }
     
-    for(int j=i; j>holePos; j--) {
+    for(unsigned j=i; j>holePos; j--) {
       row_index[j] = row_index[j-1];
       col_index[j] = col_index[j-1];
       data[j] = data[j-1];
@@ -272,21 +272,21 @@ void sparse_coo::insertionSort(int start, int end) {
 
 void sparse_coo::compress() {
   
-  int compressed_size = nnz();
+  unsigned compressed_size = nnz();
   
-  int *temp_row_index = row_index;
-  int *temp_col_index = col_index;
+  unsigned *temp_row_index = row_index;
+  unsigned *temp_col_index = col_index;
   double *temp_data = data;
   
-  row_index = new int[compressed_size];
-  col_index = new int[compressed_size];
+  row_index = new unsigned[compressed_size];
+  col_index = new unsigned[compressed_size];
   data = new double[compressed_size];
   
-  int comp_i = 0;
+  unsigned comp_i = 0;
   row_index[0] = temp_row_index[0];
   col_index[0] = temp_col_index[0];
   data[0] = temp_data[0];
-  for(int i=1; i<size; ++i) {
+  for(unsigned i=1; i<size; ++i) {
     if( (temp_row_index[i]==temp_row_index[i-1]) &&
 	(temp_col_index[i]==temp_col_index[i-1]) ) {
       data[comp_i] += temp_data[i];      
@@ -312,7 +312,7 @@ void sparse_coo::compress() {
 }
 
 void sparse_coo::print_sparse() {
-  for(int i=0; i<size; i++) {
+  for(unsigned i=0; i<size; i++) {
     printf("(%d,\t%d,\t%f)\n", row_index[i], col_index[i], data[i]);
   }
 }
@@ -323,8 +323,8 @@ void sparse_coo::load_from_file(const char *fname) {
   delete[] col_index;
   delete[] data;
 
-  row_index = new int[10];
-  col_index = new int[10];
+  row_index = new unsigned[10];
+  col_index = new unsigned[10];
   data = new double[10];
   
   size = 0;
@@ -341,9 +341,9 @@ void sparse_coo::load_from_file(const char *fname) {
   //fscanf(f, "%d, %d", &rows, &cols);
 
   while (true) {
-    int nextRow, nextCol;
+    unsigned nextRow, nextCol;
     double nextVal;
-    int n = fscanf(f, "%d, %d, %lf", &nextRow, &nextCol, &nextVal);
+    unsigned n = fscanf(f, "%d, %d, %lf", &nextRow, &nextCol, &nextVal);
     if(n != 3 || feof(f)) {
       break;
     }

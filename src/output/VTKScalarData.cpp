@@ -11,7 +11,7 @@ VTKScalarData::VTKScalarData(const Vector &d, VTKObject::VTKObjectType ot, const
 {
   
   data.resize(d.getLength());
-  for(int i=0; i<d.getLength(); ++i) {
+  for(unsigned i=0; i<d.getLength(); ++i) {
     data[i] = d(i);
   }
   

@@ -13,11 +13,11 @@ class sparse_csr {
   friend class sparse_coo;
   
 private:
-  int rows;
-  int cols;
-  int nnz;
-  int *row_ptr;
-  int *col_index;
+  unsigned rows;
+  unsigned cols;
+  unsigned nnz;
+  unsigned *row_ptr;
+  unsigned *col_index;
   double *data;
   
   
@@ -26,18 +26,19 @@ public:
   sparse_csr(const sparse_csr & src);
   ~sparse_csr();
   void init_from_coo(sparse_coo & src);
-  inline int getRows() const {return rows;}
-  inline int getCols() const {return cols;}
-  int getNNZ() const { return nnz;}
-  double operator()(int i, int j, bool & flag) const;
-  double operator()(int i, int j) const;
+  inline unsigned getRows() const {return rows;}
+  inline unsigned getCols() const {return cols;}
+  inline unsigned getNNZ() const { return nnz;}
+  double operator()(unsigned i, unsigned j, bool & flag) const;
+  double operator()(unsigned i, unsigned j) const;
+  sparse_csr & operator*=(double a);
   sparse_csr operator*(const sparse_csr & rhs) const;
   Vector operator*(const Vector & rhs) const;
-  Vector slice_col(int col) const;
-  Vector slice_row(int row) const;
-  void zero_col(int col);
-  void zero_row(int row);
-  void assign(int row, int col, double val);
+  Vector slice_col(unsigned col) const;
+  Vector slice_row(unsigned row) const;
+  void zero_col(unsigned col);
+  void zero_row(unsigned row);
+  void assign(unsigned row, unsigned col, double val);
   void print_sparse();
 };
 

@@ -184,7 +184,7 @@ void Truss2D::output() {
   std::vector<Vector> uout;
   uout.clear();
   
-  for(int i=0; i<Usol.getLength(); i+=2) {
+  for(unsigned i=0; i<Usol.getLength(); i+=2) {
     Vector v(2,0.0);
     v(0) = Usol(i);
     v(1) = Usol(i+1);

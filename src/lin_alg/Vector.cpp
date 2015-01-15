@@ -10,17 +10,17 @@ Vector::Vector() {
   length = 0;
 }
 
-Vector::Vector(int len) {
+Vector::Vector(unsigned len) {
   data = new double[len];
   capacity = len;
   length = len;
 }
 
-Vector::Vector(int len, double val) {
+Vector::Vector(unsigned len, double val) {
   data = new double[len];
   capacity = len;
   length = len;
-  for(int i=0; i<length; ++i) {
+  for(unsigned i=0; i<length; ++i) {
     data[i] = val;
   }
 }
@@ -29,7 +29,7 @@ Vector::Vector(const Vector & src) {
   length = src.length;
   capacity = src.capacity;
   data = new double[capacity];
-  for(int i=0; i<length; ++i) {
+  for(unsigned i=0; i<length; ++i) {
     data[i] = src.data[i];
   }
 }
@@ -45,7 +45,7 @@ Vector & Vector::operator=(const Vector & rhs) {
   }
   
   double *temp_data = new double[rhs.getLength()];
-  for(int i=0; i<rhs.getLength(); ++i) {
+  for(unsigned i=0; i<rhs.getLength(); ++i) {
     temp_data[i] = rhs(i);
   }
   
@@ -59,7 +59,7 @@ Vector & Vector::operator=(const Vector & rhs) {
 }
 
 
-double& Vector::operator()(int i) const {
+double& Vector::operator()(unsigned i) const {
 #ifndef _OPTIMIZED
   if(i >= length || i<0) {
     printf("Attempted to index outside of vector\n");
@@ -81,7 +81,7 @@ void Vector::append(double val) {
 Vector & Vector::operator*=(double a) {
 
 #pragma omp for  
-  for(int i=0; i<length; ++i) {
+  for(unsigned i=0; i<length; ++i) {
     data[i] *= a;
   }
   return *this;
@@ -108,7 +108,7 @@ Vector & Vector::operator+=(const Vector & rhs) {
 #endif
 
 #pragma omp for
-  for(int i=0; i<length; ++i) {
+  for(unsigned i=0; i<length; ++i) {
     data[i] += rhs(i);
   }
   
@@ -144,7 +144,7 @@ void Vector::resize() {
   
   double *temp = data;
   data = new double[2*capacity];
-  for(int i=0; i<length; ++i) {
+  for(unsigned i=0; i<length; ++i) {
     data[i] = temp[i];
   }
   capacity *= 2;
@@ -162,7 +162,7 @@ double Vector::dot(const Vector & rhs) const {
   double retval = 0.0;
 
 #pragma omp parallel for reduction(+:retval)
-  for(int i=0; i<length; ++i) {
+  for(unsigned i=0; i<length; ++i) {
     retval += data[i]*rhs(i);
   }
   
@@ -171,7 +171,7 @@ double Vector::dot(const Vector & rhs) const {
 
 void Vector::print() {
   
-  for(int i=0; i<length; ++i) {
+  for(unsigned i=0; i<length; ++i) {
     printf("%f\n", data[i]);
   }
   

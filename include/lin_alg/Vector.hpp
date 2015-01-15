@@ -8,20 +8,20 @@ YAFEL_NAMESPACE_OPEN
 class Vector {
   
 private:
-  static const int default_capacity = 10;
-  int length;
-  int capacity;
+  static const unsigned default_capacity = 10;
+  unsigned length;
+  unsigned capacity;
   double *data;
   void resize();
   
 public:
   Vector();
-  Vector(int len);
-  Vector(int len, double val);
+  Vector(unsigned len);
+  Vector(unsigned len, double val);
   Vector(const Vector & src);
   ~Vector();
   Vector & operator=(const Vector & rhs);
-  double & operator()(int i) const;
+  double & operator()(unsigned i) const;
   Vector& operator+=(const Vector & rhs);
   Vector operator+(const Vector & rhs) const;
   Vector operator-(const Vector & rhs) const;
@@ -29,7 +29,7 @@ public:
   Vector operator*(double a) const; 
   void append(double val);
   double dot(const Vector & rhs) const;
-  inline int getLength() const {return length;}
+  inline unsigned getLength() const {return length;}
   void print();
 };
 

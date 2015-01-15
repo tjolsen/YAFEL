@@ -5,42 +5,42 @@
 
 YAFEL_NAMESPACE_OPEN
 
-FullMatrix::FullMatrix(int m, int n) {
+FullMatrix::FullMatrix(unsigned m, unsigned n) {
   rows = m;
   cols = n;
   transposed = false;
   data = new double[m*n];
-  for(int i=0; i<m*n; ++i) {
+  for(unsigned i=0; i<m*n; ++i) {
     data[i] = 0.0;
   }
 }
 
-FullMatrix::FullMatrix(int m, int n, double val) {
+FullMatrix::FullMatrix(unsigned m, unsigned n, double val) {
   rows = m;
   cols = n;
   transposed = false;
   data = new double[m*n];
-  for(int i=0; i<m*n; ++i) {
+  for(unsigned i=0; i<m*n; ++i) {
     data[i] = val;
   }
 }
 
-FullMatrix::FullMatrix(int n) {
+FullMatrix::FullMatrix(unsigned n) {
   rows = n;
   cols = n;
   transposed = false;
   data = new double[n*n];
-  for(int i=0; i<n*n; ++i) {
+  for(unsigned i=0; i<n*n; ++i) {
     data[i] = 0.0;
   }
 }
 
-FullMatrix::FullMatrix(int n, double val) {
+FullMatrix::FullMatrix(unsigned n, double val) {
   rows = n;
   cols = n;
   transposed = false;
   data = new double[n*n];
-  for(int i=0; i<n*n; ++i) {
+  for(unsigned i=0; i<n*n; ++i) {
     data[i] = val;
   }
 }
@@ -51,7 +51,7 @@ FullMatrix::FullMatrix(const FullMatrix & src) {
   data = new double[rows*cols];
   transposed = src.transposed;
 
-  for(int i=0; i<rows*cols; ++i) {
+  for(unsigned i=0; i<rows*cols; ++i) {
     data[i] = src.data[i];
   }
 }
@@ -62,8 +62,8 @@ FullMatrix::FullMatrix(const sparse_csr & csr) {
   this->transposed = false;
   data = new double[rows*cols];
   
-  for(int i=0; i<getRows(); ++i) {
-    for(int j=0; j<getCols(); ++j) {
+  for(unsigned i=0; i<getRows(); ++i) {
+    for(unsigned j=0; j<getCols(); ++j) {
       this->operator()(i,j) = csr(i,j);
     }
   }
@@ -74,7 +74,7 @@ FullMatrix::~FullMatrix() {
   delete[] data;
 }
 
-inline int FullMatrix::indexOf(int i, int j) const {
+inline unsigned FullMatrix::indexOf(unsigned i, unsigned j) const {
   if(!transposed) {
     return i*cols + j;
   }
@@ -83,7 +83,7 @@ inline int FullMatrix::indexOf(int i, int j) const {
   }
 }
 
-double & FullMatrix::operator()(int i, int j) const {
+double & FullMatrix::operator()(unsigned i, unsigned j) const {
 #ifndef _OPTIMIZED
   if ( i<0 || i>=rows) {
     printf("Attempted to index out of bounds: rows\n");
@@ -111,9 +111,9 @@ FullMatrix FullMatrix::operator*(const FullMatrix & rhs) const {
 
   FullMatrix ret_mat(rows, rhs.cols, 0.0);
   
-  for(int i=0; i<getRows(); ++i) {
-    for(int j=0; j<rhs.getCols(); ++j) {
-      for(int k=0; k<cols; ++k) {
+  for(unsigned i=0; i<getRows(); ++i) {
+    for(unsigned j=0; j<rhs.getCols(); ++j) {
+      for(unsigned k=0; k<cols; ++k) {
 	ret_mat(i,j) += (*this)(i,k)*rhs(k,j); //data[indexOf(i,k)] * rhs(k,j);
       }
     }
@@ -133,8 +133,8 @@ FullMatrix &FullMatrix::operator+=(const FullMatrix &rhs)  {
   }
 #endif
 
-  for(int i=0; i<getRows(); ++i) {
-    for(int j=0; j<getCols(); ++j) {
+  for(unsigned i=0; i<getRows(); ++i) {
+    for(unsigned j=0; j<getCols(); ++j) {
       (*this)(i,j) += rhs(i,j);
     }
   }
@@ -170,8 +170,8 @@ FullMatrix &FullMatrix::operator-=(const FullMatrix &rhs) {
   }
 #endif
   
-  for(int i=0; i<getRows(); ++i) {
-    for(int j=0; j<getCols(); ++j) {
+  for(unsigned i=0; i<getRows(); ++i) {
+    for(unsigned j=0; j<getCols(); ++j) {
       (*this)(i,j) -= rhs(i,j);
     }
   }
@@ -206,8 +206,8 @@ Vector FullMatrix::operator*(const Vector & rhs) const {
 
   Vector ret_vec(rows, 0.0);
   
-  for(int i=0; i<rows; ++i) {
-    for(int j=0; j<cols; ++j) {
+  for(unsigned i=0; i<rows; ++i) {
+    for(unsigned j=0; j<cols; ++j) {
       ret_vec(i) += this->operator()(i,j) * rhs(j);
     }
   }
@@ -223,8 +223,8 @@ FullMatrix FullMatrix::getTransposed() const {
   
   FullMatrix ret_mat(cols, rows);
 
-  for(int i=0; i<rows; ++i) {
-    for(int j=0; j<cols; ++j) {
+  for(unsigned i=0; i<rows; ++i) {
+    for(unsigned j=0; j<cols; ++j) {
       ret_mat(j,i) = data[indexOf(i,j)];
     }
   }
@@ -254,11 +254,11 @@ FullMatrix FullMatrix::getInverse() const {
     FullMatrix Ainv(rows, cols, 0.0);
     Vector rhs(rows,0.0);
 
-    for(int i=0; i<cols; ++i) {
+    for(unsigned i=0; i<cols; ++i) {
       rhs(i) = 1;
       Vector Ainv_col = LU.linsolve(rhs);
       
-      for(int j=0; j<rows; ++j) {
+      for(unsigned j=0; j<rows; ++j) {
 	Ainv(j,i) = Ainv_col(j);
       }
       
@@ -290,7 +290,7 @@ double FullMatrix::det() const {
     LUDecomposition LU(*this);
 
     double prod = 1.0;
-    for(int i=0; i<getRows(); ++i) {
+    for(unsigned i=0; i<getRows(); ++i) {
       prod *= LU.U(i,i); //ignore L since LUDecomposition makes UNIT lower triangular
     }
 
@@ -309,7 +309,7 @@ FullMatrix FullMatrix::inverse2x2() const {
 
   double detA = a*d - b*c;
 
-  FullMatrix Ainv(2,2);
+  FullMatrix Ainv(2);
 
   Ainv(0,0) = d/detA;
   Ainv(0,1) = -b/detA;
@@ -334,7 +334,7 @@ FullMatrix FullMatrix::inverse3x3() const {
   
   double detA = a*(e*i - f*h) - b*(d*i - f*g) + c*(d*h - e*g);
 
-  FullMatrix Ainv(3,3);
+  FullMatrix Ainv(3);
 
   Ainv(0,0) = (e*i - f*h)/detA;
   Ainv(0,1) = -(b*i - c*h)/detA;
@@ -350,7 +350,7 @@ FullMatrix FullMatrix::inverse3x3() const {
 }
 
 
-Vector FullMatrix::slice_col(int col) const {
+Vector FullMatrix::slice_col(unsigned col) const {
 #ifndef _OPTIMIZED
   if( (col<0) || (col>=cols)) {
     perror("FullMatrix::slice_col() index out of bounds");
@@ -359,13 +359,13 @@ Vector FullMatrix::slice_col(int col) const {
 #endif
 
   Vector ret_vec(rows, 0.0);
-  for(int i=0; i<rows; ++i) {
+  for(unsigned i=0; i<rows; ++i) {
     ret_vec(i) = (*this)(i, col);
   }
   return ret_vec;
 }
 
-Vector FullMatrix::slice_row(int row) const {
+Vector FullMatrix::slice_row(unsigned row) const {
 #ifndef _OPTIMIZED
   if( (row<0) || (row>=rows)) {
     perror("FullMatrix::slice_row() index out of bounds");
@@ -374,7 +374,7 @@ Vector FullMatrix::slice_row(int row) const {
 #endif
 
   Vector ret_vec(cols, 0.0);
-  for(int i=0; i<cols; ++i) {
+  for(unsigned i=0; i<cols; ++i) {
     ret_vec(i) = (*this)(row, i);
   }
   return ret_vec;
@@ -382,8 +382,8 @@ Vector FullMatrix::slice_row(int row) const {
 
 
 void FullMatrix::print() {
-  for(int i=0; i<rows; ++i) {
-    for(int j=0; j<cols; ++j) {
+  for(unsigned i=0; i<rows; ++i) {
+    for(unsigned j=0; j<cols; ++j) {
       printf("%f ", data[indexOf(i,j)]);
     }
     printf("\n");
