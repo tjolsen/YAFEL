@@ -37,19 +37,24 @@ void Mesh::compute_min_length() {
     perror("Mesh::compute_min_length(): Invalid Mesh. Not enough points");
     exit(1);
   }
-  minLength = std::sqrt(nodal_coords[0].dot(nodal_coords[1]));
+  minLength = (nodal_coords[0]-nodal_coords[1]).norm();
+  
   for(unsigned elem=0; elem<n_elems; ++elem) {
+    if(elements[elem].size() < 2) {
+      continue; //point "element"
+    }
     
     for(unsigned i=0; i<elements[elem].size(); ++i) {
-      for(unsigned j=0; j<elements[elem].size(); ++j) {
-
-	double d = std::sqrt(nodal_coords[elements[elem][i]].dot(nodal_coords[elements[elem][j]]));
+      for(unsigned j=i+1; j<elements[elem].size(); ++j) {
 	
-	minLength = (minLength<=d) ? minLength : d;
+	Vector dx = nodal_coords[elements[elem][i]] - nodal_coords[elements[elem][j]];
+	double d = dx.norm();
+	
+	minLength = (minLength <= d) ? minLength : d;
       }
     }
     
-  }//end element loop
+  }
   
 }
 

@@ -1,6 +1,7 @@
 #include "lin_alg/Vector.hpp"
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cmath>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -167,6 +168,11 @@ double Vector::dot(const Vector & rhs) const {
   }
   
   return retval;
+}
+
+double Vector::norm() const {
+
+  return std::sqrt((*this).dot(*this));
 }
 
 void Vector::print() {

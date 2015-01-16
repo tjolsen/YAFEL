@@ -29,6 +29,7 @@ public:
   Vector operator*(double a) const; 
   void append(double val);
   double dot(const Vector & rhs) const;
+  double norm() const;
   inline unsigned getLength() const {return length;}
   void print();
 };
