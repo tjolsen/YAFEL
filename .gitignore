@@ -30,7 +30,8 @@
 #emacs backups
 *~
 
-#gmsh meshes
+#gmsh files
+*.geo
 *.msh
 
 #paraview (VTK) output files
