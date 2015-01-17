@@ -38,3 +38,11 @@ endif
 ifeq ($(linalg_optimized), true)
 	CFLAGS += -D_OPTIMIZED
 endif
+
+#======================================================
+# Make dependencies
+#======================================================
+.depend:
+	$(CPP) $(shell ls *.cpp) $(CFLAGS) -MM > .depend
+
+-include .depend

@@ -1,10 +1,12 @@
-include $(YAFELDIR)/common.mk
 
 cppfiles = $(shell ls *.cpp)
 ofiles = $(cppfiles:.cpp=.o)
 exefiles = $(cppfiles:.cpp=.exe)
 
-all: $(exefiles)
+include $(YAFELDIR)/common.mk
+
+
+all: .depend $(exefiles)
 
 
 %.exe: %.o
@@ -14,4 +16,4 @@ all: $(exefiles)
 	$(CPP) $< $(CFLAGS)
 
 clean:
-	rm *.o *.vtu *.pvd $(exefiles)
+	rm *.o *.vtu *.pvd $(exefiles) .depend

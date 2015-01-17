@@ -3,12 +3,12 @@ ofiles = $(cppfiles:.cpp=.o)
 
 include $(YAFELDIR)/common.mk
 
-all: $(ofiles)
+all: .depend $(ofiles)
 
 %.o: %.cpp
 	$(CPP) $(CFLAGS) $<
 
 clean:
-	rm $(ofiles)
+	rm $(ofiles) .depend
 
 .PHONY: all clean

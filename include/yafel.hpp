@@ -10,6 +10,8 @@
 // Library-wide global declarations
 #include "yafel_globals.hpp"
 
+// Core
+
 // Linear Algebra
 #include "lin_alg/Vector.hpp"
 #include "lin_alg/FullMatrix.hpp"
