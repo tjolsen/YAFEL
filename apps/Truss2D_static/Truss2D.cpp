@@ -5,6 +5,8 @@
 Truss2D::Truss2D(const char *Mfname, const char *outFname) :
 MeshFilename(Mfname), OutputFilename(outFname)
 {
+
+  //material parameters for steel, 1cm x 1cm cross-section
   Eyoungs = 2.0e11; // 200 GPa
   Axsection = 1.0e-4; //m^2
   rho = 8000; //density kg/m^3

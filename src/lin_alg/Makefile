@@ -3,10 +3,10 @@ include $(YAFELDIR)/common.mk
 cppfiles = $(shell ls *.cpp)
 ofiles = $(cppfiles:.cpp=.o)
 
-all: $(ofiles)
+all: .depend $(ofiles)
 
 %.o: %.cpp
 	$(CPP) $(CFLAGS) $<
 
 clean:
-	rm $(ofiles)
+	rm $(ofiles) .depend

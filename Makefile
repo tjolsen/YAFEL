@@ -5,7 +5,7 @@ include $(YAFELDIR)/common.mk
 all: $(subdirs)
 
 $(subdirs):
-	$(MAKE) -C $@
+	$(MAKE) -C $@ all
 
 clean:
 	for dir in $(subdirs); do $(MAKE) -C $$dir clean; done

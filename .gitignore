@@ -30,6 +30,9 @@
 #emacs backups
 *~
 
+#Make dependency files
+*.depend
+
 #gmsh meshes
 *.msh
 
