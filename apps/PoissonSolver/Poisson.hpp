@@ -11,6 +11,7 @@ class Poisson {
 
 private:
   Mesh M;
+  DoFManager DOFM;
   ElementFactory EF;
   Vector Usol;
   Vector Fsys;

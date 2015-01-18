@@ -4,15 +4,15 @@ YAFEL_NAMESPACE_OPEN
 
 ElementFactory::ElementFactory() {}
 
-ElementFactory::ElementFactory(Mesh &M, int dofPerNode) :
-  Mp(&M), dof_per_node(dofPerNode)
+ElementFactory::ElementFactory(Mesh &M, const DoFManager &dofm) :
+  Mp(&M), DOFM(dofm), dof_per_node(dofm.getDofPerNode())
 {
   
   //initialize implementations of elements here... 
-  lq = new LinQuad(dof_per_node);
-  ltri = new LinTri(dof_per_node);
-  ltet = new LinTet(dof_per_node);
-  lline = new LinLine(dof_per_node);
+  lq = new LinQuad(DOFM);
+  ltri = new LinTri(DOFM);
+  ltet = new LinTet(DOFM);
+  lline = new LinLine(DOFM);
 }
 
 ElementFactory::~ElementFactory() {

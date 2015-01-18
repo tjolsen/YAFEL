@@ -7,11 +7,13 @@
 YAFEL_NAMESPACE_OPEN
 
 class sparse_coo; //forward declaration. cyclic dependancy
+class DirBC;
 
 class sparse_csr {
   
   friend class sparse_coo;
-  
+  friend class DirBC;
+
 private:
   unsigned rows;
   unsigned cols;

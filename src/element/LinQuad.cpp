@@ -3,7 +3,7 @@
 
 YAFEL_NAMESPACE_OPEN
 
-LinQuad::LinQuad(unsigned dofpn) : Element(2, 4, dofpn, 4*dofpn, 9, 4)
+LinQuad::LinQuad(const DoFManager &dofm) : Element(dofm, 2, 4, 4*dofm.getDofPerNode(), 9, 4)
 {
 
   Vector v(n_spaceDim,0.0);

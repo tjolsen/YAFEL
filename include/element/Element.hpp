@@ -7,6 +7,7 @@
 #include "lin_alg/FullMatrix.hpp"
 #include "lin_alg/Vector.hpp"
 #include "mesh/Mesh.hpp"
+#include "utils/DoFManager.hpp"
 
 YAFEL_NAMESPACE_OPEN
 
@@ -34,8 +35,10 @@ public:
   std::vector<int> element;
   std::vector< Vector > nodal_coords;
   std::vector<unsigned> global_dofs;
+  DoFManager DOFM;
   
-  Element(unsigned nsd, unsigned nqp, unsigned dofpn, unsigned dofpe, int vtktype, unsigned nodespe);
+  Element(const DoFManager &dofm, unsigned nsd, unsigned nqp,
+	  unsigned dofpe, int vtktype, unsigned nodespe);
 
   // Virtual functions, specialized in child classes
   virtual ~Element() {}

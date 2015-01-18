@@ -3,7 +3,9 @@
 
 YAFEL_NAMESPACE_OPEN
 
-Poisson::Poisson(const char *fname): M(MeshReader::gmsh_read(std::string(fname))), EF(M, 1){}
+Poisson::Poisson(const char *fname): 
+  M(MeshReader::gmsh_read(std::string(fname))), DOFM(1),EF(M, DOFM)
+{}
 
 void Poisson::setup() {
   

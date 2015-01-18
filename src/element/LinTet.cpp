@@ -2,7 +2,7 @@
 
 YAFEL_NAMESPACE_OPEN
 
-LinTet::LinTet(unsigned dofpn) : Element(3, 1, dofpn, dofpn*4, 10, 4) {
+LinTet::LinTet(const DoFManager &dofm) : Element(dofm, 3, 1, dofm.getDofPerNode()*4, 10, 4) {
   Vector v(n_spaceDim, 0.0);
   
   xi_0.clear();

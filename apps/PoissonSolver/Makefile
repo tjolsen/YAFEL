@@ -5,6 +5,8 @@ cppfiles = $(shell ls *.cpp)
 ofiles = $(cppfiles:.cpp=.o)
 output = poissonSolver
 
+all: .depend $(output)
+
 $(output): $(ofiles)
 	$(CPP) $^ $(LFLAGS) -o $@
 

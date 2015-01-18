@@ -2,7 +2,7 @@
 
 YAFEL_NAMESPACE_OPEN
 
-LinTri::LinTri(unsigned dofpn) : Element(2, 1, dofpn, dofpn*3, 5, 3)
+LinTri::LinTri(const DoFManager & dofm) : Element(dofm, 2, 1, dofm.getDofPerNode()*3, 5, 3)
 {
   
   Vector v(n_spaceDim,0.0);

@@ -3,15 +3,16 @@
 
 YAFEL_NAMESPACE_OPEN
 
-Element::Element(unsigned nsd, unsigned nqp, unsigned dofpn, unsigned dofpe, int vtktype, unsigned nodespe) :
-  n_spaceDim(nsd), n_quadPoints(nqp), dof_per_node(dofpn), 
-  dof_per_el(dofpe), vtk_type(vtktype), nodes_per_el(nodespe)
+Element::Element(const DoFManager &dofm, unsigned nsd, unsigned nqp, 
+		 unsigned dofpe, int vtktype, unsigned nodespe) :
+  n_spaceDim(nsd), n_quadPoints(nqp),
+  dof_per_el(dofpe), vtk_type(vtktype), nodes_per_el(nodespe),DOFM(dofm)
 {
-  
+  dof_per_node = dofm.getDofPerNode();
 }
 
 FullMatrix Element::calcJ_xi(Vector xi) {
-  
+ 
   FullMatrix retMat(n_spaceDim, n_spaceDim, 0.0);
 
   for(unsigned i=0; i<n_spaceDim; ++i) {
@@ -83,7 +84,7 @@ void Element::update_element(const Mesh &M, unsigned elnum) {
     unsigned nodeNum = M.elements[elnum][i];
     nodal_coords.push_back(M.nodal_coords[nodeNum]);
     for(unsigned j=0; j<dof_per_node; ++j) {
-      unsigned dofNum = nodeNum*dof_per_node + j;
+      unsigned dofNum = DOFM.index(nodeNum, j);//nodeNum*dof_per_node + j;
       global_dofs.push_back(dofNum);
     }
   }

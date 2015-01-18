@@ -8,6 +8,7 @@
 #include "element/LinTet.hpp"
 #include "element/LinLine.hpp"
 #include "mesh/Mesh.hpp"
+#include "utils/DoFManager.hpp"
 
 YAFEL_NAMESPACE_OPEN
 
@@ -19,12 +20,13 @@ private:
   LinTri *ltri;
   LinTet *ltet;
   LinLine *lline;
+  DoFManager DOFM;
   int dof_per_node;
   int n_els;
   
 public:
   ElementFactory();
-  ElementFactory(Mesh &M, int dofPerNode);
+  ElementFactory(Mesh &M, const DoFManager &dofm);
   ~ElementFactory();
 
   Element *getElement(unsigned elnum); //return NULL if element not implemented

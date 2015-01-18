@@ -3,7 +3,7 @@
 
 YAFEL_NAMESPACE_OPEN
 
-LinLine::LinLine(unsigned dofpn) : Element(1, 2, dofpn, 2*dofpn, 3, 2)
+LinLine::LinLine(const DoFManager &dofm) : Element(dofm, 1, 2, 2*dofm.getDofPerNode(), 3, 2)
 {
   
   Vector v(n_spaceDim, 0.0);

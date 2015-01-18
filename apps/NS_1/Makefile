@@ -5,6 +5,8 @@ output = NS_Chorin
 cppfiles = $(shell ls *.cpp)
 ofiles = $(cppfiles:.cpp=.o)
 
+all: .depend $(output)
+
 $(output): $(ofiles)
 	$(CPP) -o $@ $(ofiles) $(LFLAGS)
 
