@@ -45,9 +45,9 @@ private:
   
   void compute_min_length();
 
-  inline unsigned get_n_nodes() {return this->n_nodes;}
-  inline unsigned get_n_elems() {return this->n_elems;}
-  inline double get_minLength() {return this->minLength;}
+  inline unsigned get_n_nodes() const {return this->n_nodes;}
+  inline unsigned get_n_elems() const {return this->n_elems;}
+  inline double get_minLength() const {return this->minLength;}
   // copy ctor -- use default
   //Mesh(const Mesh & m_in);
 
@@ -58,4 +58,5 @@ private:
 
 YAFEL_NAMESPACE_CLOSE
 
-#endif // end #ifndef _YAFEL_MESH_HPP
+#endif // end #ifndef _YAFEL_MESH_HP
+P

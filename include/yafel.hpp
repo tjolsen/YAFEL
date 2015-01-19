@@ -12,6 +12,8 @@
 
 // Utils
 #include "utils/DirBC.hpp"
+#include "utils/DoFManager.hpp"
+#include "utils/SpatialFunction.hpp"
 
 // Linear Algebra
 #include "lin_alg/Vector.hpp"
