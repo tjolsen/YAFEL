@@ -14,7 +14,7 @@ private:
 
 public:
   SpatialFunction(T (*fp)(const Vector &x)) : func(fp) {}
-  T operator()(const Vector &x) {return func(x);}
+  T operator()(const Vector &x) const {return func(x);}
 };
 
 YAFEL_NAMESPACE_CLOSE

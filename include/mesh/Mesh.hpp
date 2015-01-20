@@ -27,21 +27,21 @@ private:
   
   public:
   std::vector< Vector > nodal_coords;
-  std::vector< std::vector<int> > elements;
-  std::vector< std::vector<int> > el_tags;
-  std::vector<int> element_type;
+  std::vector< std::vector<unsigned> > elements;
+  std::vector< std::vector<unsigned> > el_tags;
+  std::vector<unsigned> element_type;
 
   // set mesh nodes and elements
   Mesh();
   Mesh(const std::vector<Vector> &nodes, 
-       const std::vector<std::vector<int> > &elems,
-       const std::vector<int> & eltype);
+       const std::vector<std::vector<unsigned> > &elems,
+       const std::vector<unsigned> & eltype);
 
   // set mesh nodes, elems, and tags
   Mesh(const std::vector<Vector> &nodes, 
-       const std::vector<std::vector<int> > &elems, 
-       const std::vector<int> & eltype,
-       const std::vector<std::vector<int> > & _tags);
+       const std::vector<std::vector<unsigned> > &elems, 
+       const std::vector<unsigned> & eltype,
+       const std::vector<std::vector<unsigned> > & _tags);
   
   void compute_min_length();
 
@@ -59,4 +59,3 @@ private:
 YAFEL_NAMESPACE_CLOSE
 
 #endif // end #ifndef _YAFEL_MESH_HP
-P

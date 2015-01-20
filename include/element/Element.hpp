@@ -32,7 +32,7 @@ public:
   // std::vector is used for general container.
   std::vector<Vector> vals; //vector of n_qp vectors. holds values of shape funcs at qp's
   std::vector<FullMatrix> grads; //vector of n_qp FullMatrix objects, hold grads of shape funcs at qp's
-  std::vector<int> element;
+  std::vector<unsigned> element;
   std::vector< Vector > nodal_coords;
   std::vector<unsigned> global_dofs;
   DoFManager DOFM;

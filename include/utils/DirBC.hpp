@@ -16,16 +16,18 @@ class DirBC {
 
 private:
   unsigned comp;
-  std::vector<unsigned> bcnodes;
+  std::vector<unsigned> bcdofs;
   std::vector<double> bcvals;
   std::vector<bool> bcmask;
   DoFManager DOFM;
+  Vector ubc;
 
 public:
-  DirBC::DirBC(const Mesh &m, const DoFManager &dofm, unsigned tagID, 
+  DirBC(const Mesh &m, const DoFManager &dofm, unsigned tagID, 
 	       unsigned comp, const SpatialFunction<double> &sfunc);
   
   void apply(sparse_csr &Ksys, Vector &Fsys);
+  inline Vector getUbc() const {return ubc;}
 };
 
 YAFEL_NAMESPACE_CLOSE

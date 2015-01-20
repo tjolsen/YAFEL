@@ -4,7 +4,8 @@
 YAFEL_NAMESPACE_OPEN
 
 Poisson::Poisson(const char *fname): 
-  M(MeshReader::gmsh_read(std::string(fname))), DOFM(1),EF(M, DOFM)
+  M(MeshReader::gmsh_read(std::string(fname))), DOFM(1),EF(M, DOFM),
+  BC(M, DOFM, 1, 0, SpatialFunction<double>([](const Vector &x){return 0.0;}))
 {}
 
 void Poisson::setup() {
@@ -14,11 +15,12 @@ void Poisson::setup() {
   
   Fsys = Vector(EF.get_n_dof(), 0.0);
   
+  /*
   bcnodes.clear();
   bcvals.clear();
 
   //set up boundary conditions: zero on boundary (physical id = 1)
-  int DIRICHLET_BOUNDARY = 1;
+  unsigned DIRICHLET_BOUNDARY = 1;
   
   for(unsigned elnum=0; elnum<M.get_n_elems(); ++elnum) {
     if(M.el_tags[elnum][0] == DIRICHLET_BOUNDARY) {
@@ -28,6 +30,7 @@ void Poisson::setup() {
       }
     }
   }
+  */
 
   //set source term
   fvol = 1;
@@ -102,6 +105,7 @@ void Poisson::assemble() {
 void Poisson::solve() {
 
   sparse_csr Ksys(Kcoo);
+  /*
   Vector u_bc(M.get_n_nodes(), 0.0);
   for(unsigned i=0; i<bcnodes.size(); ++i) {
     u_bc(bcnodes[i]) = bcvals[i];
@@ -117,6 +121,9 @@ void Poisson::solve() {
     Ksys.assign(dof, dof, 1.0);
     Fsys(dof) = bcvals[i];
   }
+  */
+  BC.apply(Ksys, Fsys);
+  Vector u_bc = BC.getUbc();
   
   std::cout << "BCs applied. Solving...\n";
   

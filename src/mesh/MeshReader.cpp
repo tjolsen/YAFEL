@@ -36,9 +36,9 @@ Mesh MeshReader::gmsh_read(std::string fname) {
   
   
   std::vector< Vector > nodal_coords;
-  std::vector<std::vector<int> > elements;
-  std::vector<int> el_type;
-  std::vector<std::vector<int> > tags;
+  std::vector<std::vector<unsigned> > elements;
+  std::vector<unsigned> el_type;
+  std::vector<std::vector<unsigned> > tags;
 
   action_t currentAction = ACTION_UNSET;
   
@@ -97,12 +97,12 @@ Mesh MeshReader::gmsh_read(std::string fname) {
 	el_type[id-1] = atoi(words[1].c_str());
 	int ntags = atoi(words[2].c_str());
 	int nodes_in_el = words.size() - ntags - 3;
-	std::vector<int> tag(ntags,0);
+	std::vector<unsigned> tag(ntags,0);
 	for(int i=3; i<3+ntags; ++i) {
 	  tag[i-3] = atoi(words[i].c_str());
 	}
 	tags[id-1] = tag;
-	std::vector<int> el(nodes_in_el, -1); //init to -1 so fails hard,if at all
+	std::vector<unsigned> el(nodes_in_el, -1); //init to -1 so fails hard,if at all
 	for(unsigned i=3+ntags; i<words.size(); ++i) {
 	  el[i-ntags-3] = atoi(words[i].c_str())-1; //using 0-based node numbering
 	}

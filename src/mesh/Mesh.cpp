@@ -8,8 +8,8 @@ YAFEL_NAMESPACE_OPEN
 Mesh::Mesh() : n_elems(0), n_nodes(0), minLength(0) {}
 
 Mesh::Mesh(const std::vector<Vector> & nodes,
-	   const std::vector< std::vector<int> > & elems,
-	   const std::vector<int> & eltype) {
+	   const std::vector< std::vector<unsigned> > & elems,
+	   const std::vector<unsigned> & eltype) {
   this->nodal_coords = nodes;
   this->elements = elems;
   this->element_type = eltype;
@@ -19,9 +19,9 @@ Mesh::Mesh(const std::vector<Vector> & nodes,
 }
 
 Mesh::Mesh(const std::vector< Vector > & nodes,
-	   const std::vector< std::vector<int> > & elems,
-	   const std::vector<int> & eltype,
-	   const std::vector< std::vector<int> > & _tags) {
+	   const std::vector< std::vector<unsigned> > & elems,
+	   const std::vector<unsigned> & eltype,
+	   const std::vector< std::vector<unsigned> > & _tags) {
   this->nodal_coords = nodes;
   this->elements = elems;
   this->element_type = eltype;

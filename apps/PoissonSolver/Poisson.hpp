@@ -13,13 +13,14 @@ private:
   Mesh M;
   DoFManager DOFM;
   ElementFactory EF;
+  DirBC BC;
   Vector Usol;
   Vector Fsys;
   sparse_coo Kcoo;
   std::vector<int> bcnodes;
   std::vector<double> bcvals;
   double fvol;
-
+  
 
   void setup();//const std::string &inputFilename);
   void assemble();
