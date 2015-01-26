@@ -27,6 +27,7 @@
 // Mesh
 #include "mesh/Mesh.hpp"
 #include "mesh/MeshReader.hpp"
+#include "mesh/MeshGenerator.hpp"
 
 // Elements
 #include "element/Element.hpp"
