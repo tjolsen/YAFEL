@@ -1,5 +1,5 @@
 #parallelize with OpenMP
-useOpenMP = true
+useOpenMP = false
 
 #compile lin_alg routines in "optimized" mode:
 #  disables certain bounds checks

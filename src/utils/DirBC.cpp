@@ -2,6 +2,7 @@
 
 YAFEL_NAMESPACE_OPEN
 
+//========================================================================
 DirBC::DirBC(const Mesh &m, const DoFManager &dofm, unsigned tagID,
 	     unsigned comp, const SpatialFunction<double> &sfunc)
 {
@@ -30,6 +31,7 @@ DirBC::DirBC(const Mesh &m, const DoFManager &dofm, unsigned tagID,
   
 }
 
+//========================================================================
 void DirBC::apply(sparse_csr &Ksys, Vector &Fsys) {
   
   Vector Ubc(Fsys.getLength(), 0.0);
@@ -40,7 +42,7 @@ void DirBC::apply(sparse_csr &Ksys, Vector &Fsys) {
   //store for later use
   this->ubc = Ubc;
 
-  Fsys += Ksys*Ubc*(-1);
+  Fsys -= Ksys*Ubc;
 
   for(unsigned i=0; i<bcvals.size(); ++i) {
     Fsys(bcdofs[i]) = bcvals[i];
@@ -59,5 +61,7 @@ void DirBC::apply(sparse_csr &Ksys, Vector &Fsys) {
   
 }
 
-
+//========================================================================
+//========================================================================
+//========================================================================
 YAFEL_NAMESPACE_CLOSE

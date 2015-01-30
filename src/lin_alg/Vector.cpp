@@ -35,6 +35,18 @@ Vector::Vector(const Vector & src) {
   }
 }
 
+
+Vector::Vector(Vector && src) {
+  // take resources
+  length = src.length;
+  capacity = src.capacity;
+  data = src.data;
+  
+  //set src.data to nullptr
+  src.data = nullptr;
+}
+
+
 Vector::~Vector() {
   delete[] data;
 }
@@ -56,6 +68,25 @@ Vector & Vector::operator=(const Vector & rhs) {
   length = rhs.getLength();
   capacity = rhs.getLength();
   
+  return *this;
+}
+
+Vector & Vector::operator=(Vector &&rhs) {
+  
+  if(this == &rhs)
+    return *this;
+  
+  //free this->data
+  delete [] data;
+  
+  //steal resources
+  length = rhs.length;
+  capacity = rhs.capacity;
+  data = rhs.data;
+  
+  //reset rhs
+  rhs.data = nullptr;
+
   return *this;
 }
 
@@ -130,6 +161,11 @@ Vector Vector::operator+(const Vector & rhs) const {
   return ret;
 }
 
+Vector & Vector::operator-=(const Vector & rhs) {
+  *this += -1*rhs;
+  return *this;
+}
+
 Vector Vector::operator-(const Vector & rhs) const {
 #ifndef _OPTIMIZED
   if(length != rhs.getLength()) {
@@ -138,7 +174,9 @@ Vector Vector::operator-(const Vector & rhs) const {
   }
 #endif  
 
-  return *this + rhs*(-1);
+  Vector ret(*this);
+  ret -= rhs;
+  return ret;
 }
 
 void Vector::resize() {

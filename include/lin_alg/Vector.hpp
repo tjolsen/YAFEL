@@ -19,11 +19,14 @@ public:
   Vector(unsigned len);
   Vector(unsigned len, double val);
   Vector(const Vector & src);
+  Vector(Vector && src);
   ~Vector();
   Vector & operator=(const Vector & rhs);
+  Vector & operator=(Vector && rhs);
   double & operator()(unsigned i) const;
   Vector& operator+=(const Vector & rhs);
   Vector operator+(const Vector & rhs) const;
+  Vector& operator-=(const Vector & rhs);
   Vector operator-(const Vector & rhs) const;
   Vector & operator*=(double a);
   Vector operator*(double a) const; 
