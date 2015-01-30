@@ -53,6 +53,9 @@ private:
 
   //destructor -- use default
   //~Mesh();
+
+  // Node reordering methods
+  void reorder_rcm();
   
 };
 
