@@ -6,6 +6,7 @@
 #include "yafel_globals.hpp"
 #include "lin_alg/sparse_csr.hpp"
 
+
 #define INSERTION_SORT_THRESHOLD 10
 
 YAFEL_NAMESPACE_OPEN
@@ -43,6 +44,9 @@ public:
   inline unsigned getCols() const {return cols;}
   inline unsigned getSize() const {return size;}
   inline bool isSquare() const {return rows==cols;}
+  inline unsigned *get_row_ptr() {return row_index;}
+  inline unsigned *get_col_ptr() {return col_index;}
+
   unsigned nnz();
   void add(unsigned row, unsigned col, double val);
   void sort();

@@ -10,9 +10,9 @@ Poisson::Poisson(const char *fname):
 
 void Poisson::setup() {
   
-  //M = MeshReader::gmsh_read(inputFilename);
-  //EF = ElementFactory(M, 1);
-  
+  //use RCM algorithm to re-order nodes
+  M.reorder_rcm();
+  BC = DirBC(M, DOFM, 1, 0, SpatialFunction<double>([](const Vector &x){return 0.0;}));
   Fsys = Vector(EF.get_n_dof(), 0.0);
   
   /*
@@ -133,7 +133,7 @@ void Poisson::solve() {
 }
 
 void Poisson::output(const std::string & outputFilename) {
-  
+
   VTKMesh vtkm(EF);
   VTKScalarData vtku(Usol, VTKObject::VTKPOINTDATA, std::string("Usol"));
   

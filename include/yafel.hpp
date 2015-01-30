@@ -44,5 +44,6 @@
 #include "output/VTKTensorData.hpp"
 #include "output/VTKMesh.hpp"
 #include "output/VTKTimeOutput.hpp"
+#include "output/MatrixVisualization.hpp"
 
 #endif

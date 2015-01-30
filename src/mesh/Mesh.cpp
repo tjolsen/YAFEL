@@ -87,21 +87,21 @@ void Mesh::reorder_rcm() {
     }
   }
   
-  //compute degrees of each node, locate max-degree node (imax)
+  //compute degrees of each node, locate min-degree node (imin)
   auto deg_it = degree.begin();
-  unsigned imax = 0;
-  unsigned max_deg = 0;
+  unsigned imin = 0;
+  unsigned min_deg = 1000000; //something unreasonably large so it is overwritten immediately
   unsigned i=0;
   for(auto it=adj_list.begin(); it<adj_list.end(); ++it, ++deg_it, ++i) {
     std::sort((*it).begin(), (*it).end());
     auto end = std::unique((*it).begin(), (*it).end());
     *deg_it = end-(*it).begin();
-    max_deg = (max_deg > *deg_it) ? max_deg : *deg_it;
-    imax = (max_deg > *deg_it) ? imax : i;
+    min_deg = (min_deg < *deg_it) ? min_deg : *deg_it;
+    imin = (min_deg < *deg_it) ? imin : i;
   }
 
   //breadth-first search, adding high-degree neighbors first
-  Q.push(imax);
+  Q.push(imin);
   
   while(!Q.empty()) {
     unsigned node = Q.front();
@@ -121,23 +121,34 @@ void Mesh::reorder_rcm() {
     std::sort(neighbors.begin(), neighbors.end());
 
     //append indices to queue in descending order of degree (std::sort puts them in ascending)
-    for(auto it=neighbors.rbegin(); it<neighbors.rend(); ++it) {
+    for(auto it=neighbors.begin(); it<neighbors.end(); ++it) {
       Q.push(it->second);
     }
   }
   
-  // create new nodes vector and update elements 
-  std::vector<Vector> new_nodes;
-  for(unsigned n=0; n<get_n_nodes(); ++n) {
-    new_nodes.push_back(nodal_coords[R[n]]);
+  //reverse R
+  std::vector<unsigned> Rrev(get_n_nodes());
+  auto rrev_it = Rrev.begin();
+  auto r_it = R.rbegin();
+  for(rrev_it = Rrev.begin(); rrev_it < Rrev.end() && r_it<R.rend(); ++rrev_it, ++r_it) {
+    *rrev_it = *r_it;
   }
-  nodal_coords = new_nodes;
+  R.swap(Rrev);
 
   std::vector<unsigned> Rinv(get_n_nodes(),0); //maps: Rinv[oldNodeNum] -> newNodeNum
   for(unsigned i=0; i<get_n_nodes(); ++i) {
     Rinv[R[i]] = i;
   }
+  
+  // create new nodes vector
+  std::vector<Vector> new_nodes(get_n_nodes());
+  for(unsigned n=0; n<get_n_nodes(); ++n) {
+    new_nodes[Rinv[n]] = nodal_coords[n];
+  }
+  nodal_coords.swap(new_nodes);
 
+
+  //update elements 
   for(auto e=elements.begin(); e<elements.end(); ++e) {
     for(auto n=e->begin(); n<e->end(); ++n) {
       *n = Rinv[*n];
