@@ -1,6 +1,7 @@
 #include "output/MatrixVisualization.hpp"
 #include <cstdio>
 #include <cstdlib>
+#include <vector>
 
 YAFEL_NAMESPACE_OPEN
 namespace MatrixVisualization {
@@ -27,6 +28,26 @@ namespace MatrixVisualization {
     pclose(gp);
   }
 
+  //========================================================================================
+  void contour_xyz(const std::vector<double> &x, 
+		   const std::vector<double> &y,
+		   const std::vector<double> &z) {
+    
+    FILE *gp = popen("gnuplot --persist", "w");
+    if(gp == NULL) {
+      fprintf(stderr, "Popen failure\n");
+      exit(1);
+      
+      fprintf(gp, "set terminal wxt\n");
+      fprintf(gp, "set pm3d map\n");
+      fprintf(gp, "splot '-' with pm3d\n");
+
+      //write contour data....
+      
+    }     
+
+  }
+  
   //========================================================================================
   void spy(sparse_coo &coo) {
     
