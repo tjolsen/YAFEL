@@ -13,7 +13,7 @@ namespace MatrixVisualization {
   void spy(const sparse_csr &csr);
 
   void contour(const FullMatrix &Z);
-  void contour(const FullMatrix &X, const FullMatrix&Y, const FullMatrix &Z);
+  void contour(const Vector &X, const Vector &Y, const FullMatrix &Z);
   
 }
 YAFEL_NAMESPACE_CLOSE

@@ -23,7 +23,7 @@ double calcMinT(unsigned x, unsigned y, unsigned N,
   bool yneighbor = false;
   double Tx=0, Ty=0;
   //not on edge/corner
-  if(!(x==0 || y==0 || x==N-1 || y==N-1)) {
+  if(x>0 && x<N-1 && y>0 && y<N-1) {
     if(visited[index_of(x-1,y,N)]) {
       xneighbor=true;
       Tx = Tfield[index_of(x-1,y,N)];
@@ -51,8 +51,11 @@ double calcMinT(unsigned x, unsigned y, unsigned N,
     else if(xneighbor) {
       T = 1 + Tx;
     }
-    else {
+    else if(yneighbor){
       T = 1 + Ty;
+    }
+    else {
+      T = 1.0;
     }
     
     return T;
@@ -69,7 +72,7 @@ int main(int argc, char **argv) {
 
   unsigned N;
   if(argc<2)
-    N = 10;
+    N = 101;
   else
     N = atoi(argv[1]);
   
@@ -77,20 +80,31 @@ int main(int argc, char **argv) {
   std::vector<bool> visited(N*N,false);
   
   typedef std::pair<double, unsigned> node_t;
-
+  double Tinit = -4.0;
   Heap<node_t> PQ;
-  PQ.insert(node_t{-3.0,index_of(N/2, N/2, N)});
+  PQ.insert(node_t{Tinit,index_of(N/2, N/2, N)});
   //starting node: 0 -> (x,y) = (0,0)
-  for(unsigned i=1; i<N+1; ++i) {
-    double Tinit = -3.0;
-    //PQ.insert(node_t{Tinit, index_of(i,0,N)});
-    //PQ.insert(node_t{Tinit, index_of(i,N-1,N)});
-    //PQ.insert(node_t{Tinit, index_of(0,i,N)});
-    //PQ.insert(node_t{Tinit, index_of(N-1,i,N)});
+
+
+  for(unsigned i=1; i<N-1; ++i) {
+    PQ.insert(node_t{Tinit, index_of(i,1,N)});
+    PQ.insert(node_t{Tinit, index_of(i,N-2,N)});
+    PQ.insert(node_t{Tinit, index_of(1,i,N)});
+    PQ.insert(node_t{Tinit, index_of(N-2,i,N)});
+    Tfield[index_of(i,1,N)] = Tinit;
+    Tfield[index_of(i,N-2,N)] = Tinit;
+    Tfield[index_of(1,i,N)] = Tinit;
+    Tfield[index_of(N-2,i,N)] = Tinit;
+    visited[index_of(i,1,N)] = true;
+    visited[index_of(i,N-2,N)] = true;
+    visited[index_of(1,i,N)] = true;
+    visited[index_of(N-2,i,N)] = true;
   }
+
 
   //iterate until all nodes have been handled
   while(PQ.size() > 0) {
+
     node_t n = PQ.extract();
     unsigned index = n.second;
     double t = n.first;
@@ -128,9 +142,16 @@ int main(int argc, char **argv) {
     //PQ.print();
   }
 
-  for(unsigned i=0; i<N*N; ++i) {
-    std::cout << Tfield[i] << std::endl;
+  FullMatrix Tmat(N,N,0.0);
+  for(unsigned i=0; i<N; ++i) {
+    for(unsigned j=0; j<N; ++j) {
+      Tmat(j,i) = Tfield[index_of(j,i,N)];
+    }
   }
+
+  Tmat.print();
+  
+  MatrixVisualization::contour(Tmat);
 
   return 0;
 }

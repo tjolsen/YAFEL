@@ -1,3 +1,5 @@
+#include <algorithm>
+
 //=========================================
 template <typename T>
 Heap<T>::Heap() {
@@ -32,7 +34,8 @@ template<typename T>
 T Heap<T>::extract() {
   
   T retval = array[0];
-  array[0] = array[array.size()-1];
+  std::swap(array[0], array[array.size()-1]);
+  //array[0] = array[array.size()-1];
   array.pop_back();
   BubbleDown(0);
   

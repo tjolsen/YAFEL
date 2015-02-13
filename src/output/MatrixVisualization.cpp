@@ -32,20 +32,26 @@ namespace MatrixVisualization {
   void contour_xyz(const std::vector<double> &x, 
 		   const std::vector<double> &y,
 		   const std::vector<double> &z) {
-    
+
     FILE *gp = popen("gnuplot --persist", "w");
     if(gp == NULL) {
       fprintf(stderr, "Popen failure\n");
       exit(1);
-      
-      fprintf(gp, "set terminal wxt\n");
-      fprintf(gp, "set pm3d map\n");
-      fprintf(gp, "splot '-' with pm3d\n");
-
-      //write contour data....
-      
-    }     
-
+    }  
+    fprintf(gp, "set terminal wxt\n");
+    fprintf(gp, "set pm3d map\n");
+    fprintf(gp, "set size square\n");
+    fprintf(gp, "splot '-' with pm3d\n");
+    
+    //write contour data....
+    for(unsigned yi=0; yi<y.size(); ++yi) {
+      for(unsigned xi=0; xi<x.size(); ++xi) {
+	fprintf(gp, "%f %f %f\n", x[xi], y[yi], z[yi*y.size() + xi]);
+      }
+      fprintf(gp, "\n");
+    }
+    
+    pclose(gp);
   }
   
   //========================================================================================
@@ -72,5 +78,29 @@ namespace MatrixVisualization {
     sparse_coo coo(csr);
     spy(coo);
   }
-}
+  
+  //========================================================================================
+  void contour(const FullMatrix &Z) {
+    
+    std::vector<double> x(Z.getCols(),0.0);
+    std::vector<double> y(Z.getRows(),0.0);
+    std::vector<double> z(Z.getRows()*Z.getCols(),0.0);
+
+    for(unsigned i=0; i<x.size(); ++i) {
+      x[i] = i;
+    }
+    for(unsigned i=0; i<y.size(); ++i) {
+      y[i] = i;
+    }
+    
+    for(unsigned i=0; i<Z.getRows(); ++i) {
+      for(unsigned j=0; j<Z.getCols(); ++j) {
+	z[i*Z.getRows() + j] = Z(i,j);
+      }
+    }
+    
+    contour_xyz(x,y,z);
+  }
+  
+} //end namespace MatrixVisualization
 YAFEL_NAMESPACE_CLOSE
