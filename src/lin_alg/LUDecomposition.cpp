@@ -3,30 +3,39 @@
 
 YAFEL_NAMESPACE_OPEN
 
-LUDecomposition::LUDecomposition(const FullMatrix &A) : L(A.getRows()), U(A.getRows())
+LUDecomposition::LUDecomposition(const FullMatrix &A) : storage(A.getRows())
 {
   computeLU(A);
 }
 
+double LUDecomposition::L(unsigned i, unsigned j) const {
+  return (i>j) ? storage(i,j) : ((i==j)?1.0 : 0.0);
+}
+
+double LUDecomposition::U(unsigned i, unsigned j) const {
+  return (j>=i) ? storage(i,j) : 0.0;
+}
+
 void LUDecomposition::computeLU(const FullMatrix &A) {
-  int N = A.getRows();
+  unsigned N = A.getRows();
 
-  for(int i=0; i<N; ++i) {
-    L(i,i) = 1.0;
-    for(int j=0; j<N; ++j) {
-      
+  for(unsigned i=0; i<N; ++i) {
+    for(unsigned j=0; j<N; ++j) {
+
       double sum = A(i,j);
-      int lim = (i<j) ? i : j;
+      unsigned lim = (i<j) ? i : j;
 
-      for(int k=0; k<lim; ++k) {
+      for(unsigned k=0; k<lim; ++k) {
 	sum -=  L(i,k)*U(k,j);
       }
-      
+
       if(i > j) {
-	L(i,j) = sum / U(j,j);
+	//L(i,j) = sum / U(j,j);
+	storage(i,j) = sum / U(j,j);
       }
       else {
-	U(i,j) = sum;
+	//U(i,j) = sum;
+	storage(i,j) = sum;
       }
     }
   }
@@ -43,7 +52,7 @@ Vector LUDecomposition::linsolve(const Vector &rhs) const {
 // Function performing a forward-substitution solve with lower trianbular matrix L
 Vector LUDecomposition::f_subst(const Vector & rhs) const {
   
-  int N = L.getRows();
+  int N = storage.getRows();
   Vector retVec(N, 0.0);
   
   for(int i=0; i<N; ++i) {
@@ -59,7 +68,7 @@ Vector LUDecomposition::f_subst(const Vector & rhs) const {
 
 Vector LUDecomposition::b_subst(const Vector &rhs) const {
   
-  int N = U.getRows();
+  int N = storage.getRows();
   Vector retVec(N, 0.0);
   
   for(int i=N-1; i>=0; --i) {

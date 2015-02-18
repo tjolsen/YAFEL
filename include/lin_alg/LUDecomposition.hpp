@@ -11,12 +11,14 @@ YAFEL_NAMESPACE_OPEN
 class LUDecomposition {
   
 private:
+  FullMatrix storage;
   void computeLU(const FullMatrix &A);
   Vector f_subst(const Vector &rhs) const;
   Vector b_subst(const Vector &rhs) const;
   
 public:
-  FullMatrix L, U;
+  double L(unsigned i, unsigned j) const;
+  double U(unsigned i, unsigned j) const;
   LUDecomposition(const FullMatrix &A);
   
   Vector linsolve(const Vector & rhs) const;
