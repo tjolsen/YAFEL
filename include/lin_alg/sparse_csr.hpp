@@ -42,6 +42,14 @@ public:
   void zero_row(unsigned row);
   void assign(unsigned row, unsigned col, double val);
   void print_sparse();
+
+  //expert-only functions. USE AT YOUR OWN RISK
+  //I provide no guarantees. Don't fuck up the memory.
+  // The sparse_csr object will always assume that it owns
+  // the arrays, and it will proceed as if that were the case.
+  unsigned *getRowPtr() const {return row_ptr;}
+  unsigned *getColIndexPtr() const {return col_index;}
+  double *getDataPtr() const {return data;}
 };
 
 YAFEL_NAMESPACE_CLOSE

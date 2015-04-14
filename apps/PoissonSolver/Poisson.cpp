@@ -128,7 +128,8 @@ void Poisson::solve() {
   std::cout << "BCs applied. Solving...\n";
   
   // apply linear solver (conjugate gradient)
-  Usol = cg_solve(Ksys, Fsys, u_bc);
+  ILUPreconditioner Kilu(Ksys);
+  Usol = pcg_solve(Ksys, Fsys, u_bc,Kilu);
   std::cout << "Solved!\n";
 }
 

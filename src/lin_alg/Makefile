@@ -1,6 +1,6 @@
 include $(YAFELDIR)/common.mk
 
-cppfiles = $(shell ls *.cpp)
+cppfiles = $(wildcard *.cpp)
 ofiles = $(cppfiles:.cpp=.o)
 
 all: .depend $(ofiles)

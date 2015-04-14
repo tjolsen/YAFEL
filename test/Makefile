@@ -1,5 +1,4 @@
-
-cppfiles = $(shell ls *.cpp)
+cppfiles = $(wildcard *.cpp)
 ofiles = $(cppfiles:.cpp=.o)
 exefiles = $(cppfiles:.cpp=.exe)
 

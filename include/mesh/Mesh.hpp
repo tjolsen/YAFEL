@@ -25,12 +25,12 @@ private:
   unsigned n_nodes;
   double minLength;
   
-  public:
+public:
   std::vector< Vector > nodal_coords;
   std::vector< std::vector<unsigned> > elements;
   std::vector< std::vector<unsigned> > el_tags;
   std::vector<unsigned> element_type;
-
+  
   // set mesh nodes and elements
   Mesh();
   Mesh(const std::vector<Vector> &nodes, 

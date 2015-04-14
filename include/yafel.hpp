@@ -23,11 +23,20 @@
 #include "lin_alg/cg_solver.hpp"
 #include "lin_alg/bicgstab.hpp"
 #include "lin_alg/LUDecomposition.hpp"
+#include "lin_alg/Preconditioner.hpp"
+#include "lin_alg/ILUPreconditioner.hpp"
+#include "lin_alg/JacobiPreconditioner.hpp"
 
 // Mesh
 #include "mesh/Mesh.hpp"
 #include "mesh/MeshReader.hpp"
 #include "mesh/MeshGenerator.hpp"
+//#include "mesh/DGMesh.hpp"
+#include "mesh/MeshTopology.hpp"
+#include "mesh/TopoPoint.hpp"
+#include "mesh/TopoLine.hpp"
+#include "mesh/TopoFace.hpp"
+//#include "mesh/TopoCell.hpp"  // <--- planned addition
 
 // Elements
 #include "element/Element.hpp"

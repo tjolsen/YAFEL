@@ -5,15 +5,50 @@
 
 YAFEL_NAMESPACE_OPEN
 
-Vector pcg_solve(const sparse_csr & A, const Vector &rhs, const Vector &x0) {
-  // Uses inverse of diag(A) matrix to precondition system
-  sparse_coo Dinv_coo;
-  for(unsigned i=0; i<A.getRows(); ++i) {
-    Dinv_coo.add(i,i, 1.0/A(i,i));
-  }
+Vector pcg_solve(const sparse_csr & A, const Vector &rhs, const Vector &x0, const Preconditioner &P) {
   
-  sparse_csr Dinv(Dinv_coo);
-  return cg_solve(Dinv*A, Dinv*rhs, x0);
+  Vector x(x0);
+  Vector r = rhs - A*x0;
+  Vector z = P.MinvV(r);
+  Vector p(z);
+
+  double rTr_old = r.dot(r);
+  double rTz_old = r.dot(z);
+  double rTr_0 = rTr_old;
+
+  if(rTr_old == 0.0) {
+    return x;
+  }
+
+  unsigned k = 0;
+  unsigned maxiter = x.getLength()*2;
+  while(k++ < maxiter) {
+    //std::cerr << k << "/" << maxiter << std::endl;
+    Vector Ap = A*p;
+    double alpha = rTz_old/(p.dot(Ap));
+    
+    x += p*alpha;
+    r += Ap*(-alpha);
+    
+    double rTr_new = r.dot(r);
+    std::cout << k << "," << rTr_new/rTr_0 << std::endl;
+    if(rTr_new/rTr_0 < CG_SOLVER_TOL) {
+      break;
+    }
+    
+    z = P.MinvV(r);
+
+    double rTz_new = r.dot(z);
+    double beta = rTz_new/rTz_old;
+    p*=beta;
+    p+=z;
+
+    //reset values for next iter
+    rTz_old = rTz_new;
+    rTr_old = rTr_new;
+  }//end while
+
+  return x;
 }
 
 
@@ -36,7 +71,9 @@ Vector cg_solve(const sparse_csr & A, const Vector & rhs, const Vector &x0) {
   }
   
   unsigned k = 0;
-  while( k < x.getLength()*2) {
+  unsigned maxiter = x.getLength()*2;
+  while( k++ < maxiter) {
+    //std::cerr << k << "/" << maxiter << std::endl;  
     Vector Ap = A*p;
     double alpha = rTr_old/p.dot(Ap);
     x += p*alpha;
@@ -46,7 +83,7 @@ Vector cg_solve(const sparse_csr & A, const Vector & rhs, const Vector &x0) {
     double rTr_new = r.dot(r);
     
     // convergence tracking
-    //std::cout << k << "," << rTr_new/rTr_0 << std::endl;
+    std::cout << k << "," << rTr_new/rTr_0 << std::endl;
     if(rTr_new/rTr_0 < CG_SOLVER_TOL) {
       //std::cerr << "converged in " << k << "steps." << std::endl;
       break;
@@ -59,7 +96,6 @@ Vector cg_solve(const sparse_csr & A, const Vector & rhs, const Vector &x0) {
     p *= beta;
     p += r;
     
-    k++;
   }//end while
   
   return x;
