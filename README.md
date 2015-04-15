@@ -46,7 +46,3 @@ This library is under very active development. Due to this, the API for the vari
 parts frequently change subtly as I discover better/different ways to do things.
 Most of these changes shouldn't break much existing code (eg, mass-convert of 'int'
 to 'unsigned' in linear algebra data structures).
-
-The next major change planned is the addition of C++11 move-constructors and
-move-assignment functions. This should dramatically speed up some of the linear
-algebra operations by eliminating memory allocations/deallocations.
