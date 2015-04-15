@@ -26,7 +26,10 @@ public:
   MeshTopology(const Mesh &M);
   ~MeshTopology();
   void print(std::ostream &out);
-  
+
+  // method to return the id of the edgenum'th neighbor of cell facenum.
+  // returns facenum on any failure
+  unsigned getCellNeighbor(unsigned faceNum, unsigned edgenum);
 };
 
 YAFEL_NAMESPACE_CLOSE

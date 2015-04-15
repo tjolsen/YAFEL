@@ -10,6 +10,17 @@ int main() {
   std::cout << "Got mesh" << std::endl;
   MeshTopology MT(M);
 
-  MT.print(std::cout);
+  for(unsigned elnum=0; elnum<M.get_n_elems(); ++elnum) {
+    std::cout << elnum << ": ";
+    for(unsigned i=0; i<M.elements[elnum].size(); ++i) {
+      unsigned neighbornum = MT.getCellNeighbor(elnum,i);
+      if(neighbornum != elnum)
+	std::cout << neighbornum << " ";
+    }
+    std::cout << std::endl;
+    
+  }
+
+
   return 0;
 }

@@ -159,4 +159,25 @@ void MeshTopology::print(std::ostream &out) {
   out << "\n";
 }
 
+unsigned MeshTopology::getCellNeighbor(unsigned faceNum, unsigned edgenum) {
+
+  TopoFace &TF = *(faces[faceNum]);
+  
+  //check number of neighbors (= number boundary edges), return facenum if edgenum too large
+  if(edgenum >= TF.boundary.size()) {
+    return faceNum;
+  }
+
+  TopoFace *neighbor;
+  TopoLine *edge = TF.boundary[edgenum];
+  if(edge->right!=nullptr && (faceNum == edge->right->id) ) {
+    neighbor = edge->left;
+  }
+  else {
+    neighbor = edge->right;
+  }
+
+  return (neighbor != nullptr) ? neighbor->id : faceNum;
+}
+
 YAFEL_NAMESPACE_CLOSE
