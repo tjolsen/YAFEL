@@ -31,7 +31,7 @@ Vector pcg_solve(const sparse_csr & A, const Vector &rhs, const Vector &x0, cons
     r += Ap*(-alpha);
     
     double rTr_new = r.dot(r);
-    std::cout << k << "," << rTr_new/rTr_0 << std::endl;
+    //std::cout << k << "," << rTr_new/rTr_0 << std::endl;
     if(rTr_new/rTr_0 < CG_SOLVER_TOL) {
       break;
     }
@@ -83,7 +83,7 @@ Vector cg_solve(const sparse_csr & A, const Vector & rhs, const Vector &x0) {
     double rTr_new = r.dot(r);
     
     // convergence tracking
-    std::cout << k << "," << rTr_new/rTr_0 << std::endl;
+    //std::cout << k << "," << rTr_new/rTr_0 << std::endl;
     if(rTr_new/rTr_0 < CG_SOLVER_TOL) {
       //std::cerr << "converged in " << k << "steps." << std::endl;
       break;
