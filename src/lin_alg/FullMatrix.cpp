@@ -74,6 +74,29 @@ FullMatrix::~FullMatrix() {
   delete[] data;
 }
 
+FullMatrix & FullMatrix::operator=(const FullMatrix &rhs) {
+  
+  if(this == &rhs) {
+    return *this;
+  }
+
+  double *tmp_data = new double[rhs.getRows()*rhs.getCols()];
+  for(unsigned i=0; i<rhs.getRows(); ++i) {
+    for(unsigned j=0; j<rhs.getCols(); ++j) {
+      tmp_data[i*rhs.getCols() + j] = rhs(i,j);
+    }
+  }
+  
+  delete [] data;
+  data = tmp_data;
+  
+  rows = rhs.rows;
+  cols = rhs.cols;
+  transposed = false;
+  
+  return *this;
+}
+
 inline unsigned FullMatrix::indexOf(unsigned i, unsigned j) const {
   if(!transposed) {
     return i*cols + j;

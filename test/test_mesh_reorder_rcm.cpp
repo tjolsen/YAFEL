@@ -42,9 +42,10 @@ int main(int argc, char **argv) {
 
   sparse_csr Acsr(Acoo);
   sparse_csr Bcsr(Bcoo);
-
-  MatrixVisualization::spy(Acsr);
-  MatrixVisualization::spy(Bcsr);
+  
+  MatrixVisualization MV1, MV2;
+  MV1.spy(Acsr);
+  MV2.spy(Bcsr);
   
   return 0;
 }
