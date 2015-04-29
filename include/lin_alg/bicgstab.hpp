@@ -10,7 +10,7 @@ Follows the algorithm on wikipedia for the stabilized biconjugate gradient metho
 #include "lin_alg/FullMatrix.hpp"
 #include "lin_alg/sparse_csr.hpp"
 
-#define BICGSTAB_TOL 1.0e-14
+#define BICGSTAB_TOL 1.0e-10
 
 YAFEL_NAMESPACE_OPEN
 

@@ -11,7 +11,7 @@ Element::Element(const DoFManager &dofm, unsigned nsd, unsigned nqp,
   dof_per_node = dofm.getDofPerNode();
 }
 
-FullMatrix Element::calcJ_xi(Vector xi) {
+FullMatrix Element::calcJ_xi(const Vector &xi) {
  
   FullMatrix retMat(n_spaceDim, n_spaceDim, 0.0);
 

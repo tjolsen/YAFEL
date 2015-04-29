@@ -14,7 +14,7 @@ YAFEL_NAMESPACE_OPEN
 
 class DirBC {
 
-private:
+public:
   unsigned comp;
   std::vector<unsigned> bcdofs;
   std::vector<double> bcvals;
@@ -22,7 +22,7 @@ private:
   DoFManager DOFM;
   Vector ubc;
 
-public:
+
   DirBC(const Mesh &m, const DoFManager &dofm, unsigned tagID, 
 	       unsigned comp, const SpatialFunction<double> &sfunc);
   

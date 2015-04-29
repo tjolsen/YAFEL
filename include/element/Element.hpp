@@ -30,7 +30,7 @@ public:
   // vector of values of dofs at qp's
   // uses Vector object to since dof's often represent a mathematical vector.
   // std::vector is used for general container.
-  std::vector<Vector> vals; //vector of n_qp vectors. holds values of shape funcs at qp's
+  std::vector<Vector> vals; //vector of n_qp Vectors. holds values of shape funcs at qp's
   std::vector<FullMatrix> grads; //vector of n_qp FullMatrix objects, hold grads of shape funcs at qp's
   std::vector<unsigned> element;
   std::vector< Vector > nodal_coords;
@@ -46,7 +46,7 @@ public:
   virtual double shape_grad_xi(unsigned node, unsigned component, const Vector &xi) const = 0;
 
   //Functions in base class
-  FullMatrix calcJ_xi(Vector xi);
+  FullMatrix calcJ_xi(const Vector &xi);
   void calcJacobians(); // calcualte Jacobians at Gauss points and store in 
   void calcGrads(); // calculate shape function gradients (wrt spatial coords) and store in "grads[qpi](A, i)"
   void calcVals(); // calculate shape function values and store in "grads[qpi](A, i)"
