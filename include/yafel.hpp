@@ -14,6 +14,8 @@
 #include "utils/DirBC.hpp"
 #include "utils/DoFManager.hpp"
 #include "utils/SpatialFunction.hpp"
+#include "utils/GaussLegendreQuadrature.hpp"
+#include "utils/DualNumber.hpp"
 
 // Linear Algebra
 #include "lin_alg/Vector.hpp"

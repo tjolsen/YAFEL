@@ -2,11 +2,9 @@ cppfiles = $(wildcard *.cpp)
 ofiles = $(cppfiles:.cpp=.o)
 exefiles = $(cppfiles:.cpp=.exe)
 
-include $(YAFELDIR)/common.mk
-
-
 all: .depend $(exefiles)
 
+include $(YAFELDIR)/common.mk
 
 %.exe: %.o
 	$(CPP) $< $(LFLAGS) -o $@

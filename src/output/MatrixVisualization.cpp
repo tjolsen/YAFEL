@@ -69,7 +69,7 @@ void MatrixVisualization::spy(sparse_coo &coo) {
   
   for(unsigned i=0; i<coo.nnz(); ++i) {
     x[i] = (double)cp[i];
-    y[i] = (double)(coo.getRows() - rp[i]);
+    y[i] = (double)(coo.getRows() - rp[i]) - 1;
   }
   
   scatter_xy(x,y);

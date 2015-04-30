@@ -41,17 +41,37 @@ void VTKMesh::write(FILE *fp) {
     Element *e = EFp->getElement(elnum);
     if(e==NULL)
       continue;
-
-    for(unsigned i=0; i<Mp->elements[elnum].size(); ++i) {
-      fprintf(fp, "%d ", Mp->elements[elnum][i]);
+    
+    switch(Mp->element_type[elnum]) {
+    case 1:
+    case 8:
+    case 26:
+    case 27:
+    case 28:
+    case 62:
+    case 63:
+    case 64:
+    case 65:
+    case 66:
+      fprintf(fp, "%d ", Mp->elements[elnum][0]);
+      for(unsigned i=2; i<Mp->elements[elnum].size(); ++i) {
+	fprintf(fp, "%d ", Mp->elements[elnum][i]);
+      }
+      fprintf(fp, "%d ", Mp->elements[elnum][1]);
+      fprintf(fp, "\n");
+      break;
+    default:
+      for(unsigned i=0; i<Mp->elements[elnum].size(); ++i) {
+	fprintf(fp, "%d ", Mp->elements[elnum][i]);
+      }
+      fprintf(fp, "\n");
     }
-    fprintf(fp, "\n");
   }
   fprintf(fp, "</DataArray>\n");
   
   fprintf(fp, "<DataArray type=\"UInt32\" Name=\"offsets\" format=\"ascii\">\n");
   int offset = 0;
-  for(unsigned elnum=0; elnum<Mp->get_n_elems();++elnum) {
+  for(unsigned elnum=0; elnum<Mp->get_n_elems(); ++elnum) {
     Element *e = EFp->getElement(elnum);
     if(e==NULL)
       continue;
