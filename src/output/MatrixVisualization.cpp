@@ -35,7 +35,23 @@ void MatrixVisualization::scatter_xy(const std::vector<double> &x,
   
 }
 
-  //========================================================================================
+//========================================================================================
+void MatrixVisualization::scatter_xy(const Vector &x, 
+				     const Vector &y) {
+  
+  fprintf(gp, "reset\n");
+  fprintf(gp, "set terminal wxt\n");
+  fprintf(gp, "set style data lines\n");
+  fprintf(gp, "set size square\n");
+  fprintf(gp, "plot '-' using 1:2 with points pt 7 ps 0.5\n");
+  
+  for(unsigned i=0; i<x.getLength(); ++i) {
+    fprintf(gp, "%f %f\n", x(i), y(i));
+  }
+  fprintf(gp, "e\n");
+}
+
+//========================================================================================
 void MatrixVisualization::contour_xyz(const std::vector<double> &x, 
 				      const std::vector<double> &y,
 				      const std::vector<double> &z) {

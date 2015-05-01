@@ -29,8 +29,8 @@ Index of (i,j) = (i*Nx) + j
 
 int main() {
   //parameters to set
-  unsigned Nx = 200;
-  unsigned Ny = 200;
+  unsigned Nx = 500;
+  unsigned Ny = 500;
   double L = 1.0;
   double T = 1.0;
   double cx = 1.0;  //ci = speed in ith direction
@@ -68,7 +68,7 @@ int main() {
   unsigned iter = 0;
   while(t < T) {
     ++iter;
-#pragma omp parallel for schedule(static,32)
+#pragma omp parallel for schedule(static,50)
     for(unsigned i=0; i<Ny; ++i) {
 	unsigned n = (i+1 + Ny)%Ny;
 	unsigned nn = (i+2 + Ny)%Ny;

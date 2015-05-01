@@ -24,6 +24,8 @@ public:
   
   void scatter_xy(const std::vector<double> &x, 
 		  const std::vector<double> &y);
+  void scatter_xy(const Vector &x, 
+		  const Vector &y);
   void contour_xyz(const std::vector<double> &x, 
 		   const std::vector<double> &y,
 		   const std::vector<double> &z);
