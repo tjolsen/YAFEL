@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
   //=====================================================
 
   // problem parameters
-  double Cspeed = .1;
+  double Cspeed = 2;
   double Ddiff = .1;
   double qvol = .1;
   SpatialFunction<double> volForcing([](const Vector &x){return 1.0;});
@@ -63,8 +63,8 @@ int main(int argc, char **argv) {
       for(unsigned A=0; A<Ndof; ++A) {
 	for(unsigned B=0; B<Ndof; ++B) { // <-- not symmetric, can't shortcut this loop
 
-	  Kloc(A,B) += Cspeed*(e->vals[qpi](A))*(e->grads[qpi](B,0)) + 
-	    Ddiff*(e->grads[qpi](A,0))*(e->grads[qpi](B,0))*e->JxW(qpi);
+	  Kloc(A,B) += ( Cspeed*(e->vals[qpi](A))*(e->grads[qpi](B,0)) + 
+			 Ddiff*(e->grads[qpi](A,0))*(e->grads[qpi](B,0)) )*e->JxW(qpi);
 
 	} //end B loop
 	

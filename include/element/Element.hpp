@@ -58,7 +58,7 @@ public:
   inline unsigned getComp(unsigned dof) const { return (dof % dof_per_node); }
   inline unsigned getBase(unsigned dof) const { return (dof/dof_per_node); }
   
-  double xval(unsigned dof, Vector xi);
+  double xval(unsigned dof, const Vector & xi);
   
   
 };
