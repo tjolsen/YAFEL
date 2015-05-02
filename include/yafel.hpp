@@ -16,6 +16,7 @@
 #include "utils/SpatialFunction.hpp"
 #include "utils/QuadratureRule.hpp"
 #include "utils/GaussLegendreQuadrature.hpp"
+#include "utils/GaussLobattoQuadrature.hpp"
 #include "utils/DualNumber.hpp"
 
 // Linear Algebra

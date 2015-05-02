@@ -11,6 +11,7 @@ GaussLegendreQuadrature::GaussLegendreQuadrature(unsigned polyOrder) :
   double PI = atan2(1,1)*4;
   double TOL = 1.0e-14;
 
+  // Newton-Raphson solve for xi-th root of Legendre polynomial
   for(unsigned xi=0; xi<polyOrder; ++xi) {
     
     double x = cos(PI*(1+xi-0.25)/(polyOrder+0.5));
