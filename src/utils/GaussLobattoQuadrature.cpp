@@ -1,5 +1,6 @@
 #include "utils/GaussLobattoQuadrature.hpp"
 #include <cmath>
+#include <iostream>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -8,7 +9,7 @@ GaussLobattoQuadrature::GaussLobattoQuadrature(unsigned Npoints) :
 {
   
   double PI = atan2(1,1)*4;
-  double TOL = 1.0e-14;
+  double TOL = 1.0e-15;
   //newton-raphson solve for quadrature points
   for(unsigned xi=0; xi<Npoints; ++xi) {
     double x = -cos((PI*xi)/(Npoints-1));
@@ -28,7 +29,7 @@ GaussLobattoQuadrature::GaussLobattoQuadrature(unsigned Npoints) :
 	Pn = Pnew;
       }
       
-      x = x - (x-Pold)/(Pn*Npoints);
+      x = x - (x - Pold/Pn)/Npoints;
 
     } while(std::abs(x-xold)>TOL);
 
