@@ -5,7 +5,7 @@
 YAFEL_NAMESPACE_OPEN
 
 GaussLegendreQuadrature::GaussLegendreQuadrature(unsigned polyOrder) :
-  nodes(polyOrder, 0.0), weights(polyOrder, 0.0)
+  QuadratureRule(polyOrder)
 {
   
   double PI = atan2(1,1)*4;

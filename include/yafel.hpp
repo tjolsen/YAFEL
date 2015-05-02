@@ -14,6 +14,7 @@
 #include "utils/DirBC.hpp"
 #include "utils/DoFManager.hpp"
 #include "utils/SpatialFunction.hpp"
+#include "utils/QuadratureRule.hpp"
 #include "utils/GaussLegendreQuadrature.hpp"
 #include "utils/DualNumber.hpp"
 
