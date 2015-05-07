@@ -9,7 +9,8 @@ int main() {
   Mesh M = MeshReader::gmsh_read(std::string("minsquare.msh"));
   std::cout << "Got mesh" << std::endl;
   MeshTopology MT(M);
-
+  MT.print(std::cout);
+  /*
   for(unsigned elnum=0; elnum<M.get_n_elems(); ++elnum) {
     std::cout << elnum << ": ";
     for(unsigned i=0; i<M.elements[elnum].size(); ++i) {
@@ -20,7 +21,7 @@ int main() {
     std::cout << std::endl;
     
   }
-
+  */
 
   return 0;
 }

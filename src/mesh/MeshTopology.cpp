@@ -19,7 +19,8 @@ MeshTopology::MeshTopology(const Mesh &M) :
   for(unsigned e=0; e<nElems; ++e) {
     unsigned etype = M.element_type[e];
 
-    if( etype == 1 ) {
+    if( etype==1 || etype==8 || etype==26 || etype==27 || etype==28 ||
+	etype==62 || etype==63 || etype==64 || etype==65 || etype==66) {
       //handle 2-node line element
       unsigned id1, id2;
       id1 = M.elements[e][0];
