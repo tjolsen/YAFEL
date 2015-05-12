@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
 	  
 	  for(unsigned j=0; j<3; ++j) {
 	    for(unsigned l=0; l<3; ++l) {
-	      Kloc(A,B) += e->JxW(qpi)+
+	      Kloc(A,B) += e->JxW(qpi)*
 		(
 		 e->grads[qpi](Abase,j)*Cijkl(i,j,k,l)*e->grads[qpi](Bbase,l)
 		 );
