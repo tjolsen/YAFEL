@@ -25,6 +25,10 @@ public:
 
   DirBC(const Mesh &m, const DoFManager &dofm, unsigned tagID, 
 	       unsigned comp, const SpatialFunction<double> &sfunc);
+
+  DirBC(const std::vector<unsigned> bcdofs_,
+	       const std::vector<double> bcvals_,
+	       const std::vector<bool> bcmask_);
   
   void apply(sparse_csr &Ksys, Vector &Fsys);
   inline Vector getUbc() const {return ubc;}

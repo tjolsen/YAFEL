@@ -26,7 +26,7 @@ public:
   FullMatrix(unsigned n, double val);
   FullMatrix(const FullMatrix & src);
   FullMatrix(const sparse_csr & csr);
-  FullMatrix(const sparse_coo & coo);
+  FullMatrix(sparse_coo & coo);
   ~FullMatrix();
 
   FullMatrix & operator=(const FullMatrix & rhs);

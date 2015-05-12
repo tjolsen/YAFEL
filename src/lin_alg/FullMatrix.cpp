@@ -69,6 +69,8 @@ FullMatrix::FullMatrix(const sparse_csr & csr) {
   }
 }
 
+FullMatrix::FullMatrix(sparse_coo &coo) : FullMatrix(sparse_csr(coo))
+{}
 
 FullMatrix::~FullMatrix() {
   delete[] data;

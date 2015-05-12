@@ -32,6 +32,13 @@ DirBC::DirBC(const Mesh &m, const DoFManager &dofm, unsigned tagID,
 }
 
 //========================================================================
+DirBC::DirBC(const std::vector<unsigned> bcdofs_,
+	     const std::vector<double> bcvals_,
+	     const std::vector<bool> bcmask_) :
+  bcdofs(bcdofs_), bcvals(bcvals_), bcmask(bcmask_)
+{}
+
+//========================================================================
 void DirBC::apply(sparse_csr &Ksys, Vector &Fsys) {
   
   Vector Ubc(Fsys.getLength(), 0.0);
