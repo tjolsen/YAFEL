@@ -17,7 +17,11 @@ Vector bicgstab(const sparse_csr & A, const Vector & rhs) {
   unsigned conv_check_freq = std::max((unsigned)1, rhs.getLength()/100);
   
   double residual_0 = rhs.dot(rhs);
-  
+
+  if(residual_0 < BICGSTAB_TOL)
+    return rhs;
+
+
   rho_old = 1.0;
   alpha= 1.0;
   w_old = 1.0;
@@ -32,22 +36,28 @@ Vector bicgstab(const sparse_csr & A, const Vector & rhs) {
     
     v = A*p;
     
+    
     alpha = rho_new/rhat.dot(v);
     
     Vector s = r_old - v*alpha;
     Vector t = A*s;
-    
-    w_new = t.dot(s) / t.dot(t);
-    
+
+    double t_dot_t = t.dot(t);
+    if(t_dot_t == 0)
+      w_new = 0;
+    else
+      w_new = t.dot(s) / t_dot_t;
+
     x += p*alpha + s*w_new;
-    
+
     if(k % conv_check_freq == 0) {
       Vector r = A*x - rhs;
       double res = r.dot(r);
+
       //convergence reporting
       //std::cout << k << "," << res/residual_0 << std::endl;
       if(res/residual_0 < BICGSTAB_TOL) {
-	std::cerr << "converged in " << k << "steps.\n";
+	//std::cerr << "converged in " << k << "steps.\n";
 	break;
       }
     }
