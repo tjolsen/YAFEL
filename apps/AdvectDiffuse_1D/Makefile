@@ -15,4 +15,4 @@ $(exefile): $(ofiles)
 	$(CPP) $(CFLAGS) $<
 
 clean:
-	rm *.o *.vtu $(exefile)
+	rm *.o  $(exefile)

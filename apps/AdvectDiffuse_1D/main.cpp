@@ -19,10 +19,10 @@ int main(int argc, char **argv) {
   //=====================================================
 
   // problem parameters
-  double Cspeed = 2;
+  double Cspeed = 1;
   double Ddiff = .1;
-  double qvol = .1;
-  SpatialFunction<double> volForcing([](const Vector &x){return 1.0;});
+  double qvol = 0;
+  SpatialFunction<double> volForcing([](const Vector &x){return 0.0;});
 
   //======================================================
 
@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
   unsigned TAG2 = 2;
   unsigned COMP = 0;
   SpatialFunction<double> bcFunc1([](const Vector &x){return 0.0;});
-  SpatialFunction<double> bcFunc2([](const Vector &x){return 0.0;});
+  SpatialFunction<double> bcFunc2([](const Vector &x){return 1.0;});
   DirBC BC1(M, dofm, TAG1, COMP, bcFunc1);
   DirBC BC2(M, dofm, TAG2, COMP, bcFunc2);
   
@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
       for(unsigned A=0; A<Ndof; ++A) {
 	for(unsigned B=0; B<Ndof; ++B) { // <-- not symmetric, can't shortcut this loop
 
-	  Kloc(A,B) += ( Cspeed*(e->vals[qpi](A))*(e->grads[qpi](B,0)) + 
+	  Kloc(A,B) += ( -Cspeed*(e->vals[qpi](B))*(e->grads[qpi](A,0)) + 
 			 Ddiff*(e->grads[qpi](A,0))*(e->grads[qpi](B,0)) )*e->JxW(qpi);
 
 	} //end B loop
@@ -89,8 +89,8 @@ int main(int argc, char **argv) {
   // compress coo sparse system matrix into csr
   sparse_csr Kcsr(Kcoo);
   
-  MatrixVisualization MV;
-  MV.spy(Kcsr);
+  //MatrixVisualization MV;
+  //MV.spy(Kcsr);
 
   //========================================================
 
