@@ -46,3 +46,10 @@ This library is under very active development. Due to this, the API for the vari
 parts frequently change subtly as I discover better/different ways to do things.
 Most of these changes shouldn't break much existing code (eg, mass-convert of 'int'
 to 'unsigned' in linear algebra data structures).
+
+The next major change planned is to implement Expression Templates (see wikipedia)
+for the Vector class (and maybe FullMatrix). This should drastically improve the 
+performance the linear algebra code by optimizing out extraneous constructor/destructor 
+calls. In addition, the underlying storage of all linear algebra data structures will
+be switched to STL containers. (My self-tutorial on memory management has been fun, but
+is ultimately impractical.)
