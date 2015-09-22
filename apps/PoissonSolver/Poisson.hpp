@@ -13,7 +13,7 @@ private:
   Mesh M;
   DoFManager DOFM;
   ElementFactory EF;
-  DirBC BC;
+  DirBC BC,BC2;
   Vector Usol;
   Vector Fsys;
   sparse_coo Kcoo;

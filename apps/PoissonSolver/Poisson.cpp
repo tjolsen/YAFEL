@@ -5,14 +5,12 @@ YAFEL_NAMESPACE_OPEN
 
 Poisson::Poisson(const char *fname): 
   M(MeshReader::gmsh_read(std::string(fname))), DOFM(1),EF(M, DOFM),
-  BC(M, DOFM, 1, 0, SpatialFunction<double>([](const Vector &x){return 0.0;}))
+  BC(M, DOFM, 1, 0, SpatialFunction<double>([](const Vector &x){return 1.0;})),
+  BC2(M,DOFM, 2, 0, SpatialFunction<double>([](const Vector &x){return 9.0;}))
 {}
 
 void Poisson::setup() {
   
-  //use RCM algorithm to re-order nodes
-  M.reorder_rcm();
-  BC = DirBC(M, DOFM, 1, 0, SpatialFunction<double>([](const Vector &x){return 0.0;}));
   Fsys = Vector(EF.get_n_dof(), 0.0);
   
   /*
@@ -50,6 +48,10 @@ void Poisson::assemble() {
       continue;
     }
     if(e->n_spaceDim != 2) {
+      continue;
+    }
+    //this next block is specific to testing the "cracked" mesh cracked_simpleCracked.msh
+    if(M.el_tags[elnum][0] == 11) {
       continue;
     }
 
@@ -123,13 +125,16 @@ void Poisson::solve() {
   }
   */
   BC.apply(Ksys, Fsys);
-  Vector u_bc = BC.getUbc();
+  BC2.apply(Ksys,Fsys);
+  Vector u_bc = BC.getUbc() + BC2.getUbc();
   
   std::cout << "BCs applied. Solving...\n";
   
   // apply linear solver (conjugate gradient)
-  ILUPreconditioner Kilu(Ksys);
-  Usol = pcg_solve(Ksys, Fsys, u_bc,Kilu);
+  //ILUPreconditioner Kilu(Ksys);
+  //Usol = pcg_solve(Ksys, Fsys, u_bc,Kilu);
+  Usol = cg_solve(Ksys,Fsys,u_bc);
+  Usol.print();
   std::cout << "Solved!\n";
 }
 
