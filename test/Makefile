@@ -1,4 +1,4 @@
-cppfiles = $(wildcard *.cpp)
+cppfiles = test_vectorTest.cpp #$(wildcard *.cpp)
 ofiles = $(cppfiles:.cpp=.o)
 exefiles = $(cppfiles:.cpp=.exe)
 
@@ -14,3 +14,9 @@ include $(YAFELDIR)/common.mk
 
 clean:
 	rm *.o *.vtu *.pvd $(exefiles) .depend
+
+runtests: all
+	@for f in $(exefiles); do echo "Running: $$f"; ./$$f; done
+
+
+.PHONY: all clean runtests

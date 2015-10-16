@@ -1,41 +1,47 @@
-#ifndef _YAFEL_VECTOR_HPP
-#define _YAFEL_VECTOR_HPP
+#ifndef __YAFEL_VECTOR_HPP
+#define __YAFEL_VECTOR_HPP
 
 #include "yafel_globals.hpp"
+#include "lin_alg/VectorExpression.hpp"
 
 YAFEL_NAMESPACE_OPEN
 
-class Vector {
+template<typename dataType=double>
+class Vector: public VectorExpression<Vector<dataType>, dataType> {
   
 private:
-  static const unsigned default_capacity = 10;
-  unsigned length;
-  unsigned capacity;
-  double *data;
-  void resize();
-  
+  typedef typename VectorExpression<Vector<dataType>,dataType>::container_type container_type;
+  typedef typename VectorExpression<Vector<dataType>,dataType>::value_type value_type;
+  typedef typename VectorExpression<Vector<dataType>,dataType>::size_type size_type;
+  typedef typename VectorExpression<Vector<dataType>,dataType>::reference reference;
+  container_type _data;
+
+
 public:
-  Vector();
-  Vector(unsigned len);
-  Vector(unsigned len, double val);
-  Vector(const Vector & src);
-  Vector(Vector && src);
-  ~Vector();
-  Vector & operator=(const Vector & rhs);
-  Vector & operator=(Vector && rhs);
-  double & operator()(unsigned i) const;
-  Vector& operator+=(const Vector & rhs);
-  Vector operator+(const Vector & rhs) const;
-  Vector& operator-=(const Vector & rhs);
-  Vector operator-(const Vector & rhs) const;
-  Vector & operator*=(double a);
-  Vector operator*(double a) const; 
-  void append(double val);
-  double dot(const Vector & rhs) const;
-  double norm() const;
-  inline unsigned getLength() const {return length;}
-  void print();
+  reference operator[](size_type i) {return _data[i];}
+  value_type operator[](size_type i) const {return _data[i];}
+  size_type size() const {return _data.size();}
+  
+  /*
+   * Constructors
+   */
+  // Construct Vector of length N
+  Vector(size_type N) : _data(N) {}
+
+  // Construct Vector of length N and fill with value
+  Vector(size_type N, value_type val) : _data(N, val) {}
+  
+  // Construct from VectorExpression<T>
+  template<typename T>
+  Vector(VectorExpression<T,dataType> const& v) {
+    _data.resize(v.size());
+    for(size_type i=0; i<v.size(); ++i) {
+      _data[i] = v[i];
+    }
+  }
+
 };
+
 
 YAFEL_NAMESPACE_CLOSE
 

@@ -5,5 +5,5 @@ libdir=${prefix}/lib/
 Name: yafel
 Description: Yet Another Finite Element Library
 Version: 0.1
-Cflags: -I${includedir} -O3 -march=native
+CXXflags: -I${includedir} -O3 -march=native
 Libs: -L${libdir} -lyafel
