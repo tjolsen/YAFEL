@@ -49,7 +49,8 @@ public:
   /*
    * Constructor
    */
-  VectorDifference(const VectorExpression<T1> &u, const VectorExpression<T2> &v) : _u(u), _v(v) {
+  VectorDifference(const VectorExpression<T1,dataType> &u, 
+		   const VectorExpression<T2,dataType> &v) : _u(u), _v(v) {
     assert(u.size() == v.size());
   }
   
