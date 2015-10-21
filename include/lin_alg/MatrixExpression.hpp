@@ -56,7 +56,7 @@ public:
   
   size_type rows() const {return _u.rows();}
   size_type cols() const {return _u.cols();}
-  value_type operator()(size_type i, size_type j) const {return _u(i,j)+_v(i,j)};
+  value_type operator()(size_type i, size_type j) const {return _u(i,j)+_v(i,j);}
 };
 
 //----------------------------------------------------------------------------------------
@@ -82,12 +82,12 @@ public:
   
   size_type rows() const {return _u.rows();}
   size_type cols() const {return _u.cols();}
-  value_type operator()(size_type i, size_type j) const {return _u(i,j)-_v(i,j)};
+  value_type operator()(size_type i, size_type j) const {return _u(i,j)-_v(i,j);}
 };
 
 //----------------------------------------------------------------------------------------
 template<typename T1, typename dataType=double>
-class MatrixScaled : public MatrixExpression<MatrixScaled<T1,T2,dataType>, dataType> {
+class MatrixScaled : public MatrixExpression<MatrixScaled<T1,dataType>, dataType> {
 
 private:
   const dataType scalar;
@@ -110,9 +110,9 @@ public:
 
 //----------------------------------------------------------------------------------------
 template<typename T1, typename dataType=double>
-class MatrixTranspose : public MatrixExpresision<MatrixTranspose<T1,dataType>, dataType> {
+class MatrixTranspose : public MatrixExpression<MatrixTranspose<T1,dataType>, dataType> {
 private:
-  const MatrixExpression &_u;
+  const T1 &_u;
   
 public:
   typedef typename MatrixExpression<MatrixTranspose<T1,dataType>,dataType>::value_type value_type;
@@ -121,7 +121,7 @@ public:
   /*
    * Constructor
    */
-  MatrixTranspose(const MatrixExpression &u) : _u(u) {}
+  MatrixTranspose(const MatrixExpression<T1,dataType> &u) : _u(u) {}
 
   size_type rows() const {return _u.rows();}
   size_type cols() const {return _u.cols();}
@@ -137,20 +137,20 @@ public:
 template<typename T1, typename T2, typename dataType>
 MatrixSum<T1,T2,dataType> operator+(const MatrixExpression<T1,dataType> &lhs,
 				    const MatrixExpression<T2,dataType> &rhs) {
-  return VectorSum<T1,T2,dataType>(lhs,rhs);
+  return MatrixSum<T1,T2,dataType>(lhs,rhs);
 }
 //----------------------------------------------------------------------------------------
 template<typename T1, typename T2, typename dataType>
 MatrixDifference<T1,T2,dataType> operator+(const MatrixExpression<T1,dataType> &lhs,
 				    const MatrixExpression<T2,dataType> &rhs) {
-  return VectorDifference<T1,T2,dataType>(lhs,rhs);
+  return MatrixDifference<T1,T2,dataType>(lhs,rhs);
 }
 //----------------------------------------------------------------------------------------
-template<typename T2, typename T2, typename dataType>
+template<typename T1, typename T2, typename dataType>
 MatrixScaled<T1,dataType> operator*(const MatrixExpression<T1,dataType> *v, T2 a) {
   return MatrixScaled<T1,dataType>(v,a);
 }
-template<typename T2, typename T2, typename dataType>
+template<typename T1, typename T2, typename dataType>
 MatrixScaled<T1,dataType> operator*(T2 a, const MatrixExpression<T1,dataType> *v) {
   return MatrixScaled<T1,dataType>(v,a);
 }

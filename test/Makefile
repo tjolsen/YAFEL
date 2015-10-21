@@ -1,4 +1,4 @@
-cppfiles = test_vectorTest.cpp #$(wildcard *.cpp)
+cppfiles = test_vectorTest.cpp test_matrixTest.cpp #$(wildcard *.cpp)
 ofiles = $(cppfiles:.cpp=.o)
 exefiles = $(cppfiles:.cpp=.exe)
 
