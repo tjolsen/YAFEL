@@ -75,7 +75,7 @@ public:
    * Constructor
    */
   MatrixDifference(const MatrixExpression<T1,dataType> &u,
-	    const MatrixExpression<T2,dataType> &v) : _u(u), _v(v) {
+		   const MatrixExpression<T2,dataType> &v) : _u(u), _v(v) {
     assert(u.rows() == v.rows() && "MatrixDifference: rows mismatch");
     assert(u.cols() == v.cols() && "MatrixDifference: cols mismatch");
   }
@@ -85,7 +85,75 @@ public:
   value_type operator()(size_type i, size_type j) const {return _u(i,j)-_v(i,j)};
 };
 
+//----------------------------------------------------------------------------------------
+template<typename T1, typename dataType=double>
+class MatrixScaled : public MatrixExpression<MatrixScaled<T1,T2,dataType>, dataType> {
 
+private:
+  const dataType scalar;
+  const T1 &_u;
+
+public:
+  typedef typename MatrixExpression<MatrixScaled<T1,dataType>, dataType>::value_type value_type;
+  typedef typename MatrixExpression<MatrixScaled<T1,dataType>, dataType>::size_type size_type;
+
+  /*
+   * Constructor
+   */
+  template<typename T2>
+  MatrixScaled(const MatrixExpression<T1,dataType> &u, T2 alpha) : scalar((dataType)alpha), _u(u) {}
+
+  size_type rows() const {return _u.rows();}
+  size_type cols() const {return _u.cols();}
+  value_type operator()(size_type i, size_type j) const {return scalar*_u(i,j);}
+};
+
+//----------------------------------------------------------------------------------------
+template<typename T1, typename dataType=double>
+class MatrixTranspose : public MatrixExpresision<MatrixTranspose<T1,dataType>, dataType> {
+private:
+  const MatrixExpression &_u;
+  
+public:
+  typedef typename MatrixExpression<MatrixTranspose<T1,dataType>,dataType>::value_type value_type;
+  typedef typename MatrixExpression<MatrixTranspose<T1,dataType>,dataType>::size_type size_type;
+
+  /*
+   * Constructor
+   */
+  MatrixTranspose(const MatrixExpression &u) : _u(u) {}
+
+  size_type rows() const {return _u.rows();}
+  size_type cols() const {return _u.cols();}
+  value_type operator()(size_type i, size_type j) const {return u(j,i);}
+};
+
+
+//----------------------------------------------------------------------------------------
+/*
+ * Operator overloading: Define operators (+, -, *, ...) for MatrixExpressions
+ */
+//----------------------------------------------------------------------------------------
+template<typename T1, typename T2, typename dataType>
+MatrixSum<T1,T2,dataType> operator+(const MatrixExpression<T1,dataType> &lhs,
+				    const MatrixExpression<T2,dataType> &rhs) {
+  return VectorSum<T1,T2,dataType>(lhs,rhs);
+}
+//----------------------------------------------------------------------------------------
+template<typename T1, typename T2, typename dataType>
+MatrixDifference<T1,T2,dataType> operator+(const MatrixExpression<T1,dataType> &lhs,
+				    const MatrixExpression<T2,dataType> &rhs) {
+  return VectorDifference<T1,T2,dataType>(lhs,rhs);
+}
+//----------------------------------------------------------------------------------------
+template<typename T2, typename T2, typename dataType>
+MatrixScaled<T1,dataType> operator*(const MatrixExpression<T1,dataType> *v, T2 a) {
+  return MatrixScaled<T1,dataType>(v,a);
+}
+template<typename T2, typename T2, typename dataType>
+MatrixScaled<T1,dataType> operator*(T2 a, const MatrixExpression<T1,dataType> *v) {
+  return MatrixScaled<T1,dataType>(v,a);
+}
 
 YAFEL_NAMESPACE_CLOSE
 

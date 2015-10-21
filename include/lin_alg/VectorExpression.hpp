@@ -23,7 +23,7 @@ public:
   typedef typename container_type::reference reference;
 
   size_type size() const { return static_cast<T const&>(*this).size(); }
-  value_type operator[](size_type i) const { return static_cast<const T&>(*this)[i]; }
+  value_type operator()(size_type i) const { return static_cast<const T&>(*this)(i); }
   
   operator T&() { return static_cast<T&>(*this); }
   operator T const&() const { return static_cast<const T&>(*this); }
@@ -54,7 +54,7 @@ public:
     assert(u.size() == v.size());
   }
   
-  value_type operator[](size_type i) const {return _u[i] - _v[i];}
+  value_type operator()(size_type i) const {return _u(i) - _v(i);}
   size_type size() const {return _u.size();}
 };
 
@@ -84,7 +84,7 @@ public:
   /*
    * Member functions
    */
-  value_type operator[](size_type i) const {return _u[i] + _v[i];}
+  value_type operator()(size_type i) const {return _u(i) + _v(i);}
   size_type size() const {return _v.size();}
 };
 
@@ -112,7 +112,7 @@ public:
   /*
    * Member functions
    */
-  value_type operator[](size_type i) const {return _scalar*_v[i];}
+  value_type operator()(size_type i) const {return _scalar*_v(i);}
   size_type size() const {return _v.size();}
 };
 
@@ -159,7 +159,7 @@ bool operator==(const VectorExpression<T1,dataType> &lhs,
   }
   
   for(typename VectorExpression<T1,dataType>::size_type i=0; i<lhs.size(); ++i) {
-    if(lhs[i] != rhs[i]) {
+    if(lhs(i) != rhs(i)) {
       return false;
     }
   }

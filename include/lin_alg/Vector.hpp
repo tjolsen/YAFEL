@@ -18,8 +18,8 @@ private:
 
 
 public:
-  reference operator[](size_type i) {return _data[i];}
-  value_type operator[](size_type i) const {return _data[i];}
+  reference operator()(size_type i) {return _data[i];}
+  value_type operator()(size_type i) const {return _data[i];}
   size_type size() const {return _data.size();}
   
   /*
@@ -31,12 +31,12 @@ public:
   // Construct Vector of length N and fill with value
   Vector(size_type N, value_type val) : _data(N, val) {}
   
-  // Construct from VectorExpression<T>
+  // Construct from VectorExpression<T,dataType>
   template<typename T>
-  Vector(VectorExpression<T,dataType> const& v) {
+  Vector(const VectorExpression<T,dataType> & v) {
     _data.resize(v.size());
     for(size_type i=0; i<v.size(); ++i) {
-      _data[i] = v[i];
+      _data[i] = v(i);
     }
   }
 

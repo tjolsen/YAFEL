@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
   // Test value populated correctly, and [] retrieves value
   double sum = 0;
   for(std::size_t i=0; i<a.size(); ++i) {
-    sum += a[i];
+    sum += a(i);
   }
   assert( std::abs(sum - N*val)<1.0e-14 && "TEST: sum of elements correct" );
 
