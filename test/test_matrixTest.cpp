@@ -27,5 +27,20 @@ int main(int argc, char **argv) {
   }
   assert(sum == M*N*val && "TEST:Matrix<double> constructed with proper values");
   
+
+  // Test copy constructor
+  Matrix<> d(c);
+  assert(d==c && "TEST: Matrix equality using copy ctor");
+
+  // Test addition and scalar multiplication
+  Matrix<> e = c+d;
+  Matrix<> f = 2*c;
+  assert(e==f && "TEST: Matrix doubling using addition and scalar multiplication");
+
+  //Test subtraction
+  Matrix<> g(M,N,0);
+  Matrix<> h = c-d;
+  assert(g==h && "TEST: Matrix subtraction");
+
   return 0;
 }

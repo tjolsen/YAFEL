@@ -141,18 +141,42 @@ MatrixSum<T1,T2,dataType> operator+(const MatrixExpression<T1,dataType> &lhs,
 }
 //----------------------------------------------------------------------------------------
 template<typename T1, typename T2, typename dataType>
-MatrixDifference<T1,T2,dataType> operator+(const MatrixExpression<T1,dataType> &lhs,
-				    const MatrixExpression<T2,dataType> &rhs) {
+MatrixDifference<T1,T2,dataType> operator-(const MatrixExpression<T1,dataType> &lhs,
+					   const MatrixExpression<T2,dataType> &rhs) {
   return MatrixDifference<T1,T2,dataType>(lhs,rhs);
 }
 //----------------------------------------------------------------------------------------
 template<typename T1, typename T2, typename dataType>
-MatrixScaled<T1,dataType> operator*(const MatrixExpression<T1,dataType> *v, T2 a) {
+MatrixScaled<T1,dataType> operator*(const MatrixExpression<T1,dataType> &v, T2 a) {
   return MatrixScaled<T1,dataType>(v,a);
 }
 template<typename T1, typename T2, typename dataType>
-MatrixScaled<T1,dataType> operator*(T2 a, const MatrixExpression<T1,dataType> *v) {
+MatrixScaled<T1,dataType> operator*(T2 a, const MatrixExpression<T1,dataType> &v) {
   return MatrixScaled<T1,dataType>(v,a);
+}
+
+//----------------------------------------------------------------------------------------
+/*
+ * Some relational operators that may be userful
+ */
+//----------------------------------------------------------------------------------------
+template<typename T1, typename T2, typename dataType>
+bool operator==(const MatrixExpression<T1,dataType> &lhs,
+		const MatrixExpression<T2,dataType> &rhs) {
+  
+  if(lhs.rows()!=rhs.rows() || lhs.cols()!=rhs.cols()) {
+    return false;
+  }
+
+  for(typename MatrixExpression<T1,dataType>::size_type i=0; i<lhs.rows(); ++i) {
+    for(typename MatrixExpression<T1,dataType>::size_type j=0; j<lhs.cols(); ++j) {
+      if(lhs(i,j) != rhs(i,j)) {
+	return false;
+      }
+    }
+  }
+  
+  return true;
 }
 
 YAFEL_NAMESPACE_CLOSE
