@@ -79,14 +79,14 @@ void test_3() {
   auto MEb = 3*A + 4*B - B;
   
   // compute with matmul
-  auto C = matmul(MEa, MEb);
+  auto C = matmul(4*A+3*B, 3*A + 4*B - B);
 
   //compute using naive Aik Bkj (easy to be correct
   Matrix<int> D(N,N,0);
   for(std::size_t i=0; i<N; ++i) {
     for(std::size_t j=0; j<N; ++j) {
       for(std::size_t k=0; k<N; ++k) {
-	D(i,j) += MEa(i,k)*MEb(k,j);
+	D(i,j) += (4*A + 3*B)(i,k) * (3*A + 4*B - B)(k,j);
       }
     }
   }
