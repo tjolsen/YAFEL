@@ -1,9 +1,9 @@
 #parallelize with OpenMP
-useOpenMP = true
+useOpenMP = false #true
 
 #compile lin_alg routines in "optimized" mode:
 #  disables certain bounds checks
-linalg_optimized = true
+linalg_optimized = false #true
 
 #define C++ compiler
 CPP = g++
@@ -15,7 +15,7 @@ CC = gcc
 AR = ar
 
 #compiler optimization and linking flags
-CFLAGS = -O3 -march=native -Wall 
+CFLAGS = -g -march=native -Wall 
 LFLAGS = -L$(YAFELDIR)/lib/ -lyafel
 ARFLAGS = -ru
 

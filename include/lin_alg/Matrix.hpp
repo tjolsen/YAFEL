@@ -3,6 +3,8 @@
 
 #include "yafel_globals.hpp"
 #include "lin_alg/MatrixExpression.hpp"
+#include <cstdio>
+#include <cstdlib>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -27,7 +29,21 @@ private:
 
 public:
   reference operator()(size_type i, size_type j) {return _data[linear_index(i,j)];}
-  value_type operator()(size_type i, size_type j) const {return _data[linear_index(i,j)];}
+  value_type operator()(size_type i, size_type j) const {
+#ifndef _OPTIMIZED
+    if(i<0 || i>= _rows) {
+      fprintf(stderr, "Matrix(i,j): i out of bounds\n"
+	      "i=%lu, _rows=%lu\n", i, _rows);
+      exit(1);
+    }
+    if(j<0 || j>= _cols) {
+      fprintf(stderr, "Matrix(i,j): j out of bounds\n"
+	      "j=%lu, _cols=%lu\n", j, _cols);
+      exit(1);
+    }
+#endif
+    return _data[linear_index(i,j)];
+  }
   size_type rows() const {return _rows;}
   size_type cols() const {return _cols;}
   
@@ -43,18 +59,26 @@ public:
   // Matrix of dimensions M x N with value dataType construction
   Matrix(size_type r, size_type c, dataType val) : _data(r*c, val), _rows(r), _cols(c) {}
 
+  // Copy constructor
+  //Matrix(const Matrix<dataType> &u) : _data(u._data), _rows(u._rows), _cols(u._cols) {}
+
   // Construct from MatrixExpression<T,dataType>
   template<typename T>
-  Matrix(const MatrixExpression<T,dataType> &u) {
+  Matrix(const MatrixExpression<T,dataType> &u) : _data(u.rows()*u.cols(), 0), 
+						  _rows(u.rows()), _cols(u.cols()) {
+    /*
     _rows = u.rows();
     _cols = u.cols();
     _data.resize(_rows*_cols);
+    */
     for(size_type i=0; i<_rows; ++i) {
       for(size_type j=0; j<_cols; ++j) {
 	(*this)(i,j) = u(i,j);
       }
     }
   }
+
+  ~Matrix() {}
 };
 
 
