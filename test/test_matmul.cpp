@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <typeinfo>
 
 using namespace yafel;
 
@@ -52,7 +53,6 @@ void test_2() {
   // compute with matmul
   auto C = matmul(A,B);
 
-
   //compute using naive Aik Bkj (easy to be correct
   Matrix<std::size_t> D(N,N,0);
   for(std::size_t i=0; i<N; ++i) {
@@ -66,11 +66,37 @@ void test_2() {
   // assert correctness
   assert(C == D &&
 	 "TEST: non-trivial matmul correctness");
-
-
 }
 
 
+void test_3() {
+  
+  std::size_t N = 10;
+  Matrix<int> A(N,N,-3);
+  Matrix<int> B(N,N,1);
+  
+  auto MEa = 4*A + 3*B;
+  auto MEb = 3*A + 4*B - B;
+  
+  // compute with matmul
+  auto C = matmul(MEa, MEb);
+
+  //compute using naive Aik Bkj (easy to be correct
+  Matrix<int> D(N,N,0);
+  for(std::size_t i=0; i<N; ++i) {
+    for(std::size_t j=0; j<N; ++j) {
+      for(std::size_t k=0; k<N; ++k) {
+	D(i,j) += MEa(i,k)*MEb(k,j);
+      }
+    }
+  }
+  
+  // assert correctness
+  assert(C == D &&
+	 "TEST: non-trivial MatrixExpression matmul correctness");
+  
+  
+}
 
 int main(int argc, char **argv) {
   
@@ -80,7 +106,9 @@ int main(int argc, char **argv) {
   // more complicated (non-uniform) matmul correctness, using size_t matrices to
   // circumvent non-associativity of floating-point multiplication
   test_2();
-  
+
+  // Test matmul with composed MatrixExpressions
+  test_3();
   
   return 0;
 }
