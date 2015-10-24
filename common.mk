@@ -15,7 +15,7 @@ CC = gcc
 AR = ar
 
 #compiler optimization and linking flags
-CFLAGS = -Wall
+CFLAGS = -O3 -march=native -Wall
 LFLAGS = -L$(YAFELDIR)/lib/ -lyafel
 ARFLAGS = -ru
 
