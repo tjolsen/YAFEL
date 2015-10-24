@@ -36,6 +36,7 @@ void MatrixVisualization::scatter_xy(const std::vector<double> &x,
 }
 
 //========================================================================================
+/*
 void MatrixVisualization::scatter_xy(const Vector &x, 
 				     const Vector &y) {
   
@@ -119,5 +120,5 @@ void MatrixVisualization::contour(const FullMatrix &Z) {
   
   contour_xyz(x,y,z);
 }
-
+*/
 YAFEL_NAMESPACE_CLOSE

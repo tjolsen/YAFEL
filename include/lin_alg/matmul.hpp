@@ -29,7 +29,7 @@ YAFEL_NAMESPACE_OPEN
  * Hard-coded parameters to control when to terminate recursion and move into a
  * (potentially) tightly-optimized block multiplication kernel.
  */ 
-const std::size_t recursion_cutoff = 8;
+const std::size_t recursion_cutoff = 32;
 
 
 
@@ -103,12 +103,28 @@ void divconq_matmul(Matrix<dataType> & C,
      n<=recursion_cutoff &&
      p<=recursion_cutoff) {
 
-    
+    // copy blocks into local memory blocks. May want to move these into a higher-up place later
+    // if allocating them seems slow
+    dataType Ablock[recursion_cutoff][recursion_cutoff];
+    dataType BblockT[recursion_cutoff][recursion_cutoff];
+    for(std::size_t i=0; i<m; ++i) {
+      for(std::size_t j=0; j<n; ++j) {
+	Ablock[i][j] = A(i,j);
+      }
+    }
+    // store the B block in transposed form, to make sequential accesses adjacent in memory
+    // should also allow for future vectorization of matmul kernel
+    for(std::size_t j=0; j<p; ++j) {
+      for(std::size_t i=0; i<n; ++i) {
+	BblockT[j][i] = B(i,j);
+      }
+    }
+
     for(std::size_t i=0; i<m; ++i) {
       for(std::size_t j=0; j<p; ++j) {
 	for(std::size_t k=0; k<n; ++k) {
 	  
-	  C(ileft+i, jright+j) += A(ileft+i, jleft+k)*B(iright+k, jright+j);
+	  C(ileft+i, jright+j) += Ablock[i][k]*BblockT[j][k];
 	  
 	}
       }

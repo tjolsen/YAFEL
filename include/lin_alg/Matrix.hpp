@@ -51,7 +51,7 @@ public:
    * Constructors
    */
   // Square matrix of dimension N with default dataType construction
-  Matrix(size_type N) : _data(N), _rows(N), _cols(N) {}
+  Matrix(size_type N) : _data(N*N), _rows(N), _cols(N) {}
 
   // Matrix of dimensions M x N with default dataType construction
   Matrix(size_type r, size_type c) : _data(r*c), _rows(r), _cols(c) {}
