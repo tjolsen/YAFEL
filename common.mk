@@ -15,8 +15,8 @@ CC = gcc
 AR = ar
 
 #compiler optimization and linking flags
-CFLAGS = -O3 -march=native -Wall
-LFLAGS = -L$(YAFELDIR)/lib/ -lyafel
+CFLAGS = -O3 -march=native -Wall  -pthread -D_YAFEL_PARALLEL_MATMUL
+LFLAGS = -L$(YAFELDIR)/lib/ -lyafel -pthread
 ARFLAGS = -ru
 
 #output library name

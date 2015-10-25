@@ -5,6 +5,7 @@
 #include "output/MatrixVisualization.hpp"
 
 #include <chrono>
+#include <mutex>
 
 //horrible horrible hack. need to fix library compilation
 #include "../src/output/MatrixVisualization.cpp"
@@ -18,12 +19,17 @@ std::chrono::steady_clock::duration time_matmul(std::size_t N, Matrix<double> &A
   //Matrix<double> A(N);
   //Matrix<double> B(N);
   //Matrix<double> C(N);
+  
 
+  
   auto t1 = std::chrono::steady_clock::now();
   
+#ifdef _YAFEL_PARALLEL_MATMUL
+  std::mutex mtx;
+  divconq_matmul(C,A,B, 0,0, 0,0, N, N, N, 0, mtx);
+#else
   divconq_matmul(C,A,B, 0,0, 0,0, N, N, N);
-  //auto C = matmul(A,B);
-
+#endif
 
   auto t2 = std::chrono::steady_clock::now();
 
@@ -54,12 +60,14 @@ std::chrono::steady_clock::duration time_naive_matmul(std::size_t N, Matrix<doub
 
 int main() {
 
+  std::cout << "Thread depth limit = " << thread_depth_limit(std::thread::hardware_concurrency()) << "\n";
+
   std::vector<double> Nvec;
   std::vector<double> Gflops1;
   std::vector<double> Gflops2;
 
   std::size_t Nmax = 5000;
-  std::size_t Nstep = 500;
+  std::size_t Nstep = 200;
   
   Matrix<double> A(Nmax);
   Matrix<double> B(Nmax);

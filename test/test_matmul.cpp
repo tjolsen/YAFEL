@@ -11,9 +11,9 @@ using namespace yafel;
 
 void test_1() {
 
-  
-  Matrix<double> A(10, 10, 1); 
-  Matrix<double> B(10, 9, 1);
+  std::size_t N=100, N2=99;
+  Matrix<double> A(N,N, 1); 
+  Matrix<double> B(N, N2, 1);
   
   // Will streamline with operator* and take advantage of default copy ctor
   Matrix<double> C = matmul(A,B);
@@ -28,8 +28,8 @@ void test_1() {
   // Each element of C should be A.cols()
   for(std::size_t i=0; i<C.rows(); ++i) {
     for(std::size_t j=0; j<C.cols(); ++j) {
-        assert(C(i,j) == (double)(A.cols()) &&
-  	 "TEST: Matmul value of C(i,j)");
+      assert(C(i,j) == (double)(A.cols()) &&
+	     "TEST: Matmul value of C(i,j)");
     }
   }
 
@@ -62,7 +62,8 @@ void test_2() {
       }
     }
   }
-  
+
+
   // assert correctness
   assert(C == D &&
 	 "TEST: non-trivial matmul correctness");
@@ -74,9 +75,6 @@ void test_3() {
   std::size_t N = 10;
   Matrix<int> A(N,N,-3);
   Matrix<int> B(N,N,1);
-  
-  auto MEa = 4*A + 3*B;
-  auto MEb = 3*A + 4*B - B;
   
   // compute with matmul
   auto C = matmul(4*A+3*B, 3*A + 4*B - B);
