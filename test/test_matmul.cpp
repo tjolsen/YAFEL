@@ -29,6 +29,8 @@ void test_1() {
   // Each element of C should be A.cols()
   for(std::size_t i=0; i<C.rows(); ++i) {
     for(std::size_t j=0; j<C.cols(); ++j) {
+      if(C(i,j) != (double)(A.cols()))
+	std::cout << "C(" << i <<"," << j << ")=" << C(i,j) << std::endl;
       assert(C(i,j) == (double)(A.cols()) &&
 	     "TEST: Matmul value of C(i,j)");
     }
@@ -41,13 +43,13 @@ void test_2() {
   
   std::size_t N = 100;
 
-  Matrix<std::size_t> A(N,N,0);
-  Matrix<std::size_t> B(N,N,0);
+  Matrix<std::size_t> A(N,N,1);
+  Matrix<std::size_t> B(N,N,1);
   
   for(std::size_t i=0; i<N; ++i) {
     for(std::size_t j=0; j<N; ++j) {
-      A(i,j) = i+j+1;
-      B(i,j) = (i+1)*(j+1);
+      //A(i,j) = i+j+1;
+      //B(i,j) = (i+1)*(j+1);
     }
   }
 
@@ -60,6 +62,10 @@ void test_2() {
     for(std::size_t j=0; j<N; ++j) {
       for(std::size_t k=0; k<N; ++k) {
 	D(i,j) += A(i,k)*B(k,j);
+      }
+      if(C(i,j) != D(i,j)) {
+	std::cout << "C(" << i <<"," << j << ")=" << C(i,j) <<
+	  ", "<< "D(" << i <<"," << j << ")=" << D(i,j) << std::endl;
       }
     }
   }

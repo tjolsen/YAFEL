@@ -1,12 +1,12 @@
 #parallelize with OpenMP
-useOpenMP = false;
+useOpenMP = false
 
 #compile lin_alg routines in "optimized" mode:
 #  disables certain bounds checks
-linalg_optimized = true;
+linalg_optimized = true
 
 # Use Parallel Matrix multiplication algorithm
-parallel_matmul = false;
+parallel_matmul = true
 
 #define C++ compiler
 CPP = g++
