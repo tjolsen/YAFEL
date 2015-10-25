@@ -13,8 +13,8 @@
 
 using namespace yafel;
 
-
-std::chrono::steady_clock::duration time_matmul(std::size_t N, Matrix<double> &A, Matrix<double> &B, Matrix<double> &C) {
+template<typename T>
+std::chrono::steady_clock::duration time_matmul(std::size_t N, Matrix<T> &A, Matrix<T> &B, Matrix<T> &C) {
 
   //Matrix<double> A(N);
   //Matrix<double> B(N);
@@ -25,8 +25,7 @@ std::chrono::steady_clock::duration time_matmul(std::size_t N, Matrix<double> &A
   auto t1 = std::chrono::steady_clock::now();
   
 #ifdef _YAFEL_PARALLEL_MATMUL
-  std::mutex mtx;
-  divconq_matmul(C,A,B, 0,0, 0,0, N, N, N, 0, mtx);
+  divconq_matmul(C,A,B, 0,0, 0,0, N, N, N, 0);
 #else
   divconq_matmul(C,A,B, 0,0, 0,0, N, N, N);
 #endif
@@ -36,8 +35,8 @@ std::chrono::steady_clock::duration time_matmul(std::size_t N, Matrix<double> &A
   return t2-t1;
 }
 
-
-std::chrono::steady_clock::duration time_naive_matmul(std::size_t N, Matrix<double> &A, Matrix<double> &B, Matrix<double> &C) {
+template<typename T>
+std::chrono::steady_clock::duration time_naive_matmul(std::size_t N, Matrix<T> &A, Matrix<T> &B, Matrix<T> &C) {
 
   auto t1 = std::chrono::steady_clock::now();
   
@@ -66,32 +65,35 @@ int main() {
   std::vector<double> Gflops1;
   std::vector<double> Gflops2;
 
-  std::size_t Nmax = 5000;
-  std::size_t Nstep = 200;
+  std::size_t Nmax = 4096;
+  std::size_t Nstart = 4;
   
-  Matrix<double> A(Nmax);
-  Matrix<double> B(Nmax);
-  Matrix<double> C(Nmax);
-  
-  for(std::size_t n=Nstep; n<Nmax; n += Nstep) {
-    std::cout << n << ": ";
-    Nvec.push_back(n);
-    
-    //2n^3 add/multiplies for non-strassen-like matrix mult
-    double work = 2*n*n*n;
-    
-    auto deltaTime1 = time_matmul(n,A,B,C);
-    //auto deltaTime2 = time_naive_matmul(n,A,B,C);
-    
-    //time in seconds
-    double dt1 = ((double)deltaTime1.count()*std::chrono::steady_clock::period::num)/std::chrono::steady_clock::period::den;
-    double dt2 = dt1;//((double)deltaTime2.count()*std::chrono::steady_clock::period::num)/std::chrono::steady_clock::period::den;
-    
-    std::cout << dt1 << ", " << dt2 << std::endl;
-    Gflops1.push_back(work/dt1);
-    Gflops2.push_back(work/dt2);
-  }
-  
+  int Niters = 5;
+
+  for(int iters=0; iters<Niters; ++iters) {
+    for(std::size_t n=Nstart; n<=Nmax; n = (n<512)? 2*n : n+512) {
+      std::cout << n << ": ";
+      Nvec.push_back(n);
+      
+      Matrix<float> A(n);
+      Matrix<float> B(n);
+      Matrix<float> C(n);
+      
+      //2n^3 add/multiplies for non-strassen-like matrix mult
+      double work = 2*n*n*n;
+      
+      auto deltaTime1 = time_matmul(n,A,B,C);
+      //auto deltaTime2 = time_naive_matmul(n,A,B,C);
+      
+      //time in seconds
+      double dt1 = ((double)deltaTime1.count()*std::chrono::steady_clock::period::num)/std::chrono::steady_clock::period::den;
+      double dt2 = dt1;//((double)deltaTime2.count()*std::chrono::steady_clock::period::num)/std::chrono::steady_clock::period::den;
+      
+      std::cout << dt1 << ", " << dt2 << std::endl;
+      Gflops1.push_back(work/dt1);
+      Gflops2.push_back(work/dt2);
+    }
+  }  
   MatrixVisualization MV;
   
   MV.scatter_xy(Nvec, Gflops1);
