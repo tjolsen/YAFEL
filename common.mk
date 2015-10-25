@@ -5,6 +5,9 @@ useOpenMP = false;
 #  disables certain bounds checks
 linalg_optimized = true;
 
+# Use Parallel Matrix multiplication algorithm
+parallel_matmul = false;
+
 #define C++ compiler
 CPP = g++
 
@@ -15,8 +18,8 @@ CC = gcc
 AR = ar
 
 #compiler optimization and linking flags
-CFLAGS = -O3 -march=native -Wall  -pthread -D_YAFEL_PARALLEL_MATMUL
-LFLAGS = -L$(YAFELDIR)/lib/ -lyafel -pthread
+CFLAGS = -O3 -march=native -Wall
+LFLAGS = -L$(YAFELDIR)/lib/ -lyafel
 ARFLAGS = -ru
 
 #output library name
@@ -39,6 +42,10 @@ ifeq ($(linalg_optimized), true)
 	CFLAGS += -D_OPTIMIZED
 endif
 
+ifeq ($(parallel_matmul), true)
+	CFLAGS +=  -pthread -D_YAFEL_PARALLEL_MATMUL
+	LFLAGS += -pthread
+endif
 #======================================================
 # Make dependencies
 #======================================================
