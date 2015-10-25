@@ -55,11 +55,31 @@ Warning
 This library is under very active development. Due to this, the API for the various
 parts frequently change subtly as I discover better/different ways to do things.
 Most of these changes shouldn't break much existing code (eg, mass-convert of 'int'
-to 'unsigned' in linear algebra data structures).
+or 'unsigned' to 'std::size_t' in linear algebra data structures).
 
-The next major change planned is to implement Expression Templates (see wikipedia)
-for the Vector class (and maybe FullMatrix). This should drastically improve the 
-performance the linear algebra code by optimizing out extraneous constructor/destructor 
-calls. In addition, the underlying storage of all linear algebra data structures will
-be switched to STL containers. (My self-tutorial on memory management has been fun, but
-is ultimately impractical.)
+Recent Changes
+==============
+
+The most recent major (compatibility-breaking) change has been a move from simple
+hand-rolled matrix and vector classes to expression template classes.
+As part of the update, the Matrix and Vector classes now accept a template
+argument defining the data type that is stored. The template argument
+defaults to "double", since it (probably) will be the most-used case.
+However, even with the default template argument, the C++ language
+does mandate a slight syntax change.
+Where before you could declare "Vector x(size);", you now must either
+explicitly specify a data type with "Vector<dataType> x(size);", or
+you may use the default template argument with "Vector<> x(size);".
+In any case, old code will no longer compile, so it must be converted.
+
+With the compatibility headache, however, comes vastly improved performance
+in the numerical linear algebra.
+The Matrix-matrix and (upcoming) matrix-vector multiplication supports
+arbitrary MatrixExpression objects and VectorExpression objects, due
+to the use of expression templates.
+This allows for efficient computation of expressions such as "(2*A + 3*B)*(u - v)"
+without the evaluation/allocation of intermediate objects.
+
+That said, expression templates are NOT used where it does not make sense to do so.
+EG: as the output of a matrix-matrix multiplication. Here, optimal cache-oblivious
+algorithms are used in place of the expression-template-style index-by-index computation.
