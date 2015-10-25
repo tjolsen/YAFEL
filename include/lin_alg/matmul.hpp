@@ -38,7 +38,7 @@ YAFEL_NAMESPACE_OPEN
  * Hard-coded parameters to control when to terminate recursion and move into a
  * (potentially) tightly-optimized block multiplication kernel.
  */ 
-const std::size_t recursion_cutoff = 64;
+const std::size_t recursion_cutoff = 32;
 
 // limit thread-spawning depth to floor( log2(NProcessors) )
 // This minimizes threading overhead while eliminating the need for
@@ -148,8 +148,8 @@ void divconq_matmul(Matrix<dataType> & C,
     }
     // store the B block in transposed form, to make sequential accesses adjacent in memory
     // should also allow for future vectorization of matmul kernel
-    for(std::size_t j=0; j<p; ++j) {
-      for(std::size_t i=0; i<n; ++i) {
+    for(std::size_t i=0; i<n; ++i) {
+      for(std::size_t j=0; j<p; ++j) {
 	BblockT[j][i] = B(iright+i,jright+j);
       }
     }
