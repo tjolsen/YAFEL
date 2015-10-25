@@ -27,8 +27,6 @@ public:
   operator T&() {return static_cast<T&>(*this);}
   operator T const&() const {return static_cast<const T&>(*this);}
 
-protected:
-  ~MatrixExpression() {}
 };
 
 
