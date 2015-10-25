@@ -3,7 +3,7 @@ YAFEL
 
 Yet Another Finite Element Library
 
-YAFEL is a general-purpose library written entirely in C++ (moving to some C++11 features).
+YAFEL is a general-purpose library written entirely in C++ (moving to C++11 features as new things are added).
 It is developed primarily as a learning exercise for myself, but is used as a research code
 as well. The library is entirely self-contained -- it does not link to any non-standard 
 external libraries. This decision was made not because I think my hand-rolled data structures
@@ -12,6 +12,16 @@ but because I wanted to fully understand the details of what is occurring at eve
 the computations. Since this library is primarily for personal use, features are added as
 the need for them arises. If you have any good ideas for something to add, please get in
 contact with me to discuss them.
+
+I'd like to give credit where it's due: this library was *heavily* inspired by the Deal.II
+library (https://github.com/dealii/dealii), which is maintained by Professor Wolfgang Bangerth at Texas A&M.
+I had the privilege of using his library in a class, and it inspired me to really get my
+hands dirty learning what goes on in these codes.
+As such, many of the workflows in this library are similar to those in the Deal.II library,
+though I have tweaked some features here and there to suit my preferences (in particular,
+a general aversion to linking to massive GB-scale libraries to achieve small tasks that
+I could do sufficiently well mysef).
+
 
 Compilation and installation
 ==========================
