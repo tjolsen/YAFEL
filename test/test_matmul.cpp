@@ -38,7 +38,7 @@ void test_1() {
 
 void test_2() {
   
-  std::size_t N = 10;
+  std::size_t N = 100;
 
   Matrix<std::size_t> A(N,N,0);
   Matrix<std::size_t> B(N,N,0);
@@ -72,7 +72,7 @@ void test_2() {
 
 void test_3() {
   
-  std::size_t N = 10;
+  std::size_t N = 100;
   Matrix<int> A(N,N,-3);
   Matrix<int> B(N,N,1);
   

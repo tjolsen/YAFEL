@@ -28,10 +28,9 @@
 #include <cstdlib>
 #include <iostream>
 
-#ifdef _YAFEL_PARALLEL_MATMUL
 #include <thread>
 #include <mutex>
-#endif
+
 
 YAFEL_NAMESPACE_OPEN
 
@@ -40,6 +39,10 @@ YAFEL_NAMESPACE_OPEN
  * (potentially) tightly-optimized block multiplication kernel.
  */ 
 const std::size_t recursion_cutoff = 32;
+
+// limit thread-spawning depth to floor( log2(NProcessors) )
+// This minimizes threading overhead while eliminating the need for
+// more complex thread scheduling
 constexpr std::size_t thread_depth_limit(std::size_t N) {
   return (N/2 == 0) ? 0 : 1 + thread_depth_limit(N/2);
 }
