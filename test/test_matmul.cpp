@@ -1,6 +1,7 @@
 #include "yafel_globals.hpp"
 #include "lin_alg/matmul.hpp"
 #include "lin_alg/Matrix.hpp"
+#include "lin_alg/operators.hpp"
 
 #include <iostream>
 #include <cstdlib>

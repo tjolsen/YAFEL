@@ -1,4 +1,5 @@
 #include "lin_alg/Vector.hpp"
+#include "lin_alg/operators.hpp"
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
