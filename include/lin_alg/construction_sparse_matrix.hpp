@@ -6,13 +6,32 @@
 
 YAFEL_NAMESPACE_OPEN
 
-template<typename T>
-class construction_sparse_matrix : public sparse_matrix<construction_sparse_matrix<T> > {
+template<typename T, typename dataType=double>
+class construction_sparse_matrix : public sparse_matrix<construction_sparse_matrix<T,dataType>, dataType> {
 
 public:
+  typedef typename sparse_matrix<construction_sparse_matrix<T,dataType>,dataType>::size_type size_type;
+  typedef typename sparse_matrix<construction_sparse_matrix<T,dataType>,dataType>::value_type value_type;
+  typedef typename sparse_matrix<construction_sparse_matrix<T,dataType>,dataType>::reference reference;
+  typedef typename sparse_matrix<construction_sparse_matrix<T,dataType>,dataType>::triplet triplet;
   
+
+  //interface inherited from sparse_matrix (must be implemented here like this to get static polymorphism right)
+  size_type rows() const { return static_cast<const T&>(*this).rows(); }
+  size_type cols() const { return static_cast<const T&>(*this).cols(); }
+  size_type nnz() {return static_cast<T&>(*this).nnz();}
+  value_type operator()(size_type i, size_type j) const {return static_cast<const T&>(*this)(i,j);}
   
-  
+  operator T&() {return static_cast<T&>(*this);}
+  operator T const&() {return static_cast<T const&>(*this);}
+
+
+  /*
+   * new interface for construction_sparse_matrix
+   * This allows children of this class to efficiently implement a method to add elements
+   * incrementally to construct a sparse matrix
+   */
+  void add(size_type i, size_type j, value_type val) {static_cast<T&>(*this).add(i,j,val);}
 };
 
 YAFEL_NAMESPACE_CLOSE
