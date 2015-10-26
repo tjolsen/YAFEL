@@ -68,7 +68,7 @@ defaults to "double", since it (probably) will be the most-used case.
 However, even with the default template argument, the C++ language
 does mandate a slight syntax change.
 Where before you could declare "Vector x(size);", you now must either
-explicitly specify a data type with "Vector<dataType> x(size);", or
+explicitly specify a data type with "Vector\<dataType> x(size);", or
 you may use the default template argument with "Vector<> x(size);".
 In any case, old code will no longer compile, so it must be converted.
 
