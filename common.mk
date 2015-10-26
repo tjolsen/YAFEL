@@ -18,7 +18,7 @@ CC = gcc
 AR = ar
 
 #compiler optimization and linking flags
-CFLAGS = -O3 -mtune=native -march=native -Wall -ffast-math -funroll-loops
+CFLAGS = -O3 -mtune=native -march=native -Wall -funroll-loops #-ffast-math 
 LFLAGS = -L$(YAFELDIR)/lib/ -lyafel
 ARFLAGS = -ru
 

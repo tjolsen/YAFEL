@@ -75,9 +75,9 @@ int main() {
       std::cout << n << ": ";
       Nvec.push_back(n);
       
-      Matrix<float> A(n);
-      Matrix<float> B(n);
-      Matrix<float> C(n);
+      Matrix<double> A(n);
+      Matrix<double> B(n);
+      Matrix<double> C(n);
       
       //2n^3 add/multiplies for non-strassen-like matrix mult
       double work = 2*n*n*n;

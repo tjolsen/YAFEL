@@ -3,7 +3,7 @@
 
 #include "yafel_globals.hpp"
 #include "lin_alg/sparse_matrix.hpp"
-#include "lin_alg/constructin_sparse_matrix.hpp"
+#include "lin_alg/construction_sparse_matrix.hpp"
 
 #include <tuple>
 #include <cstdlib>
