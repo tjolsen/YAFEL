@@ -38,7 +38,7 @@ YAFEL_NAMESPACE_OPEN
  * Hard-coded parameters to control when to terminate recursion and move into a
  * (potentially) tightly-optimized block multiplication kernel.
  */ 
-const std::size_t recursion_cutoff = 64;
+const std::size_t recursion_cutoff = 32;
 
 // limit thread-spawning depth to floor( log2(NProcessors) )
 // This minimizes threading overhead while eliminating the need for
@@ -63,8 +63,8 @@ void divconq_matmul(Matrix<dataType> & C,
 		    std::size_t p
 #ifdef _YAFEL_PARALLEL_MATMUL
 		    ,
-		    std::size_t thread_depth,
-		    std::mutex &mtx
+		    std::size_t thread_depth
+		    //std::mutex &mtx
 #endif
 );
 
@@ -90,8 +90,7 @@ Matrix<dataType> matmul(const MatrixExpression<T1,dataType> &A,
   
   // call the recursive matrix multiply
 #ifdef _YAFEL_PARALLEL_MATMUL
-  std::mutex mtx;
-  divconq_matmul(retmat, A, B, 0,0, 0,0, m,n,p,0,mtx);
+  divconq_matmul(retmat, A, B, 0,0, 0,0, m,n,p,0);
 #else
   divconq_matmul(retmat, A, B, 0,0, 0,0, m,n,p);
 #endif
@@ -120,8 +119,7 @@ void divconq_matmul(Matrix<dataType> & C,
 		    std::size_t p
 #ifdef _YAFEL_PARALLEL_MATMUL
 		    ,
-		    std::size_t thread_depth,
-		    std::mutex &mtx
+		    std::size_t thread_depth
 #endif
 )
 {
@@ -148,8 +146,8 @@ void divconq_matmul(Matrix<dataType> & C,
     }
     // store the B block in transposed form, to make sequential accesses adjacent in memory
     // should also allow for future vectorization of matmul kernel
-    for(std::size_t j=0; j<p; ++j) {
-      for(std::size_t i=0; i<n; ++i) {
+    for(std::size_t i=0; i<n; ++i) {
+      for(std::size_t j=0; j<p; ++j) {
 	BblockT[j][i] = B(iright+i,jright+j);
       }
     }
@@ -164,18 +162,12 @@ void divconq_matmul(Matrix<dataType> & C,
     }
     
     // do update to large array, have to hold mutex
-
-    { // start update block. Just making a local scope here
-#ifdef _YAFEL_PARALLEL_MATMUL
-      std::lock_guard<std::mutex> lock(mtx);
-#endif
-      for(std::size_t i=0; i<m; ++i) {
-	for(std::size_t j=0; j<p; ++j) {
-	  C(ileft+i,jright+j) += Cblock[i][j];
-	}
+    for(std::size_t i=0; i<m; ++i) {
+      for(std::size_t j=0; j<p; ++j) {
+	C(ileft+i,jright+j) += Cblock[i][j];
       }
+    }
 
-    }// end update block
     return;
   }
   
@@ -190,17 +182,16 @@ void divconq_matmul(Matrix<dataType> & C,
     std::size_t m2 = m-m1;
     
 #ifdef _YAFEL_PARALLEL_MATMUL
-    std::mutex mtx1;
     if(thread_depth < thread_depth_limit(std::thread::hardware_concurrency())) {
       std::thread t1([&](){divconq_matmul(C,A,B, iL1, jleft, iright, jright, 
-					  m1, n, p, thread_depth+1, mtx);});
+					  m1, n, p, thread_depth+1);});
       std::thread t2([&](){divconq_matmul(C,A,B, iL2, jleft, iright, jright, 
-					  m2, n, p, thread_depth+1, mtx);});
+					  m2, n, p, thread_depth+1);});
       t1.join();
       t2.join();
     } else {
-      divconq_matmul(C,A,B, iL1, jleft, iright, jright, m1, n, p, thread_depth, mtx);
-      divconq_matmul(C,A,B, iL2, jleft, iright, jright, m2, n, p, thread_depth, mtx);
+      divconq_matmul(C,A,B, iL1, jleft, iright, jright, m1, n, p, thread_depth);
+      divconq_matmul(C,A,B, iL2, jleft, iright, jright, m2, n, p, thread_depth);
     }
 #else
     divconq_matmul(C,A,B, iL1, jleft, iright, jright, m1, n, p);
@@ -217,18 +208,8 @@ void divconq_matmul(Matrix<dataType> & C,
     std::size_t jLiR_2 = jleft + n1;
 
 #ifdef _YAFEL_PARALLEL_MATMUL
-    //std::mutex mtx1;
-    if(thread_depth < thread_depth_limit(std::thread::hardware_concurrency())) {
-      std::thread t1([&](){divconq_matmul(C,A,B, ileft, jLiR_1, jLiR_1, jright, 
-					  m, n1, p, thread_depth+1, mtx);});
-      std::thread t2([&](){divconq_matmul(C,A,B, ileft, jLiR_2, jLiR_2, jright, 
-					  m, n2, p, thread_depth+1, mtx);});
-      t1.join();
-      t2.join();
-    } else {
-      divconq_matmul(C,A,B, ileft, jLiR_1, jLiR_1, jright, m, n1, p, thread_depth, mtx);
-      divconq_matmul(C,A,B, ileft, jLiR_2, jLiR_2, jright, m, n2, p, thread_depth, mtx);
-    }
+    divconq_matmul(C,A,B, ileft, jLiR_1, jLiR_1, jright, m, n1, p, thread_depth);
+    divconq_matmul(C,A,B, ileft, jLiR_2, jLiR_2, jright, m, n2, p, thread_depth);
 #else
     divconq_matmul(C,A,B, ileft, jLiR_1, jLiR_1, jright, m, n1, p);
     divconq_matmul(C,A,B, ileft, jLiR_2, jLiR_2, jright, m, n2, p);
@@ -236,24 +217,22 @@ void divconq_matmul(Matrix<dataType> & C,
   }
   else if( p >= m && p >= n) {
     // split the "p" dimension
-    
     std::size_t jR1 = jright;
     std::size_t p1 = p/2;
     std::size_t jR2 = jright + p1;
     std::size_t p2 = p - p1;
    
 #ifdef _YAFEL_PARALLEL_MATMUL
-    std::mutex mtx1;
     if(thread_depth < thread_depth_limit(std::thread::hardware_concurrency())) {
       std::thread t1([&](){divconq_matmul(C,A,B, ileft, jleft, iright, jR1, 
-						  m, n, p1, thread_depth+1, mtx);});
+					  m, n, p1, thread_depth+1);});
       std::thread t2([&](){divconq_matmul(C,A,B, ileft, jleft, iright, jR2, 
-					  m, n, p2, thread_depth+1, mtx);});
+					  m, n, p2, thread_depth+1);});
       t1.join();
       t2.join();
     } else {
-      divconq_matmul(C,A,B, ileft, jleft, iright, jR1, m, n, p1, thread_depth, mtx);
-      divconq_matmul(C,A,B, ileft, jleft, iright, jR2, m, n, p2, thread_depth, mtx);
+      divconq_matmul(C,A,B, ileft, jleft, iright, jR1, m, n, p1, thread_depth);
+      divconq_matmul(C,A,B, ileft, jleft, iright, jR2, m, n, p2, thread_depth);
     }
 #else
     divconq_matmul(C,A,B, ileft, jleft, iright, jR1, m, n, p1);
