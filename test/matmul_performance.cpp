@@ -2,6 +2,7 @@
 #include "lin_alg/Matrix.hpp"
 #include "lin_alg/MatrixExpression.hpp"
 #include "lin_alg/matmul.hpp"
+#include "lin_alg/operators.hpp"
 #include "output/MatrixVisualization.hpp"
 
 #include <chrono>
@@ -13,13 +14,8 @@
 
 using namespace yafel;
 
-template<typename T>
-std::chrono::steady_clock::duration time_matmul(std::size_t N, Matrix<T> &A, Matrix<T> &B, Matrix<T> &C) {
-
-  //Matrix<double> A(N);
-  //Matrix<double> B(N);
-  //Matrix<double> C(N);
-  
+template<typename T1, typename T2, typename dataType>
+std::chrono::steady_clock::duration time_matmul(std::size_t N, const MatrixExpression<T1,dataType> &A, const MatrixExpression<T2,dataType> &B, Matrix<dataType> &C) {
 
   
   auto t1 = std::chrono::steady_clock::now();
