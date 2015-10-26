@@ -32,6 +32,10 @@ public:
    * incrementally to construct a sparse matrix
    */
   void add(size_type i, size_type j, value_type val) {static_cast<T&>(*this).add(i,j,val);}
+
+  // Suggest a new size for the underlying data storage to speed up incremental assembly
+  // Will not do anything if it would result in the destruction of data (ie, N < data.size())
+  void preallocate(size_type N) {static_cast<T&>(*this).preallocate(N);}
 };
 
 YAFEL_NAMESPACE_CLOSE

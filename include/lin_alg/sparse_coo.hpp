@@ -39,8 +39,7 @@ public:
       if(std::get<0>(t)==i && std::get<1>(t)==j) {
 	val += std::get<2>(t);
       }
-    }
-    
+    }    
     return val;
   }
 
@@ -78,6 +77,14 @@ public:
       return 0;
     }
   }
+  
+  void add(size_type i, size_type j, value_type val) {
+    _data.push_back(triplet(i,j,val));
+  }
+
+  void preallocate(size_type N) {
+    _data.reserve(N);
+  }
 
 private:
   std::vector<triplet> _data;
@@ -86,7 +93,10 @@ private:
   size_type _nnz;
   bool _isCompressed;
 
-  void compress();
+  void compress() {
+    std::sort(_data, std::less);
+    
+  }
 };
 
 YAFEL_NAMESPACE_CLOSE

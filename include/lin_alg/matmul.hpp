@@ -29,8 +29,6 @@
 #include <iostream>
 
 #include <thread>
-#include <mutex>
-
 
 YAFEL_NAMESPACE_OPEN
 
@@ -64,7 +62,6 @@ void divconq_matmul(Matrix<dataType> & C,
 #ifdef _YAFEL_PARALLEL_MATMUL
 		    ,
 		    std::size_t thread_depth
-		    //std::mutex &mtx
 #endif
 );
 
