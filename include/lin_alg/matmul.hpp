@@ -152,9 +152,31 @@ void divconq_matmul(Matrix<dataType> & C,
     for(std::size_t i=0; i<m; ++i) {
       for(std::size_t j=0; j<p; ++j) {
 	Cblock[i][j] = 0;
+
+	// Sachith's inner loop. Can be adapated in partial specialization for dataType=double 
+	// to use AVX FMA instructions?
+	Cblock[i][j] = 0;
+	dataType s0 = 0;
+	dataType s1 = 0;
+	dataType s2 = 0;
+	dataType s3 = 0;
+	std::size_t nn = n & (-4); // 4*floor(n/4)
+	for(std::size_t k=0; k<nn; k += 4) {
+	  s0 += Ablock[i][k+0]*BblockT[j][k+0];
+	  s1 += Ablock[i][k+1]*BblockT[j][k+1];
+	  s2 += Ablock[i][k+2]*BblockT[j][k+2];
+	  s3 += Ablock[i][k+3]*BblockT[j][k+3];
+	}
+	Cblock[i][j] += (s0 + s1 + s2 + s3);
+	for (std::size_t k = nn; k<n; ++k){
+	  Cblock[i][j] += Ablock[i][k]*BblockT[j][k];
+	}
+	/* Original innermost loop
+	 * 
 	for(std::size_t k=0; k<n; ++k) {
 	  Cblock[i][j] += Ablock[i][k]*BblockT[j][k];
 	}
+	*/
       }
     }
     
