@@ -217,10 +217,17 @@ void divconq_matmul(Matrix<dataType> & C,
     
 #ifdef _YAFEL_PARALLEL_MATMUL
     if(thread_depth < max_threads) {
+      /*
       std::thread t1([&](){divconq_matmul(C,A,B, iL1, jleft, iright, jright, 
 					  m1, n, p, thread_depth+1);});
       std::thread t2([&](){divconq_matmul(C,A,B, iL2, jleft, iright, jright, 
 					  m2, n, p, thread_depth+1);});
+      */
+      std::thread t1(divconq_matmul<T1,T2,dataType>, std::ref(C),std::ref(A),std::ref(B), iL1, jleft, iright, jright, 
+		     m1, n, p, thread_depth+1);
+      std::thread t2(divconq_matmul<T1,T2,dataType>, std::ref(C),std::ref(A),std::ref(B), iL2, jleft, iright, jright, 
+		     m2, n, p, thread_depth+1);
+
       t1.join();
       t2.join();
     } else {
@@ -258,10 +265,16 @@ void divconq_matmul(Matrix<dataType> & C,
    
 #ifdef _YAFEL_PARALLEL_MATMUL
     if(thread_depth < max_threads) {
+      /*
       std::thread t1([&](){divconq_matmul(C,A,B, ileft, jleft, iright, jR1, 
 					  m, n, p1, thread_depth+1);});
       std::thread t2([&](){divconq_matmul(C,A,B, ileft, jleft, iright, jR2, 
 					  m, n, p2, thread_depth+1);});
+      */
+      std::thread t1(divconq_matmul<T1,T2,dataType>, std::ref(C),std::ref(A),std::ref(B), ileft, jleft, iright, jR1,
+		     m, n, p1, thread_depth+1);
+      std::thread t2(divconq_matmul<T1,T2,dataType>, std::ref(C),std::ref(A),std::ref(B), ileft, jleft, iright, jR2, 
+		     m, n, p2, thread_depth+1);
       t1.join();
       t2.join();
     } else {
@@ -314,7 +327,7 @@ matmul_kernel(dataType Ablock[recursion_cutoff][recursion_cutoff],
 
 
 template<>
-__attribute__((gnu_inline))
+//__attribute__((gnu_inline))
 inline void 
 matmul_kernel(double Ablock[recursion_cutoff][recursion_cutoff], 
 		   double BblockT[recursion_cutoff][recursion_cutoff], 
@@ -331,8 +344,13 @@ matmul_kernel(double Ablock[recursion_cutoff][recursion_cutoff],
       Cblock[i][j+2] = 0;
       Cblock[i][j+3] = 0;
 
+      // For accumulating
       __m256d ymm0, ymm1, ymm2, ymm3;
+
+      // For holding Ablock[i][k:k+3]
       __m256d ymm4, ymm5, ymm6, ymm7;
+      
+      // For holding BblockT[j+dj][k:k+3]
       __m256d ymm8, ymm9, ymm10, ymm11;
       
       ymm0 = _mm256_setzero_pd();

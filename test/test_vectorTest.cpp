@@ -7,7 +7,7 @@
 using namespace yafel;
 
 
-int main(int argc, char **argv) {
+int main() {
   
   std::size_t N = 10;
   double val = 1.0;
