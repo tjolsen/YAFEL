@@ -163,33 +163,8 @@ void divconq_matmul(Matrix<dataType> & C,
       }
     }
 
-    /*
-    for(std::size_t i=0; i<m; ++i) {
-      for(std::size_t j=0; j<p; ++j) {
-	Cblock[i][j] = 0;
-
-	// Sachith's inner loop. Can be adapated in partial specialization for dataType=double 
-	// to use AVX FMA instructions?
-	Cblock[i][j] = 0;
-	dataType s0 = 0;
-	dataType s1 = 0;
-	dataType s2 = 0;
-	dataType s3 = 0;
-	std::size_t nn = n & (-4); // 4*floor(n/4)
-	for(std::size_t k=0; k<nn; k += 4) {
-	  s0 += Ablock[i][k+0]*BblockT[j][k+0];
-	  s1 += Ablock[i][k+1]*BblockT[j][k+1];
-	  s2 += Ablock[i][k+2]*BblockT[j][k+2];
-	  s3 += Ablock[i][k+3]*BblockT[j][k+3];
-	}
-	Cblock[i][j] += (s0 + s1 + s2 + s3);
-	for (std::size_t k = nn; k<n; ++k){
-	  Cblock[i][j] += Ablock[i][k]*BblockT[j][k];
-	}
-      }
-    }
-    */
-
+    // call the matrix multiplication kernel
+    // a highly optimized version exists for intel core 4xxx or 5xxx processors (requires FMA instruction support)
     matmul_kernel(Ablock,BblockT,Cblock,m,n,p);
     
     // do update to large array, have to hold mutex
@@ -240,22 +215,6 @@ void divconq_matmul(Matrix<dataType> & C,
 #endif
     
   }
-  else if( n >= m && n >= p) {
-    // split the "n" dimension
-    std::size_t n1 = n/2;
-    std::size_t n2 = n - n/2;
-    
-    std::size_t jLiR_1 = jleft;
-    std::size_t jLiR_2 = jleft + n1;
-
-#ifdef _YAFEL_PARALLEL_MATMUL
-    divconq_matmul(C,A,B, ileft, jLiR_1, jLiR_1, jright, m, n1, p, thread_depth);
-    divconq_matmul(C,A,B, ileft, jLiR_2, jLiR_2, jright, m, n2, p, thread_depth);
-#else
-    divconq_matmul(C,A,B, ileft, jLiR_1, jLiR_1, jright, m, n1, p);
-    divconq_matmul(C,A,B, ileft, jLiR_2, jLiR_2, jright, m, n2, p);
-#endif
-  }
   else if( p >= m && p >= n) {
     // split the "p" dimension
     std::size_t jR1 = jright;
@@ -286,7 +245,23 @@ void divconq_matmul(Matrix<dataType> & C,
     divconq_matmul(C,A,B, ileft, jleft, iright, jR2, m, n, p2);
 #endif
   }
-
+  else if( n >= m && n >= p) {
+    // split the "n" dimension
+    std::size_t n1 = n/2;
+    std::size_t n2 = n - n/2;
+    
+    std::size_t jLiR_1 = jleft;
+    std::size_t jLiR_2 = jleft + n1;
+    
+#ifdef _YAFEL_PARALLEL_MATMUL
+    divconq_matmul(C,A,B, ileft, jLiR_1, jLiR_1, jright, m, n1, p, thread_depth);
+    divconq_matmul(C,A,B, ileft, jLiR_2, jLiR_2, jright, m, n2, p, thread_depth);
+#else
+    divconq_matmul(C,A,B, ileft, jLiR_1, jLiR_1, jright, m, n1, p);
+    divconq_matmul(C,A,B, ileft, jLiR_2, jLiR_2, jright, m, n2, p);
+#endif
+  }
+  
 } // end divconq_matmul
 
 
