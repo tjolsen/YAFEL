@@ -18,8 +18,8 @@ CC = gcc
 AR = ar
 
 #compiler optimization and linking flags
-CFLAGS = -g -Wall -Werror -Wextra
-LFLAGS = -L$(YAFELDIR)/lib/ -lyafel
+CFLAGS = -O3 -Wall -Werror -Wextra
+LFLAGS = #-L$(YAFELDIR)/lib/ -lyafel 
 ARFLAGS = -ru
 
 #output library name
@@ -31,7 +31,7 @@ LIB = libyafel.a
 #=================================================================
 
 # These will always be necessary, so they're moved away from the configurable line
-CFLAGS += -c -I$(YAFELDIR)/include/ -std=c++11 -mavx -march=native -mtune=native -funroll-loops
+CFLAGS += -c -I$(YAFELDIR)/include -std=c++11 -mavx -march=native -mtune=native -funroll-loops
 
 ifeq ($(useOpenMP), true)
 	CFLAGS += -fopenmp
