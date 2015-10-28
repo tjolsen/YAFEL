@@ -6,7 +6,7 @@ useOpenMP = false
 linalg_optimized = true
 
 # Use Parallel Matrix multiplication algorithm
-parallel_matmul = true
+parallel_matmul = false #true
 
 #define C++ compiler
 CPP = g++
@@ -31,7 +31,7 @@ LIB = libyafel.a
 #=================================================================
 
 # These will always be necessary, so they're moved away from the configurable line
-CFLAGS += -c -I$(YAFELDIR)/include/ -std=c++11
+CFLAGS += -c -I$(YAFELDIR)/include/ -std=c++11 -mavx
 
 ifeq ($(useOpenMP), true)
 	CFLAGS += -fopenmp

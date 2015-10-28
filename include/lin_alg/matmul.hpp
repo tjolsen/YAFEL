@@ -30,13 +30,16 @@
 
 #include <thread>
 
+// AVX intrinsics
+#include <immintrin.h>
+
 YAFEL_NAMESPACE_OPEN
 
 /* 
  * Hard-coded parameters to control when to terminate recursion and move into a
  * (potentially) tightly-optimized block multiplication kernel.
  */ 
-const std::size_t recursion_cutoff = 32;
+const std::size_t recursion_cutoff = 128;
 
 // limit thread-spawning depth to floor( log2(NProcessors) )
 // This minimizes threading overhead while eliminating the need for
@@ -64,6 +67,17 @@ void divconq_matmul(Matrix<dataType> & C,
 		    std::size_t thread_depth
 #endif
 );
+
+
+// forward declaration of matmul kernel function
+template<typename dataType>
+inline void matmul_kernel(dataType Ablock[recursion_cutoff][recursion_cutoff], 
+		   dataType BblockT[recursion_cutoff][recursion_cutoff], 
+		   dataType Cblock[recursion_cutoff][recursion_cutoff],
+		   std::size_t m,
+		   std::size_t n,
+		   std::size_t p);
+
 
 
 // top-level matrix multiplication function
@@ -149,6 +163,7 @@ void divconq_matmul(Matrix<dataType> & C,
       }
     }
 
+    /*
     for(std::size_t i=0; i<m; ++i) {
       for(std::size_t j=0; j<p; ++j) {
 	Cblock[i][j] = 0;
@@ -171,14 +186,11 @@ void divconq_matmul(Matrix<dataType> & C,
 	for (std::size_t k = nn; k<n; ++k){
 	  Cblock[i][j] += Ablock[i][k]*BblockT[j][k];
 	}
-	/* Original innermost loop
-	 * 
-	for(std::size_t k=0; k<n; ++k) {
-	  Cblock[i][j] += Ablock[i][k]*BblockT[j][k];
-	}
-	*/
       }
     }
+    */
+
+    matmul_kernel(Ablock,BblockT,Cblock,m,n,p);
     
     // do update to large array, have to hold mutex
     for(std::size_t i=0; i<m; ++i) {
@@ -187,6 +199,9 @@ void divconq_matmul(Matrix<dataType> & C,
       }
     }
 
+    
+
+    
     return;
   }
   
@@ -259,7 +274,164 @@ void divconq_matmul(Matrix<dataType> & C,
 #endif
   }
 
-}
+} // end divconq_matmul
+
+
+template<typename dataType>
+inline void 
+matmul_kernel(dataType Ablock[recursion_cutoff][recursion_cutoff], 
+		   dataType BblockT[recursion_cutoff][recursion_cutoff], 
+		   dataType Cblock[recursion_cutoff][recursion_cutoff],
+		   std::size_t m,
+		   std::size_t n,
+		   std::size_t p) {
+  for(std::size_t i=0; i<m; ++i) {
+    for(std::size_t j=0; j<p; ++j) {
+      Cblock[i][j] = 0;
+      
+      // Sachith's inner loop. Can be adapated in partial specialization for dataType=double 
+      // to use AVX FMA instructions?
+      dataType s0 = 0;
+      dataType s1 = 0;
+      dataType s2 = 0;
+      dataType s3 = 0;
+      std::size_t nn = n & (-4); // 4*floor(n/4)
+      for(std::size_t k=0; k<nn; k += 4) {
+	s0 += Ablock[i][k+0]*BblockT[j][k+0];
+	s1 += Ablock[i][k+1]*BblockT[j][k+1];
+	s2 += Ablock[i][k+2]*BblockT[j][k+2];
+	s3 += Ablock[i][k+3]*BblockT[j][k+3];
+      }
+      Cblock[i][j] += (s0 + s1 + s2 + s3);
+      for (std::size_t k = nn; k<n; ++k){
+	Cblock[i][j] += Ablock[i][k]*BblockT[j][k];
+      }
+    }
+  }
+  
+  
+} // end matmul_kernel
+
+
+template<>
+__attribute__((gnu_inline))
+__attribute__((aligned(64)))
+inline void 
+matmul_kernel(double Ablock[recursion_cutoff][recursion_cutoff], 
+		   double BblockT[recursion_cutoff][recursion_cutoff], 
+		   double Cblock[recursion_cutoff][recursion_cutoff],
+		   std::size_t m,
+		   std::size_t n,
+		   std::size_t p) {
+  for(std::size_t i=0; i<m; ++i) {
+    
+    std::size_t pp = p & (-4);
+    for(std::size_t j=0; j<pp; j += 4) {
+      Cblock[i][j+0] = 0;
+      Cblock[i][j+1] = 0;
+      Cblock[i][j+2] = 0;
+      Cblock[i][j+3] = 0;
+
+      __m256d ymm0, ymm1, ymm2, ymm3;
+      __m256d ymm4, ymm5, ymm6, ymm7;
+      __m256d ymm8, ymm9, ymm10, ymm11;
+      
+      ymm0 = _mm256_setzero_pd();
+      ymm1 = _mm256_setzero_pd();
+      ymm2 = _mm256_setzero_pd();
+      ymm3 = _mm256_setzero_pd();
+
+      std::size_t nn = 16*(n/16);// & (-16); // 16*floor(n/16)
+      for(std::size_t k=0; k<nn; k += 16) {
+	ymm4 = _mm256_load_pd(&(Ablock[i][k+0]));
+	ymm5 = _mm256_load_pd(&(Ablock[i][k+4]));
+	ymm6 = _mm256_load_pd(&(Ablock[i][k+8]));
+	ymm7 = _mm256_load_pd(&(Ablock[i][k+12]));
+
+	//---------- dk=0 -----------
+	ymm8 = _mm256_load_pd(&(BblockT[j+0][k+0]));
+	ymm9 = _mm256_load_pd(&(BblockT[j+1][k+0]));
+	ymm10 = _mm256_load_pd(&(BblockT[j+2][k+0]));
+	ymm11 = _mm256_load_pd(&(BblockT[j+3][k+0]));
+
+	ymm0 = _mm256_fmadd_pd(ymm4, ymm8, ymm0);
+	ymm1 = _mm256_fmadd_pd(ymm4, ymm9, ymm1);
+	ymm2 = _mm256_fmadd_pd(ymm4, ymm10, ymm2);
+	ymm3 = _mm256_fmadd_pd(ymm4, ymm11, ymm3);
+
+	//---------- dk=4 -----------
+	ymm8 = _mm256_load_pd(&(BblockT[j+0][k+4]));
+	ymm9 = _mm256_load_pd(&(BblockT[j+1][k+4]));
+	ymm10 = _mm256_load_pd(&(BblockT[j+2][k+4]));
+	ymm11 = _mm256_load_pd(&(BblockT[j+3][k+4]));
+
+	ymm0 = _mm256_fmadd_pd(ymm5, ymm8, ymm0);
+	ymm1 = _mm256_fmadd_pd(ymm5, ymm9, ymm1);
+	ymm2 = _mm256_fmadd_pd(ymm5, ymm10, ymm2);
+	ymm3 = _mm256_fmadd_pd(ymm5, ymm11, ymm3);
+
+	
+	//---------- dk=8 -----------
+	ymm8 = _mm256_load_pd(&(BblockT[j+0][k+8]));
+	ymm9 = _mm256_load_pd(&(BblockT[j+1][k+8]));
+	ymm10 = _mm256_load_pd(&(BblockT[j+2][k+8]));
+	ymm11 = _mm256_load_pd(&(BblockT[j+3][k+8]));
+
+	ymm0 = _mm256_fmadd_pd(ymm6, ymm8, ymm0);
+	ymm1 = _mm256_fmadd_pd(ymm6, ymm9, ymm1);
+	ymm2 = _mm256_fmadd_pd(ymm6, ymm10, ymm2);
+	ymm3 = _mm256_fmadd_pd(ymm6, ymm11, ymm3);
+
+	//---------- dk=12 -----------
+	ymm8 = _mm256_load_pd(&(BblockT[j+0][k+12]));
+	ymm9 = _mm256_load_pd(&(BblockT[j+1][k+12]));
+	ymm10 = _mm256_load_pd(&(BblockT[j+2][k+12]));
+	ymm11 = _mm256_load_pd(&(BblockT[j+3][k+12]));
+
+	ymm0 = _mm256_fmadd_pd(ymm7, ymm8, ymm0);
+	ymm1 = _mm256_fmadd_pd(ymm7, ymm9, ymm1);
+	ymm2 = _mm256_fmadd_pd(ymm7, ymm10, ymm2);
+	ymm3 = _mm256_fmadd_pd(ymm7, ymm11, ymm3);
+
+
+      }
+
+      // horizontal add to accumulate dot prods
+      Cblock[i][j+0] += ( ((double*)&ymm0)[0]+((double*)&ymm0)[1]+((double*)&ymm0)[2]+((double*)&ymm0)[3] );
+      Cblock[i][j+1] += ( ((double*)&ymm1)[0]+((double*)&ymm1)[1]+((double*)&ymm1)[2]+((double*)&ymm1)[3] );
+      Cblock[i][j+2] += ( ((double*)&ymm2)[0]+((double*)&ymm2)[1]+((double*)&ymm2)[2]+((double*)&ymm2)[3] );
+      Cblock[i][j+3] += ( ((double*)&ymm3)[0]+((double*)&ymm3)[1]+((double*)&ymm3)[2]+((double*)&ymm3)[3] );
+
+      for (std::size_t k = nn; k<n; ++k){
+	Cblock[i][j+0] += Ablock[i][k]*BblockT[j+0][k];
+	Cblock[i][j+1] += Ablock[i][k]*BblockT[j+1][k];
+	Cblock[i][j+2] += Ablock[i][k]*BblockT[j+2][k];
+	Cblock[i][j+3] += Ablock[i][k]*BblockT[j+3][k];
+      }
+    } // end j<pp loop
+    for (std::size_t j = pp; j<p; ++j) {
+      Cblock[i][j] = 0;
+
+      double s0 = 0;
+      double s1 = 0;
+      double s2 = 0;
+      double s3 = 0;
+      std::size_t nn = n &(-4);
+      for(std::size_t k=0; k<nn; k+= 4) {
+	s0 += Ablock[i][k+0]*BblockT[j][k+0];
+	s1 += Ablock[i][k+1]*BblockT[j][k+1];
+	s2 += Ablock[i][k+2]*BblockT[j][k+2];
+	s3 += Ablock[i][k+3]*BblockT[j][k+3];
+      }
+      Cblock[i][j] += (s0 + s1 + s2 + s3);
+      for(std::size_t k=nn; k<n; ++k) {
+	Cblock[i][j] += Ablock[i][k]*BblockT[j][k];
+      }
+    }
+  }
+  
+  
+} // end matmul_kernel
 
 
 YAFEL_NAMESPACE_CLOSE

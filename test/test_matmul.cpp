@@ -11,13 +11,14 @@ using namespace yafel;
 
 
 void test_1() {
-
-  std::size_t N=100, N2=99;
-  Matrix<double> A(N,N, 1); 
-  Matrix<double> B(N, N2, 1);
+  
+  printf("test_matmul: test_1\n");
+  std::size_t N=1000, N2=999;
+  Matrix<> A(N,N, 1); 
+  Matrix<> B(N, N2, 1);
   
   // Will streamline with operator* and take advantage of default copy ctor
-  Matrix<double> C = matmul(A,B);
+  Matrix<> C = matmul(A,B);
   
   // ensure that dimensions are correct
   assert(C.rows() == A.rows() &&
@@ -40,7 +41,7 @@ void test_1() {
 
 
 void test_2() {
-  
+  printf("test_matmul: test_2\n");
   std::size_t N = 100;
 
   Matrix<std::size_t> A(N,N,1);
@@ -78,7 +79,7 @@ void test_2() {
 
 
 void test_3() {
-  
+  printf("test_matmul: test_3\n");
   std::size_t N = 100;
   Matrix<int> A(N,N,-3);
   Matrix<int> B(N,N,1);
