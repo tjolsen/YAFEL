@@ -61,13 +61,13 @@ int main() {
   std::vector<double> Gflops1;
   std::vector<double> Gflops2;
 
-  std::size_t Nmax = 4096;
+  std::size_t Nmax = 4096*2;
   std::size_t Nstart = 4;
   
   int Niters = 5;
 
   for(int iters=0; iters<Niters; ++iters) {
-    for(std::size_t n=Nstart; n<=Nmax; n = (n<512)? n+4 : n+512) {
+    for(std::size_t n=Nstart; n<=Nmax; n = (n<512)? n+4 : n+256) {
       std::cout << n << ": ";
       Nvec.push_back(n);
       

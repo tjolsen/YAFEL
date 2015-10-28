@@ -24,6 +24,6 @@ runtests: all
 	@for f in $(test_exefiles); do echo "Running: $$f"; ./$$f; done
 
 runbenchmarks: all
-	@for f in $(benchmark_exefiles); do echo "Running: $$f"; ./$$f; done
+	@for f in $(benchmark_exefiles); do echo "Running: $$f"; ulimit -a; ./$$f; done
 
 .PHONY: all clean runtests runbenchmarks
