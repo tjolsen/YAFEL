@@ -146,9 +146,9 @@ void divconq_matmul(Matrix<dataType> & C,
 
     // copy blocks into local memory blocks. May want to move these into a higher-up place later
     // if allocating them seems slow
-    dataType Ablock[recursion_cutoff][recursion_cutoff];
-    dataType BblockT[recursion_cutoff][recursion_cutoff];
-    dataType Cblock[recursion_cutoff][recursion_cutoff];
+    dataType Ablock[recursion_cutoff][recursion_cutoff] __attribute__ ((aligned(32)));
+    dataType BblockT[recursion_cutoff][recursion_cutoff] __attribute__ ((aligned(32)));
+    dataType Cblock[recursion_cutoff][recursion_cutoff] __attribute__ ((aligned(32)));
     
     for(std::size_t i=0; i<m; ++i) {
       for(std::size_t j=0; j<n; ++j) {
