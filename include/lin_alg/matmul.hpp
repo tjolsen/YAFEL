@@ -48,7 +48,7 @@ constexpr std::size_t thread_depth_limit(std::size_t N) {
   return (N/2 == 0) ? 0 : 1 + thread_depth_limit(N/2);
 }
 
-
+const std::size_t max_threads = thread_depth_limit(std::thread::hardware_concurrency());
 
 //forward function declaration
 template<typename T1, typename T2, typename dataType>
@@ -146,9 +146,9 @@ void divconq_matmul(Matrix<dataType> & C,
 
     // copy blocks into local memory blocks. May want to move these into a higher-up place later
     // if allocating them seems slow
-    dataType Ablock[recursion_cutoff][recursion_cutoff] __attribute__ ((aligned(32)));
-    dataType BblockT[recursion_cutoff][recursion_cutoff] __attribute__ ((aligned(32)));
-    dataType Cblock[recursion_cutoff][recursion_cutoff] __attribute__ ((aligned(32)));
+    dataType Ablock[recursion_cutoff][recursion_cutoff]__attribute__((aligned(32)));
+    dataType BblockT[recursion_cutoff][recursion_cutoff]__attribute__((aligned(32)));
+    dataType Cblock[recursion_cutoff][recursion_cutoff]__attribute__((aligned(32)));
     
     for(std::size_t i=0; i<m; ++i) {
       for(std::size_t j=0; j<n; ++j) {
@@ -216,7 +216,7 @@ void divconq_matmul(Matrix<dataType> & C,
     std::size_t m2 = m-m1;
     
 #ifdef _YAFEL_PARALLEL_MATMUL
-    if(thread_depth < thread_depth_limit(std::thread::hardware_concurrency())) {
+    if(thread_depth < max_threads) {
       std::thread t1([&](){divconq_matmul(C,A,B, iL1, jleft, iright, jright, 
 					  m1, n, p, thread_depth+1);});
       std::thread t2([&](){divconq_matmul(C,A,B, iL2, jleft, iright, jright, 
@@ -257,7 +257,7 @@ void divconq_matmul(Matrix<dataType> & C,
     std::size_t p2 = p - p1;
    
 #ifdef _YAFEL_PARALLEL_MATMUL
-    if(thread_depth < thread_depth_limit(std::thread::hardware_concurrency())) {
+    if(thread_depth < max_threads) {
       std::thread t1([&](){divconq_matmul(C,A,B, ileft, jleft, iright, jR1, 
 					  m, n, p1, thread_depth+1);});
       std::thread t2([&](){divconq_matmul(C,A,B, ileft, jleft, iright, jR2, 
@@ -315,7 +315,6 @@ matmul_kernel(dataType Ablock[recursion_cutoff][recursion_cutoff],
 
 template<>
 __attribute__((gnu_inline))
-__attribute__((aligned(64)))
 inline void 
 matmul_kernel(double Ablock[recursion_cutoff][recursion_cutoff], 
 		   double BblockT[recursion_cutoff][recursion_cutoff], 
