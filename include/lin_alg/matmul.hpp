@@ -327,7 +327,7 @@ matmul_kernel(dataType Ablock[recursion_cutoff][recursion_cutoff],
 
 
 template<>
-//__attribute__((gnu_inline))
+__attribute__((gnu_inline))
 inline void 
 matmul_kernel(double Ablock[recursion_cutoff][recursion_cutoff], 
 		   double BblockT[recursion_cutoff][recursion_cutoff], 
