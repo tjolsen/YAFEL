@@ -21,9 +21,10 @@ clean:
 	rm *.o *.vtu *.pvd $(exefiles) .depend
 
 runtests: all
-	@for f in $(test_exefiles); do echo "Running: $$f"; ./$$f; done
+	@for f in $(test_exefiles); do echo "Running: $$f"; (ulimit -S -s 8192; ./$$f); done
 
 runbenchmarks: all
-	@for f in $(benchmark_exefiles); do echo "Running: $$f"; ulimit -a; ./$$f; done
+	(ulimit -a)
+	@for f in $(benchmark_exefiles); do echo "Running: $$f"; (ulimit -S -s 8192; ./$$f); done
 
 .PHONY: all clean runtests runbenchmarks
