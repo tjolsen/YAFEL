@@ -48,7 +48,7 @@ constexpr std::size_t thread_depth_limit(std::size_t N) {
   return (N/2 == 0) ? 0 : 1 + thread_depth_limit(N/2);
 }
 
-const std::size_t max_threads = std::thread::hardware_concurrency();//thread_depth_limit(std::thread::hardware_concurrency());
+const std::size_t max_threads = thread_depth_limit(std::thread::hardware_concurrency());
 
 //forward function declaration
 template<typename T1, typename T2, typename dataType>
