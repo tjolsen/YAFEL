@@ -12,7 +12,6 @@ using namespace yafel;
 
 void test_1() {
   
-  printf("test_matmul: test_1\n");
   std::size_t N=1000, N2=999;
   Matrix<> A(N,N, 1); 
   Matrix<> B(N, N2, 1);
@@ -41,7 +40,6 @@ void test_1() {
 
 
 void test_2() {
-  printf("test_matmul: test_2\n");
   std::size_t N = 100;
 
   Matrix<std::size_t> A(N,N,1);
@@ -79,7 +77,6 @@ void test_2() {
 
 
 void test_3() {
-  printf("test_matmul: test_3\n");
   std::size_t N = 100;
   Matrix<double> A(N,N,-3);
   Matrix<double> B(N,N,1);

@@ -6,8 +6,9 @@
 #include "lin_alg/construction_sparse_matrix.hpp"
 
 #include <tuple>
-#include <cstdlib>
 #include <algorithm>
+#include <cstdlib>
+#include <cstdio>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -22,12 +23,40 @@ public:
 
   size_type rows() const {return _rows;}
   size_type cols() const {return _cols;}
-
+  size_type nnz() {
+    if(!_isCompressed) {
+      compress();
+    }
+    return _nnz;
+  }
+  
   /*
    * Constructors
    */
-  sparse_coo() : _data(10), _rows(0), _cols(0), _nnz(0), _nElements(0), _isCompressed(true)
+  sparse_coo() : 
+    _data(), _rows(0), _cols(0), 
+    _nnz(0), _isCompressed(false)
   {}
+
+
+  sparse_coo(const std::vector<triplet> &ts) : 
+    _data(ts), _rows(0), _cols(0), 
+    _nnz(0), _isCompressed(false) {
+    
+    compress();
+
+    for(auto t : _data) {
+      size_type i = std::get<0>(t);
+      size_type j = std::get<1>(t);
+
+      _rows = (_rows < i+1) ? i+1 : _cols;
+      _cols = (_cols < j+1) ? j+1 : _cols;
+    }
+    
+  }
+
+
+  //sparse_coo(const sparse_coo &coo) : sparse_coo(coo._data) {}
 
   /*
    * Will implement 2 kinds of operator() functions with different const-ness.
@@ -62,7 +91,7 @@ public:
       }
       mid = lo + (hi-lo)/2;
 
-      std::tuple<size_type, size_type> mid_ij(std::get<0>(_data[mid]), std:;get<1>(_data[mid]));
+      std::tuple<size_type, size_type> mid_ij(std::get<0>(_data[mid]), std::get<1>(_data[mid]));
       
       if(mid_ij < target) {
 	hi=mid;
@@ -85,35 +114,72 @@ public:
   }
   
   void add(size_type i, size_type j, value_type val) {
-    if(_nElements < _data.size()) {
-      _data[_nElements++] = triplet(i,j,val);
-    }
-    else {
       _data.push_back(triplet(i,j,val));
-    }
-    
+
     // update some matrix properties
     _isCompressed = false;
-    _rows = (_rows < i) ? i : _rows;
-    _cols = (_cols < j) ? j : _cols;
+    _rows = (_rows < i+1) ? i+1 : _rows;
+    _cols = (_cols < j+1) ? j+1 : _cols;
   }
 
   void preallocate(size_type N) {
     _data.reserve(N);
   }
 
+  // utility routine, useful for testing if nothing else
+  bool operator==(sparse_coo<dataType> &rhs) {
+    compress();
+    rhs.compress();
+    
+    if(_rows != rhs.rows() ||
+       _cols != rhs.cols() ||
+       _nnz != rhs.nnz()) {
+      
+      return false;
+    }
+
+    for(size_type i=0; i<_data.size(); ++i) {
+      if(_data[i] != rhs._data[i]) {
+	return false;
+      }
+    }
+
+    return true;
+  }
+  
 private:
   std::vector<triplet> _data;
   size_type _rows;
   size_type _cols;
   size_type _nnz;
-  size_type _nElements;
   bool _isCompressed;
 
   void compress() {
-    std::sort(_data, std::less);
+    
+    if(_isCompressed) {
+      return;
+    }
+    
+    // Sort data using standard tuple operator< : sorts first by i, then j, then val.
+    std::sort(_data.begin(), _data.end());
 
     
+    // Compress data by accumulating all entries with identical (i,j) into a single entry
+    size_type current_location = 0;
+    for(size_type i=1; i<_data.size(); ++i) {
+      if(std::get<0>(_data[current_location])==std::get<0>(_data[i]) &&
+	 std::get<1>(_data[current_location])==std::get<1>(_data[i])) {
+
+	std::get<2>(_data[current_location]) += std::get<2>(_data[i]);
+      }
+      else {
+	_data[++current_location] = _data[i];
+      }
+    }
+
+    _nnz = current_location+1;
+    _isCompressed = true;
+    _data.resize(_nnz);
   }
 };
 
