@@ -24,6 +24,12 @@ public:
   size_type cols() const {return _cols;}
 
   /*
+   * Constructors
+   */
+  sparse_coo() : _data(10), _rows(0), _cols(0), _nnz(0), _nElements(0), _isCompressed(true)
+  {}
+
+  /*
    * Will implement 2 kinds of operator() functions with different const-ness.
    * The non-const one will be faster for repeated use (which you shouldn't really be doing, btw),
    * as it will be permitted to call the compress() function and find the desired element via
@@ -79,7 +85,17 @@ public:
   }
   
   void add(size_type i, size_type j, value_type val) {
-    _data.push_back(triplet(i,j,val));
+    if(_nElements < _data.size()) {
+      _data[_nElements++] = triplet(i,j,val);
+    }
+    else {
+      _data.push_back(triplet(i,j,val));
+    }
+    
+    // update some matrix properties
+    _isCompressed = false;
+    _rows = (_rows < i) ? i : _rows;
+    _cols = (_cols < j) ? j : _cols;
   }
 
   void preallocate(size_type N) {
@@ -91,10 +107,12 @@ private:
   size_type _rows;
   size_type _cols;
   size_type _nnz;
+  size_type _nElements;
   bool _isCompressed;
 
   void compress() {
     std::sort(_data, std::less);
+
     
   }
 };
