@@ -8,6 +8,9 @@
 
 #include <vector>
 
+
+YAFEL_NAMESPACE_OPEN
+
 template<typename T>
 class sparsity_pattern {
 
@@ -26,5 +29,8 @@ public:
   operator T&() {return static_cast<T&>(*this);}
   operator T const&() {return static_cast<const T&>(*this);}
 };
+
+
+YAFEL_NAMESPACE_CLOSE
 
 #endif
