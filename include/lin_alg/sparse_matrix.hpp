@@ -33,7 +33,7 @@ public:
   operator T&() {return static_cast<T&>(*this);}
   operator T const&() {return static_cast<T const&>(*this);}
 
-  std::vector<triplet> get_triplets() {return static_cast<T&>(*this).cols();}
+  std::vector<triplet> get_triplets() {return static_cast<T&>(*this).get_triplets();}
 };
 
 YAFEL_NAMESPACE_CLOSE
