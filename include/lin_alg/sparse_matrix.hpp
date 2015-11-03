@@ -2,6 +2,7 @@
 #define _YAFEL_SPARSE_MATRIX_HPP
 
 #include "yafel_globals.hpp"
+#include "lin_alg/sparse_utils.hpp"
 
 #include <vector>
 #include <tuple>
@@ -22,7 +23,7 @@ public:
   typedef std::size_t size_type;
   typedef dataType value_type;
   typedef dataType& reference;
-  typedef std::tuple<size_type, size_type, value_type> triplet;
+
   
   
   size_type rows() const { return static_cast<const T&>(*this).rows(); }
@@ -33,7 +34,7 @@ public:
   operator T&() {return static_cast<T&>(*this);}
   operator T const&() {return static_cast<T const&>(*this);}
 
-  std::vector<triplet> get_triplets() {return static_cast<T&>(*this).get_triplets();}
+  std::vector<triplet> get_triplets() return {return static_cast<T&>(*this).get_triplets();}
 };
 
 YAFEL_NAMESPACE_CLOSE

@@ -2,6 +2,7 @@
 #define _YAFEL_SPARSE_COO_HPP
 
 #include "yafel_globals.hpp"
+#include "lin_alg/sparse_utils.hpp"
 #include "lin_alg/sparse_matrix.hpp"
 #include "lin_alg/construction_sparse_matrix.hpp"
 
@@ -145,6 +146,15 @@ public:
     }
 
     return true;
+  }
+
+  // Return a constant reference to the triplets, to be used in construction 
+  // of sparsity patterns and other sparse matrix formats.
+  // There is no need to make full copies for this, since the sparsity 
+  // pattern needs to allocate its own memory anyway.
+  const std::vector<triplet> & get_triplets() {
+    compress();
+    return _data;
   }
   
 private:

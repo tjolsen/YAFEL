@@ -3,6 +3,8 @@
 
 
 #include "lin_alg/sparsity_pattern.hpp"
+#include "lin_alg/sparse_matrix.hpp"
+#include "lin_alg/sparse_utils.hpp"
 
 YAFEL_NAMESPACE_OPEN
 
@@ -11,9 +13,22 @@ class csr_sparsity_pattern : public sparsity_pattern<csr_sparsity_pattern> {
 public:
   typedef typename sparsity_pattern<csr_sparsity_pattern>::container_type container_type;
   typedef typename sparsity_pattern<csr_sparsity_pattern>::size_type size_type;
-
+  typedef 
+  
   container_type row_ptr;
   container_type col_index;
+
+
+  /*
+   * Constructors
+   */
+  csr_sparsity_pattern(const container_type &rp, const container_type ci) :
+    row_ptr(rp), col_index(ci)
+  {}
+  
+  csr_sparsity_pattern(container_type &&rp, container_type &&ci) :
+    row_ptr(rp), col_index(ci)
+  {}
 
   size_type operator()(size_type i, size_type j, bool &in_sparsity) {
     in_sparsity = false;
