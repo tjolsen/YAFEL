@@ -8,9 +8,6 @@
 
 YAFEL_NAMESPACE_OPEN
 
-typedef std::tuple<size_type, size_type, value_type> triplet;
-
-
 
 
 YAFEL_NAMESPACE_CLOSE
