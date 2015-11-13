@@ -1,57 +1,118 @@
-#ifndef _YAFEL_SPARSE_CSR_HPP
-#define _YAFEL_SPARSE_CSR_HPP
+#ifndef __YAFEL_SPARSE_CSR_HPP
+#define __YAFEL_SPARSE_CSR_HPP
 
-#include "yafel_globals.hpp"
-#include "lin_alg/Vector.hpp"
+#include "lin_alg/sparse_matrix.hpp"
+#include "lin_alg/csr_sparsity_pattern.hpp"
 
-YAFEL_NAMESPACE_OPEN
 
-class sparse_coo; //forward declaration. cyclic dependancy
-class DirBC;
+template<typename dataType>
+class sparse_csr : public sparse_matrix<sparse_csr<dataType>, dataType> {
 
-class sparse_csr {
-  
-  friend class sparse_coo;
-  friend class DirBC;
+public:
+  typedef typename sparse_matrix<sparse_csr<dataType>, dataType>::container_type container_type;
+  typedef typename sparse_matrix<sparse_csr<dataType>, dataType>::size_type size_type;
+  typedef typename sparse_matrix<sparse_csr<dataType>, dataType>::value_type value_type;
+  typedef typename sparse_matrix<sparse_csr<dataType>, dataType>::reference reference;
+  typedef typename sparse_matrix<sparse_csr<dataType>, dataType>::triplet triplet;
+
+  size_type rows() const {return _rows;}
+  size_type cols() const {return _cols;}
+  size_type nnz() const {return data.size();}
+
+
+  sparse_csr(std::vector<triplet> &triplets) {
+    // std::less sorts triplets in (row, col, val) form
+    // into an order that is useful for construction of
+    // sparse_csr matrices.
+    std::sort(triplets.begin(), triplets.end(), std::less);
+    
+    //get the number of rows+1
+    row_ptr.resize(std::get<0>(*triplets.end())+1);
+
+
+    size_type curr_row = std::get<0>(triplets[0]);
+    size_type curr_col = std::get<1>(triplets[0]);
+    dataType curr_val =  std::get<2>(triplets[0]);
+
+    row_ptr[0] = 0;
+    col_index.push_back(curr_col);
+    
+    for(size_type i=1; i<triplets.size(); ++i) {
+      size_type row = std::get<0>(triplets[i]);
+      size_type col = std::get<1>(triplets[i]);
+      dataType val = std::get<2>(triplets[i]);
+      
+      if(row == curr_row && col==curr_col) {
+	// compress new value into accumulator
+	curr_val += val;
+      }
+      else if(row == curr_row) {
+	// store accumulated value, move to next col
+	
+	curr_col = col;
+	
+      }
+    }
+    
+  }
+
+
+
+  value_type operator()(size_type i, size_type j) const {
+    
+    bool in_sparsity = false;
+    
+    size_type idx = index_of(i,j,in_sparsity);
+    
+    return (in_sparsity) ? _data[idx] : _zero;
+  }
+
+  value_type& operator()(size_type i, size_type j) {
+    
+    bool in_sparsity = false;
+    
+    size_type idx = index_of(i,j,in_sparsity);
+    
+    return (in_sparsity) ? _data[idx] : _zero;
+  }
+
 
 private:
-  unsigned rows;
-  unsigned cols;
-  unsigned nnz;
-  unsigned *row_ptr;
-  unsigned *col_index;
-  double *data;
-  
-  
-public:
-  sparse_csr(sparse_coo & src);
-  sparse_csr(const sparse_csr & src);
-  ~sparse_csr();
-  void init_from_coo(sparse_coo & src);
-  inline unsigned getRows() const {return rows;}
-  inline unsigned getCols() const {return cols;}
-  inline unsigned getNNZ() const { return nnz;}
-  double operator()(unsigned i, unsigned j, bool & flag) const;
-  double operator()(unsigned i, unsigned j) const;
-  sparse_csr & operator*=(double a);
-  sparse_csr operator*(const sparse_csr & rhs) const;
-  Vector operator*(const Vector & rhs) const;
-  Vector slice_col(unsigned col) const;
-  Vector slice_row(unsigned row) const;
-  void zero_col(unsigned col);
-  void zero_row(unsigned row);
-  void assign(unsigned row, unsigned col, double val);
-  void print_sparse();
+  std::vector<size_type> row_ptr;
+  std::vector<size_type> col_index;
+  container_type data;
+  size_type _rows;
+  size_type _cols;
+  value_type _zero; // <-- this holds a zero so that I can return value_type& from a operator() call
 
-  //expert-only functions. USE AT YOUR OWN RISK
-  //I provide no guarantees. Don't fuck up the memory.
-  // The sparse_csr object will always assume that it owns
-  // the arrays, and it will proceed as if that were the case.
-  unsigned *getRowPtr() const {return row_ptr;}
-  unsigned *getColIndexPtr() const {return col_index;}
-  double *getDataPtr() const {return data;}
+
+  inline size_type index_of(size_type i, size_type j, bool &in_sparsity) const {
+    
+    in_sparsity = true;
+    size_type lo, hi, mid;
+    do {
+      lo = row_ptr[i];
+      hi = row_ptr[i+1];
+      mid = lo + (hi-lo)/2;
+      
+      size_type jmid = col_index[mid];
+      if( jmid < j) {
+	lo = mid+1;
+      }
+      else if(jmid > j) {
+	hi = mid;
+      }
+      else {
+	in_sparsity = true;
+	break;
+      }
+    } while (lo < hi);
+    
+    
+    return mid;
+  }
+
 };
 
-YAFEL_NAMESPACE_CLOSE
 
 #endif
