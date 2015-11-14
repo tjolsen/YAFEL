@@ -10,10 +10,10 @@ template<typename T, typename dataType=double>
 class construction_sparse_matrix : public sparse_matrix<construction_sparse_matrix<T,dataType>, dataType> {
 
 public:
-  typedef typename sparse_matrix<construction_sparse_matrix<T,dataType>,dataType>::size_type size_type;
-  typedef typename sparse_matrix<construction_sparse_matrix<T,dataType>,dataType>::value_type value_type;
-  typedef typename sparse_matrix<construction_sparse_matrix<T,dataType>,dataType>::reference reference;
-  typedef typename sparse_matrix<construction_sparse_matrix<T,dataType>,dataType>::triplet triplet;
+  using size_type = typename sparse_matrix<construction_sparse_matrix<T,dataType>,dataType>::size_type;
+  using value_type = typename sparse_matrix<construction_sparse_matrix<T,dataType>,dataType>::value_type;
+  using reference = typename sparse_matrix<construction_sparse_matrix<T,dataType>,dataType>::reference;
+  using triplet = typename sparse_matrix<construction_sparse_matrix<T,dataType>,dataType>::triplet;
   
 
   //interface inherited from sparse_matrix (must be implemented here like this to get static polymorphism right)
@@ -21,6 +21,7 @@ public:
   size_type cols() const { return static_cast<const T&>(*this).cols(); }
   size_type nnz() {return static_cast<T&>(*this).nnz();}
   value_type operator()(size_type i, size_type j) const {return static_cast<const T&>(*this)(i,j);}
+  const std::vector<triplet> & get_triplets() {return static_cast<T&>(*this).get_triplets();}
   
   operator T&() {return static_cast<T&>(*this);}
   operator T const&() {return static_cast<T const&>(*this);}

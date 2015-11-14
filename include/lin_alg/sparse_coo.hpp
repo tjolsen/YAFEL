@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <cstdio>
+#include <iostream>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -171,6 +172,7 @@ private:
     }
     
     // Sort data using standard tuple operator< : sorts first by i, then j, then val.
+    // This gives a csr-useful sorting order
     std::sort(_data.begin(), _data.end());
 
     
