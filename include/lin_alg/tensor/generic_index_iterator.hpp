@@ -1,7 +1,10 @@
-#ifndef _INDEX_ITERATOR_HPP
-#define _INDEX_ITERATOR_HPP
+#ifndef __YAFEL_GENERIC_INDEX_ITERATOR_HPP
+#define __YAFEL_GENERIC_INDEX_ITERATOR_HPP
 
-#include "iterator_utils.hpp"
+#include "yafel_globals.hpp"
+#include "lin_alg/tensor/iterator_utils.hpp"
+
+YAFEL_NAMESPACE_OPEN
 
 template<unsigned DIM, unsigned RANK, int... IDXS>
 class generic_index_iterator {
@@ -51,10 +54,8 @@ private:
   std::string stringify(TT t) {
     return std::to_string(t);
   }
-  
 
 public:
-
   template<typename ...Args>
   generic_index_iterator(Args... _indices) : done(false), indices(std::make_tuple(_indices...))
   {
@@ -81,5 +82,8 @@ public:
   }
 
 }; //end class
+
+
+YAFEL_NAMESPACE_CLOSE
 
 #endif

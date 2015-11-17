@@ -1,7 +1,10 @@
-#ifndef _CONST_REFERENCE_INDEX_ITERATOR_HPP
-#define _CONST_REFERENCE_INDEX_ITERATOR_HPP
+#ifndef __YAFEL_CONST_REFERENCE_INDEX_ITERATOR_HPP
+#define __YAFEL_CONST_REFERENCE_INDEX_ITERATOR_HPP
 
-#include "generic_index_iterator.hpp"
+#include "yafel_globals.hpp"
+#include "lin_alg/tensor/generic_index_iterator.hpp"
+
+YAFEL_NAMESPACE_OPEN
 
 template<typename TENSTYPE, unsigned DIM, unsigned RANK, int... IDXS>
 class const_reference_index_iterator : public generic_index_iterator<DIM,RANK,IDXS...> {
@@ -25,5 +28,8 @@ public:
     return apply_indices(this->sequence);
   }
 };
+
+
+YAFEL_NAMESPACE_CLOSE
 
 #endif

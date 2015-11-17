@@ -1,7 +1,10 @@
-#ifndef _ITERATOR_UTILS
-#define _ITERATOR_UTILS
+#ifndef __YAFEL_ITERATOR_UTILS
+#define __YAFEL_ITERATOR_UTILS
 
+#include "yafel_globals.hpp"
 #include <tuple>
+
+YAFEL_NAMESPACE_OPEN
 
 // Sequence generator
 template <int ...S>
@@ -24,5 +27,7 @@ template<typename ...Args>
 struct type_gen<0, Args...> {
   typedef std::tuple<Args...> type;
 };
+
+YAFEL_NAMESPACE_CLOSE
 
 #endif

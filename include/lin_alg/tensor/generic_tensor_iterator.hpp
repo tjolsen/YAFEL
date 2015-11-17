@@ -1,7 +1,10 @@
-#ifndef _GENERIC_TENSOR_ITERATOR_HPP
-#define _GENERIC_TENSOR_ITERATOR_HPP
+#ifndef __YAFEL_GENERIC_TENSOR_ITERATOR_HPP
+#define __YAFEL_GENERIC_TENSOR_ITERATOR_HPP
 
-#include "iterator_utils.hpp"
+#include "yafel_globals.hpp"
+#include "lin_alg/tensor/iterator_utils.hpp"
+
+YAFEL_NAMESPACE_OPEN
 
 template<unsigned DIM, unsigned RANK>
 class generic_tensor_iterator {
@@ -49,10 +52,7 @@ private:
     return std::to_string(t);
   }
   
-
 public:
-
-
   generic_tensor_iterator() : done(false)
   {
     static_assert(RANK>0, "Must have at least rank 1 tensor");
@@ -77,5 +77,8 @@ public:
   }
 
 }; //end class
+
+
+YAFEL_NAMESPACE_CLOSE
 
 #endif

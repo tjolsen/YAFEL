@@ -1,7 +1,10 @@
-#ifndef _REFERENCE_TENSOR_ITERATOR_HPP
-#define _REFERENCE_TENSOR_ITERATOR_HPP
+#ifndef __YAFEL_REFERENCE_TENSOR_ITERATOR_HPP
+#define __YAFEL_REFERENCE_TENSOR_ITERATOR_HPP
 
-#include "generic_tensor_iterator.hpp"
+#include "yafel_globals.hpp"
+#include "lin_alg/tensor/generic_tensor_iterator.hpp"
+
+YAFEL_NAMESPACE_OPEN
 
 template<typename TENSTYPE, unsigned DIM, unsigned RANK>
 class reference_tensor_iterator : public generic_tensor_iterator<DIM,RANK> {
@@ -22,5 +25,7 @@ public:
     return apply_indices(this->sequence);
   }
 };
+
+YAFEL_NAMESPACE_CLOSE
 
 #endif
