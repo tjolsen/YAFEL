@@ -9,7 +9,7 @@
 
 YAFEL_NAMESPACE_OPEN
 
-class csr_sparsity_pattern : public sparsity_pattern<csr_sparsity_pattern> {
+class csr_sparsity_pattern_copy : public sparsity_pattern<csr_sparsity_pattern> {
 
 public:
   typedef typename sparsity_pattern<csr_sparsity_pattern>::container_type container_type;
@@ -28,6 +28,28 @@ public:
   {}
 
 };
+
+
+class csr_sparsity_pattern_reference : public sparsity_pattern<csr_sparsity_pattern> {
+
+public:
+  typedef typename sparsity_pattern<csr_sparsity_pattern>::container_type container_type;
+  typedef typename sparsity_pattern<csr_sparsity_pattern>::size_type size_type;
+  
+  const container_type & row_ptr;
+  const container_type & col_index;
+
+  csr_sparsity_pattern(const container_type &rp, const container_type &ci) :
+    row_ptr(rp), col_index(ci)
+  {}
+  
+  csr_sparsity_pattern(container_type &&rp, container_type &&ci) :
+    row_ptr(rp), col_index(ci)
+  {}
+
+};
+
+
 
 YAFEL_NAMESPACE_CLOSE
 

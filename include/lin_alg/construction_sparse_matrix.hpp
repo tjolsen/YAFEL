@@ -1,5 +1,5 @@
-#ifndef _YAFEL_CONSTRUCTION_SPARSE_MATRIX
-#define _YAFEL_CONSTRUCTION_SPARSE_MATRIX
+#ifndef __YAFEL_CONSTRUCTION_SPARSE_MATRIX
+#define __YAFEL_CONSTRUCTION_SPARSE_MATRIX
 
 #include "yafel_globals.hpp"
 #include "lin_alg/sparse_matrix.hpp"
@@ -20,7 +20,7 @@ public:
   size_type rows() const { return static_cast<const T&>(*this).rows(); }
   size_type cols() const { return static_cast<const T&>(*this).cols(); }
   size_type nnz() {return static_cast<T&>(*this).nnz();}
-  value_type operator()(size_type i, size_type j) const {return static_cast<const T&>(*this)(i,j);}
+  //value_type operator()(size_type i, size_type j) const {return static_cast<const T&>(*this)(i,j);}
   const std::vector<triplet> & get_triplets() {return static_cast<T&>(*this).get_triplets();}
   
   operator T&() {return static_cast<T&>(*this);}

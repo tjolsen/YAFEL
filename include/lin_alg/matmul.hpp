@@ -1,5 +1,5 @@
-#ifndef _YAFEL_MATMUL_HPP
-#define _YAFEL_MATMUL_HPP
+#ifndef __YAFEL_MATMUL_HPP
+#define __YAFEL_MATMUL_HPP
 
 
 /*

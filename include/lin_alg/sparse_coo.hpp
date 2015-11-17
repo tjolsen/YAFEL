@@ -58,8 +58,6 @@ public:
   }
 
 
-  //sparse_coo(const sparse_coo &coo) : sparse_coo(coo._data) {}
-
   /*
    * Will implement 2 kinds of operator() functions with different const-ness.
    * The non-const one will be faster for repeated use (which you shouldn't really be doing, btw),
@@ -69,6 +67,7 @@ public:
    * The const version will not be permitted to do this, so it must do a linear scan through ALL
    * triples to ensure proper aggregation of the value.
    */
+  /*
   value_type operator()(size_type i, size_type j) const {
     value_type val(0);
     
@@ -114,7 +113,8 @@ public:
       return 0;
     }
   }
-  
+  */
+
   void add(size_type i, size_type j, value_type val) {
       _data.push_back(triplet(i,j,val));
 

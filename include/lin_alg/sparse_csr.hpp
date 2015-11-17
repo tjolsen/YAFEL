@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include <algorithm>
-#include <typeinfo>
+#include <cstdlib>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -88,62 +88,56 @@ public:
   sparse_csr(sparse_matrix<T,dataType> &sp) : sparse_csr(sp.get_triplets()) {}
 
 
+  /*
+   * Index operators
+   * Defining _OPTIMIZED turns off bounds checking
+   */
   value_type operator()(size_type i, size_type j) const {
+#ifndef _OPTIMIZED
+    if(i>=_rows || j >= cols) {
+      std::cerr << "error:sparse_csr:operator() out of bounds\n";
+      exit(1);
+    }
+#endif
     bool in_sparsity = true;
     size_type idx = index_of(i,j,in_sparsity);
-    return (in_sparsity) ? _data[idx] : _zero;
+    return (in_sparsity) ? _data[idx] : dataType(0);
   }
 
   value_type& operator()(size_type i, size_type j) {
+#ifndef _OPTIMIZED
+    if(i>=_rows || j >= cols) {
+      std::cerr << "error:sparse_csr:operator() out of bounds\n";
+      exit(1);
+    }
+#endif
+
     bool in_sparsity = true;
     size_type idx = index_of(i,j,in_sparsity);
     return (in_sparsity) ? _data[idx] : _zero;
   }
 
+  /*
+   * Functions to get sparsity patterns.
+   * csr_sparsity_pattern_copy contains a deep copy of row_ptr, col_index
+   * csr_sparsity_pattern_reference contains const references to these vectors
+   */
+  csr_sparsity_pattern_copy get_sparsity_pattern_copy() const {
+    return csr_sparsity_pattern_copy(row_ptr, col_index);
+  }
 
+  csr_sparsity_pattern_reference get_sparsity_pattern_reference() const {
+    return csr_sparsity_pattern_reference(row_ptr, col_index);
+  }
+  
+
+private:
   std::vector<size_type> row_ptr;
   std::vector<size_type> col_index;
   container_type _data;
-private:
   size_type _rows;
   size_type _cols;
   value_type _zero; // <-- this holds a zero so that I can return value_type& from a operator() call
-
-  /*
-  inline size_type index_of(size_type i, size_type j, bool &in_sparsity) const {
-    in_sparsity = true;
-    size_type lo, hi, mid;
-
-    lo = row_ptr[i];
-    hi = row_ptr[i+1];
-
-    
-    do {
-      mid = lo + (hi-lo)/2;
-      
-      std::cout << "lo:"<<lo<<" mid:"<<mid<<" hi:"<<hi<<"\n";
-      std::cout << "cilo:"<<col_index[lo]<<" cimid:"<<col_index[mid]<<" cihi:"<<col_index[hi]<<"\n";
-      
-      size_type jmid = col_index[mid];
-      std::cout << "jmid:" << j << " j:" << j <<" " <<(jmid==j) << "\n";
-
-      if(jmid == j) {
-	std::cout << "returning\n";
-	in_sparsity = true;
-	return mid;
-      }
-      if( jmid < j) {
-	lo = mid+1;
-      }
-      else if(jmid > j) {
-	hi = mid;
-      }
-    } while (lo < hi);
-
-    std::cout << "terminated naturally\n";
-    return mid;
-  }
-  */
   
   inline size_type index_of(size_type i, size_type j, bool &in_sparsity) {
     for(size_type idx=row_ptr[i]; idx<row_ptr[i+1]; ++idx) {

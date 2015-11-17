@@ -22,7 +22,10 @@ public:
   size_type rows() const { return static_cast<const T&>(*this).rows(); }
   size_type cols() const { return static_cast<const T&>(*this).cols(); }
   size_type nnz() {return static_cast<T&>(*this).nnz();}
-  value_type operator()(size_type i, size_type j) const {return static_cast<const T&>(*this)(i,j);}
+
+  // moving this to the access_sparse_matrix CRTP-intermediate class.
+  // This removes operator() from the construction_sparse_matrix class, taking capability away from sparse_coo
+  //value_type operator()(size_type i, size_type j) const {return static_cast<const T&>(*this)(i,j);}
   
   operator T&() {return static_cast<T&>(*this);}
   operator T const&() {return static_cast<T const&>(*this);}
