@@ -34,7 +34,7 @@ template <typename T, unsigned DIM, unsigned RANK, typename dataType=double>
 class TensorExpression {
 
 public:
-  typedef size_type = std::size_t;
+  using size_type = std::size_t;
   using value_type = dataType;
 
   size_type rank() const {return RANK;}
@@ -55,20 +55,20 @@ public:
 
 //--------------------------------------------------------------------------------
 /*
- *
+ * Scalar scaling of a tensor expression. Scalar type T2 must be type-convertable to dataType
  */
 //--------------------------------------------------------------------------------
 template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType=double>
-class TensorScaled : public TensorExpression<TensorScaled<T1,DIM,RANK,dataType>, DIM, RANK, dataType> {
+class TensorScaled : public TensorExpression<TensorScaled<T1,T2,DIM,RANK,dataType>, DIM, RANK, dataType> {
 public:
-  using value_type = typename TensorExpression<TensorScaled<T1,DIM,RANK,dataType>,DIM,RANK,dataType>::value_type;
+  using value_type = typename TensorExpression<TensorScaled<T1,T2,DIM,RANK,dataType>,DIM,RANK,dataType>::value_type;
 private:
   const T1 &_u;
   const dataType alpha;
   
 public:
   TensorScaled(const TensorExpression<T1,DIM,RANK,dataType> &u, T2 a)
-    : _u(u), alpha(a)
+    : _u(u), alpha(dataType(a))
   {}
   
   template<typename ...Args>
@@ -196,7 +196,7 @@ otimes(const TensorExpression<T1,DIM,R1,dataType> &u,
 template <typename T1, typename T2, unsigned DIM, unsigned R1, unsigned R2, 
 	  unsigned NCONTRACT, typename dataType=double>
 class TensorContraction :
-  public TensorExpression<TensorContraction<T1,T2,DIM,R1,R2,dataType>,DIM,R1+R2-2*NCONTRACT, dataType>
+  public TensorExpression<TensorContraction<T1,T2,DIM,R1,R2,NCONTRACT,dataType>,DIM,R1+R2-2*NCONTRACT, dataType>
 {
 public:
   using value_type = typename TensorExpression<TensorContraction<T1,T2,DIM,R1,R2,NCONTRACT,dataType>,DIM, R1+R2-2*NCONTRACT, dataType>::value_type;
