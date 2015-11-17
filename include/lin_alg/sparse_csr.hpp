@@ -2,6 +2,7 @@
 #define __YAFEL_SPARSE_CSR_HPP
 
 #include "lin_alg/sparse_matrix.hpp"
+#include "lin_alg/access_sparse_matrix.hpp"
 #include "lin_alg/csr_sparsity_pattern.hpp"
 
 #include <iostream>
@@ -11,7 +12,7 @@
 YAFEL_NAMESPACE_OPEN
 
 template<typename dataType=double>
-class sparse_csr : public sparse_matrix<sparse_csr<dataType>, dataType> {
+class sparse_csr : public access_sparse_matrix<sparse_csr<dataType>, dataType> {
 
 public:
   using container_type =  typename sparse_matrix<sparse_csr<dataType>, dataType>::container_type;
