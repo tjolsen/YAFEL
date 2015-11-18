@@ -17,6 +17,7 @@
 #include "lin_alg/tensor/const_reference_index_iterator.hpp"
 
 #include <tuple>
+#include <type_traits>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -75,6 +76,21 @@ public:
   value_type operator()(Args ...args) const {return _u(args...)*alpha;}
 };
 
+template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType>
+const TensorScaled<T1,T2,DIM,RANK,dataType>
+operator*(const TensorExpression<T1,DIM,RANK,dataType> &u, T2 alpha) {
+  static_assert(std::is_fundamental<T2>::value,
+		"Error: TensorScaled currently only intended for primitive types");
+  return TensorScaled<T1,T2,DIM,RANK,dataType>(u,alpha);
+}
+
+template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType>
+const TensorScaled<T1,T2,DIM,RANK,dataType>
+operator*(T2 alpha, const TensorExpression<T1,DIM,RANK,dataType> &u) {
+  static_assert(std::is_fundamental<T2>::value,
+		"Error: TensorScaled currently only intended for primitive types");
+  return TensorScaled<T1,T2,DIM,RANK,dataType>(u,alpha);
+}
 
 //--------------------------------------------------------------------------------
 /*
@@ -102,7 +118,7 @@ public:
 
 };
 
-template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType=double>
+template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType>
 const TensorSum<T1,T2,DIM,RANK,dataType>
 operator+(const TensorExpression<T1,DIM,RANK,dataType> &u,
 	  const TensorExpression<T2,DIM,RANK,dataType> &v) {

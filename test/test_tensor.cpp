@@ -73,7 +73,7 @@ bool test_4() {
 
 // Test tensor subtraction
 bool test_5() {
-  Tensor<3,2,int> A,B;
+  Tensor<3,5,int> A,B;
 
   int a=1, b=2;
 
@@ -84,12 +84,36 @@ bool test_5() {
     *it = b;
   }
 
-  Tensor<3,2,int> C = A-B;
+  Tensor<3,5,int> C = A-B;
   bool good = true;
   for(auto it=C.begin(); !it.end(); it.next()) {
     good = good && (*it==(a-b));
   }
   
+  return good;
+}
+
+// Test tensor scaling
+bool test_6() {
+
+  Tensor<4,4,int> A,B;
+
+  // put together some contrived calculation that couldn't be accidental
+  int a = 4, b = -3;
+  for(auto it=A.begin(); !it.end(); it.next()) {
+    *it = 2;
+  }
+  for(auto it=B.begin(); !it.end(); it.next()) {
+    *it = 1;
+  }
+  
+  Tensor<4,4,int> C = a*A + b*B;
+
+  bool good = true;
+  for(auto it=C.begin(); !it.end(); it.next()) {
+    good = good && (*it == (2*a + b));
+  }
+
   return good;
 }
 
@@ -117,6 +141,10 @@ int main() {
   if(!test_5()) {
     retval |= 1<<4;
     std::cout << "Failed test_5" << "\n";
+  }
+  if(!test_6()) {
+    retval |= 1<<5;
+    std::cout << "Failed test_6" << "\n";
   }
 
   return retval;
