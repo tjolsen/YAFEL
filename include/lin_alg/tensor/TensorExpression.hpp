@@ -193,6 +193,9 @@ public:
   
   template<typename ...Args>
   value_type operator()(Args ...args) const {
+    static_assert(sizeof...(args) == R1+R2, 
+		  "OuterProduct::operator() error wrong number of arguments");
+
     return lhs(typename gens<R1>::type(), std::forward_as_tuple(args...))
       *rhs(typename gens<R2>::type(), std::forward_as_tuple(args...));
   }
@@ -209,13 +212,26 @@ otimes(const TensorExpression<T1, DIM, R1, dataType> &u,
 
 
 //--------------------------------------------------------------------------------
+/*
+ * Class representing the inner-product contraction of 2 tensors.
+ * The NCONTRACT template parameter specifies how many indices are to be contracted out
+ *
+ * Need to figure out way to specialize to return a dataType rather than a TensorExpression
+ * for operations resulting in a rank 0 tensor.
+ *
+ * Example operations would be: 
+ *                             c_i = A_{ij}b_{j}      <--- NCONTRACT = 1
+ *                             A_{ij} = C_{ijkl}B_{kl}    <--- NCONTRACT = 2
+ */
+//--------------------------------------------------------------------------------
 template <typename T1, typename T2, unsigned DIM, unsigned R1, unsigned R2, 
 	  unsigned NCONTRACT, typename dataType=double>
 class TensorContraction :
   public TensorExpression<TensorContraction<T1,T2,DIM,R1,R2,NCONTRACT,dataType>,DIM,R1+R2-2*NCONTRACT, dataType>
 {
 public:
-  using value_type = typename TensorExpression<TensorContraction<T1,T2,DIM,R1,R2,NCONTRACT,dataType>,DIM, R1+R2-2*NCONTRACT, dataType>::value_type;
+  using value_type = typename TensorExpression<TensorContraction<T1,T2,DIM,R1,R2,NCONTRACT,dataType>,
+					       DIM, R1+R2-2*NCONTRACT, dataType>::value_type;
 
 private:
   const T1 &_u;

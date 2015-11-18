@@ -22,7 +22,10 @@ public:
   const_reference_index_iterator(const TENSTYPE &t, Args... _indices) : 
     generic_index_iterator<DIM,RANK,IDXS...>(_indices...), 
     _t(t)
-  {}
+  {
+    static_assert(sizeof...(_indices)==RANK,
+		  "const_reference_index_iterator: wrong numbero f indices");
+  }
   
   typename TENSTYPE::value_type operator*() const {
     return apply_indices(this->sequence);
