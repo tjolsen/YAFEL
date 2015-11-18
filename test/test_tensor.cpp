@@ -6,18 +6,92 @@
 
 using namespace yafel;
 
+// Test that generic_tensor_iterator is hitting the right number of locations
 bool test_1() {
 
-  generic_tensor_iterator<3,2> GI;
+  generic_tensor_iterator<3,4> GI;
   std::size_t count=0;
   
   for(; !GI.end(); GI.next()) {
     ++count;
   }
   
-  return count == 3*3;
+  return count == 3*3*3*3;
 }
 
+
+// Test that generic_index_iterator hits correct number of locations
+bool test_2() {
+  generic_index_iterator<3,4,0,1> GI(0,0,0,0);
+  std::size_t count=0;
+  
+  for(; !GI.end(); GI.next()) {
+    ++count;
+  }
+  return count==3*3;
+}
+
+// Test construction of Tensor object, assignment of values, then sum of values
+bool test_3() {
+
+  Tensor<3,2> A;
+  
+  int a = 1;
+  for(auto it=A.begin(); !it.end(); it.next()) {
+    *it = a;
+    ++a;
+  }
+
+  int sum=0;
+  for(auto it = A.begin(); !it.end(); it.next()) {
+    sum += *it;
+  }
+  return sum == 45;
+}
+
+// Test tensor addition
+bool test_4() {
+  Tensor<3,2,int> A,B;
+
+  int a=1, b=2;
+
+  for(auto it=A.begin(); !it.end(); it.next()) {
+    *it = a;
+  }
+  for(auto it=B.begin(); !it.end(); it.next()) {
+    *it = b;
+  }
+
+  Tensor<3,2,int> C = A+B;
+  bool good = true;
+  for(auto it=C.begin(); !it.end(); it.next()) {
+    good = good && (*it==(a+b));
+  }
+  
+  return good;
+}
+
+// Test tensor subtraction
+bool test_5() {
+  Tensor<3,2,int> A,B;
+
+  int a=1, b=2;
+
+  for(auto it=A.begin(); !it.end(); it.next()) {
+    *it = a;
+  }
+  for(auto it=B.begin(); !it.end(); it.next()) {
+    *it = b;
+  }
+
+  Tensor<3,2,int> C = A-B;
+  bool good = true;
+  for(auto it=C.begin(); !it.end(); it.next()) {
+    good = good && (*it==(a-b));
+  }
+  
+  return good;
+}
 
 
 int main() {
@@ -27,6 +101,22 @@ int main() {
   if(!test_1()) {
     retval |= 1<<0;
     std::cout << "Failed test_1" << "\n";
+  }
+  if(!test_2()) {
+    retval |= 1<<1;
+    std::cout << "Failed test_2" << "\n";
+  }
+  if(!test_3()) {
+    retval |= 1<<2;
+    std::cout << "Failed test_3" << "\n";
+  }
+  if(!test_4()) {
+    retval |= 1<<3;
+    std::cout << "Failed test_4" << "\n";
+  }
+  if(!test_5()) {
+    retval |= 1<<4;
+    std::cout << "Failed test_5" << "\n";
   }
 
   return retval;

@@ -18,6 +18,11 @@ public:
   template<typename ...Args>
   value_type operator()(Args ...args) const {return _data[index(args...)];}
   
+  //get a reference_tensor_iterator to the beginning
+  reference_tensor_iterator<Tensor<DIM,RANK,dataType>,DIM,RANK> begin() {
+    return reference_tensor_iterator<Tensor<DIM,RANK,dataType>,DIM,RANK>(*this);
+  }
+  
   //initialize a zero-tensor
   Tensor() {
     for(unsigned i=0; i<_tensorStorage(DIM,RANK); ++i) {

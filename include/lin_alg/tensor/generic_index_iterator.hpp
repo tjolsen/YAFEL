@@ -57,7 +57,7 @@ private:
 
 public:
   template<typename ...Args>
-  generic_index_iterator(Args... _indices) : done(false), indices(std::make_tuple(_indices...))
+  generic_index_iterator(Args... _indices) : indices(std::make_tuple(_indices...)), done(false)
   {
     static_assert(RANK>0, "Must have at least rank 1 tensor");
     static_assert(sizeof...(Args) == RANK, "RANK/nargs mismatch");

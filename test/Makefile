@@ -1,4 +1,4 @@
-testfiles = test_vectorTest.cpp test_matrixTest.cpp test_sparse_coo.cpp test_sparse_csr.cpp test_tensor.cpp test_matmul.cpp 
+testfiles = test_vectorTest.cpp test_matrixTest.cpp test_sparse_coo.cpp test_sparse_csr.cpp test_tensor.cpp #test_matmul.cpp 
 benchmarkfiles = matmul_performance.cpp
 cppfiles = $(testfiles) $(benchmarkfiles)
 
@@ -25,6 +25,6 @@ runtests: all
 
 runbenchmarks: all
 	(ulimit -a)
-	@for f in $(benchmark_exefiles); do echo "Running: $$f"; (ulimit -S -s 8192; ./$$f); done
+	@for f in $(benchmark_exefiles); do echo "Running: $$f"; (ulimit -S -s 8192; a=./$$f); done
 
 .PHONY: all clean runtests runbenchmarks
