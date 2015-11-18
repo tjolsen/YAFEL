@@ -227,7 +227,8 @@ otimes(const TensorExpression<T1, DIM, R1, dataType> &u,
 template <typename T1, typename T2, unsigned DIM, unsigned R1, unsigned R2, 
 	  unsigned NCONTRACT, typename dataType=double>
 class TensorContraction :
-  public TensorExpression<TensorContraction<T1,T2,DIM,R1,R2,NCONTRACT,dataType>,DIM,R1+R2-2*NCONTRACT, dataType>
+  public TensorExpression<TensorContraction<T1,T2,DIM,R1,R2,NCONTRACT,dataType>,
+			  DIM,R1+R2-2*NCONTRACT, dataType>
 {
 public:
   using value_type = typename TensorExpression<TensorContraction<T1,T2,DIM,R1,R2,NCONTRACT,dataType>,
@@ -237,14 +238,24 @@ private:
   const T1 &_u;
   const T2 &_v;
 
+  
+
+
 public:
   
   TensorContraction(const TensorExpression<T1,DIM,R1,dataType> &u,
 		    const TensorExpression<T2,DIM,R2,dataType> &v)
     : _u(u), _v(v)
-  {}
+  {
+    static_assert(NCONTRACT>=1 && NCONTRACT<R1 && NCONTRACT<R2,
+		  "TensorContraction: bad value of NCONTRACT");
+  }
 
-
+  template <typename ...Args>
+    value_type operator()(Args ...args) {
+    
+  }
+  
 };
 
 
