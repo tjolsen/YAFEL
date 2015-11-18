@@ -167,8 +167,7 @@ operator-(const TensorExpression<T1,DIM,RANK,dataType> &u,
  */
 //--------------------------------------------------------------------------------
 template <typename T1, typename T2, unsigned DIM, unsigned R1, unsigned R2, typename dataType=double>
-class OuterProduct : 
-  public TensorExpression<OuterProduct<T1,T2,DIM,R1,R2,dataType>,DIM,R1+R2,dataType>
+class OuterProduct : public TensorExpression<OuterProduct<T1,T2,DIM,R1,R2,dataType>,DIM,R1+R2,dataType>
 {
 public:
   using value_type = typename TensorExpression<OuterProduct<T1,T2,DIM,R1,R2,dataType>,DIM,R1+R2,dataType>::value_type;
@@ -183,13 +182,13 @@ private:
   
   template <int ...S, typename ...Args>
   value_type rhs(seq<S...>, const std::tuple<Args...> &params) const {
-    return _u(std::get<S+R1>(params)...);
+    return _v(std::get<S+R1>(params)...);
   }
   
 public:
-  OuterProduct(const TensorExpression<T1,DIM,R1,dataType> &u,
-	       const TensorExpression<T1,DIM,R1,dataType> &v)
-    : _u(u), _v(v)
+  OuterProduct(const TensorExpression<T1,DIM,R1,dataType> &u, 
+	       const TensorExpression<T2,DIM,R2,dataType> &v) 
+  : _u(u), _v(v)
   {}
   
   template<typename ...Args>
@@ -202,9 +201,10 @@ public:
 
 template<typename T1, typename T2, unsigned DIM, unsigned R1, unsigned R2, typename dataType=double>
 const OuterProduct<T1,T2,DIM,R1,R2,dataType>
-otimes(const TensorExpression<T1,DIM,R1,dataType> &u,
-       const TensorExpression<T2,DIM,R2,dataType> &v) {
-  return OuterProduct<T1,T2,DIM,R1,R2,dataType>(u,v);
+otimes(const TensorExpression<T1, DIM, R1, dataType> &u,
+       const TensorExpression<T2, DIM, R2, dataType> &v) 
+{
+  return OuterProduct<T1, T2, DIM, R1, R2, dataType>(u,v);
 }
 
 

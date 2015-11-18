@@ -117,6 +117,28 @@ bool test_6() {
   return good;
 }
 
+// test outer product
+bool test_7() {
+  
+  Tensor<3,3,double> A;
+  Tensor<3,2,double> B;
+  
+  double a=2, b=3;
+  for(auto it=A.begin(); !it.end(); it.next()) {
+    *it=a;
+  }
+  for(auto it=B.begin(); !it.end(); it.next()) {
+    *it=b;
+  }
+
+  bool good = true;
+  Tensor<3,5> C = otimes(A,B);
+  for(auto it=C.begin(); !it.end(); it.next()) {
+    good = good && (*it == a*b);
+  }
+
+  return good;
+}
 
 int main() {
 
@@ -145,6 +167,10 @@ int main() {
   if(!test_6()) {
     retval |= 1<<5;
     std::cout << "Failed test_6" << "\n";
+  }
+  if(!test_7()) {
+    retval |= 1<<6;
+    std::cout << "Failed test_7" << "\n";
   }
 
   return retval;
