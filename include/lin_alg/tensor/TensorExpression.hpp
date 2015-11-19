@@ -238,8 +238,22 @@ private:
   const T1 &_u;
   const T2 &_v;
 
-  
+  template<int ...S1, int ...S2, typename ...Args>
+  const_reference_index_iterator<T1,DIM,RANK,R1-NCONTRACT+S...>
+  lhs_iterator(seq<S1...>, const std::tuple<Args...> &params) {
+    
+    
+    
+  }
 
+  template<int ...S, typename ...Args>
+  const_reference_index_iterator<T1,DIM,RANK,S...>
+  rhs_iterator(seq<S...>, const std::tuple<Args...> &params) {
+    
+    
+    
+  }
+  
 
 public:
   
@@ -252,7 +266,10 @@ public:
   }
 
   template <typename ...Args>
-    value_type operator()(Args ...args) {
+  value_type operator()(Args ...args) {
+    
+    auto lhsit = lhs_iterator(typename gens<R1-NCONTRACT>::type(), std::forward_as_tuple(args...));
+    auto rhsit = rhs_iterator(typename gens<R2-NCONTRACT>::type(), std::forward_as_tuple(args...));
     
   }
   
