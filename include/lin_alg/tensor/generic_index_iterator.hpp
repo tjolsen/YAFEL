@@ -70,7 +70,7 @@ public:
   
   void reset() {
     done = false;
-    zero_level(seq<RANK-1>());
+    zero_level(seq<IDXS...>());
   }
   
   bool end() {

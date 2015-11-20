@@ -18,6 +18,7 @@
 
 #include <tuple>
 #include <type_traits>
+#include <iostream>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -240,32 +241,24 @@ private:
 
   template<int ...S, int ...ZSEQ, int ...NCSEQ, typename ...Args>
     const_reference_index_iterator<T1,DIM,R1,R1-NCONTRACT+NCSEQ...>
-    lhs_iterator(seq<S...>, seq<NCSEQ...>, zseq<ZSEQ...>, const std::tuple<Args...> &params) {
+    lhs_iterator(seq<S...>, seq<NCSEQ...>, zseq<ZSEQ...>, const std::tuple<Args...> &params) const {
     
-    const_reference_index_iterator<T1,DIM,R1,R1-NCONTRACT+NCSEQ...> it(_u, std::get<S>(params)..., ZSEQ...);
+    const_reference_index_iterator<T1,DIM,R1,R1-NCONTRACT+NCSEQ...> 
+      it(_u, std::get<S>(params)..., ZSEQ...);
     
     return it;
   }
-
+  
   template<int ...S, int ...ZSEQ, int ...NCSEQ, typename ...Args>
-    const_reference_index_iterator<T1,DIM,R1,R1-NCONTRACT+NCSEQ...>
-    rhs_iterator(seq<S...>, seq<NCSEQ...>, zseq<ZSEQ...>, const std::tuple<Args...> &params) {
+    const_reference_index_iterator<T1,DIM,R2,NCSEQ...>
+    rhs_iterator(seq<S...>, seq<NCSEQ...>, zseq<ZSEQ...>, const std::tuple<Args...> &params) const {
     
-    const_reference_index_iterator<T2,DIM,R2,NCSEQ...> it(_v, ZSEQ..., std::get<S+R1-NCONTRACT>(params)...);
-    
-    return it;
-  }
-
-  /*
-  template<int ...S, typename ...Args>
-  const_reference_index_iterator<T1,DIM,R1,R1-NCONTRACT+S...>
-  rhs_iterator(seq<S...>, const std::tuple<Args...> &params) {
-    
-    
+    const_reference_index_iterator<T2,DIM,R2,NCSEQ...> 
+      it(_v, ZSEQ..., std::get<S+R1-NCONTRACT>(params)...);
     
     return it;
   }
-  */
+  
 
 public:
   
@@ -278,7 +271,7 @@ public:
   }
 
   template <typename ...Args>
-  value_type operator()(Args ...args) {
+  value_type operator()(Args ...args) const {
     
     auto lhsit = lhs_iterator(typename gens<R1-NCONTRACT>::type(), 
 			      typename gens<NCONTRACT>::type(), 
