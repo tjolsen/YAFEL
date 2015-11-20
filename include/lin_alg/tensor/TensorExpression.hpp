@@ -250,7 +250,7 @@ private:
   }
   
   template<int ...S, int ...ZSEQ, int ...NCSEQ, typename ...Args>
-    const_reference_index_iterator<T1,DIM,R2,NCSEQ...>
+    const_reference_index_iterator<T2,DIM,R2,NCSEQ...>
     rhs_iterator(seq<S...>, seq<NCSEQ...>, zseq<ZSEQ...>, const std::tuple<Args...> &params) const {
     
     const_reference_index_iterator<T2,DIM,R2,NCSEQ...> 

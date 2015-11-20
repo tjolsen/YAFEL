@@ -193,7 +193,7 @@ bool test_9() {
   
 
   auto C = contract<2>(A,B);
-  Tensor<3,4> D;
+  Tensor<3,4,int> D;
   bool good = true;
   for(std::size_t i=0; i<3; ++i) {
     for(std::size_t j=0; j<3; ++j) {
@@ -211,6 +211,35 @@ bool test_9() {
     }
   }
 
+  return good;
+}
+
+// Test tensor contraction of rank 2 and rank 1 tensors
+bool test_10() {
+  Tensor<3,2,int> A;
+  Tensor<3,1,int> B;
+
+  int a = 7;
+  for(auto it=A.begin(); !it.end(); it.next()) {
+    *it = a;
+    a = (17*a)%31;
+  }
+  for(auto it=B.begin(); !it.end(); it.next()) {
+    *it = a;
+    a = (17*a)%31;
+  }
+
+  auto C = contract<1>(A,B);
+  Tensor<3,1,int> D;
+  bool good = true;
+  for(std::size_t i=0; i<3; ++i) {
+    D(i) = 0;
+    for(std::size_t j=0; j<3; ++j) {
+      D(i) += A(i,j)*B(j);
+    }
+    good = good && C(i)==D(i);
+  }
+  
   return good;
 }
 
@@ -254,6 +283,10 @@ int main() {
   if(!test_9()) {
     retval |= 1<<8;
     std::cout << "Failed test_9" << "\n";
+  }
+  if(!test_10()) {
+    retval |= 1<<9;
+    std::cout << "Failed test_10" << "\n";
   }
 
   return retval;
