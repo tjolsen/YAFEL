@@ -3,9 +3,9 @@ YAFEL
 
 Yet Another Finite Element Library
 
-YAFEL is a general-purpose library written entirely in C++ (moving to C++11 features as new things are added).
-It is developed primarily as a learning exercise for myself, but is used as a research code
-as well. The library is entirely self-contained -- it does not link to any non-standard 
+YAFEL is a general-purpose finite element library written entirely in C++/C++11.
+It is being developed primarily as a learning exercise and research code.
+The library is entirely self-contained -- it does not link to any non-standard 
 external libraries. This decision was made not because I think my hand-rolled data structures
 and algorithms will out-perform those under professional development (PETSc, Trilinos, deal.ii),
 but because I wanted to fully understand the details of what is occurring at every stage of
