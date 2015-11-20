@@ -140,6 +140,25 @@ bool test_7() {
   return good;
 }
 
+// Test tensor-contraction of rank 2 tensors (ie: matmul)
+bool test_8() {
+  
+  Tensor<3,2> A,B;
+  
+  for(std::size_t i=0; i<3; ++i) {
+    for(std::size_t j=0; j<3; ++j)  {
+      A(i,j) = 1.0;
+      B(i,j) = 2.0;
+    }
+  }
+  
+  Tensor<3,2> C = contract<1>(A,B);
+  
+  
+  return C(0,0) == 6.0;
+}
+
+
 int main() {
 
   int retval = 0;
@@ -171,6 +190,10 @@ int main() {
   if(!test_7()) {
     retval |= 1<<6;
     std::cout << "Failed test_7" << "\n";
+  }
+  if(!test_8()) {
+    retval |= 1<<7;
+    std::cout << "Failed test_8" << "\n";
   }
 
   return retval;

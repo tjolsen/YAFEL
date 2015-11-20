@@ -38,7 +38,7 @@ struct zeroGen : zeroGen<N-1, 0, S...> {};
 template<int ...S>
 struct zeroGen<0,S...> {
   typedef zseq<S...> type;
-}
+};
 
 YAFEL_NAMESPACE_CLOSE
 

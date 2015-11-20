@@ -238,15 +238,25 @@ private:
   const T1 &_u;
   const T2 &_v;
 
-  template<int ...S, typename ...Args>
-  const_reference_index_iterator<T1,DIM,RANK,R1-NCONTRACT+S...>
-  lhs_iterator(seq<S...>, const std::tuple<Args...> &params) {
+  template<int ...S, int ...ZSEQ, int ...NCSEQ, typename ...Args>
+    const_reference_index_iterator<T1,DIM,R1,R1-NCONTRACT+NCSEQ...>
+    lhs_iterator(seq<S...>, seq<NCSEQ...>, zseq<ZSEQ...>, const std::tuple<Args...> &params) {
     
-    const_reference_index_iterator<T1,DIM,RANK,R1-NCONTRACT+S...> it();
+    const_reference_index_iterator<T1,DIM,R1,R1-NCONTRACT+NCSEQ...> it(_u, std::get<S>(params)..., ZSEQ...);
     
     return it;
   }
 
+  template<int ...S, int ...ZSEQ, int ...NCSEQ, typename ...Args>
+    const_reference_index_iterator<T1,DIM,R1,R1-NCONTRACT+NCSEQ...>
+    rhs_iterator(seq<S...>, seq<NCSEQ...>, zseq<ZSEQ...>, const std::tuple<Args...> &params) {
+    
+    const_reference_index_iterator<T2,DIM,R2,NCSEQ...> it(_v, ZSEQ..., std::get<S+R1-NCONTRACT>(params)...);
+    
+    return it;
+  }
+
+  /*
   template<int ...S, typename ...Args>
   const_reference_index_iterator<T1,DIM,R1,R1-NCONTRACT+S...>
   rhs_iterator(seq<S...>, const std::tuple<Args...> &params) {
@@ -255,7 +265,7 @@ private:
     
     return it;
   }
-  
+  */
 
 public:
   
@@ -270,8 +280,14 @@ public:
   template <typename ...Args>
   value_type operator()(Args ...args) {
     
-    auto lhsit = lhs_iterator(typename gens<R1-NCONTRACT>::type(), std::forward_as_tuple(args...));
-    auto rhsit = rhs_iterator(typename gens<R2-NCONTRACT>::type(), std::forward_as_tuple(args...));
+    auto lhsit = lhs_iterator(typename gens<R1-NCONTRACT>::type(), 
+			      typename gens<NCONTRACT>::type(), 
+			      typename zeroGen<NCONTRACT>::type(),
+			      std::forward_as_tuple(args...));
+    auto rhsit = rhs_iterator(typename gens<R2-NCONTRACT>::type(), 
+			      typename gens<NCONTRACT>::type(), 
+			      typename zeroGen<NCONTRACT>::type(),
+			      std::forward_as_tuple(args...));
     
     value_type ret(0);
     for(; !lhsit.end(); lhsit.next(), rhsit.next()) {
@@ -283,6 +299,14 @@ public:
   
 };
 
+
+template<unsigned NCONTRACT, typename T1, typename T2, unsigned DIM, unsigned R1, unsigned R2, typename dataType>
+const TensorContraction<T1, T2, DIM, R1, R2, NCONTRACT, dataType>
+contract(const TensorExpression<T1,DIM,R1,dataType> &lhs,
+	 const TensorExpression<T2,DIM,R2,dataType> &rhs) {
+  
+  return TensorContraction<T1,T2,DIM,R1,R2,NCONTRACT,dataType>(lhs,rhs);
+}
 
 
 YAFEL_NAMESPACE_CLOSE
