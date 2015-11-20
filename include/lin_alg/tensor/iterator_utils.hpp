@@ -28,6 +28,18 @@ struct type_gen<0, Args...> {
   typedef std::tuple<Args...> type;
 };
 
+// zeros generator
+template<int ...S>
+struct zseq{};
+
+template<int N, int ...S>
+struct zeroGen : zeroGen<N-1, 0, S...> {};
+
+template<int ...S>
+struct zeroGen<0,S...> {
+  typedef zseq<S...> type;
+}
+
 YAFEL_NAMESPACE_CLOSE
 
 #endif

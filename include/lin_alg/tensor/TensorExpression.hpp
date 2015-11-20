@@ -238,20 +238,22 @@ private:
   const T1 &_u;
   const T2 &_v;
 
-  template<int ...S1, int ...S2, typename ...Args>
+  template<int ...S, typename ...Args>
   const_reference_index_iterator<T1,DIM,RANK,R1-NCONTRACT+S...>
-  lhs_iterator(seq<S1...>, const std::tuple<Args...> &params) {
+  lhs_iterator(seq<S...>, const std::tuple<Args...> &params) {
     
+    const_reference_index_iterator<T1,DIM,RANK,R1-NCONTRACT+S...> it();
     
-    
+    return it;
   }
 
   template<int ...S, typename ...Args>
-  const_reference_index_iterator<T1,DIM,RANK,S...>
+  const_reference_index_iterator<T1,DIM,R1,R1-NCONTRACT+S...>
   rhs_iterator(seq<S...>, const std::tuple<Args...> &params) {
     
     
     
+    return it;
   }
   
 
@@ -261,7 +263,7 @@ public:
 		    const TensorExpression<T2,DIM,R2,dataType> &v)
     : _u(u), _v(v)
   {
-    static_assert(NCONTRACT>=1 && NCONTRACT<R1 && NCONTRACT<R2,
+    static_assert(NCONTRACT>=1 && NCONTRACT<=R1 && NCONTRACT<=R2 && (R1+R2-2*NCONTRACT)>0,
 		  "TensorContraction: bad value of NCONTRACT");
   }
 
@@ -271,6 +273,12 @@ public:
     auto lhsit = lhs_iterator(typename gens<R1-NCONTRACT>::type(), std::forward_as_tuple(args...));
     auto rhsit = rhs_iterator(typename gens<R2-NCONTRACT>::type(), std::forward_as_tuple(args...));
     
+    value_type ret(0);
+    for(; !lhsit.end(); lhsit.next(), rhsit.next()) {
+      ret += (*lhsit)*(*rhsit);
+    }
+    
+    return ret;
   }
   
 };
