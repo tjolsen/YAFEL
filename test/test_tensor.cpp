@@ -170,7 +170,44 @@ bool test_8() {
 	D(i,j) += A(i,k)*B(k,j);
       }
       good = good && C(i,j)==D(i,j);
-      std::cout << "i:"<<i<<" j:"<<j<<"  C(i,j)="<<C(i,j)<< "  D(i,j)="<<D(i,j)<<"\n";
+    }
+  }
+
+  return good;
+}
+
+
+// Test tensor-contraction of rank 4 tensors
+bool test_9() {
+  
+  Tensor<3,4,int> A,B;
+  int a = 7;
+  for(auto it=A.begin(); !it.end(); it.next()) {
+    *it = a;
+    a = (17*a)%31;
+  }
+  for(auto it=B.begin(); !it.end(); it.next()) {
+    *it = a;
+    a = (17*a)%31;
+  }
+  
+
+  auto C = contract<2>(A,B);
+  Tensor<3,4> D;
+  bool good = true;
+  for(std::size_t i=0; i<3; ++i) {
+    for(std::size_t j=0; j<3; ++j) {
+      for(std::size_t k=0; k<3; ++k) {
+	for(std::size_t l=0; l<3; ++l) {
+	  D(i,j,k,l) = 0;
+	  for(std::size_t m=0; m<3; ++m) {
+	    for(std::size_t n=0; n<3; ++n) {
+	      D(i,j,k,l) += A(i,j,m,n)*B(m,n,k,l);
+	    }
+	  }
+	  good = good && C(i,j,k,l) == D(i,j,k,l);
+	}
+      }
     }
   }
 
@@ -213,6 +250,10 @@ int main() {
   if(!test_8()) {
     retval |= 1<<7;
     std::cout << "Failed test_8" << "\n";
+  }
+  if(!test_9()) {
+    retval |= 1<<8;
+    std::cout << "Failed test_9" << "\n";
   }
 
   return retval;
