@@ -3,6 +3,7 @@
 #include "lin_alg/tensor/generic_index_iterator.hpp"
 
 #include <iostream>
+#include <typeinfo>
 
 using namespace yafel;
 
@@ -62,7 +63,7 @@ bool test_4() {
     *it = b;
   }
 
-  Tensor<3,2,int> C = A+B;
+  auto C = A+B; //Tensor<3,2,int>
   bool good = true;
   for(auto it=C.begin(); !it.end(); it.next()) {
     good = good && (*it==(a+b));
@@ -84,7 +85,7 @@ bool test_5() {
     *it = b;
   }
 
-  Tensor<3,5,int> C = A-B;
+  auto C = A-B; //Tensor<3,5,int>
   bool good = true;
   for(auto it=C.begin(); !it.end(); it.next()) {
     good = good && (*it==(a-b));
@@ -120,8 +121,8 @@ bool test_6() {
 // test outer product
 bool test_7() {
   
-  Tensor<3,3,double> A;
-  Tensor<3,2,double> B;
+  Tensor<3,3,int> A;
+  Tensor<3,2,int> B;
   
   double a=2, b=3;
   for(auto it=A.begin(); !it.end(); it.next()) {
@@ -132,7 +133,7 @@ bool test_7() {
   }
 
   bool good = true;
-  Tensor<3,5> C = otimes(A,B);
+  Tensor<3,5,int> C = otimes(A,B);
   for(auto it=C.begin(); !it.end(); it.next()) {
     good = good && (*it == a*b);
   }
@@ -155,14 +156,10 @@ bool test_8() {
     counter = (7*counter)%13;
   }
   
-  auto C = contract<1>(A,B);
+  Tensor<3,2,int> C = contract<1>(A,B);
   
-  C(0,0);
-  C(1,1);
-  C(2,2);
   Tensor<3,2,int> D;
   bool good = true;
-
   for(std::size_t i=0; i<3; ++i) {
     for(std::size_t j=0; j<3; ++j) {
       D(i,j) = 0;
@@ -192,7 +189,7 @@ bool test_9() {
   }
   
 
-  auto C = contract<2>(A,B);
+  Tensor<3,4,int> C = contract<2>(A,B);
   Tensor<3,4,int> D;
   bool good = true;
   for(std::size_t i=0; i<3; ++i) {
@@ -229,13 +226,52 @@ bool test_10() {
     a = (17*a)%31;
   }
 
-  auto C = contract<1>(A,B);
+  Tensor<3,1,int> C = contract<1>(A,B);
   Tensor<3,1,int> D;
   bool good = true;
   for(std::size_t i=0; i<3; ++i) {
     D(i) = 0;
     for(std::size_t j=0; j<3; ++j) {
       D(i) += A(i,j)*B(j);
+    }
+    good = good && C(i)==D(i);
+  }
+  
+  return good;
+}
+
+
+// Test tensor contraction of rank 2 and rank 1 tensor expressions
+bool test_11() {
+  Tensor<3,2,int> A, B;
+  Tensor<3,1,int> u,v;
+
+  int a = 7;
+  for(auto it=A.begin(); !it.end(); it.next()) {
+    *it = a;
+    a = (17*a)%31;
+  }
+  for(auto it=B.begin(); !it.end(); it.next()) {
+    *it = a;
+    a = (17*a)%31;
+  }
+  for(auto it=u.begin(); !it.end(); it.next()) {
+    *it = a;
+    a = (17*a)%31;
+  }
+  for(auto it=v.begin(); !it.end(); it.next()) {
+    *it = a;
+    a = (17*a)%31;
+  }
+
+  Tensor<3,1,int> C = contract<1>(3*A+B, u-v*2);
+
+  Tensor<3,1,int> D;
+  bool good = true;
+  for(std::size_t i=0; i<3; ++i) {
+    D(i) = 0;
+    for(std::size_t j=0; j<3; ++j) {
+      D(i) += (3*A(i,j) + B(i,j))*(u(j) - v(j)*2);
     }
     good = good && C(i)==D(i);
   }
@@ -287,6 +323,10 @@ int main() {
   if(!test_10()) {
     retval |= 1<<9;
     std::cout << "Failed test_10" << "\n";
+  }
+  if(!test_11()) {
+    retval |= 1<<10;
+    std::cout << "Failed test_11" << "\n";
   }
 
   return retval;

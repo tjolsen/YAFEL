@@ -32,7 +32,7 @@ constexpr unsigned _tensorStorage(unsigned dim, unsigned rank) {
  * To be used via CRTP with classes representing tensor operations.
  */
 //--------------------------------------------------------------------------------
-template <typename T, unsigned DIM, unsigned RANK, typename dataType=double>
+template <typename T, unsigned DIM, unsigned RANK, typename dataType>
 class TensorExpression {
 
 public:
@@ -60,37 +60,37 @@ public:
  * Scalar scaling of a tensor expression. Scalar type T2 must be type-convertable to dataType
  */
 //--------------------------------------------------------------------------------
-template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType=double>
-class TensorScaled : public TensorExpression<TensorScaled<T1,T2,DIM,RANK,dataType>, DIM, RANK, dataType> {
+template<typename T1, unsigned DIM, unsigned RANK, typename dataType>
+class TensorScaled : public TensorExpression<TensorScaled<T1,DIM,RANK,dataType>, DIM, RANK, dataType> {
 public:
-  using value_type = typename TensorExpression<TensorScaled<T1,T2,DIM,RANK,dataType>,DIM,RANK,dataType>::value_type;
+  using value_type = typename TensorExpression<TensorScaled<T1,DIM,RANK,dataType>,DIM,RANK,dataType>::value_type;
 private:
   const T1 &_u;
   const dataType alpha;
   
 public:
+  template<typename T2>
   TensorScaled(const TensorExpression<T1,DIM,RANK,dataType> &u, T2 a)
     : _u(u), alpha(dataType(a))
-  {}
+  {
+    static_assert(std::is_fundamental<T2>::value,
+		  "Error: TensorScaled currently only intended for primitive types");
+  }
   
   template<typename ...Args>
   value_type operator()(Args ...args) const {return _u(args...)*alpha;}
 };
 
 template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType>
-const TensorScaled<T1,T2,DIM,RANK,dataType>
+TensorScaled<T1,DIM,RANK,dataType>
 operator*(const TensorExpression<T1,DIM,RANK,dataType> &u, T2 alpha) {
-  static_assert(std::is_fundamental<T2>::value,
-		"Error: TensorScaled currently only intended for primitive types");
-  return TensorScaled<T1,T2,DIM,RANK,dataType>(u,alpha);
+  return TensorScaled<T1,DIM,RANK,dataType>(u,alpha);
 }
 
 template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType>
-const TensorScaled<T1,T2,DIM,RANK,dataType>
+TensorScaled<T1,DIM,RANK,dataType>
 operator*(T2 alpha, const TensorExpression<T1,DIM,RANK,dataType> &u) {
-  static_assert(std::is_fundamental<T2>::value,
-		"Error: TensorScaled currently only intended for primitive types");
-  return TensorScaled<T1,T2,DIM,RANK,dataType>(u,alpha);
+  return TensorScaled<T1,DIM,RANK,dataType>(u,alpha);
 }
 
 //--------------------------------------------------------------------------------
@@ -99,7 +99,7 @@ operator*(T2 alpha, const TensorExpression<T1,DIM,RANK,dataType> &u) {
  * lhs (_u) and rhs (_v) must be of equal rank and dimension
  */
 //--------------------------------------------------------------------------------
-template <typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType=double>
+template <typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType>
 class TensorSum : public TensorExpression<TensorSum<T1,T2,DIM,RANK,dataType>, DIM, RANK, dataType> {
 public:
   using value_type = typename TensorExpression<TensorSum<T1,T2,DIM,RANK,dataType>,DIM,RANK,dataType>::value_type;
@@ -120,7 +120,7 @@ public:
 };
 
 template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType>
-const TensorSum<T1,T2,DIM,RANK,dataType>
+TensorSum<T1,T2,DIM,RANK,dataType>
 operator+(const TensorExpression<T1,DIM,RANK,dataType> &u,
 	  const TensorExpression<T2,DIM,RANK,dataType> &v) {
   return TensorSum<T1,T2,DIM,RANK,dataType>(u,v);
@@ -132,7 +132,7 @@ operator+(const TensorExpression<T1,DIM,RANK,dataType> &u,
  * lhs (_u) and rhs (_v) must be of equal rank and dimension
  */
 //--------------------------------------------------------------------------------
-template <typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType=double>
+template <typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType>
 class TensorDifference : 
   public TensorExpression<TensorDifference<T1,T2,DIM,RANK,dataType>, DIM, RANK, dataType> 
 {
@@ -154,8 +154,8 @@ public:
 
 };
 
-template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType=double>
-const TensorDifference<T1,T2,DIM,RANK,dataType>
+template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType>
+TensorDifference<T1,T2,DIM,RANK,dataType>
 operator-(const TensorExpression<T1,DIM,RANK,dataType> &u,
 	  const TensorExpression<T2,DIM,RANK,dataType> &v) {
   return TensorDifference<T1,T2,DIM,RANK,dataType>(u,v);
@@ -167,7 +167,7 @@ operator-(const TensorExpression<T1,DIM,RANK,dataType> &u,
  * Tensor outer product. Result is a new tensor expression of dimension DIM, rank R1+R2.
  */
 //--------------------------------------------------------------------------------
-template <typename T1, typename T2, unsigned DIM, unsigned R1, unsigned R2, typename dataType=double>
+template <typename T1, typename T2, unsigned DIM, unsigned R1, unsigned R2, typename dataType>
 class OuterProduct : public TensorExpression<OuterProduct<T1,T2,DIM,R1,R2,dataType>,DIM,R1+R2,dataType>
 {
 public:
@@ -203,8 +203,8 @@ public:
   
 };
 
-template<typename T1, typename T2, unsigned DIM, unsigned R1, unsigned R2, typename dataType=double>
-const OuterProduct<T1,T2,DIM,R1,R2,dataType>
+template<typename T1, typename T2, unsigned DIM, unsigned R1, unsigned R2, typename dataType>
+OuterProduct<T1,T2,DIM,R1,R2,dataType>
 otimes(const TensorExpression<T1, DIM, R1, dataType> &u,
        const TensorExpression<T2, DIM, R2, dataType> &v) 
 {
@@ -226,7 +226,7 @@ otimes(const TensorExpression<T1, DIM, R1, dataType> &u,
  */
 //--------------------------------------------------------------------------------
 template <typename T1, typename T2, unsigned DIM, unsigned R1, unsigned R2, 
-	  unsigned NCONTRACT, typename dataType=double>
+	  unsigned NCONTRACT, typename dataType>
 class TensorContraction :
   public TensorExpression<TensorContraction<T1,T2,DIM,R1,R2,NCONTRACT,dataType>,
 			  DIM,R1+R2-2*NCONTRACT, dataType>
@@ -294,7 +294,7 @@ public:
 
 
 template<unsigned NCONTRACT, typename T1, typename T2, unsigned DIM, unsigned R1, unsigned R2, typename dataType>
-const TensorContraction<T1, T2, DIM, R1, R2, NCONTRACT, dataType>
+TensorContraction<T1, T2, DIM, R1, R2, NCONTRACT, dataType>
 contract(const TensorExpression<T1,DIM,R1,dataType> &lhs,
 	 const TensorExpression<T2,DIM,R2,dataType> &rhs) {
   
