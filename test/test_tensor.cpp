@@ -1,6 +1,7 @@
 #include "lin_alg/tensor/Tensor.hpp"
 #include "lin_alg/tensor/generic_tensor_iterator.hpp"
 #include "lin_alg/tensor/generic_index_iterator.hpp"
+#include "lin_alg/tensor/tensor_specializations.hpp"
 
 #include <iostream>
 #include <typeinfo>
@@ -280,6 +281,40 @@ bool test_11() {
 }
 
 
+// Test tensor-contraction of rank 2 tensors (ie: matmul)
+bool test_12() {
+  
+  Tensor<3,2,int> A,B;
+  
+  int counter = 3;
+  for(auto it=A.begin(); !it.end(); it.next()) {
+    *it = counter;
+    counter = (7*counter)%13;
+  }
+  for(auto it=B.begin(); !it.end(); it.next()) {
+    *it = counter;
+    counter = (7*counter)%13;
+  }
+  
+  Tensor<3,2,int> C = A*B;
+  
+  Tensor<3,2,int> D;
+  bool good = true;
+  for(std::size_t i=0; i<3; ++i) {
+    for(std::size_t j=0; j<3; ++j) {
+      D(i,j) = 0;
+      for(std::size_t k=0; k<3; ++k) {
+	D(i,j) += A(i,k)*B(k,j);
+      }
+      good = good && C(i,j)==D(i,j);
+    }
+  }
+
+  return good;
+}
+
+
+
 int main() {
 
   int retval = 0;
@@ -327,6 +362,10 @@ int main() {
   if(!test_11()) {
     retval |= 1<<10;
     std::cout << "Failed test_11" << "\n";
+  }
+  if(!test_12()) {
+    retval |= 1<<11;
+    std::cout << "Failed test_12" << "\n";
   }
 
   return retval;

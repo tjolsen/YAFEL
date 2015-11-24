@@ -57,7 +57,12 @@ public:
 
 //--------------------------------------------------------------------------------
 /*
- * Scalar scaling of a tensor expression. Scalar type T2 must be type-convertable to dataType
+ * Scalar scaling of a tensor expression. Scalar type T2 must be type-convertable to dataType.
+ * Currently, operator* only works if T2 is a fundamental data type. This functionality is
+ * to avoid conflict with operator* that indicates tensor contraction (defined below).
+ *
+ * Functionality may be added in the future to support scaling by user-defined scalar types,
+ * but this is not a high priority at the moment.
  */
 //--------------------------------------------------------------------------------
 template<typename T1, unsigned DIM, unsigned RANK, typename dataType>
@@ -81,13 +86,15 @@ public:
   value_type operator()(Args ...args) const {return _u(args...)*alpha;}
 };
 
-template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType>
+template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType, 
+	 typename = typename std::enable_if<std::is_fundamental<T2>::value, T2>::type>
 TensorScaled<T1,DIM,RANK,dataType>
 operator*(const TensorExpression<T1,DIM,RANK,dataType> &u, T2 alpha) {
   return TensorScaled<T1,DIM,RANK,dataType>(u,alpha);
 }
 
-template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType>
+template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType,
+	 typename = typename std::enable_if<std::is_fundamental<T2>::value, T2>::type>
 TensorScaled<T1,DIM,RANK,dataType>
 operator*(T2 alpha, const TensorExpression<T1,DIM,RANK,dataType> &u) {
   return TensorScaled<T1,DIM,RANK,dataType>(u,alpha);
