@@ -1,6 +1,7 @@
-#ifndef _DUALNUMBER_HPP
-#define _DUALNUMBER_HPP
+#ifndef __YAFEL_DUALNUMBER_HPP
+#define __YAFEL_DUALNUMBER_HPP
 
+#include "yafel_globals.hpp"
 #include <cmath>
 
 YAFEL_NAMESPACE_OPEN
@@ -13,6 +14,7 @@ public:
   DualNumber():DualNumber(0,0) {}
   DualNumber(T v1, T v2): first(v1), second(v2) {}
 
+  // arithmetic operator overloading (+, -, *, /)
   DualNumber<T> operator+(const DualNumber<T> &rhs) const {
     return DualNumber<T>(first+rhs.first, second+rhs.second);
   }
@@ -26,7 +28,7 @@ public:
   DualNumber<T> operator-(double rhs) const {
     return DualNumber<T>(first-rhs, second);
   }
-
+  
   DualNumber<T> operator*(const DualNumber<T> & rhs) const {
     return DualNumber<T>(first*rhs.first, second*rhs.first + first*rhs.second);
   }
@@ -42,8 +44,14 @@ public:
     return DualNumber<T>(first/rhs, second/rhs);
   }
 
+  
+  // unary operator-()
+  DualNumber<T> operator-() const {
+    return DualNumber<T>(-first, -second);
+  }
 };
 
+// Overload operators for primitive types with lhs/rhs order reversed
 template<typename T>
 DualNumber<T> operator+(double lhs, DualNumber<T> rhs) {
   return DualNumber<T>(lhs+rhs.first, rhs.second);
