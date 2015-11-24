@@ -281,7 +281,7 @@ bool test_11() {
 }
 
 
-// Test tensor-contraction of rank 2 tensors (ie: matmul)
+// Test tensor-contraction of rank 2 tensors (ie: matmul) using operator*
 bool test_12() {
   
   Tensor<3,2,int> A,B;
@@ -306,6 +306,37 @@ bool test_12() {
       for(std::size_t k=0; k<3; ++k) {
 	D(i,j) += A(i,k)*B(k,j);
       }
+      good = good && C(i,j)==D(i,j);
+    }
+  }
+
+  return good;
+}
+
+// Test associativity of tensor multiplication: (a*A)*B == a*(A*B)
+bool test_13() {
+  
+  Tensor<3,2,int> A,B;
+
+  int a = -5;
+  
+  int counter = 3;
+  for(auto it=A.begin(); !it.end(); it.next()) {
+    *it = counter;
+    counter = (7*counter)%13;
+  }
+  for(auto it=B.begin(); !it.end(); it.next()) {
+    *it = counter;
+    counter = (7*counter)%13;
+  }
+  
+  Tensor<3,2,int> C = (a*A)*B;
+  
+  Tensor<3,2,int> D = a*(A*B);
+
+  bool good = true;
+  for(std::size_t i=0; i<3; ++i) {
+    for(std::size_t j=0; j<3; ++j) {
       good = good && C(i,j)==D(i,j);
     }
   }
@@ -366,6 +397,10 @@ int main() {
   if(!test_12()) {
     retval |= 1<<11;
     std::cout << "Failed test_12" << "\n";
+  }
+  if(!test_13()) {
+    retval |= 1<<12;
+    std::cout << "Failed test_13" << "\n";
   }
 
   return retval;
