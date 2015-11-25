@@ -1,4 +1,4 @@
-testfiles = test_vectorTest.cpp test_matrixTest.cpp test_sparse_coo.cpp test_sparse_csr.cpp test_tensor.cpp #test_matmul.cpp 
+testfiles = test_vectorTest.cpp test_matrixTest.cpp test_sparse_coo.cpp test_sparse_csr.cpp test_tensor.cpp test_csr_spmv.cpp test_matmul.cpp 
 benchmarkfiles = matmul_performance.cpp
 cppfiles = $(testfiles) $(benchmarkfiles)
 

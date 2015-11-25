@@ -14,6 +14,7 @@
 #include "yafel_globals.hpp"
 #include "lin_alg/Vector.hpp"
 #include "lin_alg/sparse_csr.hpp"
+#include "lin_alg/csr_sparsity_pattern.hpp"
 
 #include <cassert>
 #include <cstdlib>
@@ -32,7 +33,6 @@ Vector<dataType> csr_spmv(const sparse_csr<dataType> &A,
   
   Vector<dataType> b(A.rows(), 0);
   
-  
   for(std::size_t row = 0; row<A.rows(); ++row) {
 
     std::size_t idxmin, idxmax;
@@ -42,7 +42,7 @@ Vector<dataType> csr_spmv(const sparse_csr<dataType> &A,
     //accumulator
     dataType accum = 0;
     for(std::size_t idx=idxmin; idx<idxmax; ++idx) {
-      std::size_t col = col_index[idx];
+      std::size_t col = A.col_index[idx];
       accum += A._data[idx]*x(col);
     }
     b(row) = accum;

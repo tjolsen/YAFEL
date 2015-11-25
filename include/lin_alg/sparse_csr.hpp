@@ -130,12 +130,14 @@ public:
   csr_sparsity_pattern_reference get_sparsity_pattern_reference() const {
     return csr_sparsity_pattern_reference(row_ptr, col_index);
   }
-  
 
-private:
+
+  // easier to write algorithms if these are public
   std::vector<size_type> row_ptr;
   std::vector<size_type> col_index;
   container_type _data;
+
+private:
   size_type _rows;
   size_type _cols;
   value_type _zero; // <-- this holds a zero so that I can return value_type& from a operator() call
