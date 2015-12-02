@@ -58,7 +58,7 @@ DualNumber<T> operator+(double lhs, DualNumber<T> rhs) {
 }
 template<typename T>
 DualNumber<T> operator-(double lhs, DualNumber<T> rhs) {
-  return DualNumber<T>(lhs-rhs.first, rhs.second);
+  return DualNumber<T>(lhs-rhs.first, -rhs.second);
 }
 template<typename T>
 DualNumber<T> operator*(double lhs, DualNumber<T> rhs) {
