@@ -1,7 +1,3 @@
-element:
-	-add vector element factory. Stores one Element* for each element,
-	 so values don't have to be recomputed between timesteps (at expense of storage)
-	-Will also make assembly parallelization possible
 mesh:
 	Mesh generation functions. make {1,2,3}-D rectillinear meshes without gmsh.
 	Include options to have boundary elements included to facilitate BC application.
