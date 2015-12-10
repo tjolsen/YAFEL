@@ -1,6 +1,8 @@
 #ifndef __YAFEL_SPARSE_CSR_HPP
 #define __YAFEL_SPARSE_CSR_HPP
 
+#include "yafel_globals.hpp"
+
 #include "lin_alg/sparse_matrix.hpp"
 #include "lin_alg/access_sparse_matrix.hpp"
 #include "lin_alg/csr_sparsity_pattern.hpp"
