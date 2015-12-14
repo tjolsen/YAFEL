@@ -1,5 +1,10 @@
 subdirs = src apps test doc
 
+ifndef YAFELDIR
+ export YAFELDIR=$(shell pwd)
+ $(warning Your YAFELDIR is not defined. Set to "$(YAFELDIR)".)
+endif
+
 include $(YAFELDIR)/common.mk
 
 all: $(subdirs)
