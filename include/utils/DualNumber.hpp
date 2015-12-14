@@ -13,6 +13,7 @@ public:
   T second;
   DualNumber():DualNumber(0,0) {}
   DualNumber(T v1, T v2): first(v1), second(v2) {}
+  DualNumber(T v1) : first(v1), second(T(0)) {}
 
   // arithmetic operator overloading (+, -, *, /)
   DualNumber<T> operator+(const DualNumber<T> &rhs) const {
@@ -51,6 +52,11 @@ public:
   }
 };
 
+
+/*
+
+  Shouldn't need this block w/ addition of 3rd ctor
+
 // Overload operators for primitive types with lhs/rhs order reversed
 template<typename T>
 DualNumber<T> operator+(double lhs, DualNumber<T> rhs) {
@@ -68,6 +74,7 @@ template<typename T>
 DualNumber<T> operator/(double lhs, DualNumber<T> rhs) {
   return DualNumber<T>(lhs/rhs.first, -lhs*rhs.second/(rhs.first*rhs.first));
 }
+*/
 
 // More Useful Functions
 template<typename T>
