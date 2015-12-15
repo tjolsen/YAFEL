@@ -28,7 +28,7 @@ test_%.o: test_%.cpp
 	$(CPP) $< $(CFLAGS)
 
 clean:
-	rm *.o *.vtu *.pvd $(exefiles) .depend
+	rm *.o *.vtu *.pvd $(exefiles) *.gcda *.gcno .depend coverage.info
 
 runtests: all
 	@for f in $(test_exefiles); do echo "Running: $$f"; (ulimit -S -s 8192; ./$$f); done

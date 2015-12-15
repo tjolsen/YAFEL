@@ -40,7 +40,8 @@ void test_1() {
 
 
 void test_2() {
-  std::size_t N = 100;
+  //use odd number to ensure that a certain part of matmul_kernel function is hit (can't be multiple of 4)
+  std::size_t N = 107; 
 
   Matrix<std::size_t> A(N,N,1);
   Matrix<std::size_t> B(N,N,1);

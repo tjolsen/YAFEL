@@ -43,3 +43,7 @@
 
 #movie files saved from paraview
 *.avi
+
+# lcov files
+*.gcda
+*.gcno

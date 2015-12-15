@@ -167,7 +167,7 @@ void divconq_matmul(Matrix<dataType> & C,
     // a highly optimized version exists for intel core 4xxx or 5xxx processors (requires FMA instruction support)
     matmul_kernel(Ablock,BblockT,Cblock,m,n,p);
     
-    // do update to large array, have to hold mutex
+    // do update to large array
     for(std::size_t i=0; i<m; ++i) {
       for(std::size_t j=0; j<p; ++j) {
 	C(ileft+i,jright+j) += Cblock[i][j];
@@ -305,7 +305,7 @@ matmul_kernel(dataType Ablock[recursion_cutoff][recursion_cutoff],
 #ifdef __FMA__
 
 template<>
-__attribute__((gnu_inline))
+//__attribute__((gnu_inline))
 inline void 
 matmul_kernel(double Ablock[recursion_cutoff][recursion_cutoff], 
 		   double BblockT[recursion_cutoff][recursion_cutoff], 
