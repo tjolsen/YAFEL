@@ -11,21 +11,21 @@ all: .depend $(exefiles)
 
 include $(YAFELDIR)/common.mk
 
-COVERAGE_CFLAGS = $(CFLAGS) -O0 -fprofile-arcs -ftest-coverage
-COVERAGE_CXXFLAGS = $(CFLAGS) -O0 -fprofile-arcs -ftest-coverage
-COVERAGE_LDFLAGS = $(LFLAGS) -lgcov
+COVERAGE_CFLAGS += $(CFLAGS) -O0 -fprofile-arcs -ftest-coverage
+COVERAGE_CXXFLAGS += $(CXXFLAGS) -O0 -fprofile-arcs -ftest-coverage
+COVERAGE_LDFLAGS += $(LDFLAGS) -lgcov
 
 test_%.exe: test_%.o
-	$(CPP) $< $(COVERAGE_LDFLAGS) -o $@
+	$(CXX) $< $(COVERAGE_LDFLAGS) -o $@
 
 test_%.o: test_%.cpp
-	$(CPP) $< $(COVERAGE_CXXFLAGS)
+	$(CXX) $< $(COVERAGE_CXXFLAGS)
 
 %.exe: %.o
-	$(CPP) $< $(LFLAGS) -o $@
+	$(CXX) $< $(LDFLAGS) -o $@
 
 %.o: %.cpp
-	$(CPP) $< $(CFLAGS)
+	$(CXX) $< $(CXXFLAGS)
 
 clean:
 	rm *.o *.vtu *.pvd $(exefiles) *.gcda *.gcno .depend coverage.info

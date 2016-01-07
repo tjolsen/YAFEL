@@ -9,7 +9,7 @@ linalg_optimized = true
 parallel_matmul = true
 
 #define C++ compiler
-CPP = g++
+CXX = g++
 
 #define C compiler
 CC = gcc
@@ -18,8 +18,8 @@ CC = gcc
 AR = ar
 
 #compiler optimization and linking flags
-CFLAGS = -O3 -Wall -Werror -Wextra
-LFLAGS = #-L$(YAFELDIR)/lib/ -lyafel 
+CXXFLAGS = -O3 -Wall -Werror -Wextra
+LDFLAGS = #-L$(YAFELDIR)/lib/ -lyafel 
 ARFLAGS = -ru
 
 #output library name
@@ -31,25 +31,25 @@ LIB = libyafel.a
 #=================================================================
 
 # These will always be necessary, so they're moved away from the configurable line
-CFLAGS += -c -I$(YAFELDIR)/include -std=c++11 -march=native -mtune=native -funroll-loops
+CXXFLAGS += -c -I$(YAFELDIR)/include -std=c++11 -march=native -mtune=native -funroll-loops
 
 ifeq ($(useOpenMP), true)
-	CFLAGS += -fopenmp
-	LFLAGS += -fopenmp
+	CXXFLAGS += -fopenmp
+	LDFLAGS += -fopenmp
 endif
 
 ifeq ($(linalg_optimized), true)
-	CFLAGS += -D_OPTIMIZED
+	CXXFLAGS += -D_OPTIMIZED
 endif
 
 ifeq ($(parallel_matmul), true)
-	CFLAGS +=  -pthread -D_YAFEL_PARALLEL_MATMUL
-	LFLAGS += -pthread
+	CXXFLAGS += -pthread -D_YAFEL_PARALLEL_MATMUL
+	LDFLAGS += -pthread
 endif
 #======================================================
 # Make dependencies
 #======================================================
 .depend:
-	$(CPP) $(shell ls *.cpp) $(CFLAGS) -MM > .depend
+	$(CXX) $(shell ls *.cpp) $(CXXFLAGS) -MM > .depend
 
 -include .depend

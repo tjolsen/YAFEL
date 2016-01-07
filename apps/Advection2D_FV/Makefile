@@ -10,10 +10,10 @@ all: $(outfile)
 include $(YAFELDIR)/common.mk
 
 $(outfile): $(ofiles)
-	$(CPP) $(ofiles) $(LFLAGS) -o $@
+	$(CXX) $(ofiles) $(LDFLAGS) -o $@
 
 %.o: %.cpp
-	$(CPP) $(CFLAGS) $<
+	$(CXX) $(CXXFLAGS) $<
 
 clean:
 	rm $(outfile) *.o

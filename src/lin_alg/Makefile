@@ -6,7 +6,7 @@ ofiles = $(cppfiles:.cpp=.o)
 all: .depend $(ofiles)
 
 %.o: %.cpp
-	$(CPP) $(CFLAGS) $<
+	$(CXX) $(CXXFLAGS) $<
 
 clean:
 	rm $(ofiles) .depend

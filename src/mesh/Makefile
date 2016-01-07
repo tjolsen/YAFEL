@@ -6,7 +6,7 @@ include $(YAFELDIR)/common.mk
 all: .depend $(ofiles)
 
 %.o: %.cpp
-	$(CPP) $(CFLAGS) $<
+	$(CXX) $(CXXFLAGS) $<
 
 clean:
 	rm $(ofiles) .depend

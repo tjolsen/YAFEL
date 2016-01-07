@@ -8,10 +8,10 @@ output = poissonSolver
 all: .depend $(output)
 
 $(output): $(ofiles)
-	$(CPP) $^ $(LFLAGS) -o $@
+	$(CXX) $^ $(LDFLAGS) -o $@
 
 %.o: %.cpp
-	$(CPP) $(CFLAGS) $< 
+	$(CXX) $(CXXFLAGS) $< 
 
 clean:
 	rm $(output) $(ofiles) *.vtu

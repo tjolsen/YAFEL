@@ -8,10 +8,10 @@ ofiles = $(cppfiles:.cpp=.o)
 all: .depend $(output)
 
 $(output): $(ofiles)
-	$(CPP) -o $@ $(ofiles) $(LFLAGS)
+	$(CXX) -o $@ $(ofiles) $(LDFLAGS)
 
 %.o: %.cpp
-	$(CPP) $(CFLAGS) $<
+	$(CXX) $(CXXFLAGS) $<
 
 clean:
 	rm $(output) $(ofiles) *.vtu .depend
