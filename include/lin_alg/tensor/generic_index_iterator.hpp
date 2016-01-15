@@ -23,11 +23,11 @@ private:
     }
   }
   
-  template <int I, int... II>
-  void inc(const seq<I, II...> &) {
+  template <int I, int II, int... III>
+  void inc(const seq<I, II, III...> &) {
     if(++std::get<I>(indices) == DIM) {
       std::get<I>(indices) = 0;
-      inc(seq<II...>());
+      inc(seq<II, III...>());
    } 
   }
 
@@ -36,10 +36,10 @@ private:
     std::get<I>(indices) = 0;
   }
   
-  template <int I, int ...II>
-  void zero_level(const seq<I,II...> &) {
+  template <int I, int II, int ...III>
+  void zero_level(const seq<I,II,III...> &) {
     std::get<I>(indices) = 0;
-    zero_level(seq<II...>());
+    zero_level(seq<II,III...>());
   }
   
   template<int ...S>
