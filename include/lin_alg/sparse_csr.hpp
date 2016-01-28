@@ -68,8 +68,8 @@ public:
       _cols = ((col+1) > _cols) ? col+1 : _cols;
       
       if(row == curr_row && col==curr_col) {
-	_data[idx] += val;
-      }
+	_data[idx] += val; 
+     }
       else {
 	++idx;
 	if(row != curr_row) {

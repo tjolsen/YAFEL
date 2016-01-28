@@ -24,17 +24,165 @@ public:
   using reference = typename sparse_matrix<sparse_bcsr<BLOCK,dataType>,dataType>::reference;
   using triplet = typename sparse_matrix<sparse_bcsr<BLOCK,dataType>,dataType>::triplet;
 
-  size_type rows() const {return _rows;}
-  size_type cols() const {return _cols;}
+  size_type rows() const {return _brows*BLOCK;}
+  size_type cols() const {return _bcols*BLOCK;}
   size_type nnz() const {return _data.size();}
   
+  std::vector<size_type> brow_ptr;
+  std::vector<size_type> bcol_index;
+  container_type data;
+
+  struct bcsr_compare {
+    bool operator()(const triplet &t1, const triplet &t2) {
+      size_type I1, I2, J1, J2, i1, i2, j1, j2;
+      I1 = std::get<0>(t1)/BLOCK;
+      I2 = std::get<0>(t2)/BLOCK;
+      J1 = std::get<1>(t1)/BLOCK;
+      J2 = std::get<1>(t2)/BLOCK;
+      i1 = std::get<0>(t1)%BLOCK;
+      i2 = std::get<0>(t2)%BLOCK;
+      j1 = std::get<1>(t1)%BLOCK;
+      j2 = std::get<1>(t2)%BLOCK;
+      
+      if(I1 < I2) {
+	return true;
+      }
+      else {
+	if(I1 > I2) return false;
+	
+	if(J1 < J2) {
+	  return true;
+	}
+	else {
+	  if(J1>J2) return false;
+
+	  if(i1<i2) {
+	    return true;
+	  }
+	  else {
+	    if (i1>i2) return false;
+
+	    if(j1<j2) {
+	      return true;
+	    }
+	    else {
+	      return false;
+	    }
+	  }
+	}
+      }
+    }
+  };
+
+
+  /*
+   * Construction from other sparse_matrix objects (including, perhaps especially, sparse_coo)
+   *
+   */
+  template<typename T>
+  sparse_bcsr(sparse_matrix<T,dataType> &sp) : sparse_bcsr(sp.get_triplets()) {}
   
-  sparse_bcsr(const std::vector<triplet> &ts) :_zero(0) {
 
+  /*
+   * Construction from triplets.
+   * This is the main workhorse of the data structure, taking an unordered (potentially uncompressed)
+   * vector of triplets and performing the required sorting to convert it into a sparse_bcsr ordering.
+   * 
+   * This function DOES MODIFY the input triplet vector "ts" (by sorting)
+   */
+  sparse_bcsr(std::vector<triplet> &ts) :_zero(0) {
+    block_stride = BLOCK*BLOCK;
+    assert(ts.size() > 0 && "Doesn't support empty matrices (yet)");
+
+    //sort the triplets into bcsr order using the bcsr_compare struct
+    std::sort(ts.begin(), ts.end(), bcsr_compare());
     
+    size_type brows = std::get<0>(ts[ts.sizse()-1]);
+    brow_ptr.resize(brows+1, size_type(0));
 
+    size_type curr_brow = std::get<0>(ts)/BLOCK;
+    size_type curr_bcol = std::get<1>(ts)/BLOCK;
+    
+    // count number of blocks (single pass thru tuples. saves mem alloc time from push_back calls)
+    size_type nblocks = 1;
+    for(size_type i=1; i<ts.size(); ++i) {
+      if(curr_brow == std::get<0>(ts[i])/BLOCK &&
+	 curr_bcol == std::get<1>(ts[i])/BLOCK) {
+	continue;
+      }
+      else {
+	++nblocks;
+	curr_brow == std::get<0>(ts[i])/BLOCK;
+	curr_bcol == std::get<1>(ts[i])/BLOCK;
+      }
+    }
+
+    // resize storage containers
+    bcol_index.resize(nblocks, size_type(0));
+    data.resize(nblocks*block_stride, value_type(0));
+
+    //construct from triplets
+    size_type curr_brow = std::get<0>(ts[0])/BLOCK;
+    size_type curr_bcol = std::get<1>(ts[0])/BLOCK;
+    
+    _rows = std::get<0>(ts[0])+1;
+    _cols = std::get<1>(ts[0])+1;
+    
+    for(size_type r=0; r<=curr_brow; ++r) {
+      brow_ptr[r] = 0;
+    }
+    
+    bcol_index[0] = curr_bcol;
+    data[index(0, std::get<0>(ts[0])%BLOCK, std::get<1>(ts[0])%BLOCK)] = std::get<2>(ts[0]);
+    
+    size_type bidx = 0;
+    for(size_type i=1; i<ts.size(); ++i) {
+      
+      size_type I = std::get<0>(ts[i])/BLOCK;
+      size_type J = std::get<1>(ts[i])/BLOCK;
+      size_type i = std::get<0>(ts[i])%BLOCK;
+      size_type j = std::get<1>(ts[i])%BLOCK;
+      value_type val = std::get<2>(ts[i]);
+      
+
+      //keep track of number of brows, bcols. 
+      // not yet sure if I should enforce matrix sizes to be multiples of BLOCK
+      _brows = (I+1)>_rows ? I+1 : _brows;
+      _bcols = (J+1)>_cols ? J+1 : _bcols;
+      
+      
+      if(I==curr_brow && J==curr_bcol) {
+	data[index(bidx, i, j)] += val;
+      }
+      else {
+	++bidx;
+
+	if(curr_brow != I) {
+	  for(size_type r=curr_brow+1; r<=I; ++r) {
+	    brow_ptr[r] = bidx;
+	  }
+	  
+	  curr_brow = I;
+	}
+	curr_bcol = J;
+
+	bcol_index[bidx] = J;
+	data[index(bidx, i, j)] += val;
+      }
+    }
+    
+    row_ptr[_brows] = nblocks;
   }
 
+private:
+  size_type _brows;
+  size_type _bcols;
+  size_type _nnz;
+  size_type block_stride;
+  
+  inline size_type index(bidx, i, j) {
+    return bidx*block_stride + i*BLOCK + j;
+  }
 };
 
 
