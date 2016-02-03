@@ -6,6 +6,7 @@
 #include "lin_alg/access_sparse_matrix.hpp"
 //#include "lin_alg/bcsr_sparsity_pattern.hpp"
 
+#include <iostream> // <-- for debugging only
 #include <algorithm>
 #include <cstdlib>
 #include <tuple>
@@ -97,7 +98,7 @@ public:
     //sort the triplets into bcsr order using the bcsr_compare struct
     std::sort(ts.begin(), ts.end(), bcsr_compare());
     
-    size_type brows = std::get<0>(ts[ts.size()-1]);
+    size_type brows = std::get<0>(*ts.rbegin())/BLOCK+1;
     brow_ptr.resize(brows+1, size_type(0));
 
     size_type curr_brow = std::get<0>(ts[0])/BLOCK;
@@ -108,15 +109,16 @@ public:
     for(size_type i=1; i<ts.size(); ++i) {
       if(curr_brow == std::get<0>(ts[i])/BLOCK &&
 	 curr_bcol == std::get<1>(ts[i])/BLOCK) {
-	continue;
       }
       else {
 	++nblocks;
-	//curr_brow == std::get<0>(ts[i])/BLOCK;
-	//curr_bcol == std::get<1>(ts[i])/BLOCK;
       }
+      curr_brow = std::get<0>(ts[i])/BLOCK;
+      curr_bcol = std::get<1>(ts[i])/BLOCK;
     }
-
+    
+    std::cout << nblocks << std::endl;
+    
     // resize storage containers
     bcol_index.resize(nblocks, size_type(0));
     data.resize(nblocks*block_stride, value_type(0));
