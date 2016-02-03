@@ -2,17 +2,16 @@
 #define __YAFEL_SPARSE_BCSR_HPP
 
 #include "yafel_globals.hpp"
-
 #include "lin_alg/sparse_matrix.hpp"
-#incldue "lin_alg/access_sparse_matrix.hpp"
+#include "lin_alg/access_sparse_matrix.hpp"
 //#include "lin_alg/bcsr_sparsity_pattern.hpp"
-
 
 #include <algorithm>
 #include <cstdlib>
 #include <tuple>
+#include <cassert>
 
-YAFEL_NAMESAPCE_OPEN
+YAFEL_NAMESPACE_OPEN
 
 template<unsigned BLOCK, typename dataType=double>
 class sparse_bcsr : public access_sparse_matrix<sparse_bcsr<BLOCK,dataType>, dataType> {
@@ -26,7 +25,7 @@ public:
 
   size_type rows() const {return _brows*BLOCK;}
   size_type cols() const {return _bcols*BLOCK;}
-  size_type nnz() const {return _data.size();}
+  size_type nnz() const {return data.size();}
   
   std::vector<size_type> brow_ptr;
   std::vector<size_type> bcol_index;
@@ -90,19 +89,20 @@ public:
    * 
    * This function DOES MODIFY the input triplet vector "ts" (by sorting)
    */
-  sparse_bcsr(std::vector<triplet> &ts) :_zero(0) {
+  sparse_bcsr(const std::vector<triplet> & _ts) {
+    std::vector<triplet> ts(_ts);
     block_stride = BLOCK*BLOCK;
     assert(ts.size() > 0 && "Doesn't support empty matrices (yet)");
 
     //sort the triplets into bcsr order using the bcsr_compare struct
     std::sort(ts.begin(), ts.end(), bcsr_compare());
     
-    size_type brows = std::get<0>(ts[ts.sizse()-1]);
+    size_type brows = std::get<0>(ts[ts.size()-1]);
     brow_ptr.resize(brows+1, size_type(0));
 
-    size_type curr_brow = std::get<0>(ts)/BLOCK;
-    size_type curr_bcol = std::get<1>(ts)/BLOCK;
-    
+    size_type curr_brow = std::get<0>(ts[0])/BLOCK;
+    size_type curr_bcol = std::get<1>(ts[0])/BLOCK;
+  
     // count number of blocks (single pass thru tuples. saves mem alloc time from push_back calls)
     size_type nblocks = 1;
     for(size_type i=1; i<ts.size(); ++i) {
@@ -112,8 +112,8 @@ public:
       }
       else {
 	++nblocks;
-	curr_brow == std::get<0>(ts[i])/BLOCK;
-	curr_bcol == std::get<1>(ts[i])/BLOCK;
+	//curr_brow == std::get<0>(ts[i])/BLOCK;
+	//curr_bcol == std::get<1>(ts[i])/BLOCK;
       }
     }
 
@@ -122,11 +122,11 @@ public:
     data.resize(nblocks*block_stride, value_type(0));
 
     //construct from triplets
-    size_type curr_brow = std::get<0>(ts[0])/BLOCK;
-    size_type curr_bcol = std::get<1>(ts[0])/BLOCK;
+    curr_brow = std::get<0>(ts[0])/BLOCK;
+    curr_bcol = std::get<1>(ts[0])/BLOCK;
     
-    _rows = std::get<0>(ts[0])+1;
-    _cols = std::get<1>(ts[0])+1;
+    //_rows = std::get<0>(ts[0])+1;
+    //_cols = std::get<1>(ts[0])+1;
     
     for(size_type r=0; r<=curr_brow; ++r) {
       brow_ptr[r] = 0;
@@ -136,19 +136,19 @@ public:
     data[index(0, std::get<0>(ts[0])%BLOCK, std::get<1>(ts[0])%BLOCK)] = std::get<2>(ts[0]);
     
     size_type bidx = 0;
-    for(size_type i=1; i<ts.size(); ++i) {
+    for(size_type idx=1; idx<ts.size(); ++idx) {
       
-      size_type I = std::get<0>(ts[i])/BLOCK;
-      size_type J = std::get<1>(ts[i])/BLOCK;
-      size_type i = std::get<0>(ts[i])%BLOCK;
-      size_type j = std::get<1>(ts[i])%BLOCK;
-      value_type val = std::get<2>(ts[i]);
+      size_type I = std::get<0>(ts[idx])/BLOCK;
+      size_type J = std::get<1>(ts[idx])/BLOCK;
+      size_type i = std::get<0>(ts[idx])%BLOCK;
+      size_type j = std::get<1>(ts[idx])%BLOCK;
+      value_type val = std::get<2>(ts[idx]);
       
 
       //keep track of number of brows, bcols. 
       // not yet sure if I should enforce matrix sizes to be multiples of BLOCK
-      _brows = (I+1)>_rows ? I+1 : _brows;
-      _bcols = (J+1)>_cols ? J+1 : _bcols;
+      _brows = (I+1)>_brows ? I+1 : _brows;
+      _bcols = (J+1)>_bcols ? J+1 : _bcols;
       
       
       if(I==curr_brow && J==curr_bcol) {
@@ -171,7 +171,7 @@ public:
       }
     }
     
-    row_ptr[_brows] = nblocks;
+    brow_ptr[_brows] = nblocks;
   }
 
 private:
@@ -180,11 +180,14 @@ private:
   size_type _nnz;
   size_type block_stride;
   
-  inline size_type index(bidx, i, j) {
+  inline size_type index(size_type bidx, size_type i, size_type j) {
     return bidx*block_stride + i*BLOCK + j;
   }
-};
+
+}; // end class sparse_bcsr
 
 
 
-YAFEL_NAMESAPCE_CLOSE
+YAFEL_NAMESPACE_CLOSE
+
+#endif
