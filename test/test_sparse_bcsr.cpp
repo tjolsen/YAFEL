@@ -10,9 +10,15 @@
 using namespace yafel;
 
 
+
+/*
+ * Test operator() for correctness.
+ * Test fills a matrix with integers and then reads
+ * them back out to ensure correct retrieval
+ */
 bool test_1() {
   
-  std::size_t N = 6;
+  std::size_t N = 60;
   
   sparse_coo<int> coo;
   for(std::size_t i=0; i<N; ++i) {
@@ -23,18 +29,14 @@ bool test_1() {
   
   sparse_bcsr<3,int> bcsr(coo);
 
-  for(auto biptr : bcsr.brow_ptr)
-    std::cout << biptr << " ";
-  std::cout << std::endl;
+  // test for equality with known values 
+  for(std::size_t i=0; i<N; ++i) {
+    for(std::size_t j=0; j<N; ++j) {
+      if( bcsr(i,j) != int(i*N+j) )
+        return false;
+    }
+  }
 
-  for(auto biptr : bcsr.bcol_index)
-    std::cout << biptr << " ";
-  std::cout << std::endl;
-
-  for(auto biptr : bcsr.data)
-    std::cout << biptr << " ";
-  std::cout << std::endl;
-  
   return true;
 }
 

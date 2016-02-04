@@ -90,7 +90,7 @@ public:
    * 
    * This function DOES MODIFY the input triplet vector "ts" (by sorting)
    */
-  sparse_bcsr(const std::vector<triplet> & _ts) {
+  sparse_bcsr(const std::vector<triplet> & _ts) : _zero(0) {
     std::vector<triplet> ts(_ts);
     block_stride = BLOCK*BLOCK;
     assert(ts.size() > 0 && "Doesn't support empty matrices (yet)");
@@ -116,8 +116,6 @@ public:
       curr_brow = std::get<0>(ts[i])/BLOCK;
       curr_bcol = std::get<1>(ts[i])/BLOCK;
     }
-    
-    std::cout << nblocks << std::endl;
     
     // resize storage containers
     bcol_index.resize(nblocks, size_type(0));
@@ -176,15 +174,43 @@ public:
     brow_ptr[_brows] = nblocks;
   }
 
+
+  value_type operator()(size_type i, size_type j) const {
+#ifndef _OPTIMIZED
+    if(i>= _brows*BLOCK || j >=_bcols*BLOCK) {
+      std::cerr << "error:sparse_bcsr:operator() out of bounds\n";
+      exit(1);
+    }
+#endif
+    
+    bool in_sparsity = true;
+    size_type bidx = bindex_of(i/BLOCK, j/BLOCK, in_sparsity);
+    
+    return (in_sparsity) ? data[index(bidx, i%BLOCK, j%BLOCK)] : dataType(0);
+  }
+
 private:
   size_type _brows;
   size_type _bcols;
   size_type _nnz;
   size_type block_stride;
-  
-  inline size_type index(size_type bidx, size_type i, size_type j) {
+  value_type _zero;
+
+  inline size_type index(size_type bidx, size_type i, size_type j) const {
     return bidx*block_stride + i*BLOCK + j;
   }
+
+  inline size_type bindex_of(size_type I, size_type J, bool &in_sparsity) const {
+    for(size_type idx=brow_ptr[I]; idx<brow_ptr[I+1]; ++idx) {
+      if(J == bcol_index[idx]) {
+        in_sparsity = true;
+        return idx;
+      }
+    }
+    in_sparsity=false;
+    return data.size();
+  }
+
 
 }; // end class sparse_bcsr
 
