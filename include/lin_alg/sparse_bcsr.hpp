@@ -90,7 +90,8 @@ public:
    * 
    * This function DOES MODIFY the input triplet vector "ts" (by sorting)
    */
-  sparse_bcsr(const std::vector<triplet> & _ts) : _zero(0) {
+  sparse_bcsr(const std::vector<triplet> & _ts) :  _brows(0), _bcols(0), _zero(0)
+  {
     std::vector<triplet> ts(_ts);
     block_stride = BLOCK*BLOCK;
     assert(ts.size() > 0 && "Doesn't support empty matrices (yet)");
@@ -192,7 +193,7 @@ public:
 private:
   size_type _brows;
   size_type _bcols;
-  size_type _nnz;
+  //size_type _nnz;
   size_type block_stride;
   value_type _zero;
 
