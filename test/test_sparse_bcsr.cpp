@@ -51,9 +51,7 @@ bool test_2() {
 
   sparse_coo<int> coo;
   for(std::size_t i=0; i<N; ++i) {
-    for(std::size_t j=0; j<N; ++j) {
-      coo.add(i,j,int(i*N+j));
-    }
+    coo.add(i,i,int(i));
   }
   
   sparse_bcsr<3,int> bcsr(coo);
