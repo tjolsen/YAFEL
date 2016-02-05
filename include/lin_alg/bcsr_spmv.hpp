@@ -1,6 +1,15 @@
 #ifndef __YAFEL_BCSR_SPMV
 #define __YAFEL_BCSR_SPMV
 
+/*
+ * Sparse matrix-vector multiplication subroutine for a 
+ * block-compressed-sparse-row matrix. This will only be
+ * implemented for Vector<dataType> rather than VectorExpression<dataType>
+ * in order to force conversion to take advantage of known
+ * data reuse.
+ */
+
+
 #include "yafel_globals.hpp"
 #include "lin_alg/Vector.hpp"
 #include "lin_alg/sparse_bcsr.hpp"

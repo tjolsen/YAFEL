@@ -47,3 +47,14 @@
 # lcov files
 *.gcda
 *.gcno
+
+# images
+*.png
+*.eps
+
+# data files
+*.csv
+
+# extra directories
+test/outhtml/
+experimental/
