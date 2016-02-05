@@ -23,18 +23,24 @@ Vector<dataType> bcsr_spmv(const sparse_bcsr<BLOCK, dataType> &A,
   Vector<dataType> b(A.rows(), 0);
   std::size_t BLOCK2 = BLOCK*BLOCK;
   
-  for(std::size_t brow=0; brow<A.rows(). ++brow) {
-    
+  for(std::size_t brow=0; brow<A.rows()/BLOCK; ++brow) {
+
     std::size_t idxmin, idxmax;
     idxmin = A.brow_ptr[brow];
     idxmax = A.brow_ptr[brow+1];
     
+    std::cout << "min:"<<idxmin<<" max:" << idxmax << "\n";
     //accumulate
     dataType accum[BLOCK] = { };
+    for(std::size_t i=0; i<BLOCK; ++i) {
+      accum[i] = dataType(0);
+    }
+    
     for(std::size_t idx=idxmin; idx<idxmax; ++idx) {
+      std::cout << "\t"<<idx<<"\n";
       for(std::size_t i=0; i<BLOCK; ++i) {
         for(std::size_t j=0; j<BLOCK; ++j) {
-          col = A.bcol_index[idx]*BLOCK;
+          std::size_t col = A.bcol_index[idx]*BLOCK + j;
           accum[i] += A.data[idx*BLOCK2 + i*BLOCK + j]*x(col);
         }
       }
@@ -45,7 +51,6 @@ Vector<dataType> bcsr_spmv(const sparse_bcsr<BLOCK, dataType> &A,
     
   }
 
-  
   return b;
 }
 
