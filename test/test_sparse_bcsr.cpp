@@ -59,6 +59,54 @@ bool test_2() {
   return bcsr.rows()==3*(N/3) && bcsr.cols()==3*(N/3);
 }
 
+/*
+ * Construct directly from triplets, test accumulation.
+ * test for rows() and cols() correctness.
+ */
+bool test_3() {
+  
+  std::size_t N = 60;
+  std::vector<typename sparse_bcsr<3>::triplet> ts;
+
+  for(std::size_t i=0; i<N; ++i) {
+    ts.push_back(std::make_tuple(N-1, N-1, 1.0));
+    ts.push_back(std::make_tuple(0, 0, 1.0));
+  }
+
+  sparse_bcsr<3> bcsr(ts);
+
+  return bcsr.rows()==N && bcsr.cols()==N;
+
+}
+
+
+/*
+ * Construct directly from triplets, test accumulation.
+ * test for operator() correctness.
+ */
+bool test_4() {
+  
+  std::size_t N = 60;
+  std::vector<typename sparse_bcsr<3>::triplet> ts;
+
+  for(std::size_t i=0; i<N; ++i) {
+    ts.push_back(std::make_tuple(N-1, N-1, 1.0));
+    ts.push_back(std::make_tuple(0, 0, 1.0));
+  }
+
+  sparse_bcsr<3> bcsr(ts);
+
+  bool retval = true;
+  retval = retval && bcsr(0,0)==double(N);
+  retval = retval && bcsr(N-1,N-1)==double(N);
+  for(std::size_t i=1; i<N-1; ++i) {
+    retval = retval && bcsr(i,i) == 0;
+  }
+
+  return retval;
+
+}
+
 
 
 int main() {
@@ -73,6 +121,16 @@ int main() {
   if(!test_2()) {
     std::cout << "Failed test_2()" << std::endl;
     retval |= 1<<1;
+  }
+
+  if(!test_3()) {
+    std::cout << "Failed test_3()" << std::endl;
+    retval |= 1<<2;
+  }
+
+  if(!test_4()) {
+    std::cout << "Failed test_4()" << std::endl;
+    retval |= 1<<3;
   }
   
   
