@@ -12,7 +12,6 @@
 #include "lin_alg/Vector.hpp"
 #include "lin_alg/access_sparse_matrix.hpp"
 #include "lin_alg/operators.hpp"
-#include <iostream>
 
 YAFEL_NAMESPACE_OPEN
 
