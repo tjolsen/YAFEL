@@ -53,7 +53,7 @@ Vector<dataType> cg_solve(const access_sparse_matrix<T, dataType> &A,
   }
   
   while(k++ < maxiter) {
-    
+
     auto Ap = A*p;
     dataType alpha = rTr_old/p.dot(Ap);
     x += p*alpha;
@@ -61,7 +61,7 @@ Vector<dataType> cg_solve(const access_sparse_matrix<T, dataType> &A,
     r += -alpha*Ap;
     
     dataType rTr_new = r.dot(r);
-    
+
     //convergence check
     if(rTr_new/rTr_0 < CG_SOLVER_TOL) {
       break;

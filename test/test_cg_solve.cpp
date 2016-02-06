@@ -30,6 +30,36 @@ bool test_1() {
   return res == rhs;
 }
 
+// make a laplacian matrix, gonna test with that.
+bool test_2() {
+  
+  // seed rand w/ 0 for deterministic results
+  // maybe switch to time(0) ?
+  srand(0);
+  
+  std::size_t N = 10;
+  sparse_coo<> coo;
+  Vector<> xref(N,0);
+  for(std::size_t i=0; i<N; ++i) {
+    coo.add(i,i,-2.0);
+    xref(i) = double(i);
+  }
+  for(std::size_t i=1; i<N; ++i) {
+    coo.add(i,i-1,1.0);
+    coo.add(i-1,i,1.0);
+  }
+  
+  sparse_csr<> csr(coo);
+
+  Vector<> rhs = csr*xref;
+
+  auto res = cg_solve(csr, rhs);
+
+  Vector<> diff = res - xref;
+  double errnorm = diff.dot(diff);
+  
+  return errnorm < 1.0e-10;
+}
 
 
 
@@ -42,6 +72,10 @@ int main() {
   if(!test_1()) {
     std::cerr << "Failed test_1()" << std::endl;
     retval |= 1<<0;
+  }
+  if(!test_2()) {
+    std::cerr << "Failed test_2()" << std::endl;
+    retval |= 1<<1;
   }
   
   return retval;
