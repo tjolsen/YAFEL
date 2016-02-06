@@ -52,6 +52,8 @@ Vector<dataType> csr_spmv(const sparse_csr<dataType> &A,
   return b;
 }
 
+
+
 YAFEL_NAMESPACE_CLOSE
 
 

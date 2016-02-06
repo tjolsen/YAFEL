@@ -32,6 +32,7 @@ public:
    */
   value_type operator()(size_type i, size_type j) const {return static_cast<T const&>(*this)(i,j);}
   reference operator()(size_type i, size_type j) {return static_cast<T&>(*this)(i,j);}
+
 };
 
 YAFEL_NAMESPACE_CLOSE

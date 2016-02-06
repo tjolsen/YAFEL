@@ -40,7 +40,63 @@ public:
     }
   }
 
+
+  /*
+   * Vector-specific operators. Cannot be used with VectorExpressions as
+   * left-hand argument.
+   */
+  template<typename T>
+  Vector<dataType>& operator+=(const VectorExpression<T,dataType> &rhs) {
+#ifndef _OPTIMIZED
+    assert(size() == rhs.size() && "Vector::operator+= dimension mismatch");
+#endif
+    for(size_type i=0; i<size(); ++i) {
+      _data[i] += rhs(i);
+    }
+    
+    return *this;
+  }
+
+  template<typename T>
+  Vector<dataType>& operator-=(const VectorExpression<T,dataType> &rhs) {
+#ifndef _OPTIMIZED
+    assert(size() == rhs.size() && "Vector::operator+= dimension mismatch");
+#endif
+    for(size_type i=0; i<size(); ++i) {
+      _data[i] -= rhs(i);
+    }
+    
+    return *this;
+  }
+
+  template<typename T>
+  Vector<dataType>& operator*=(const VectorExpression<T,dataType> &rhs) {
+#ifndef _OPTIMIZED
+    assert(size() == rhs.size() && "Vector::operator+= dimension mismatch");
+#endif
+    for(size_type i=0; i<size(); ++i) {
+      _data[i] *= rhs(i);
+    }
+    
+    return *this;
+  }
+
+  Vector<dataType>& operator*=(dataType rhs) {
+
+    for(size_type i=0; i<size(); ++i) {
+      _data[i] *= rhs;
+    }
+    
+    return *this;
+  }
+
+
+
 };
+
+
+
+
 
 
 YAFEL_NAMESPACE_CLOSE

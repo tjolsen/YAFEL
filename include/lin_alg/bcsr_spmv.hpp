@@ -61,6 +61,8 @@ Vector<dataType> bcsr_spmv(const sparse_bcsr<BLOCK, dataType> &A,
   return b;
 }
 
+
+
 YAFEL_NAMESPACE_CLOSE
 
 #endif

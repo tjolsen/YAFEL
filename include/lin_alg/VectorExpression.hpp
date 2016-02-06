@@ -27,6 +27,21 @@ public:
   
   operator T&() { return static_cast<T&>(*this); }
   operator T const&() const { return static_cast<const T&>(*this); }
+
+  //dot product
+  template<typename T2>
+  value_type dot(const VectorExpression<T2,dataType> &rhs) const {
+#ifndef _OPTIMIZED
+    assert(this->size() == rhs.size() && "VectorExpression::dot dimension mismatch");
+#endif
+    
+    value_type retval = value_type(0);
+    for(size_type i=0; i<size(); ++i) {
+      retval += (*this)(i)*rhs(i);
+    }
+    
+    return retval;
+  }
 };
 
 

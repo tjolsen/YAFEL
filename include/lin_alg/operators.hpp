@@ -8,8 +8,15 @@
 
 #include "lin_alg/Matrix.hpp"
 #include "lin_alg/MatrixExpression.hpp"
-
 #include "lin_alg/matmul.hpp"
+
+#include "lin_alg/access_sparse_matrix.hpp"
+#include "lin_alg/sparse_csr.hpp"
+#include "lin_alg/sparse_bcsr.hpp"
+#include "lin_alg/csr_spmv.hpp"
+#include "lin_alg/bcsr_spmv.hpp"
+
+
 
 YAFEL_NAMESPACE_OPEN
 
@@ -89,6 +96,28 @@ template<typename T1, typename T2, typename dataType>
 MatrixScaled<T1,dataType> operator*(T2 a, const MatrixExpression<T1,dataType> &v) {
   return MatrixScaled<T1,dataType>(v,a);
 }
+
+//----------------------------------------------------------------------------------------
+/*
+ * Sparse matrix operators
+ */
+//----------------------------------------------------------------------------------------
+template<typename T, typename dataType>
+Vector<dataType> operator*(const access_sparse_matrix<T,dataType> &A,
+                           const Vector<dataType> &x) {
+  return static_cast<T const&>(A)*x;
+}
+
+template<unsigned BLOCK, typename dataType>
+Vector<dataType> operator*(const sparse_bcsr<BLOCK, dataType> &A, const Vector<dataType> &x) {
+  return bcsr_spmv(A,x);
+}
+
+template<typename dataType>
+Vector<dataType> operator*(const sparse_csr<dataType> &A, const Vector<dataType> &x) {
+  return csr_spmv(A,x);
+}
+
 
 //----------------------------------------------------------------------------------------
 /*

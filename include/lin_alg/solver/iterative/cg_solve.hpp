@@ -10,9 +10,16 @@
 
 #include "yafel_globals.hpp"
 #include "lin_alg/Vector.hpp"
-#include "access_sparse_matrix.hpp"
+#include "lin_alg/access_sparse_matrix.hpp"
+#include "lin_alg/operators.hpp"
+#include <iostream>
 
-#define CG_SOLVER_TOL 1.0e-14
+YAFEL_NAMESPACE_OPEN
+
+// not sure if I should use double or dataType for this.
+// practically speaking, cg only makes sense for floating-point
+// types, in which case double is fine.
+constexpr double CG_SOLVER_TOL = 1.0e-14;
 
 template<typename T, typename dataType>
 Vector<dataType> cg_solve(const access_sparse_matrix<T, dataType> &A,
@@ -48,7 +55,7 @@ Vector<dataType> cg_solve(const access_sparse_matrix<T, dataType> &A,
   while(k++ < maxiter) {
     
     auto Ap = A*p;
-    dataType alpha = rTR_old/p.dot(Ap);
+    dataType alpha = rTr_old/p.dot(Ap);
     x += p*alpha;
     
     r += -alpha*Ap;
@@ -77,7 +84,7 @@ Vector<dataType> cg_solve(const access_sparse_matrix<T, dataType> &A,
 
 
 
-
+YAFEL_NAMESPACE_CLOSE
 
 
 #endif
