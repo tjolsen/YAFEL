@@ -21,11 +21,11 @@
 
 // Linear Algebra
 #include "lin_alg/Vector.hpp"
-#include "lin_alg/FullMatrix.hpp"
+#include "lin_alg/Matrix.hpp"
 #include "lin_alg/sparse_coo.hpp"
 #include "lin_alg/sparse_csr.hpp"
-#include "lin_alg/cg_solver.hpp"
-#include "lin_alg/bicgstab.hpp"
+#include "lin_alg/solver/iterative/cg_solver.hpp"
+#include "lin_alg/solver/iterative/bicgstab.hpp"
 #include "lin_alg/LUDecomposition.hpp"
 #include "lin_alg/Preconditioner.hpp"
 #include "lin_alg/ILUPreconditioner.hpp"

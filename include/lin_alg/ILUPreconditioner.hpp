@@ -45,8 +45,6 @@ public:
     for(size_type r=0; r<ILU.rows()-1; ++r) {
       bool flag = true;
       
-      std::cout << r << std::endl;
-      
       value_type d = value_type(1)/ILU(r, r, flag);
       
       for(size_type i=r+1; i<ILU.rows(); ++i) {
