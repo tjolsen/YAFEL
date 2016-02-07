@@ -30,7 +30,11 @@ public:
   operator T&() {return static_cast<T&>(*this);}
   operator T const&() {return static_cast<T const&>(*this);}
 
+  // various ways to get the triplets from a sparse matrix. Returning a reference
+  // only makes sense for sparse_coo, but i need to be able to do it from other
+  // types too.
   const std::vector<triplet> & get_triplets() {return static_cast<T&>(*this).get_triplets();}
+  std::vector<triplet> copy_triplets() {return static_cast<T&>(*this).copy_triplets();}
 };
 
 YAFEL_NAMESPACE_CLOSE

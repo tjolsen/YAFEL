@@ -6,13 +6,16 @@
 
 YAFEL_NAMESPACE_OPEN
 
+template<typename T, typename dataType>
 class Preconditioner {
-
-
 public:
-  //all preconditioners must implement a (hopefully fast) linear solve.
-  virtual Vector MinvV(const Vector &rhs) const = 0;
+  operator T&() {return static_cast<T&>(*this);}
+  operator T const&() {return static_cast<T const&>(*this);}
   
+  //all preconditioners must implement a (hopefully fast) linear solve.
+  Vector<dataType> MinvV(const Vector<double> &rhs) const {
+    return static_cast<const T&>(*this).MinvV(rhs);
+  }
 
 };
 

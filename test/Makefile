@@ -1,6 +1,6 @@
 testfiles = test_vectorTest.cpp test_matrixTest.cpp test_sparse_coo.cpp test_sparse_csr.cpp 
 testfiles += test_sparse_bcsr.cpp test_tensor.cpp test_csr_spmv.cpp test_bcsr_spmv.cpp 
-testfiles += test_matmul.cpp test_DualNumber.cpp test_cg_solve.cpp test_bicgstab_solve.cpp
+testfiles += test_matmul.cpp test_DualNumber.cpp test_cg_solve.cpp test_bicgstab_solve.cpp test_ILU.cpp
 
 benchmarkfiles = matmul_performance.cpp
 

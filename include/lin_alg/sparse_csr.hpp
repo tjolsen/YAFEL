@@ -134,6 +134,20 @@ public:
   }
 
 
+  std::vector<triplet> copy_triplets() const {
+    
+    std::vector<triplet> ts(nnz());
+    
+    size_type count=0;
+    for(size_type r=0; r<rows(); ++r) {
+      for(size_type idx=row_ptr[r]; idx<row_ptr[r+1]; ++idx) {
+        ts[count++] = std::make_tuple(r, col_index[idx], _data[idx]);
+      }
+    }
+
+    return ts;
+  }
+
   // easier to write algorithms if these are public
   std::vector<size_type> row_ptr;
   std::vector<size_type> col_index;
