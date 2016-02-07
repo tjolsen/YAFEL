@@ -50,7 +50,7 @@ public:
       value_type d = value_type(1)/ILU(r, r, flag);
       
       for(size_type i=r+1; i<ILU.rows(); ++i) {
-        std::cout << "\t" << i << std::endl;
+
         reference A_ir = ILU(i,r,flag);
         
         if(!flag) continue; //skip if not in sparsity
@@ -66,11 +66,9 @@ public:
             break;
           }
         }
-        std::cout << "\t\t";
+
         for(size_type idx=idxmin; idx<idxmax; ++idx) {
           size_type j = ILU.col_index[idx];
-          
-          std::cout << j << " ";
           reference A_ij = ILU._data[idx];
           value_type A_rj = ILU(r,j,flag);
           
@@ -79,7 +77,6 @@ public:
           }
 
         } // end idx-loop
-        std::cout << std::endl;
         
       } // end i-loop
       
