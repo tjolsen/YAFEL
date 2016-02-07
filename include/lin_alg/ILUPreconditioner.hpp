@@ -12,11 +12,12 @@
 
 
 #include "yafel_globals.hpp"
+#include "lin_alg/Preconditioner.hpp"
 #include "lin_alg/sparse_csr.hpp"
 #include "lin_alg/Vector.hpp"
-#include "lin_alg/Preconditioner.hpp"
 
 #include <cassert>
+#include <iostream>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -43,11 +44,13 @@ public:
 
     for(size_type r=0; r<ILU.rows()-1; ++r) {
       bool flag = true;
-
+      
+      std::cout << r << std::endl;
+      
       value_type d = value_type(1)/ILU(r, r, flag);
       
-      for(size_type i=r+1; r<ILU.rows(); ++i) {
-        
+      for(size_type i=r+1; i<ILU.rows(); ++i) {
+        std::cout << "\t" << i << std::endl;
         reference A_ir = ILU(i,r,flag);
         
         if(!flag) continue; //skip if not in sparsity
@@ -57,10 +60,18 @@ public:
         
         size_type idxmin = ILU.row_ptr[i];
         size_type idxmax = ILU.row_ptr[i+1];
-        
+        for(size_type idx=idxmin; idx<idxmax; ++idx) {
+          if(ILU.col_index[idx] > r) {
+            idxmin = idx;
+            break;
+          }
+        }
+        std::cout << "\t\t";
         for(size_type idx=idxmin; idx<idxmax; ++idx) {
           size_type j = ILU.col_index[idx];
-          reference A_ij = ILU.data[idx];
+          
+          std::cout << j << " ";
+          reference A_ij = ILU._data[idx];
           value_type A_rj = ILU(r,j,flag);
           
           if(flag) {
@@ -68,6 +79,7 @@ public:
           }
 
         } // end idx-loop
+        std::cout << std::endl;
         
       } // end i-loop
       

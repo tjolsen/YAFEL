@@ -120,6 +120,31 @@ public:
     return (in_sparsity) ? _data[idx] : _zero;
   }
 
+  value_type operator()(size_type i, size_type j, bool & in_sparsity) const {
+#ifndef _OPTIMIZED
+    if(i>=_rows || j >= cols) {
+      std::cerr << "error:sparse_csr:operator() out of bounds\n";
+      exit(1);
+    }
+#endif
+    in_sparsity = true;
+    size_type idx = index_of(i,j,in_sparsity);
+    return (in_sparsity) ? _data[idx] : dataType(0);
+  }
+
+  value_type& operator()(size_type i, size_type j, bool & in_sparsity) {
+#ifndef _OPTIMIZED
+    if(i>=_rows || j >= cols) {
+      std::cerr << "error:sparse_csr:operator() out of bounds\n";
+      exit(1);
+    }
+#endif
+
+    in_sparsity = true;
+    size_type idx = index_of(i,j,in_sparsity);
+    return (in_sparsity) ? _data[idx] : _zero;
+  }
+
   /*
    * Functions to get sparsity patterns.
    * csr_sparsity_pattern_copy contains a deep copy of row_ptr, col_index

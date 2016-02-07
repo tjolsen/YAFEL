@@ -31,7 +31,12 @@ bool test_1() {
     }
   }
   
-  ILUPreconditioner<double> ilu(sparse_csr<double>(coo));
+
+  sparse_csr<double> csr(coo);
+
+  std::cout << "\t" << csr.rows() << "," << csr.cols() << "\n";
+  
+  ILUPreconditioner<double> ilu(csr);
 
   std::vector<typename sparse_csr<double>::triplet> ts = ilu.getILU().copy_triplets();
   
