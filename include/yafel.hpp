@@ -24,12 +24,12 @@
 #include "lin_alg/Matrix.hpp"
 #include "lin_alg/sparse_coo.hpp"
 #include "lin_alg/sparse_csr.hpp"
-#include "lin_alg/solver/iterative/cg_solver.hpp"
-#include "lin_alg/solver/iterative/bicgstab.hpp"
-#include "lin_alg/LUDecomposition.hpp"
-#include "lin_alg/Preconditioner.hpp"
-#include "lin_alg/ILUPreconditioner.hpp"
-#include "lin_alg/JacobiPreconditioner.hpp"
+#include "lin_alg/solver/iterative/cg_solve.hpp"
+#include "lin_alg/solver/iterative/bicgstab_solve.hpp"
+#include "lin_alg/solver/iterative/Preconditioner.hpp"
+#include "lin_alg/solver/iterative/ILUPreconditioner.hpp"
+#include "lin_alg/solver/iterative/JacobiPreconditioner.hpp"
+#include "lin_alg/solver/direct/LUDecomposition.hpp"
 
 // Mesh
 #include "mesh/Mesh.hpp"

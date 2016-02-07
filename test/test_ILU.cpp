@@ -1,5 +1,5 @@
 #include "yafel_globals.hpp"
-#include "lin_alg/ILUPreconditioner.hpp"
+#include "lin_alg/solver/iterative/ILUPreconditioner.hpp"
 #include "lin_alg/sparse_csr.hpp"
 #include "lin_alg/sparse_coo.hpp"
 

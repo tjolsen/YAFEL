@@ -2,7 +2,7 @@
 #define _YAFEL_JACOBIPRECONDITIONER_HPP
 
 #include "yafel_globals.hpp"
-#include "lin_alg/Preconditioner.hpp"
+#include "lin_alg/solver/iterative/Preconditioner.hpp"
 #include "lin_alg/Vector.hpp"
 #include "lin_alg/sparse_csr.hpp"
 
