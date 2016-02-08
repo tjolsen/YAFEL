@@ -35,10 +35,10 @@ Mesh MeshReader::gmsh_read(std::string fname) {
   } action_t;
   
   
-  std::vector< Vector > nodal_coords;
-  std::vector<std::vector<unsigned> > elements;
-  std::vector<unsigned> el_type;
-  std::vector<std::vector<unsigned> > tags;
+  std::vector<coordinate_type> nodal_coords;
+  std::vector<std::vector<size_type> > elements;
+  std::vector<size_type> el_type;
+  std::vector<std::vector<size_type> > tags;
 
   action_t currentAction = ACTION_UNSET;
   
@@ -84,7 +84,7 @@ Mesh MeshReader::gmsh_read(std::string fname) {
     case PARSE_NODES:
       {
 	id = atoi(words[0].c_str());
-	Vector node(3,0.0);
+	coordinate_type node;
 	for(int i=0; i<3; ++i) {
 	  node(i) = atof(words[i+1].c_str());
 	}
@@ -97,13 +97,13 @@ Mesh MeshReader::gmsh_read(std::string fname) {
 	el_type[id-1] = atoi(words[1].c_str());
 	int ntags = atoi(words[2].c_str());
 	int nodes_in_el = words.size() - ntags - 3;
-	std::vector<unsigned> tag(ntags,0);
+	std::vector<size_type> tag(ntags,0);
 	for(int i=3; i<3+ntags; ++i) {
 	  tag[i-3] = atoi(words[i].c_str());
 	}
 	tags[id-1] = tag;
-	std::vector<unsigned> el(nodes_in_el, -1); //init to -1 so fails hard,if at all
-	for(unsigned i=3+ntags; i<words.size(); ++i) {
+	std::vector<size_type> el(nodes_in_el, -1); //init to -1 so fails hard,if at all
+	for(size_type i=3+ntags; i<words.size(); ++i) {
 	  el[i-ntags-3] = atoi(words[i].c_str())-1; //using 0-based node numbering
 	}
 	elements[id-1] = el;
