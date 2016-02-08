@@ -300,12 +300,33 @@ public:
 };
 
 
-template<unsigned NCONTRACT, typename T1, typename T2, unsigned DIM, unsigned R1, unsigned R2, typename dataType>
+template<unsigned NCONTRACT, typename T1, typename T2, unsigned DIM, 
+         unsigned R1, unsigned R2, typename dataType,
+         typename = typename std::enable_if<R1+R2-2*NCONTRACT>::type >
 TensorContraction<T1, T2, DIM, R1, R2, NCONTRACT, dataType>
 contract(const TensorExpression<T1,DIM,R1,dataType> &lhs,
 	 const TensorExpression<T2,DIM,R2,dataType> &rhs) {
   
   return TensorContraction<T1,T2,DIM,R1,R2,NCONTRACT,dataType>(lhs,rhs);
+}
+
+
+template<unsigned NCONTRACT, typename T1, typename T2, unsigned DIM, 
+         unsigned R1, unsigned R2, typename dataType,
+         typename = typename std::enable_if<R1+R2-2*NCONTRACT==0>::type >
+//TensorContraction<T1, T2, DIM, R1, R2, NCONTRACT, dataType>
+dataType contract(const TensorExpression<T1,DIM,R1,dataType> &lhs,
+                  const TensorExpression<T2,DIM,R2,dataType> &rhs) {
+  
+  auto l_it = lhs.begin();
+  auto r_it = rhs.begin();
+  dataType accum(0);
+  
+  for(; !l_it.end(); l_it.next(), r_it.next()) {
+    accum += (*l_it)*(*r_it);
+  }
+  
+  return accum;
 }
 
 

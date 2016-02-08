@@ -11,6 +11,7 @@ template<unsigned DIM, unsigned RANK, typename dataType=double>
 class Tensor : public TensorExpression< Tensor<DIM,RANK,dataType>, DIM, RANK, dataType> {
 public:
   using value_type = typename TensorExpression<Tensor<DIM,RANK,dataType>,DIM,RANK,dataType>::value_type;
+  using size_type = typename TensorExpression<Tensor<DIM,RANK,dataType>,DIM,RANK,dataType>::size_type;
   
   template<typename ...Args>
   value_type & operator()(Args ...args) {return _data[index(args...)];}
@@ -25,9 +26,11 @@ public:
   
   //initialize a zero-tensor
   Tensor() {
-    for(unsigned i=0; i<_tensorStorage(DIM,RANK); ++i) {
-      _data[i] = 0;
+
+    for(auto ti = this->begin(); !ti.end(); ti.next()) {
+      *ti = value_type(0);
     }
+
   }
 
   // copy a tensor or tensor-expression into a new (explicitly stored) tensor
@@ -55,12 +58,14 @@ private:
     return DIM*index(args...) + i;
   }
 
+  /*
   template<typename T, int ...S, typename ...Args>
   void copy_element(const seq<S...> &, 
 		    const std::tuple<Args...> &indices, 
 		    const TensorExpression<T,DIM,RANK,dataType> &tens) {
     (*this)(std::get<S>(indices)...) = tens(std::get<S>(indices)...);
   }
+  */
 
 };
 

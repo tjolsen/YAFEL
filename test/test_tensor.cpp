@@ -345,6 +345,31 @@ bool test_13() {
 }
 
 
+// test full contraction of rank 1 tensors (dot product)
+bool test_14() {
+  Tensor<3,1,int> A, B;
+  auto ait=A.begin();
+  auto bit=B.begin();
+  for(; !ait.end(); ait.next(), bit.next()) {
+    *ait = 1;
+    *bit = 1;
+  }
+
+  return contract<1>(A,B)==3;
+}
+
+// test full contraction of rank 4 tensors (dot product)
+bool test_15() {
+  Tensor<3,4,int> A, B;
+  auto ait=A.begin();
+  auto bit=B.begin();
+  for(; !ait.end(); ait.next(), bit.next()) {
+    *ait = 1;
+    *bit = 1;
+  }
+
+  return contract<4>(A,B)==3*3*3*3;
+}
 
 int main() {
 
@@ -401,6 +426,14 @@ int main() {
   if(!test_13()) {
     retval |= 1<<12;
     std::cout << "Failed test_13" << "\n";
+  }
+  if(!test_14()) {
+    retval |= 1<<13;
+    std::cout << "Failed test_14" << "\n";
+  }
+  if(!test_15()) {
+    retval |= 1<<14;
+    std::cout << "Failed test_15" << "\n";
   }
 
   return retval;
