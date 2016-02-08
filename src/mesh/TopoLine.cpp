@@ -6,9 +6,9 @@ YAFEL_NAMESPACE_OPEN
 
 TopoLine::TopoLine(): TopoLine(0, nullptr, nullptr) {}
 
-TopoLine::TopoLine(unsigned _id) : TopoLine(_id, nullptr, nullptr) {}
+TopoLine::TopoLine(std::size_t _id) : TopoLine(_id, nullptr, nullptr) {}
 
-TopoLine::TopoLine(unsigned _id, TopoPoint *h, TopoPoint *t) :
+TopoLine::TopoLine(std::size_t _id, TopoPoint *h, TopoPoint *t) :
   id(_id), head(h), tail(t), left(nullptr), right(nullptr)
 {}
 

@@ -13,15 +13,15 @@ class TopoFace;
 class TopoLine {
 
 public:
-  unsigned id;
+  std::size_t id;
   TopoPoint *head;
   TopoPoint *tail;
   TopoFace *left;
   TopoFace *right;
 
   TopoLine();
-  TopoLine(unsigned _id);
-  TopoLine(unsigned _id, TopoPoint *h, TopoPoint *t);
+  TopoLine(std::size_t _id);
+  TopoLine(std::size_t _id, TopoPoint *h, TopoPoint *t);
   TopoLine(const TopoLine &TL);
 };
 

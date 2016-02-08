@@ -13,12 +13,12 @@ class TopoPoint;
 class TopoFace {
   
 public:
-  unsigned id;
+  std::size_t id;
   std::vector<TopoPoint*> vertices;
   std::vector<TopoLine*> boundary;
 
   TopoFace();
-  TopoFace(unsigned _id);
+  TopoFace(std::size_t _id);
   
 };
 

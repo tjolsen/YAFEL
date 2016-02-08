@@ -6,31 +6,31 @@ MeshTopology::MeshTopology(const Mesh &M) :
   points(), lines(), faces()
 {
   
-  unsigned nPoints = M.get_n_nodes();
+  std::size_t nPoints = M.get_n_nodes();
 
   // create vector of TopoPoints;
-  for(unsigned i=0; i<nPoints; ++i) {
+  for(std::size_t i=0; i<nPoints; ++i) {
     TopoPoint tp(i);
     points.push_back(tp);
   }
 
   // Loop over elements, creating lines and cells as needed
-  unsigned nElems = M.get_n_elems();
-  for(unsigned e=0; e<nElems; ++e) {
-    unsigned etype = M.element_type[e];
+  std::size_t nElems = M.get_n_elems();
+  for(std::size_t e=0; e<nElems; ++e) {
+    std::size_t etype = M.element_type[e];
 
     if( etype==1 || etype==8 || etype==26 || etype==27 || etype==28 ||
 	etype==62 || etype==63 || etype==64 || etype==65 || etype==66) {
       //handle 2-node line element
-      unsigned id1, id2;
+      std::size_t id1, id2;
       id1 = M.elements[e][0];
       id2 = M.elements[e][1];
       bool line_exists = false;
-      unsigned lineid = get_line_id(id1, id2, line_exists);
+      std::size_t lineid = get_line_id(id1, id2, line_exists);
       if(!line_exists) {
 	std::cout << "Creating line from line elem" << std::endl;
-	unsigned tail = (id1<id2) ? id1 : id2;
-	unsigned head = (id1<id2) ? id2 : id1;
+	std::size_t tail = (id1<id2) ? id1 : id2;
+	std::size_t head = (id1<id2) ? id2 : id1;
 	lineid = lines.size();
 	lines.emplace_back(new TopoLine(lineid, &points[head], &points[tail]));
 	points[head].incoming.push_back(lines[lineid]);
@@ -40,26 +40,26 @@ MeshTopology::MeshTopology(const Mesh &M) :
     else if(etype == 2 || etype == 3) {
       
       // handle 3-node triangle or 4-node quad
-      unsigned Nverts = M.elements[e].size();
+      std::size_t Nverts = M.elements[e].size();
       faces.emplace(e,new TopoFace(e));
       TopoFace *TFp = faces[e];
       
       //get vertices
-      for(unsigned i=0; i<Nverts; ++i) {
+      for(std::size_t i=0; i<Nverts; ++i) {
 	TFp->vertices.push_back(&points[M.elements[e][i]]);
       }
       
       //get edges
-      for(unsigned edge=0; edge<Nverts; ++edge) {
-	unsigned id1,id2;
+      for(std::size_t edge=0; edge<Nverts; ++edge) {
+	std::size_t id1,id2;
 	id1 = M.elements[e][edge];
 	id2 = M.elements[e][(edge+1)%Nverts];
 	
 	bool line_exists = false;
-	unsigned lineid = get_line_id(id1, id2, line_exists);
+	std::size_t lineid = get_line_id(id1, id2, line_exists);
 	if(!line_exists) {
-	  unsigned tail = (id1<id2) ? id1 : id2;
-	  unsigned head = (id1<id2) ? id2 : id1;
+	  std::size_t tail = (id1<id2) ? id1 : id2;
+	  std::size_t head = (id1<id2) ? id2 : id1;
 	  lineid = lines.size();
 	  TopoLine *TL = new TopoLine();//(lineid, &(points[head]), &(points[tail]));
 	  TL->id = lineid;
@@ -108,14 +108,14 @@ MeshTopology::~MeshTopology() {
 
 
 
-unsigned MeshTopology::get_line_id(unsigned vid1, unsigned vid2, bool &exists) {
+std::size_t MeshTopology::get_line_id(std::size_t vid1, std::size_t vid2, bool &exists) {
   
-  unsigned retid = 0;
-  unsigned minid = (vid1<vid2 ? vid1 : vid2);
-  unsigned maxid = (vid1<vid2 ? vid2 : vid1);
+  std::size_t retid = 0;
+  std::size_t minid = (vid1<vid2 ? vid1 : vid2);
+  std::size_t maxid = (vid1<vid2 ? vid2 : vid1);
   TopoPoint & TP = points[minid];
 
-  for(unsigned i=0; i<TP.outgoing.size(); ++i) {
+  for(std::size_t i=0; i<TP.outgoing.size(); ++i) {
     if(TP.outgoing[i]->head->id == maxid) {
       exists = true;
       retid = TP.outgoing[i]->id;
@@ -132,7 +132,7 @@ unsigned MeshTopology::get_line_id(unsigned vid1, unsigned vid2, bool &exists) {
 void MeshTopology::print(std::ostream &out) {
   
   // print point info
-  for(unsigned i=0; i<points.size(); ++i) {
+  for(std::size_t i=0; i<points.size(); ++i) {
     out << points[i] << "\n";
   }
   out << "\n";
@@ -160,7 +160,7 @@ void MeshTopology::print(std::ostream &out) {
   out << "\n";
 }
 
-unsigned MeshTopology::getCellNeighbor(unsigned faceNum, unsigned edgenum) {
+std::size_t MeshTopology::getCellNeighbor(std::size_t faceNum, std::size_t edgenum) {
 
   TopoFace &TF = *(faces[faceNum]);
   

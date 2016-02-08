@@ -18,9 +18,9 @@ class MeshTopology {
 private:
   std::vector<TopoPoint> points;
   std::vector<TopoLine*> lines;
-  std::map<unsigned, TopoFace*> faces;
+  std::map<std::size_t, TopoFace*> faces;
 
-  unsigned get_line_id(unsigned vid1, unsigned vid2, bool &exists);
+  std::size_t get_line_id(std::size_t vid1, std::size_t vid2, bool &exists);
 
 public:
   MeshTopology(const Mesh &M);
@@ -29,7 +29,7 @@ public:
 
   // method to return the id of the edgenum'th neighbor of cell facenum.
   // returns facenum on any failure
-  unsigned getCellNeighbor(unsigned faceNum, unsigned edgenum);
+  std::size_t getCellNeighbor(std::size_t faceNum, std::size_t edgenum);
 };
 
 YAFEL_NAMESPACE_CLOSE

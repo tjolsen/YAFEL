@@ -15,7 +15,7 @@ class TopoLine;
 class TopoPoint {
 
 public:
-  unsigned id;
+  std::size_t id;
   std::vector<TopoLine*> incoming;
   std::vector<TopoLine*> outgoing;
 

@@ -5,7 +5,7 @@ YAFEL_NAMESPACE_OPEN
 
 TopoPoint::TopoPoint() : TopoPoint(0) {}
 
-TopoPoint::TopoPoint(unsigned _id):
+TopoPoint::TopoPoint(std::size_t _id):
   id(_id), incoming(), outgoing() 
 {
   incoming.clear();
