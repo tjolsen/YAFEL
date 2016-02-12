@@ -22,6 +22,32 @@ bool test_3() {
   return (M.n_nodes()==1331) && (M.n_elements()==1000);
 }
 
+// test node(n) for 2D RectilinearMesh
+bool test_4() {
+  
+  //default mesh with 10 elements in each direction, 1x1 square
+  RectilinearMesh<2> M;
+  bool good = true;
+  Tensor<2,1,double> x;
+  
+  // node at (0,0)
+  auto mx = M.node(0);
+  good = good && contract<1>(x-mx,x-mx)==0;
+
+  // node at (1,0)
+  mx = M.node(10);
+  x(0) = 1;
+  good = good && contract<1>(x-mx, x-mx)==0;
+
+  // node at (.5,5)
+  mx = M.node(55);
+  x(0) = .5; x(1) = .5;
+  good = good && contract<1>(x-mx, x-mx)==0;
+
+  return good;
+}
+
+
 
 int main() {
   int retval = 0;
