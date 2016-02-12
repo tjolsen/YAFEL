@@ -20,7 +20,7 @@ public:
   std::vector<TopoLine*> outgoing;
 
   TopoPoint();
-  TopoPoint(unsigned _id);
+  TopoPoint(std::size_t _id);
 };
 
 YAFEL_NAMESPACE_CLOSE

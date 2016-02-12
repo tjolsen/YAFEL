@@ -19,10 +19,11 @@
 
 YAFEL_NAMESPACE_OPEN
 
+template<unsigned NSD>
 class Mesh {
   
 public:
-  using coordinate_type = Tensor<3,1,double>;
+  using coordinate_type = Tensor<NSD,1,double>;
   using container_type = std::vector<coordinate_type>;
   using size_type = typename container_type::size_type;
 
