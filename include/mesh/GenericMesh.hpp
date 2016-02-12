@@ -1,5 +1,5 @@
-#ifndef __YAFEL_GENERIC_MESH
-#define __YAFEL_GENERIC_MESH
+#ifndef __YAFEL_GENERIC_MESH_HPP
+#define __YAFEL_GENERIC_MESH_HPP
 
 #include "yafel_globals.hpp"
 #include "lin_alg/tensor/Tensor.hpp"
@@ -10,6 +10,8 @@
  * GenericMesh: Base class utilizing CRTP to define the interface for finite element
  * mesh data structures. 
  */
+
+YAFEL_NAMESPACE_OPEN
 
 template<typename T, unsigned NSD>
 class GenericMesh {
@@ -31,5 +33,7 @@ public:
   operator T&(){return static_cast<T&>(*this);}
   operator T const&() const {return static_cast<T const&>(*this);}
 };
+
+YAFEL_NAMESPACE_CLOSE
 
 #endif
