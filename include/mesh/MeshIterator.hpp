@@ -15,9 +15,9 @@ YAFEL_NAMESPACE_OPEN
 template<typename MESHTYPE>
 class MeshIterator {
 public:
-  using size_type = MESHTYPE::size_type;
-  using coordinate_type = MESHTYPE::coordinate_type;
-  using element_container = MESHTYPE::element_container;
+  using size_type = typename MESHTYPE::size_type;
+  using coordinate_type = typename MESHTYPE::coordinate_type;
+  using element_container = typename MESHTYPE::element_container;
 
   // Constructors
   MeshIterator(const MESHTYPE &M, size_type p) :
@@ -44,7 +44,7 @@ public:
   bool operator<(const MeshIterator<MESHTYPE> &rhs) const {
     if(&mesh != &(rhs.mesh)) {
       // iterators do not point to the same mesh. Not cool bro...
-      throw(std::invalid_argument("MeshIterator objects point to different meshes");
+      throw(std::invalid_argument("MeshIterator objects point to different meshes"));
     }
     return ptr<rhs.ptr;
   }
@@ -52,7 +52,7 @@ public:
   bool operator==(const MeshIterator<MESHTYPE> &rhs) const {
     if(&mesh != &(rhs.mesh)) {
       // iterators do not point to the same mesh. Not cool bro...
-      throw(std::invalid_argument("MeshIterator objects point to different meshes");
+      throw(std::invalid_argument("MeshIterator objects point to different meshes"));
     }
     return ptr==rhs.ptr;
   }
