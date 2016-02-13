@@ -25,8 +25,8 @@ public:
   using element_container = std::vector<size_type>;
 
   // Functions that all meshes must support
-  size_type n_nodes() const {return static_cast<T const&>(*this).n_nodes();}
-  size_type n_elements() const {return static_cast<T const&>(*this).n_elements();}
+  inline size_type n_nodes() const {return static_cast<T const&>(*this).n_nodes();}
+  inline size_type n_elements() const {return static_cast<T const&>(*this).n_elements();}
   
   coordinate_type node(size_type nodenum) const {return static_cast<T const&>(*this).node(nodenum);}
   element_container element(size_type elnum) const {return static_cast<T const&>(*this).element(elnum);}

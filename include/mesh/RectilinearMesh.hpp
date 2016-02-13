@@ -67,7 +67,7 @@ public:
 
   // Interface implementation
   
-  size_type n_nodes() const {
+  inline size_type n_nodes() const {
     size_type ret(1);
     for(auto de : dim_elems) {
       ret *= (de+1);
@@ -75,7 +75,7 @@ public:
     return ret;
   }
 
-  size_type n_elements() const {
+  inline size_type n_elements() const {
     size_type ret(1);
     for(auto de : dim_elems) {
       ret *= de;
