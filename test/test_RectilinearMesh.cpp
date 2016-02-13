@@ -118,6 +118,13 @@ bool test_8() {
     good = good && el[i]==correct[i];
   }  
 
+  el = M.element(100);
+  correct = std::vector<std::size_t>{121,122,133,132, 
+                                     242,243,254,253};
+  for(std::size_t i=0; i<8; ++i) {
+    good = good && el[i]==correct[i];
+  }
+
   return good;
 }
 
