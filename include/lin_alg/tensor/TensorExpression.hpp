@@ -314,7 +314,6 @@ contract(const TensorExpression<T1,DIM,R1,dataType> &lhs,
 template<unsigned NCONTRACT, typename T1, typename T2, unsigned DIM, 
          unsigned R1, unsigned R2, typename dataType,
          typename = typename std::enable_if<R1+R2-2*NCONTRACT==0>::type >
-//TensorContraction<T1, T2, DIM, R1, R2, NCONTRACT, dataType>
 dataType contract(const TensorExpression<T1,DIM,R1,dataType> &lhs,
                   const TensorExpression<T2,DIM,R2,dataType> &rhs) {
   
