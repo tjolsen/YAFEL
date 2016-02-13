@@ -93,6 +93,36 @@ bool test_6() {
 }
 
 
+//test single element 3D mesh. Want to make sure it grabs the nodes in right order
+bool test_7() {
+  RectilinearMesh<3> M(std::vector<double>{1,1,1}, std::vector<std::size_t>{1,1,1});
+  bool good = true;
+  auto el = M.element(0);
+  std::vector<std::size_t> correct{0,1,3,2, 4,5,7,6};
+  for(std::size_t i=0; i<8; ++i) {
+    good = good && el[i]==correct[i];
+  }  
+  
+  return good;
+}
+
+//get elements from 3D mesh.
+bool test_8() {
+  
+  RectilinearMesh<3> M;
+  bool good = true;
+  
+  auto el = M.element(0);
+  std::vector<std::size_t> correct{0,1,12,11, 121,122,133,132};
+  for(std::size_t i=0; i<8; ++i) {
+    good = good && el[i]==correct[i];
+  }  
+
+  return good;
+}
+
+
+
 int main() {
   int retval = 0;
 
@@ -119,6 +149,14 @@ int main() {
  if(!test_6()) {
     std::cerr << "Failed test_6" << std::endl;
     retval |= 1<<5;
+  }
+ if(!test_7()) {
+    std::cerr << "Failed test_7" << std::endl;
+    retval |= 1<<6;
+  }
+ if(!test_8()) {
+    std::cerr << "Failed test_8" << std::endl;
+    retval |= 1<<7;
   }
 
 
