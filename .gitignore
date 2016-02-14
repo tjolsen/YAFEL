@@ -58,3 +58,6 @@
 # extra directories
 test/outhtml/
 experimental/
+
+# garbage files that are slowly being removed
+*.old
