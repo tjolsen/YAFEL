@@ -22,6 +22,7 @@ public:
   size_type nnz() {return static_cast<T&>(*this).nnz();}
   //value_type operator()(size_type i, size_type j) const {return static_cast<const T&>(*this)(i,j);}
   const std::vector<triplet> & get_triplets() {return static_cast<T&>(*this).get_triplets();}
+  std::vector<triplet> copy_triplets() {return static_cast<T&>(*this).copy_triplets();}
   
   operator T&() {return static_cast<T&>(*this);}
   operator T const&() {return static_cast<T const&>(*this);}

@@ -157,6 +157,10 @@ public:
     compress();
     return _data;
   }
+  std::vector<triplet> copy_triplets() const{
+    //compress();
+    return _data;
+  }
   
 private:
   std::vector<triplet> _data;

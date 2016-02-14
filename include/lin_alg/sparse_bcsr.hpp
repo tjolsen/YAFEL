@@ -190,10 +190,37 @@ public:
     return (in_sparsity) ? data[index(bidx, i%BLOCK, j%BLOCK)] : dataType(0);
   }
 
+  
+  std::vector<triplet> copy_triplets() {
+    
+    std::vector<triplet> triplets(data.size());
+    
+    size_type count = 0;
+    for(size_type brow=0; brow<_brows; ++brow) {
+
+      for(size_type bidx=brow_ptr[brow]; bidx<brow_ptr[brow+1]; ++bidx) {
+        
+        size_type bcol = bcol_index[bidx];
+        
+        for(size_type i=0; i<BLOCK; ++i) {
+          for(size_type j=0; j<BLOCK; ++j) {
+            std::get<0>(triplets[count]) = brow*BLOCK + i;
+            std::get<1>(triplets[count]) = bcol*BLOCK + j;
+            std::get<2>(triplets[count]) = data[index(bidx,i,j)];
+            
+            ++count;
+          }
+        }
+      }
+    }
+
+    return triplets;
+  }
+
+
 private:
   size_type _brows;
   size_type _bcols;
-  //size_type _nnz;
   size_type block_stride;
   value_type _zero;
 
