@@ -39,8 +39,8 @@ public:
   std::vector<size_type> global_dofs;
   DoFManager DOFM;
   
-  Element(const DoFManager &dofm, size_type nsd, size_type nqp,
-	  size_type dofpe, int vtktype, size_type nodespe);
+  //Element(const DoFManager &dofm, size_type nsd, size_type nqp,
+  //size_type dofpe, int vtktype, size_type nodespe);
 
   // Virtual functions, specialized in child classes
   virtual ~Element() {}
@@ -51,7 +51,7 @@ public:
   Matrix<double> calcJ_xi(const Tensor<NSD,1> &xi);
   void calcJacobians(); // calcualte Jacobians at Gauss points and store in 
   void calcGrads(); // calculate shape function gradients (wrt spatial coords) and store in "grads[qpi](A, i)"
-  void calcVals(); // calculate shape function values and store in "grads[qpi](A, i)"
+  void calcVals(); // calculate shape function values and store in "vals[qpi](A)"
   void update_element(const Mesh & M, size_type elnum);
   inline double JxW(size_type qpi) const { return gauss_weights[qpi]*detJ[qpi]; }
   

@@ -2,19 +2,19 @@
 #define _SPATIALFUNCTION_HPP
 
 #include "yafel_globals.hpp"
-#include "lin_alg/Vector.hpp"
+#include "lin_alg/tensor/Tensor.hpp"
 
 YAFEL_NAMESPACE_OPEN
 
-template<typename T>
+template<unsigned NSD, typename T=double>
 class SpatialFunction {
 
 private:
-  T (*func)(const Vector &x);
+  T (*func)(const Tensor<NSD,1,T> &x);
 
 public:
-  SpatialFunction(T (*fp)(const Vector &x)) : func(fp) {}
-  T operator()(const Vector &x) const {return func(x);}
+  SpatialFunction(T (*fp)(const Tensor<NSD,1,T> &x)) : func(fp) {}
+  T operator()(const Tensor<NSD,1,T> &x) const {return func(x);}
 };
 
 YAFEL_NAMESPACE_CLOSE
