@@ -378,6 +378,59 @@ bool test_16() {
   return v(0)==1 && v(1)==2 && v(2)==3;
 }
 
+// test det of 2x2 and 3x3 tensors
+bool test_17() {
+  Tensor<2,2> A;
+  A(0,0) = 1; A(1,1) =1;
+  A(1,0) = 2; A(0,1) = 2;
+  
+  
+  Tensor<3,2> B;
+  B(0,0) = 1; B(1,1) =1;
+  B(1,0) = 2; B(0,1) = 2;
+  B(2,2) = 1;
+
+  return det(A)==double(-3) && det(B)==double(-3);
+}
+
+//test inv for 2x2 and 3x3 tensors
+//testing exact equality to identity tensors
+//because A and B are constructed to have det(.) = -1,
+//so Ainv and Binv are exactly representable in floating point numbers
+bool test_18() {
+  Tensor<2,2> A;
+  A(0,0) = 1; A(1,1) =1;
+  A(1,0) = 2; A(0,1) = 1;
+  
+  
+  Tensor<3,2> B;
+  B(0,0) = 1; B(1,1) =1;
+  B(1,0) = 2; B(0,1) = 1;
+  B(2,2) = 1;
+
+  Tensor<2,2> Ainv = inv(A);
+  Tensor<3,2> Binv = inv(B);
+  
+  Tensor<2,2> I2; I2(0,0) = I2(1,1) = 1;
+  Tensor<3,2> I3; I3(0,0) = I3(1,1) = I3(2,2) = 1;
+  
+  Tensor<2,2> AinvA = Ainv*A;
+  Tensor<3,2> BinvB = Binv*B;
+
+  bool good = true;
+  auto i2it = I2.begin();
+  for(auto it=AinvA.begin(); !it.end(); it.next(), i2it.next()) {
+    good = good && *it == *i2it;
+  }
+  
+  auto i3it = I3.begin();
+  for(auto it=BinvB.begin(); !it.end(); it.next(), i3it.next()) {
+    good = good && *it == *i3it;
+  }
+
+  return good;
+}
+
 int main() {
 
   int retval = 0;
@@ -445,6 +498,14 @@ int main() {
   if(!test_16()) {
     retval |= 1<<15;
     std::cout << "Failed test_16" << "\n";
+  }
+  if(!test_17()) {
+    retval |= 1<<16;
+    std::cout << "Failed test_17" << "\n";
+  }
+  if(!test_18()) {
+    retval |= 1<<17;
+    std::cout << "Failed test_18" << "\n";
   }
 
   return retval;

@@ -35,16 +35,5 @@ double LinQuad::shape_value_xi(unsigned node, const Vector &xi) const {
   return val;
 }
 
-double LinQuad::shape_grad_xi(unsigned node, unsigned comp, const Vector &xi) const {
-  
-  double val = 1.0;
-  for(unsigned i=0; i<n_spaceDim; ++i) {
-    if(comp == i)
-      continue;
-    val *= (1.0/2.0) * (xi_0[node](i)*xi(i)+1);
-  }
-  
-  return val * xi_0[node](comp)/(2.0);
-}
 
 YAFEL_NAMESPACE_CLOSE
