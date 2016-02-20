@@ -371,6 +371,13 @@ bool test_15() {
   return contract<4>(A,B)==3*3*3*3;
 }
 
+//test initializer list construction of rank 1 tensor
+bool test_16() {
+
+  Tensor<3,1,int> v{1,2,3};
+  return v(0)==1 && v(1)==2 && v(2)==3;
+}
+
 int main() {
 
   int retval = 0;
@@ -434,6 +441,10 @@ int main() {
   if(!test_15()) {
     retval |= 1<<14;
     std::cout << "Failed test_15" << "\n";
+  }
+  if(!test_16()) {
+    retval |= 1<<15;
+    std::cout << "Failed test_16" << "\n";
   }
 
   return retval;

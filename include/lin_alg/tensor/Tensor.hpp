@@ -3,7 +3,8 @@
 
 #include "yafel_globals.hpp"
 #include "lin_alg/tensor/TensorExpression.hpp"
-
+#include <initializer_list>
+//#include <cassert>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -23,6 +24,26 @@ public:
   reference_tensor_iterator<Tensor<DIM,RANK,dataType>,DIM,RANK> begin() {
     return reference_tensor_iterator<Tensor<DIM,RANK,dataType>,DIM,RANK>(*this);
   }
+
+
+  //initializer list construction for rank 1 tensors
+  //template<typename std::enable_if<RANK==1>::type>
+  Tensor(std::initializer_list<dataType> il) {
+    static_assert(RANK==1, "Tensor: Tried to use initializer list ctor for RANK \\neq 1");
+
+#ifndef _OPTIMIZED
+    if(il.size() != DIM) {
+      throw(std::domain_error("Tensor: Error: Initializer list ctor size() \\neq DIM"));
+    }
+#endif
+    //assert(il.size() == DIM && "Tensor: Error initializer list size() \neq DIM");
+    auto it = il.begin();
+    for(size_type i=0; i<DIM; ++i, ++it) {
+      (*this)(i) = *it;
+    }
+
+  }
+
   
   //initialize a zero-tensor
   Tensor() {
@@ -44,6 +65,8 @@ public:
       *TI = *tens_it;
     }
   }
+
+
 
 private:
   value_type _data[_tensorStorage(DIM,RANK)];

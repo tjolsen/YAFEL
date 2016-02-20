@@ -26,7 +26,7 @@ Vector<dataType> bcsr_spmv(const sparse_bcsr<BLOCK, dataType> &A,
 {
 
 #ifndef _OPTIMIZED
-  assert(A.cols() == x.length() && "Error: bcsr_spmv dimension mismatch");
+  assert(A.cols() == x.size() && "Error: bcsr_spmv dimension mismatch");
 #endif
 
   Vector<dataType> b(A.rows(), 0);

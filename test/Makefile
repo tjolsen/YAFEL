@@ -17,6 +17,8 @@ all: .depend $(exefiles)
 
 include $(YAFELDIR)/common.mk
 
+CXXFLAGS := $(filter-out -D_OPTIMIZED, $(CXXFLAGS))
+
 COVERAGE_CFLAGS += $(CFLAGS) -O0 -fprofile-arcs -ftest-coverage
 COVERAGE_CXXFLAGS += $(CXXFLAGS) -O0 -fprofile-arcs -ftest-coverage
 COVERAGE_LDFLAGS += $(LDFLAGS) -lgcov

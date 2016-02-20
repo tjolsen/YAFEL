@@ -18,7 +18,7 @@ class Element {
 public:
   using coordinate_type = Tensor<NSD,1>;
   using size_type = typename coordinate_type::size_type;
-  
+
 
   size_type n_spaceDim;
   size_type n_quadPoints;
@@ -40,8 +40,8 @@ public:
   std::vector<size_type> global_dofs;
   DoFManager DOFM;
   
-  //Element(const DoFManager &dofm, size_type nsd, size_type nqp,
-  //size_type dofpe, int vtktype, size_type nodespe);
+  Element(const DoFManager &dofm, size_type nsd, size_type nqp,
+          size_type dofpe, int vtktype, size_type nodespe);
 
   // Virtual functions, specialized in child classes
   virtual ~Element() {}

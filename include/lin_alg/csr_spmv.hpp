@@ -28,7 +28,7 @@ Vector<dataType> csr_spmv(const sparse_csr<dataType> &A,
 {
 
 #ifndef _OPTIMIZED
-  assert(A.cols() == x.length() && "Error: csr_spmv dimension mismatch");
+  assert(A.cols() == x.size() && "Error: csr_spmv dimension mismatch");
 #endif
   
   Vector<dataType> b(A.rows(), 0);
