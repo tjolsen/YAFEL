@@ -33,7 +33,7 @@ public:
 
 #ifndef _OPTIMIZED
     if(il.size() != DIM) {
-      throw(std::domain_error("Tensor: Error: Initializer list ctor size() \\neq DIM"));
+      throw(std::length_error("Tensor: Error: Initializer list ctor size() \\neq DIM"));
     }
 #endif
     //assert(il.size() == DIM && "Tensor: Error initializer list size() \neq DIM");
