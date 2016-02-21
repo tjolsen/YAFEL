@@ -1,5 +1,5 @@
-#ifndef _DOFMANAGER_HPP
-#define _DOFMANAGER_HPP
+#ifndef __YAFEL_DOFMANAGER_HPP
+#define __YAFEL_DOFMANAGER_HPP
 
 #include "yafel_globals.hpp"
 

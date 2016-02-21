@@ -4,7 +4,6 @@
 #include "yafel_globals.hpp"
 #include "lin_alg/tensor/TensorExpression.hpp"
 #include <initializer_list>
-//#include <cassert>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -27,18 +26,17 @@ public:
 
 
   //initializer list construction for rank 1 tensors
-  //template<typename std::enable_if<RANK==1>::type>
   Tensor(std::initializer_list<dataType> il) {
     static_assert(RANK==1, "Tensor: Tried to use initializer list ctor for RANK \\neq 1");
 
 #ifndef _OPTIMIZED
-    if(il.size() != DIM) {
+    if(il.size() > DIM) {
       throw(std::length_error("Tensor: Error: Initializer list ctor size() \\neq DIM"));
     }
 #endif
-    //assert(il.size() == DIM && "Tensor: Error initializer list size() \neq DIM");
-    auto it = il.begin();
-    for(size_type i=0; i<DIM; ++i, ++it) {
+
+    size_type i=0;
+    for(auto it=il.begin(); it<il.end(); ++i, ++it) {
       (*this)(i) = *it;
     }
 
@@ -67,6 +65,35 @@ public:
   }
 
 
+  /*
+   * Update operators +=, -=
+   */
+  template<typename T>
+  Tensor<DIM,RANK,dataType> & operator+=(const TensorExpression<T,DIM,RANK,dataType> &rhs) {
+    
+    auto lhsit = this->begin();
+    auto rhsit = rhs.begin();
+    for(; !lhsit.end(); lhsit.next(), rhsit.next()) {
+      *lhsit += *rhsit;
+    }
+    
+    return *this;
+  }
+
+  template<typename T>
+  Tensor<DIM,RANK,dataType> & operator-=(const TensorExpression<T,DIM,RANK,dataType> &rhs) {
+    
+    auto lhsit = this->begin();
+    auto rhsit = rhs.begin();
+    for(; !lhsit.end(); lhsit.next(), rhsit.next()) {
+      *lhsit -= *rhsit;
+    }
+
+    return *this;
+  }
+
+
+
 
 private:
   value_type _data[_tensorStorage(DIM,RANK)];
@@ -81,16 +108,8 @@ private:
     return DIM*index(args...) + i;
   }
 
-  /*
-  template<typename T, int ...S, typename ...Args>
-  void copy_element(const seq<S...> &, 
-		    const std::tuple<Args...> &indices, 
-		    const TensorExpression<T,DIM,RANK,dataType> &tens) {
-    (*this)(std::get<S>(indices)...) = tens(std::get<S>(indices)...);
-  }
-  */
-
 };
+
 
 YAFEL_NAMESPACE_CLOSE
 

@@ -1,14 +1,14 @@
 #ifndef __YAFEL_ELEMENT_HPP
 #define __YAFEL_ELEMENT_HPP
 
-#include <vector>
-
 #include "yafel_globals.hpp"
 #include "lin_alg/Matrix.hpp"
 #include "lin_alg/Vector.hpp"
 #include "lin_alg/tensor/Tensor.hpp"
+#include "lin_alg/tensor/tensor_specializations.hpp"
 #include "mesh/GenericMesh.hpp"
 #include "utils/DoFManager.hpp"
+#include <vector>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -40,23 +40,22 @@ public:
   std::vector<size_type> global_dofs;
   DoFManager DOFM;
   
-  Element(const DoFManager &dofm, size_type nsd, size_type nqp,
+  Element(const DoFManager &dofm, size_type nqp,
           size_type dofpe, int vtktype, size_type nodespe);
-
+  
   // Virtual functions, specialized in child classes
   virtual ~Element() {}
-  virtual double shape_value_xi(size_type node, const coordinate_cype &xi) const = 0;
+  virtual double shape_value_xi(size_type node, const coordinate_type &xi) const = 0;
   virtual double shape_grad_xi(size_type node, size_type component, const coordinate_type &xi) const = 0;
 
   //Functions in base class
-  Matrix<double> calcJ_xi(const coordinate_type &xi);
   void calcJacobians(); // calcualte Jacobians at Gauss points and store in 
   void calcGrads(); // calculate shape function gradients (wrt spatial coords) and store in "grads[qpi](A, i)"
   void calcVals(); // calculate shape function values and store in "vals[qpi](A)"
-  Tensor<NSD,2> calcJ_xi(const coordinate_type &xi);
+  Tensor<NSD,2> calcJ_xi(const coordinate_type &xi) const;
 
   template<typename MTYPE, unsigned MNSD>
-  void update_element(const GenericMesh<MTYPE,NSD> & M, size_type elnum);
+  void update_element(const GenericMesh<MTYPE,MNSD> & M, size_type elnum);
 
   inline double JxW(size_type qpi) const { return quad_weights[qpi]*detJ[qpi]; }
   
@@ -65,8 +64,9 @@ public:
   inline size_type getComp(size_type dof) const { return (dof % dof_per_node); }
   inline size_type getBase(size_type dof) const { return (dof/dof_per_node); }
   
-  double xval(size_type dof, const Vector<double> & xi);
-  
+  //return spatial interpolation at point xi
+  coordinate_type xval(const coordinate_type & xi) const;
+
 };
 
 
@@ -79,7 +79,7 @@ public:
 //---------------------------------------------------------------------
 template<unsigned NSD>
 Element<NSD>::Element(const DoFManager &dofm, size_type nqp, 
-		 size_type dofpe, int vtktype, size_type nodespe) :
+                      size_type dofpe, int vtktype, size_type nodespe) :
   n_spaceDim(NSD), 
   n_quadPoints(nqp),
   dof_per_el(dofpe), 
@@ -93,10 +93,10 @@ Element<NSD>::Element(const DoFManager &dofm, size_type nqp,
 
 //---------------------------------------------------------------------
 template<unsigned NSD>
-Tensor<NSD,2> Element<NSD>::calcJ_xi(const coordinate_type &xi) {
- 
+Tensor<NSD,2> Element<NSD>::calcJ_xi(const coordinate_type &xi) const {
+  
   Tensor<NSD,2> ret;
-
+  
   for(size_type i=0; i<n_spaceDim; ++i) {
     for(size_type j=0; j<n_spaceDim; ++j) {
       for(size_type A=0; A<nodes_per_el; ++A) {
@@ -105,7 +105,7 @@ Tensor<NSD,2> Element<NSD>::calcJ_xi(const coordinate_type &xi) {
     }
   }
   
-  return retMat;
+  return ret;
 }
 
 //---------------------------------------------------------------------
@@ -113,27 +113,28 @@ template<unsigned NSD>
 void Element<NSD>::calcJacobians() {
   jacobians.clear();
   detJ.clear();
-
+  
   for(size_type i=0; i<n_quadPoints; ++i) {
-    jacobians.emplace_back( calcJ_xi(quad_points[i]) );
+    auto J = calcJ_xi(quad_points[i]);
+    jacobians.push_back(J);
     
-    detJ.push_back(jacobians[i].det());
+    detJ.push_back(det(J));
   }
-
+  
 }
 
 
 //---------------------------------------------------------------------
 template<unsigned NSD>
-void Element::calcGrads() {
+void Element<NSD>::calcGrads() {
   
-  grads.clear();
+  shape_grads.clear();
   
   for(size_type qpi=0; qpi<n_quadPoints; ++qpi) {
-    Vector qp = quad_points[qpi];
+    coordinate_type qp = quad_points[qpi];
     
-    FullMatrix Jinv = jacobians[qpi].getInverse();
-    FullMatrix NG(nodes_per_el, n_spaceDim, 0.0);
+    auto Jinv = inv(jacobians[qpi]);
+    Matrix<double> NG(nodes_per_el, n_spaceDim, 0.0);
 
     for(size_type A=0; A<nodes_per_el; ++A) {
       for(size_type j=0; j<n_spaceDim; ++j) {
@@ -143,52 +144,63 @@ void Element::calcGrads() {
       }
     }
     
-    grads.push_back(NG);
+    shape_grads.push_back(NG);
   }
 }
 
 
 //---------------------------------------------------------------------
 template<unsigned NSD>
-void Element::calcVals() {
-  vals.clear();
+void Element<NSD>::calcVals() {
+  shape_vals.clear();
   for(size_type qpi=0; qpi<n_quadPoints; ++qpi) {
     auto qp = quad_points[qpi];
     Vector<double> V(nodes_per_el, 0.0);
     for(size_type A=0; A<nodes_per_el; ++A) {
       V(A) = shape_value_xi(A, qp);
     }
-    vals.push_back(V);
+    shape_vals.push_back(V);
   }
 }
 
 
 
 //---------------------------------------------------------------------
-template<unsigned NSD, typename MTYPE, unsigned MNSD>
-void Element::update_element(const GenericMesh<MTYPE,MNSD> &M, size_type elnum) {
-
-  size_type Nnodes = M.elements[elnum].size();
-
+template<unsigned NSD>
+template<typename MTYPE, unsigned MNSD>
+void Element<NSD>::update_element(const GenericMesh<MTYPE,MNSD> &M, size_type elnum) {
+  
+  size_type Nnodes = M.element(elnum).size();
+  
   global_dofs.clear();
   nodal_coords.clear();
-  element_nodes = M.elements[elnum];
-
+  element_nodes = M.element(elnum);
+  
   for(size_type nodeNum : element_nodes) {
-    nodal_coords.push_back(M.nodal_coords[nodeNum]);
+    nodal_coords.push_back(M.node(nodeNum));
     for(size_type j=0; j<dof_per_node; ++j) {
       size_type dofNum = DOFM.index(nodeNum, j);//nodeNum*dof_per_node + j;
       global_dofs.push_back(dofNum);
     }
   }
-
+  
   calcJacobians();
   calcGrads();
   calcVals();
 }
 
 
-
+template<unsigned NSD>
+typename Element<NSD>::coordinate_type 
+Element<NSD>::xval(const coordinate_type & xi) const {
+  
+  coordinate_type x;
+  for(size_type A=0; A<nodes_per_el; ++A) {
+    x += nodal_coords[A]*shape_value_xi(A,xi);
+  }
+  
+  return x;
+}
 
 YAFEL_NAMESPACE_CLOSE
 
