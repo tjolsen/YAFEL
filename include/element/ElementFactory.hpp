@@ -10,34 +10,59 @@
 #include "element/LagrangeLine.hpp"
 #include "mesh/GenericMesh.hpp"
 #include "utils/DoFManager.hpp"
+#include "utils/ElementType.hpp"
 
 YAFEL_NAMESPACE_OPEN
 
 template<typename MTYPE, unsigned NSD>
 class ElementFactory {
 
+public:
+  using size_type = typename GenericMesh<MTYPE,NSD>::size_type;
+
+  ElementFactory()=delete;
+  ElementFactory(const GenericMesh<MTYPE,NSD> &M, const DoFManager &dofm);
+
+  Element & getElement(size_type elnum); //return NullElement if not implemented
+
+  inline const GenericMesh<MTYPE,NSD> & getMesh() const {return M;}
+  inline size_type n_dof() const { return dof_per_node*(M.n_nodes()); }
+  inline size_type dof_per_node() const { return _dof_per_node; }
+
+
 private:
   const GenericMesh<MTYPE,NSD> &M;
-  LinQuad<NSD> *lq;
-  LinTri *ltri;
-  LinTet *ltet;
-  LinLine *lline;
-  LagrangeLine *lagLines[10];
+  LinQuad<NSD> linear_quad;
+  NullElement<NSD> null_element;
   DoFManager DOFM;
-  int dof_per_node;
-  int n_els;
-  
-public:
-  ElementFactory();
-  ElementFactory(Mesh &M, const DoFManager &dofm);
-  ~ElementFactory();
-
-  Element & getElement(unsigned elnum); //return NULL if element not implemented
-
-  const GenericMesh<MTYPE,NSD> & getMesh() {return M;}
-  inline unsigned get_n_dof() { return dof_per_node*(M.n_nodes()); }
-  inline unsigned get_dof_per_node() { return dof_per_node; }
+  size_type _dof_per_node;
 };
+
+
+/*
+ * Implementation starts here
+ */
+
+template<typename MTYPE, unsigned NSD>
+ElementFactory(const GenericMesh<MTYPE,NSD> &M, const DoFManager &dofm)
+  : linear_quad(dofm),
+    null_element(dofm),
+    DOFM(dofm),
+    dof_per_node(dofm.dof_per_node())
+{}
+
+template<typename MTYPE, unsigned NSD>
+Element & getElement(size_type elnum) {
+  
+  ElementType t = M.element_type(elnum);
+
+  switch(t) {
+  case ElementType::LINEAR_QUAD:
+    return linear_quad;
+  default:
+    return null_element;
+  }
+}
 
 YAFEL_NAMESPACE_CLOSE
 
