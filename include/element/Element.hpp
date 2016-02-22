@@ -21,6 +21,7 @@ public:
 
 
   size_type n_spaceDim;
+  size_type n_topoDim;
   size_type n_quadPoints;
   size_type dof_per_node;
   size_type dof_per_el;
@@ -40,7 +41,7 @@ public:
   std::vector<size_type> global_dofs;
   DoFManager DOFM;
   
-  Element(const DoFManager &dofm, size_type nqp,
+  Element(const DoFManager &dofm, size_type ntd, size_type nqp,
           size_type dofpe, int vtktype, size_type nodespe);
   
   // Virtual functions, specialized in child classes
@@ -78,9 +79,10 @@ public:
 
 //---------------------------------------------------------------------
 template<unsigned NSD>
-Element<NSD>::Element(const DoFManager &dofm, size_type nqp, 
+Element<NSD>::Element(const DoFManager &dofm, size_type ntd, size_type nqp, 
                       size_type dofpe, int vtktype, size_type nodespe) :
   n_spaceDim(NSD), 
+  n_topoDim(ntd),
   n_quadPoints(nqp),
   dof_per_el(dofpe), 
   vtk_type(vtktype), 

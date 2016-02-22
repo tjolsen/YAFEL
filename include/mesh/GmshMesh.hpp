@@ -14,6 +14,8 @@
 
 #include "yafel_globals.hpp"
 #include "mesh/GenericMesh.hpp"
+#include "utils/ElementType.hpp"
+
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -71,6 +73,9 @@ public:
     return _elements[elnum];
   }
 
+  inline ElementType element_type(size_type elnum) const {
+    return ElementType_Mappings::gmsh_to_ElementType(_element_type[elnum]);
+  }
 
 private:
   void load_from_stream(std::istream &in);

@@ -1,5 +1,5 @@
-#ifndef _YAFEL_ELEMENTFACTORY_HPP
-#define _YAFEL_ELEMENTFACTORY_HPP
+#ifndef __YAFEL_ELEMENTFACTORY_HPP
+#define __YAFEL_ELEMENTFACTORY_HPP
 
 #include "yafel_globals.hpp"
 #include "element/Element.hpp"
@@ -8,16 +8,17 @@
 #include "element/LinTet.hpp"
 #include "element/LinLine.hpp"
 #include "element/LagrangeLine.hpp"
-#include "mesh/Mesh.hpp"
+#include "mesh/GenericMesh.hpp"
 #include "utils/DoFManager.hpp"
 
 YAFEL_NAMESPACE_OPEN
 
+template<typename MTYPE, unsigned NSD>
 class ElementFactory {
 
 private:
-  Mesh *Mp;
-  LinQuad *lq;
+  const GenericMesh<MTYPE,NSD> &M;
+  LinQuad<NSD> *lq;
   LinTri *ltri;
   LinTet *ltet;
   LinLine *lline;
@@ -31,10 +32,10 @@ public:
   ElementFactory(Mesh &M, const DoFManager &dofm);
   ~ElementFactory();
 
-  Element *getElement(unsigned elnum); //return NULL if element not implemented
+  Element & getElement(unsigned elnum); //return NULL if element not implemented
 
-  Mesh *getMesh() {return Mp;}
-  inline unsigned get_n_dof() { return dof_per_node*(Mp->get_n_nodes()); }
+  const GenericMesh<MTYPE,NSD> & getMesh() {return M;}
+  inline unsigned get_n_dof() { return dof_per_node*(M.n_nodes()); }
   inline unsigned get_dof_per_node() { return dof_per_node; }
 };
 

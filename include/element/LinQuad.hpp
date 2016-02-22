@@ -19,7 +19,7 @@ public:
   using coordinate_type = typename Element<NSD>::coordinate_type;
 
   template<typename = typename std::enable_if<NSD>=2>::type>
-  LinQuad(const DoFManager &dofm) : Element<NSD>(dofm, 4, 4*dofm.getDofPerNode(), 9, 4) {
+  LinQuad(const DoFManager &dofm) : Element<NSD>(dofm, 2, 4, 4*dofm.getDofPerNode(), 9, 4) {
     double a = 1.0/sqrt(3.0);
     this->quad_points.clear();
     this->quad_weights.resize(4,1.0);
@@ -40,7 +40,7 @@ public:
 
   double shape_value_xi(size_type node, const coordinate_type &xi) const {
     double val = 1.0;
-    for(unsigned i=0; i<NSD; ++i) {
+    for(unsigned i=0; i<this->n_topoDim; ++i) {
       val *= (1.0/2.0) * (this->xi_0[node](i)*xi(i) + 1);
     }
     
@@ -49,7 +49,7 @@ public:
 
   double shape_grad_xi(size_type node, size_type component, const coordinate_type &xi) const {
     double val = 1.0;
-    for(size_type i=0; i<NSD; ++i) {
+    for(size_type i=0; i<this->n_topoDim; ++i) {
       if(component == i) {
         continue;
       }

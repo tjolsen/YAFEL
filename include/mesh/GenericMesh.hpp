@@ -10,7 +10,7 @@
 #include "yafel_globals.hpp"
 #include "lin_alg/tensor/Tensor.hpp"
 #include "mesh/MeshIterator.hpp"
-
+#include "utils/ElementType.hpp"
 
 #include <vector>
 
@@ -27,6 +27,9 @@ public:
   // Functions that all meshes must support
   inline size_type n_nodes() const {return static_cast<T const&>(*this).n_nodes();}
   inline size_type n_elements() const {return static_cast<T const&>(*this).n_elements();}
+  inline ElementType element_type(size_type elnum) const {
+    return static_cast<T const&>(*this).element_type(elnum);
+  }
   
   coordinate_type node(size_type nodenum) const {return static_cast<T const&>(*this).node(nodenum);}
   element_container element(size_type elnum) const {return static_cast<T const&>(*this).element(elnum);}
