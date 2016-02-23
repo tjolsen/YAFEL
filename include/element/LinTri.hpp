@@ -15,8 +15,8 @@ public:
   using size_type = typename Element<NSD>::size_type;
   using coordinate_type = typename Element<NSD>::coordinate_type;
 
-  LinTri(const DoFManager &dofm) : Element(dofm, ElementType::LINEAR_TRI,
-                                           2, 3, 3*dofm.getDofPerNode(), 5, 3)
+  LinTri(const DoFManager &dofm) : Element<NSD>(dofm, ElementType::LINEAR_TRI,
+                                           2, 1, 3*dofm.getDofPerNode(), 5, 3)
   {
     double c = 1.0/3.0;
     this->xi_0.clear();
@@ -38,12 +38,12 @@ public:
 
     return 0;
   }
-  inline double shape_grad_xi(size_type node, size_type component, const coordinate_type &xi) const {
+  inline double shape_grad_xi(size_type node, size_type component, const coordinate_type &) const {
     if(node==0) {
       return -1;
     }
     else {
-      return (node-1)==comp;
+      return (node-1)==component;
     }
   }
   

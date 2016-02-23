@@ -16,6 +16,7 @@ bool test_1() {
 
   good = good && 
     el.n_spaceDim == NSD && 
+    el.n_topoDim == 2 &&
     el.n_quadPoints == 4 && 
     el.dof_per_node == 1 && 
     el.dof_per_el == 4 && 
