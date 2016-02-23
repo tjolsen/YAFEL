@@ -33,6 +33,7 @@ public:
 private:
   const GenericMesh<MTYPE,NSD> &M;
   LinQuad<NSD> linear_quad;
+  LinTri<NSD> linear_tri;
   NullElement<NSD> null_element;
   DoFManager DOFM;
   size_type _dof_per_node;
@@ -46,6 +47,7 @@ private:
 template<typename MTYPE, unsigned NSD>
 ElementFactory(const GenericMesh<MTYPE,NSD> &M, const DoFManager &dofm)
   : linear_quad(dofm),
+    linear_tri(dofm),
     null_element(dofm),
     DOFM(dofm),
     dof_per_node(dofm.dof_per_node())

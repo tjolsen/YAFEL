@@ -3,6 +3,7 @@
 #include "element/LinQuad.hpp"
 #include "mesh/RectilinearMesh.hpp"
 #include "utils/DoFManager.hpp"
+#include "utils/ElementType.hpp"
 #include <iostream>
 
 using namespace yafel;
@@ -18,7 +19,8 @@ bool test_1() {
     el.n_quadPoints == 4 && 
     el.dof_per_node == 1 && 
     el.dof_per_el == 4 && 
-    el.vtk_type == 9;
+    el.vtk_type == 9 &&
+    el.element_type == ElementType::LINEAR_QUAD;
 
   return good;
 }

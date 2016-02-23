@@ -5,6 +5,7 @@
 #include "element/Element.hpp"
 #include "lin_alg/Vector.hpp"
 #include "utils/DoFManager.hpp"
+#include "utils/ElementType.hpp"
 #include <vector>
 #include <type_traits>
 #include <cmath>
@@ -19,7 +20,8 @@ public:
   using coordinate_type = typename Element<NSD>::coordinate_type;
 
   template<typename = typename std::enable_if<NSD>=2>::type>
-  LinQuad(const DoFManager &dofm) : Element<NSD>(dofm, 2, 4, 4*dofm.getDofPerNode(), 9, 4) {
+  LinQuad(const DoFManager &dofm) : Element<NSD>(dofm, ElementType::LINEAR_QUAD, 
+                                                 2, 4, 4*dofm.getDofPerNode(), 9, 4) {
     double a = 1.0/sqrt(3.0);
     this->quad_points.clear();
     this->quad_weights.resize(4,1.0);

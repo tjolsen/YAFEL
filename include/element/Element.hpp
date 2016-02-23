@@ -8,6 +8,8 @@
 #include "lin_alg/tensor/tensor_specializations.hpp"
 #include "mesh/GenericMesh.hpp"
 #include "utils/DoFManager.hpp"
+#include "utils/ElementType.hpp"
+
 #include <vector>
 
 YAFEL_NAMESPACE_OPEN
@@ -20,10 +22,10 @@ public:
   using size_type = typename coordinate_type::size_type;
 
 
-  size_type n_spaceDim;
-  size_type n_topoDim;
-  size_type n_quadPoints;
-  size_type dof_per_node;
+  size_type n_spaceDim; // number of spatial dimensions = dimension of coordinate_type
+  size_type n_topoDim; // topological dimension of element (line = 1, quad/tri=2, hex/tet = 3)
+  size_type n_quadPoints; // number of quadrature points. may be shifted into a QuadratureRule object in the future
+  size_type dof_per_node; 
   size_type dof_per_el;
   int vtk_type;
   size_type el_num;
@@ -40,12 +42,13 @@ public:
   std::vector<coordinate_type> nodal_coords;
   std::vector<size_type> global_dofs;
   DoFManager DOFM;
+  ElementType element_type;
   
-  Element(const DoFManager &dofm, size_type ntd, size_type nqp,
-          size_type dofpe, int vtktype, size_type nodespe);
+  Element(const DoFManager &dofm, ElementType eltype, size_type ntd, 
+          size_type nqp, size_type dofpe, int vtktype, size_type nodespe);
   
   // Virtual functions, specialized in child classes
-  virtual ~Element() {}
+  //virtual ~Element() {}
   virtual double shape_value_xi(size_type node, const coordinate_type &xi) const = 0;
   virtual double shape_grad_xi(size_type node, size_type component, const coordinate_type &xi) const = 0;
 
@@ -79,7 +82,7 @@ public:
 
 //---------------------------------------------------------------------
 template<unsigned NSD>
-Element<NSD>::Element(const DoFManager &dofm, size_type ntd, size_type nqp, 
+Element<NSD>::Element(const DoFManager &dofm, ElementType eltype, size_type ntd, size_type nqp, 
                       size_type dofpe, int vtktype, size_type nodespe) :
   n_spaceDim(NSD), 
   n_topoDim(ntd),
@@ -87,7 +90,8 @@ Element<NSD>::Element(const DoFManager &dofm, size_type ntd, size_type nqp,
   dof_per_el(dofpe), 
   vtk_type(vtktype), 
   nodes_per_el(nodespe),
-  DOFM(dofm)
+  DOFM(dofm),
+  element_type(eltype)
 {
   dof_per_node = dofm.getDofPerNode();
 }
@@ -171,6 +175,12 @@ void Element<NSD>::calcVals() {
 template<unsigned NSD>
 template<typename MTYPE, unsigned MNSD>
 void Element<NSD>::update_element(const GenericMesh<MTYPE,MNSD> &M, size_type elnum) {
+
+  // do not update a null element
+  // ...you're going to have a bad time...
+  if(element_type == ElementType::NULL_ELEMENT) {
+    return;
+  }
   
   size_type Nnodes = M.element(elnum).size();
   
