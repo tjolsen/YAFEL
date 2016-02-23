@@ -9,6 +9,7 @@
 #include "lin_alg/Matrix.hpp"
 #include "lin_alg/MatrixExpression.hpp"
 #include "lin_alg/matmul.hpp"
+#include "lin_alg/mvmul.hpp"
 
 #include "lin_alg/access_sparse_matrix.hpp"
 #include "lin_alg/sparse_csr.hpp"
@@ -39,11 +40,11 @@ VectorDifference<T1,T2,dataType> operator-(const VectorExpression<T1,dataType> &
 }
 
 //-------------------------------------------------------------------------
-template<typename T1, typename T2, typename dataType>
+template<typename T1, typename T2, typename dataType, typename = typename std::enable_if<std::is_fundamental<T2>::value,T2>::type>
 VectorScaled<T1,dataType> operator*(const VectorExpression<T1,dataType> &v, T2 a) {
   return VectorScaled<T1,dataType>(v, a);
 }
-template<typename T1, typename T2, typename dataType>
+template<typename T1, typename T2, typename dataType, typename = typename std::enable_if<std::is_fundamental<T2>::value,T2>::type>
 VectorScaled<T1,dataType> operator*(T2 a, const VectorExpression<T1,dataType> &v) {
   return VectorScaled<T1,dataType>(v, a);
 }
@@ -88,14 +89,21 @@ Matrix<dataType> operator*(const MatrixExpression<T1,dataType> &lhs,
   return matmul(lhs,rhs);
 }
 //----------------------------------------------------------------------------------------
-template<typename T1, typename T2, typename dataType>
+template<typename T1, typename T2, typename dataType, typename = typename std::enable_if<std::is_fundamental<T2>::value,T2>::type>
 MatrixScaled<T1,dataType> operator*(const MatrixExpression<T1,dataType> &v, T2 a) {
   return MatrixScaled<T1,dataType>(v,a);
 }
-template<typename T1, typename T2, typename dataType>
+template<typename T1, typename T2, typename dataType, typename = typename std::enable_if<std::is_fundamental<T2>::value,T2>::type>
 MatrixScaled<T1,dataType> operator*(T2 a, const MatrixExpression<T1,dataType> &v) {
   return MatrixScaled<T1,dataType>(v,a);
 }
+//----------------------------------------------------------------------------------------
+template<typename MT, typename VT, typename dataType>
+Vector<dataType> operator*(const MatrixExpression<MT,dataType> &lhs,
+                           const VectorExpression<VT,dataType> &rhs) {
+  return mvmul(lhs, rhs);
+}
+
 
 //----------------------------------------------------------------------------------------
 /*

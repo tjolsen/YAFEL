@@ -2,7 +2,7 @@ testfiles = test_vectorTest.cpp test_matrixTest.cpp test_sparse_coo.cpp test_spa
 testfiles += test_sparse_bcsr.cpp test_tensor.cpp test_csr_spmv.cpp test_bcsr_spmv.cpp 
 testfiles += test_DualNumber.cpp test_cg_solve.cpp test_bicgstab_solve.cpp test_ILU.cpp
 testfiles += test_RectilinearMesh.cpp test_GmshMesh.cpp test_LinTriElement.cpp
-testfiles += test_LinQuadElement.cpp test_MatrixVisualization.cpp test_matmul.cpp
+testfiles += test_LinQuadElement.cpp test_LU.cpp test_MatrixVisualization.cpp test_matmul.cpp
 
 benchmarkfiles = matmul_performance.cpp
 

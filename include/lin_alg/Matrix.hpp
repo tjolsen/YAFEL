@@ -11,23 +11,12 @@ YAFEL_NAMESPACE_OPEN
 template<typename dataType=double>
 class Matrix : public MatrixExpression<Matrix<dataType>,dataType> {
 
-private:
-  typedef typename MatrixExpression<Matrix<dataType>,dataType>::container_type container_type;
-  typedef typename MatrixExpression<Matrix<dataType>,dataType>::value_type value_type;
-  typedef typename MatrixExpression<Matrix<dataType>,dataType>::size_type size_type;
-  typedef typename MatrixExpression<Matrix<dataType>,dataType>::reference reference;
-  container_type _data;
-  size_type _rows;
-  size_type _cols;
-  
-  /* 
-   * Define row-major linear indexing.
-   * Auxiliary function is used to remove any hidden explicit dependence on row/col-major
-   * ordering elsewhere in code. Can be switched easily to column-major by 
-   */
-  inline size_type linear_index(size_type i, size_type j) const {return i*_cols + j;}
-
 public:
+  using container_type = typename MatrixExpression<Matrix<dataType>,dataType>::container_type;
+  using value_type = typename MatrixExpression<Matrix<dataType>,dataType>::value_type;
+  using size_type = typename MatrixExpression<Matrix<dataType>,dataType>::size_type;
+  using reference = typename MatrixExpression<Matrix<dataType>,dataType>::reference;
+
   reference operator()(size_type i, size_type j) {return _data[linear_index(i,j)];}
   value_type operator()(size_type i, size_type j) const {
 #ifndef _OPTIMIZED
@@ -78,7 +67,20 @@ public:
     }
   }
 
-  ~Matrix() {}
+
+private:
+  container_type _data;
+  size_type _rows;
+  size_type _cols;
+
+  /*
+   * Define row-major linear indexing here to eliminate any explicit
+   * dependence on this later in the code. Can be easily changed to column-major
+   * if desired.
+   */
+  inline size_type linear_index(size_type i, size_type j) const {
+    return i*_cols + j;
+  }
 };
 
 

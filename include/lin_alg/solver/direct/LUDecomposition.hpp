@@ -17,7 +17,7 @@ public:
   using value_type = typename Matrix<dataType>::value_type;
   using reference = typename Matrix<dataType>::reference;
 
-  LUDecomposition(const Matrix<dataType> &A) : storage(A.rows(), A.rows(), dataType(0))
+  LUDecomposition(const Matrix<dataType> &A) : storage(A)
   {
     computeLU(A);
   }
@@ -38,29 +38,19 @@ private:
   Matrix<dataType> storage;
   
   void computeLU(const Matrix<dataType> &A) {
-    size_type N = A.getRows();
+    size_type N = A.rows();
     
-    for(size_type i=0; i<N; ++i) {
-      for(size_type j=0; j<N; ++j) {
-        
-        value_type sum = A(i,j);
-        size_type lim = (i<j) ? i : j;
-        
-        for(size_type k=0; k<lim; ++k) {
-          sum -=  L(i,k)*U(k,j);
+    for(size_type k=0; k<N; ++k) {
+      for(size_type i=k+1; i<N; ++i) {
+        value_type m = storage(i,k)/storage(k,k);
+        for(size_type j=k; j<N; ++j) {
+          storage(i,j) -= m*storage(k,j);
         }
-        
-        if(i > j) {
-          storage(i,j) = sum / U(j,j);
-        }
-        else {
-          storage(i,j) = sum;
-        }
+        storage(i,k) = m;
       }
     }
-    
+
     return;
-    
   }
   
   Vector<dataType> f_subst(const Vector<dataType> &rhs) const {
@@ -80,10 +70,11 @@ private:
   
   Vector<dataType> b_subst(const Vector<dataType> &rhs) const {
   
-    size_type N = storage.getRows();
+    size_type N = storage.rows();
     Vector<dataType> retVec(N, value_type(0));
-    
-    for(size_type i=N-1; i>=0; --i) {
+
+    for(size_type ii=1; ii<=N; ++ii) {
+      size_type i = N - ii;
       value_type val = rhs(i);
       for(size_type j=i+1; j<N; ++j) {
         val -= U(i,j)*retVec(j);

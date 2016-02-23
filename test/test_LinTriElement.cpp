@@ -26,10 +26,10 @@ bool test_1() {
   return good;
 }
 
-// integrate over the 1x1 square in square.msh
+// integrate over the 1x1 square in minsquare.msh (1054 elements)
 bool test_2() {
 
-  GmshMesh<2> M("square.msh");
+  GmshMesh<2> M("minsquare.msh");
   DoFManager dofm;
   
   LinTri<2> el(dofm);

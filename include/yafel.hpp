@@ -13,17 +13,21 @@
 // Utils
 #include "utils/DirBC.hpp"
 #include "utils/DoFManager.hpp"
-#include "utils/SpatialFunction.hpp"
-#include "utils/QuadratureRule.hpp"
-#include "utils/GaussLegendreQuadrature.hpp"
-#include "utils/GaussLobattoQuadrature.hpp"
 #include "utils/DualNumber.hpp"
+#include "utils/ElementType.hpp"
+//#include "utils/QuadratureRule.hpp"
+//#include "utils/GaussLegendreQuadrature.hpp"
+//#include "utils/GaussLobattoQuadrature.hpp"
+#include "utils/SpatialFunction.hpp"
+
+
 
 // Linear Algebra
 #include "lin_alg/Vector.hpp"
 #include "lin_alg/Matrix.hpp"
 #include "lin_alg/sparse_coo.hpp"
 #include "lin_alg/sparse_csr.hpp"
+#include "lin_alg/sparse_bcsr.hpp"
 #include "lin_alg/solver/iterative/cg_solve.hpp"
 #include "lin_alg/solver/iterative/bicgstab_solve.hpp"
 #include "lin_alg/solver/iterative/Preconditioner.hpp"
