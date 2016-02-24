@@ -36,10 +36,9 @@
 #include "lin_alg/solver/direct/LUDecomposition.hpp"
 
 // Mesh
-#include "mesh/Mesh.hpp"
-#include "mesh/MeshReader.hpp"
-#include "mesh/MeshGenerator.hpp"
-//#include "mesh/DGMesh.hpp"
+#include "mesh/GenericMesh.hpp"
+#include "mesh/RectilinearMesh.hpp"
+#include "mesh/GmshMesh.hpp"
 #include "mesh/MeshTopology.hpp"
 #include "mesh/TopoPoint.hpp"
 #include "mesh/TopoLine.hpp"
@@ -50,7 +49,7 @@
 #include "element/Element.hpp"
 #include "element/LinQuad.hpp"
 #include "element/LinTri.hpp"
-#include "element/LinTet.hpp"
+//#include "element/LinTet.hpp"
 #include "element/ElementFactory.hpp"
 
 // Output

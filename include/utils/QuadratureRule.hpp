@@ -11,13 +11,13 @@
  */
 
 
-#include "yafel_gloabls.hpp"
+#include "yafel_globals.hpp"
 #include "lin_alg/tensor/Tensor.hpp"
 #include <vector>
 
 YAFEL_NAMESPACE_OPEN
 
-template<typename T>
+template<unsigned NSD>
 class QuadratureRule {
 
 public:
@@ -25,14 +25,10 @@ public:
   using size_type = typename Tensor<NSD,1,double>::size_type;
   using value_type = typename Tensor<NSD,1,double>::value_type;
   
-  value_type weight(size_type qpi) const {return static_cast<T const&>(*this).weight(qpi);}
-  coordinate_type qp(size_type qpi) const {return static_cast<T const&>(*this).qp(qpi);}
-  size_type n_qp() const {return static_cast<T const&>(*this).n_qp();}
+  virtual value_type weight(size_type qpi) const = 0;
+  virtual coordinate_type qp(size_type qpi) const = 0;
+  virtual size_type n_qp() const = 0;
 
-
-  operator T&() {return static_cast<T&>(*this);}
-  operator T const&() const {return static_cast<T const&>(*this);}
-  
 };
 
 YAFEL_NAMESPACE_CLOSE

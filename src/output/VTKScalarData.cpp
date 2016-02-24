@@ -6,12 +6,11 @@ YAFEL_NAMESPACE_OPEN
 VTKScalarData::VTKScalarData(const std::vector<double> &d, VTKObject::VTKObjectType ot, const std::string &s) :
   VTKObject(VTKObject::VTKSCALARDATA, ot, s), data(d) {}
 
-VTKScalarData::VTKScalarData(const Vector &d, VTKObject::VTKObjectType ot, const std::string &s) :
-  VTKObject(VTKObject::VTKSCALARDATA, ot, s)
+VTKScalarData::VTKScalarData(const Vector<double> &d, VTKObject::VTKObjectType ot, const std::string &s) :
+  VTKObject(VTKObject::VTKSCALARDATA, ot, s), data(d.size(),0)
 {
   
-  data.resize(d.getLength());
-  for(unsigned i=0; i<d.getLength(); ++i) {
+  for(std::size_t i=0; i<d.size(); ++i) {
     data[i] = d(i);
   }
   
@@ -22,7 +21,7 @@ void VTKScalarData::write(FILE *fp) {
   fprintf(fp, "<DataArray type=\"Float32\" format=\"ascii\" Name=\"%s\" NumberOfComponents=\"1\">\n",
 	  getName().c_str());
   
-  for(unsigned i=0; i<data.size(); ++i) {
+  for(std::size_t i=0; i<data.size(); ++i) {
     fprintf(fp, "%f\n", data[i]);
   }
   

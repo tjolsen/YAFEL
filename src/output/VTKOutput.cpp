@@ -4,11 +4,11 @@
 
 YAFEL_NAMESPACE_OPEN
 
-VTKOutput::VTKOutput() {
-  vtkmesh = NULL;
-  pointData.clear();
-  cellData.clear();
-}
+VTKOutput::VTKOutput() :
+  vtkmesh(nullptr),
+  pointData(),
+  cellData()
+{}
 
 void VTKOutput::addVTKObject(VTKObject *VO) {
   switch(VO->getObjectType()) {

@@ -1,6 +1,13 @@
 #ifndef __YAFEL_ELEMENTTYPE_HPP
 #define __YAFEL_ELEMENTTYPE_HPP
 
+/*
+ * Utility (enum) class to provide a unified way to describe an element
+ * type. This file also provides a set of functions to map from a
+ * preprocessor element type description to the one used here.
+ */
+
+
 #include "yafel_globals.hpp"
 
 YAFEL_NAMESPACE_OPEN
@@ -26,12 +33,12 @@ enum class ElementType {
     LINEAR_HEX,
     QUADRATIC_HEX,
     CUBIC_HEX,
-
+    
   // 3-D Tetrahedral Elements
     LINEAR_TET,
     QUADRATIC_TET,
     CUBIC_TET,
-
+    
   // Error Type
     NULL_ELEMENT
 };

@@ -18,11 +18,14 @@ private:
 
 public:
   VTKOutput();
-  void addVTKObject(VTKObject * VO);
+  
+  void addVTKObject(VTKObject* VO);
   void clearData();
   void clearMesh();
+
   void write(const std::string & fname);
 };
+
 
 YAFEL_NAMESPACE_CLOSE
 #endif

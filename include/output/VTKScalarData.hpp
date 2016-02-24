@@ -5,6 +5,7 @@
 #include "output/VTKObject.hpp"
 #include "lin_alg/Vector.hpp"
 #include <vector>
+#include <string>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -15,7 +16,7 @@ private:
 
 public:
   VTKScalarData(const std::vector<double> &d, VTKObject::VTKObjectType ot, const std::string &s);
-  VTKScalarData(const Vector &d, VTKObject::VTKObjectType ot, const std::string &s);
+  VTKScalarData(const Vector<double> &d, VTKObject::VTKObjectType ot, const std::string &s);
 
   void write(FILE *fp);
 };

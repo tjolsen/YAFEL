@@ -1,4 +1,4 @@
-SUBDIRS = lin_alg mesh element output utils
+SUBDIRS = output #utils #lin_alg mesh element 
 SUBDIRTARGETS= $(SUBDIRS:%=%.tmp) # workaround to get header-file dependencies to work correctly
 
 include $(YAFELDIR)/common.mk

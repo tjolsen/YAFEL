@@ -24,6 +24,8 @@
 #include "utils/ElementType.hpp"
 #include "utils/DirBC.hpp"
 
+//include output tools
+#include "output/MatrixVisualization.hpp"
 
 #include <iostream>
 #include <vector>
@@ -48,8 +50,6 @@ int main() {
   ElementFactory<RectilinearMesh<NSD>, NSD> EF(M,dofm);
 
   sparse_coo<double> COO;
-  Vector<double> Fsys(EF.n_dof());
-  
 
   // assemble system
   for(std::size_t elnum=0; elnum<M.n_elements(); ++elnum) {
@@ -91,11 +91,54 @@ int main() {
     
   }//end element loop
 
-  // solve system
-  
+  //manually construct boundary conditions
+  std::vector<std::size_t> bcnodes;
+  std::vector<double> bcvals;
+  std::vector<bool> bcmask(M.n_nodes(),false);
 
+  double x0_bcval = 1;
+  double x1_bcval = 0;
+  double y0_bcval = 0;
+  double y1_bcval = 0;
+
+  for(std::size_t i=0; i<M.n_nodes(); ++i) {
+    Tensor<NSD,1> x = M.node(i);
+    if(x(0) == 0) {
+      bcnodes.push_back(i);
+      bcvals.push_back(x0_bcval);
+      bcmask[i] = true;
+    }
+    else if(x(0) == L) {
+      bcnodes.push_back(i);
+      bcvals.push_back(x1_bcval);
+      bcmask[i] = true;
+    }
+    else if(x(1) == 0) {
+      bcnodes.push_back(i);
+      bcvals.push_back(y0_bcval);
+      bcmask[i] = true;
+    }
+    else if(x(1) == L) {
+      bcnodes.push_back(i);
+      bcvals.push_back(y1_bcval);
+      bcmask[i] = true;
+    }
+  }
+
+  DirBC BC(bcnodes, bcvals, bcmask);
+
+  // solve system
+  sparse_csr<double> Ksys(COO);
+  Vector<double> Fsys(Ksys.rows(), 0);
+
+  BC.apply(Ksys, Fsys);
+  
+  Vector<double> U = cg_solve(Ksys, Fsys, BC.get_ubc());
 
   // output system
+  VTKOutput vout;
 
+  
+  
   return 0;
 }

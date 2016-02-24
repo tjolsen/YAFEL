@@ -9,6 +9,6 @@ all: .depend $(ofiles)
 	$(CXX) $(CXXFLAGS) $<
 
 clean:
-	rm $(ofiles)
+	rm $(ofiles) .depend
 
 .PHONY: all clean

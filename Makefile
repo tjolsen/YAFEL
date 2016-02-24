@@ -1,4 +1,4 @@
-subdirs = src apps test doc
+subdirs = src test doc #apps 
 
 ifndef YAFELDIR
  export YAFELDIR=$(shell pwd)

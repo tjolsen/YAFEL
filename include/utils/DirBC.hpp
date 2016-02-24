@@ -13,6 +13,7 @@
 #include "lin_alg/access_sparse_matrix.hpp"
 #include "lin_alg/sparse_csr.hpp"
 #include "lin_alg/Vector.hpp"
+#include "lin_alg/operators.hpp"
 #include "utils/DoFManager.hpp"
 #include "utils/SpatialFunction.hpp"
 #include <vector>
@@ -28,7 +29,6 @@ public:
   std::vector<size_type> bcdofs;
   std::vector<double> bcvals;
   std::vector<bool> bcmask;
-  DoFManager DOFM;
   Vector<double> ubc;
   
   template<unsigned NSD>
@@ -38,12 +38,12 @@ public:
   DirBC(const std::vector<size_type> bcdofs_,
 	       const std::vector<double> bcvals_,
 	       const std::vector<bool> bcmask_)
-    : bcdofs(bcdofs_), bcvals(bcvals_), bcmask(bcmask_), DOFM(), ubc(bcmask_.size(),0)
+    : bcdofs(bcdofs_), bcvals(bcvals_), bcmask(bcmask_), ubc(bcmask_.size(),0)
   {};
   
   template<typename T>
   void apply(access_sparse_matrix<T,double> &Ksys, Vector<double> &Fsys);
-  inline Vector<double> getUbc() const {return ubc;}
+  inline Vector<double> get_ubc() const {return ubc;}
 };
 
 
@@ -58,7 +58,6 @@ DirBC::DirBC(const GmshMesh<NSD> &M, const DoFManager &dofm, size_type tagID,
   : bcdofs(), 
     bcvals(), 
     bcmask(dofm.n_dofs(M.n_nodes()),false), 
-    DOFM(dofm), 
     ubc(dofm.n_dofs(M.n_nodes()),0)
 {
 

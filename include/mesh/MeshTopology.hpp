@@ -1,7 +1,7 @@
 #ifndef _YAFEL_MESHTOPOLOGY_HPP
 #define _YAFEL_MESHTOPOLOGY_HPP
 
-#include "mesh/Mesh.hpp"
+#include "mesh/GenericMesh.hpp"
 #include "mesh/TopoPoint.hpp"
 #include "mesh/TopoLine.hpp"
 #include "mesh/TopoFace.hpp"
@@ -23,7 +23,8 @@ private:
   std::size_t get_line_id(std::size_t vid1, std::size_t vid2, bool &exists);
 
 public:
-  MeshTopology(const Mesh &M);
+  template<typename MT, unsigned NSD>
+  MeshTopology(const GenericMesh<MT,NSD> &M);
   ~MeshTopology();
   void print(std::ostream &out);
 
