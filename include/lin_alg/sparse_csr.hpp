@@ -27,65 +27,8 @@ public:
   size_type cols() const {return _cols;}
   size_type nnz() const {return _data.size();}
 
-  sparse_csr(const std::vector<triplet> &ts) : _zero(0) {
-
-    
-    // handle empty matrix. Currently, it'll break as soon as operator() is called.
-    if(ts.size() == 0) {
-      return;
-    }
-
-
-    // std::less sorts triplets in (row, col, val) form
-    // into an order that is useful for construction of
-    // sparse_csr matrices.
-    std::vector<triplet> triplets(ts);
-    std::sort(triplets.begin(), triplets.end());
-    
-    //get the number of rows+1
-    row_ptr.resize(std::get<0>(triplets[triplets.size()-1])+2);
-
-    size_type curr_row = std::get<0>(triplets[0]);
-    size_type curr_col = std::get<1>(triplets[0]);
-
-    //initialize matrix size. will grow when new triplets are processed
-    _rows = curr_row+1;
-    _cols = curr_col+1;
-
-    for(size_type r=0; r<=curr_row; ++r) {
-      row_ptr[r] = 0;
-    }
-    col_index.push_back(curr_col);
-    _data.push_back(std::get<2>(triplets[0]));
-    size_type idx = 0;
-    
-    for(size_type i=1; i<triplets.size(); ++i) {
-      size_type row = std::get<0>(triplets[i]);
-      size_type col = std::get<1>(triplets[i]);
-      dataType val = std::get<2>(triplets[i]);
-
-      _rows = ((row+1) > _rows) ? row+1 : _rows;
-      _cols = ((col+1) > _cols) ? col+1 : _cols;
-      
-      if(row == curr_row && col==curr_col) {
-	_data[idx] += val; 
-     }
-      else {
-	++idx;
-	if(row != curr_row) {
-	  for(size_type r=curr_row+1; r<=row; ++r) {
-	    row_ptr[r] = idx;
-	  }
-	  curr_row = row;
-	}
-	col_index.push_back(col);
-	curr_col = col;
-	_data.push_back(val);
-      }
-    }
-
-    row_ptr[_rows] = _data.size();
-  }
+  //Constructors
+  sparse_csr(const std::vector<triplet> &ts);
 
   template<typename T>
   sparse_csr(sparse_matrix<T,dataType> &sp) : sparse_csr(sp.get_triplets()) {}
@@ -95,55 +38,11 @@ public:
    * Index operators
    * Defining _OPTIMIZED turns off bounds checking
    */
-  value_type operator()(size_type i, size_type j) const {
-#ifndef _OPTIMIZED
-    if(i>=_rows || j >= _cols) {
-      std::cerr << "error:sparse_csr:operator() out of bounds\n";
-      exit(1);
-    }
-#endif
-    bool in_sparsity = true;
-    size_type idx = index_of(i,j,in_sparsity);
-    return (in_sparsity) ? _data[idx] : dataType(0);
-  }
+  value_type operator()(size_type i, size_type j) const;
+  reference operator()(size_type i, size_type j);
+  value_type operator()(size_type i, size_type j, bool & in_sparsity) const;
+  reference operator()(size_type i, size_type j, bool & in_sparsity);
 
-  value_type& operator()(size_type i, size_type j) {
-#ifndef _OPTIMIZED
-    if(i>=_rows || j >= _cols) {
-      std::cerr << "error:sparse_csr:operator() out of bounds\n";
-      exit(1);
-    }
-#endif
-
-    bool in_sparsity = true;
-    size_type idx = index_of(i,j,in_sparsity);
-    return (in_sparsity) ? _data[idx] : _zero;
-  }
-
-  value_type operator()(size_type i, size_type j, bool & in_sparsity) const {
-#ifndef _OPTIMIZED
-    if(i>=_rows || j >= cols) {
-      std::cerr << "error:sparse_csr:operator() out of bounds\n";
-      exit(1);
-    }
-#endif
-    in_sparsity = true;
-    size_type idx = index_of(i,j,in_sparsity);
-    return (in_sparsity) ? _data[idx] : dataType(0);
-  }
-
-  value_type& operator()(size_type i, size_type j, bool & in_sparsity) {
-#ifndef _OPTIMIZED
-    if(i>=_rows || j >= _cols) {
-      std::cerr << "error:sparse_csr:operator() out of bounds\n";
-      exit(1);
-    }
-#endif
-
-    in_sparsity = true;
-    size_type idx = index_of(i,j,in_sparsity);
-    return (in_sparsity) ? _data[idx] : _zero;
-  }
 
   /*
    * Functions to get sparsity patterns.
@@ -158,21 +57,8 @@ public:
     return csr_sparsity_pattern_reference(row_ptr, col_index);
   }
 
-
-  std::vector<triplet> copy_triplets() const {
-    
-    std::vector<triplet> ts(nnz());
-    
-    size_type count=0;
-    for(size_type r=0; r<rows(); ++r) {
-      for(size_type idx=row_ptr[r]; idx<row_ptr[r+1]; ++idx) {
-        ts[count++] = std::make_tuple(r, col_index[idx], _data[idx]);
-      }
-    }
-
-    return ts;
-  }
-
+  std::vector<triplet> copy_triplets() const;
+  
   // easier to write algorithms if these are public
   std::vector<size_type> row_ptr;
   std::vector<size_type> col_index;
@@ -195,6 +81,147 @@ private:
   }
 
 }; //end class sparse_csr
+
+
+
+/*
+ * Implementation
+ */
+template<typename dataType>
+sparse_csr<dataType>::sparse_csr(const std::vector<triplet> &ts) : _zero(0) {
+  
+  
+  // handle empty matrix. Currently, it'll break as soon as operator() is called.
+  if(ts.size() == 0) {
+    return;
+  }
+  
+  
+  // std::less sorts triplets in (row, col, val) form
+  // into an order that is useful for construction of
+  // sparse_csr matrices.
+  std::vector<triplet> triplets(ts);
+  std::sort(triplets.begin(), triplets.end());
+  
+  //get the number of rows+1
+  row_ptr.resize(std::get<0>(triplets[triplets.size()-1])+2);
+  
+  size_type curr_row = std::get<0>(triplets[0]);
+  size_type curr_col = std::get<1>(triplets[0]);
+  
+  //initialize matrix size. will grow when new triplets are processed
+  _rows = curr_row+1;
+  _cols = curr_col+1;
+  
+  for(size_type r=0; r<=curr_row; ++r) {
+    row_ptr[r] = 0;
+  }
+  col_index.push_back(curr_col);
+  _data.push_back(std::get<2>(triplets[0]));
+  size_type idx = 0;
+  
+  for(size_type i=1; i<triplets.size(); ++i) {
+    size_type row = std::get<0>(triplets[i]);
+    size_type col = std::get<1>(triplets[i]);
+    dataType val = std::get<2>(triplets[i]);
+    
+    _rows = ((row+1) > _rows) ? row+1 : _rows;
+    _cols = ((col+1) > _cols) ? col+1 : _cols;
+    
+    if(row == curr_row && col==curr_col) {
+      _data[idx] += val; 
+    }
+    else {
+      ++idx;
+      if(row != curr_row) {
+        for(size_type r=curr_row+1; r<=row; ++r) {
+          row_ptr[r] = idx;
+        }
+        curr_row = row;
+      }
+      col_index.push_back(col);
+      curr_col = col;
+      _data.push_back(val);
+    }
+  }
+  
+  row_ptr[_rows] = _data.size();
+}
+
+template<typename dataType>
+typename sparse_csr<dataType>::value_type 
+sparse_csr<dataType>::operator()(size_type i, size_type j) const {
+#ifndef _OPTIMIZED
+  if(i>=_rows || j >= _cols) {
+    std::cerr << "error:sparse_csr:operator() out of bounds\n";
+    exit(1);
+  }
+#endif
+  bool in_sparsity = true;
+  size_type idx = index_of(i,j,in_sparsity);
+  return (in_sparsity) ? _data[idx] : dataType(0);
+}
+
+template<typename dataType>
+typename sparse_csr<dataType>::reference
+sparse_csr<dataType>::operator()(size_type i, size_type j) {
+#ifndef _OPTIMIZED
+  if(i>=_rows || j >= _cols) {
+    std::cerr << "error:sparse_csr:operator() out of bounds\n";
+    exit(1);
+  }
+#endif
+  
+  bool in_sparsity = true;
+  size_type idx = index_of(i,j,in_sparsity);
+  return (in_sparsity) ? _data[idx] : _zero;
+}
+
+template<typename dataType>
+typename sparse_csr<dataType>::value_type 
+sparse_csr<dataType>::operator()(size_type i, size_type j, bool & in_sparsity) const {
+#ifndef _OPTIMIZED
+  if(i>=_rows || j >= cols) {
+    std::cerr << "error:sparse_csr:operator() out of bounds\n";
+    exit(1);
+  }
+#endif
+  in_sparsity = true;
+  size_type idx = index_of(i,j,in_sparsity);
+  return (in_sparsity) ? _data[idx] : dataType(0);
+}
+
+template<typename dataType>
+typename sparse_csr<dataType>::reference 
+sparse_csr<dataType>::operator()(size_type i, size_type j, bool & in_sparsity) {
+#ifndef _OPTIMIZED
+  if(i>=_rows || j >= _cols) {
+    std::cerr << "error:sparse_csr:operator() out of bounds\n";
+    exit(1);
+  }
+#endif
+  
+  in_sparsity = true;
+  size_type idx = index_of(i,j,in_sparsity);
+  return (in_sparsity) ? _data[idx] : _zero;
+}
+
+template<typename dataType>
+std::vector<typename sparse_csr<dataType>::triplet> 
+sparse_csr<dataType>::copy_triplets() const {
+  
+  std::vector<triplet> ts(nnz());
+  
+  size_type count=0;
+  for(size_type r=0; r<rows(); ++r) {
+    for(size_type idx=row_ptr[r]; idx<row_ptr[r+1]; ++idx) {
+      ts[count++] = std::make_tuple(r, col_index[idx], _data[idx]);
+    }
+  }
+  
+  return ts;
+}
+
 
 YAFEL_NAMESPACE_CLOSE
 

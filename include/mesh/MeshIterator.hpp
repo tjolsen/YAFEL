@@ -28,7 +28,8 @@ public:
   // prefix increment
   MeshIterator<MESHTYPE> & operator++() {
     ++ptr; 
-    return *this;}
+    return *this;
+  }
 
   // postfix increment
   MeshIterator<MESHTYPE> operator++(int) {

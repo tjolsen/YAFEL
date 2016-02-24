@@ -15,7 +15,7 @@ public:
   DoFManager(unsigned dofpn) : dofPerNode(dofpn) {}
   inline unsigned index(unsigned node, unsigned comp) const {return node*dofPerNode + comp;}
   inline unsigned getDofPerNode() const {return dofPerNode;}
-  inline unsigned getNDofs(unsigned nNodes) const {return dofPerNode*nNodes;}
+  inline unsigned n_dofs(unsigned nNodes) const {return dofPerNode*nNodes;}
 };
 
 YAFEL_NAMESPACE_CLOSE

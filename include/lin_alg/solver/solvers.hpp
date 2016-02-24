@@ -5,14 +5,14 @@
  */ 
 
 // Iterative Solvers and preconditioners
-#include "lin_alg/iterative/cg_solve.hpp"
-#include "lin_alg/iterative/bicgstab.hpp"
-#include "lin_alg/iterative/Preconditioner.hpp"
-#include "lin_alg/iterative/JacobiPreconditioner.hpp"
-#include "lin_alg/iterative/ILUPreconditioner.hpp"
+#include "lin_alg/solver/iterative/cg_solve.hpp"
+#include "lin_alg/solver/iterative/bicgstab_solve.hpp"
+#include "lin_alg/solver/iterative/Preconditioner.hpp"
+#include "lin_alg/solver/iterative/JacobiPreconditioner.hpp"
+#include "lin_alg/solver/iterative/ILUPreconditioner.hpp"
 
 // Direct Solvers
-#include "lin_alg/direct/LUDecomposition.hpp"
+#include "lin_alg/solver/direct/LUDecomposition.hpp"
 
 
 #endif
