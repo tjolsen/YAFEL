@@ -67,7 +67,9 @@ void MatrixVisualization::spy(sparse_matrix<T,dataType> &A) {
      << "plot '-' using 1:2 with points pt 7 ps 0.5\n";
 
   for(auto t : triplets) {
-    ss << std::get<1>(t) << " " << std::get<0>(t) << "\n";
+    if(std::get<2>(t) != 0) { // <-- semantics of "spy" func are to look at nonzeros
+      ss << std::get<1>(t) << " " << std::get<0>(t) << "\n";
+    }
   }
 
   fprintf(gp, "%s", ss.str().c_str());

@@ -45,7 +45,7 @@ int main() {
    * Problem Parameters
    */
   double L = 1; // box length
-  double dim_elem = 100; // elements along each dimension
+  double dim_elem = 200; // elements along each dimension
 
   //set up basic structures
   RectilinearMesh<NSD> M(std::vector<double>(NSD,L), std::vector<std::size_t>(NSD,dim_elem));
@@ -61,7 +61,7 @@ int main() {
     if(el.element_type == ElementType::NULL_ELEMENT) {
       continue;
     }
-
+    //update element shape values, gradients
     el.update_element(M,elnum);
 
     std::size_t dof_per_el = el.dof_per_el;
@@ -88,7 +88,8 @@ int main() {
     
   }//end element loop
 
-  //manually construct boundary conditions
+  //manually construct boundary conditions.
+  // this will be abstracted away into something nicer at some point
   std::vector<std::size_t> bcnodes;
   std::vector<double> bcvals;
   std::vector<bool> bcmask(M.n_nodes(),false);
@@ -122,14 +123,19 @@ int main() {
     }
   }
 
+  //make dirichlet bc object using vectors created above
   DirBC BC(bcnodes, bcvals, bcmask);
 
-  // solve system
+
+  //set up sparse matrix data structure for solving
   sparse_csr<double> Ksys(COO);
   Vector<double> Fsys(Ksys.rows(), 0);
 
+  //apply bc to linear system
   BC.apply(Ksys, Fsys);
 
+  //solve linear system using Conjugate Gradient, with the boundary conditions
+  // as an initial guess (rather than just zero)
   Vector<double> U = cg_solve(Ksys, Fsys, BC.get_ubc());
 
   // output system
