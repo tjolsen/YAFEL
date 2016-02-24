@@ -45,7 +45,7 @@ int main() {
    * Problem Parameters
    */
   double L = 1; // box length
-  double dim_elem = 200; // elements along each dimension
+  double dim_elem = 100; // elements along each dimension
 
   //set up basic structures
   RectilinearMesh<NSD> M(std::vector<double>(NSD,L), std::vector<std::size_t>(NSD,dim_elem));
@@ -94,35 +94,28 @@ int main() {
   std::vector<double> bcvals;
   std::vector<bool> bcmask(M.n_nodes(),false);
 
-  double x0_bcval = 1;
-  double x1_bcval = 0;
-  double y0_bcval = 0;
-  double y1_bcval = 2;
+  std::vector<double> x0_bcvals(NSD,0), x1_bcvals(NSD,0);
+  for(std::size_t i=0; i<NSD; ++i) {
+    x0_bcvals[i] = i+1;
+  }
 
   for(std::size_t i=0; i<M.n_nodes(); ++i) {
     Tensor<NSD,1> x = M.node(i);
-    if(x(0) == 0) {
-      bcnodes.push_back(i);
-      bcvals.push_back(x0_bcval);
-      bcmask[i] = true;
-    }
-    else if(x(0) == L) {
-      bcnodes.push_back(i);
-      bcvals.push_back(x1_bcval);
-      bcmask[i] = true;
-    }
-    else if(x(1) == 0) {
-      bcnodes.push_back(i);
-      bcvals.push_back(y0_bcval);
-      bcmask[i] = true;
-    }
-    else if(x(1) == L) {
-      bcnodes.push_back(i);
-      bcvals.push_back(y1_bcval);
-      bcmask[i] = true;
+    for(std::size_t dim=0; dim<NSD; ++dim) {
+
+      if(x(dim) == 0) {
+        bcnodes.push_back(i);
+        bcvals.push_back(x0_bcvals[dim]);
+        bcmask[i] = true;
+      }
+      else if(x(dim) == L) {
+        bcnodes.push_back(i);
+        bcvals.push_back(x1_bcvals[dim]);
+        bcmask[i] = true;
+      }
     }
   }
-
+  
   //make dirichlet bc object using vectors created above
   DirBC BC(bcnodes, bcvals, bcmask);
 
