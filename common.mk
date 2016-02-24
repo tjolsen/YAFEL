@@ -19,7 +19,7 @@ AR = ar
 
 #compiler optimization and linking flags
 CXXFLAGS = -O3 -Wall -Werror -Wextra #-fmax-errors=5
-LDFLAGS = #-L$(YAFELDIR)/lib/ -lyafel 
+LDFLAGS = -L$(YAFELDIR)/lib/ -lyafel 
 ARFLAGS = -ru
 
 #output library name

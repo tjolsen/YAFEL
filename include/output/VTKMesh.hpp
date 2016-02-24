@@ -49,7 +49,7 @@ void VTKMesh<MT,NSD>::write(FILE *fp) {
   
   //write header
   fprintf(fp, "%s\n", "<UnstructuredGrid>");
-  fprintf(fp, "<Piece NumberOfPoints=\"%d\" NumberOfCells=\"%d\">\n",
+  fprintf(fp, "<Piece NumberOfPoints=\"%lu\" NumberOfCells=\"%lu\">\n",
 	  M.n_nodes(), nCells );
   
   //write point data
@@ -79,17 +79,17 @@ void VTKMesh<MT,NSD>::write(FILE *fp) {
     case ElementType::LINEAR_LINE:
     case ElementType::QUADRATIC_LINE:
     case ElementType::CUBIC_LINE:
-      fprintf(fp, "%d ", M.element(elnum)[0]);
+      fprintf(fp, "%lu ", M.element(elnum)[0]);
       for (size_type i=2; i<M.element(elnum).size(); ++i) {
-        fprintf(fp, "%d ", M.element(elnum)[i]);
+        fprintf(fp, "%lu ", M.element(elnum)[i]);
       }
-      fprintf(fp, "%d ", M.element(elnum)[1]);
+      fprintf(fp, "%lu ", M.element(elnum)[1]);
       fprintf(fp, "\n");
       break;
 
     default:
       for(size_type i=0; i<M.element(elnum).size(); ++i) {
-        fprintf(fp, "%d ", M.element(elnum)[i]);
+        fprintf(fp, "%lu ", M.element(elnum)[i]);
       }
       fprintf(fp, "\n");
     }
@@ -97,14 +97,14 @@ void VTKMesh<MT,NSD>::write(FILE *fp) {
   fprintf(fp, "</DataArray>\n");
   
   fprintf(fp, "<DataArray type=\"UInt32\" Name=\"offsets\" format=\"ascii\">\n");
-  int offset = 0;
+  size_type offset = 0;
   for(size_type elnum=0; elnum<M.n_elements(); ++elnum) {
     ElementType et = M.element_type(elnum);
     if(et==ElementType::NULL_ELEMENT)
       continue;
     
     offset += M.element(elnum).size();
-    fprintf(fp, "%d\n", offset);
+    fprintf(fp, "%lu\n", offset);
   }
   fprintf(fp, "</DataArray>\n");
   

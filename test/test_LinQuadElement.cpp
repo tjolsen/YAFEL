@@ -87,6 +87,31 @@ bool test_3() {
 }
 
 
+//test gradients
+template<unsigned NSD>
+bool test_4() {
+ 
+  std::vector<double> m_dims(NSD,1);
+  std::vector<std::size_t> elres(NSD,1);
+  
+  RectilinearMesh<NSD> M(m_dims, elres);
+  DoFManager dofm;
+
+  LinQuad<NSD> el(dofm);
+  
+  el.update_element(M,0);
+  
+  bool good = true;
+
+  good = good &&
+    el.shape_grad_xi(0, 0, Tensor<NSD,1>{-1, -1}) == -1.0/2.0 &&
+    el.shape_grad_xi(0, 1, Tensor<NSD,1>{-1, -1}) == -1.0/2.0 &&
+    el.shape_grad_xi(2, 0, Tensor<NSD,1>{1, 1}) == 1.0/2.0 &&
+    el.shape_grad_xi(2, 1, Tensor<NSD,1>{1, 1}) == 1.0/2.0;
+
+  return good;
+}
+
 int main() {
 
   int retval = 0;
@@ -109,6 +134,10 @@ int main() {
   if(!test_3<3>()) {
     std::cerr << "Failed test_3<3>" << std::endl;
     retval |= 1<<2;
+  }
+  if(!test_4<2>()) {
+    std::cerr << "Failed test_4<2>" << std::endl;
+    retval |= 1<<3;
   }
   
   

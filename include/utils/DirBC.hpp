@@ -17,7 +17,7 @@
 #include "utils/DoFManager.hpp"
 #include "utils/SpatialFunction.hpp"
 #include <vector>
-
+#include <iostream>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -41,8 +41,7 @@ public:
     : bcdofs(bcdofs_), bcvals(bcvals_), bcmask(bcmask_), ubc(bcmask_.size(),0)
   {};
   
-  template<typename T>
-  void apply(access_sparse_matrix<T,double> &Ksys, Vector<double> &Fsys);
+  void apply(sparse_csr<double> &Ksys, Vector<double> &Fsys);
   inline Vector<double> get_ubc() const {return ubc;}
 };
 
@@ -81,34 +80,6 @@ DirBC::DirBC(const GmshMesh<NSD> &M, const DoFManager &dofm, size_type tagID,
   
 }
 
-
-template<>
-void DirBC::apply(access_sparse_matrix<sparse_csr<double>,double> &Kcsr, Vector<double> &Fsys) {
-  
-  auto Ksys = static_cast<sparse_csr<double>&>(Kcsr);
-  
-  for(std::size_t i=0; i<bcvals.size(); ++i) {
-    ubc(bcdofs[i]) = bcvals[i];
-  }
-
-  Fsys -= Ksys*ubc;
-
-  for(std::size_t i=0; i<bcvals.size(); ++i) {
-    Fsys(bcdofs[i]) = bcvals[i];
-  }
-  
-  //set Ksys entries to 0 or 1 to apply BC's
-  for(std::size_t r=0; r<Ksys.rows(); ++r) {
-    for(std::size_t i=Ksys.row_ptr[r]; i<Ksys.row_ptr[r+1]; ++i) {
-      std::size_t c = Ksys.col_index[i];
-      if(bcmask[r] || bcmask[c])
-	Ksys._data[i] = 0.0;
-      if(bcmask[r] && bcmask[c])
-	Ksys._data[i] = 1.0;
-    }
-  }
-
-}
 
 YAFEL_NAMESPACE_CLOSE
 

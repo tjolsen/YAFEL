@@ -26,6 +26,9 @@
 
 //include output tools
 #include "output/MatrixVisualization.hpp"
+#include "output/VTKOutput.hpp"
+#include "output/VTKMesh.hpp"
+#include "output/VTKScalarData.hpp"
 
 #include <iostream>
 #include <vector>
@@ -42,7 +45,7 @@ int main() {
    * Problem Parameters
    */
   double L = 1; // box length
-  double dim_elem = 10; // elements along each dimension
+  double dim_elem = 1; // elements along each dimension
 
   //set up basic structures
   RectilinearMesh<NSD> M(std::vector<double>(NSD,L), std::vector<std::size_t>(NSD,dim_elem));
@@ -53,37 +56,36 @@ int main() {
 
   // assemble system
   for(std::size_t elnum=0; elnum<M.n_elements(); ++elnum) {
-    std::cout << elnum << std::endl;
     Element<NSD> & el = EF.getElement(elnum);
-    std::cout << "Got element\n";
+
     if(el.element_type == ElementType::NULL_ELEMENT) {
       continue;
     }
-    std::cout << "updating...";
+
     el.update_element(M,elnum);
-    std::cout << "done\n";
+
     std::size_t dof_per_el = el.dof_per_el;
     
     Matrix<double> Kloc(dof_per_el, dof_per_el, 0);
     
     for(std::size_t qpi=0; qpi<el.n_quadPoints; ++qpi) {
-      std::cout << "\tqpi="<<qpi<<std::endl;
       for(std::size_t A=0; A<dof_per_el; ++A) {
-        for(std::size_t B=A; B<dof_per_el; ++B) {
+        for(std::size_t B=0; B<dof_per_el; ++B) {
           Kloc(A,B) = 0;
           Kloc(B,A) = 0;
           for(std::size_t i=0; i<NSD; ++i) {
             Kloc(A,B) += el.shape_grads[qpi](A,i)*el.shape_grads[qpi](B,i)*el.JxW(qpi);
           }
-          Kloc(B,A) = Kloc(A,B);
         }
       }
     }
 
     for(std::size_t A=0; A<dof_per_el; ++A) {
       std::size_t GA = el.global_dofs[A];
+      std::cout << GA<<std::endl;
       for(std::size_t B=0; B<dof_per_el; ++B) {
         std::size_t GB = el.global_dofs[B];
+        std::cout << "\t"<<GB<<std::endl;
         
         COO.add(GA, GB, Kloc(A,B));
       }
@@ -131,14 +133,39 @@ int main() {
   sparse_csr<double> Ksys(COO);
   Vector<double> Fsys(Ksys.rows(), 0);
 
+  for(std::size_t i=0; i<Ksys.rows(); ++i) {
+    for(std::size_t j=0; j<Ksys.cols(); ++j) {
+      std::cout << Ksys(i,j) << "\t";
+    }
+    std::cout << std::endl;
+  }
+
+
   BC.apply(Ksys, Fsys);
+
+  for(std::size_t i=0; i<Fsys.size(); ++i) {
+    std::cout << Fsys(i) << "\t" << BC.get_ubc()(i) << "\t" << bcmask[i]<< std::endl;
+  }
   
-  Vector<double> U = cg_solve(Ksys, Fsys, BC.get_ubc());
+  for(std::size_t i=0; i<Ksys.rows(); ++i) {
+    for(std::size_t j=0; j<Ksys.cols(); ++j) {
+      std::cout << Ksys(i,j) << "\t";
+    }
+    std::cout << std::endl;
+  }
+
+  Vector<double> U = cg_solve(Ksys, Fsys);//, BC.get_ubc());
 
   // output system
   VTKOutput vout;
+  VTKMesh<RectilinearMesh<NSD>, NSD> vtkm(M);
+  VTKScalarData vtku(U, VTKObject::VTKPOINTDATA, "U");
+  VTKScalarData vtkubc(BC.get_ubc(), VTKObject::VTKPOINTDATA, "U BC");
 
+  vout.addVTKObject(&vtkm);
+  vout.addVTKObject(&vtku);
+  vout.addVTKObject(&vtkubc);
   
-  
+  vout.write("output.vtu");
   return 0;
 }
