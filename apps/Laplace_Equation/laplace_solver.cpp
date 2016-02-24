@@ -45,7 +45,7 @@ int main() {
    * Problem Parameters
    */
   double L = 1; // box length
-  double dim_elem = 1; // elements along each dimension
+  double dim_elem = 100; // elements along each dimension
 
   //set up basic structures
   RectilinearMesh<NSD> M(std::vector<double>(NSD,L), std::vector<std::size_t>(NSD,dim_elem));
@@ -71,8 +71,6 @@ int main() {
     for(std::size_t qpi=0; qpi<el.n_quadPoints; ++qpi) {
       for(std::size_t A=0; A<dof_per_el; ++A) {
         for(std::size_t B=0; B<dof_per_el; ++B) {
-          Kloc(A,B) = 0;
-          Kloc(B,A) = 0;
           for(std::size_t i=0; i<NSD; ++i) {
             Kloc(A,B) += el.shape_grads[qpi](A,i)*el.shape_grads[qpi](B,i)*el.JxW(qpi);
           }
@@ -82,11 +80,8 @@ int main() {
 
     for(std::size_t A=0; A<dof_per_el; ++A) {
       std::size_t GA = el.global_dofs[A];
-      std::cout << GA<<std::endl;
       for(std::size_t B=0; B<dof_per_el; ++B) {
         std::size_t GB = el.global_dofs[B];
-        std::cout << "\t"<<GB<<std::endl;
-        
         COO.add(GA, GB, Kloc(A,B));
       }
     }
@@ -101,7 +96,7 @@ int main() {
   double x0_bcval = 1;
   double x1_bcval = 0;
   double y0_bcval = 0;
-  double y1_bcval = 0;
+  double y1_bcval = 2;
 
   for(std::size_t i=0; i<M.n_nodes(); ++i) {
     Tensor<NSD,1> x = M.node(i);
@@ -133,28 +128,9 @@ int main() {
   sparse_csr<double> Ksys(COO);
   Vector<double> Fsys(Ksys.rows(), 0);
 
-  for(std::size_t i=0; i<Ksys.rows(); ++i) {
-    for(std::size_t j=0; j<Ksys.cols(); ++j) {
-      std::cout << Ksys(i,j) << "\t";
-    }
-    std::cout << std::endl;
-  }
-
-
   BC.apply(Ksys, Fsys);
 
-  for(std::size_t i=0; i<Fsys.size(); ++i) {
-    std::cout << Fsys(i) << "\t" << BC.get_ubc()(i) << "\t" << bcmask[i]<< std::endl;
-  }
-  
-  for(std::size_t i=0; i<Ksys.rows(); ++i) {
-    for(std::size_t j=0; j<Ksys.cols(); ++j) {
-      std::cout << Ksys(i,j) << "\t";
-    }
-    std::cout << std::endl;
-  }
-
-  Vector<double> U = cg_solve(Ksys, Fsys);//, BC.get_ubc());
+  Vector<double> U = cg_solve(Ksys, Fsys, BC.get_ubc());
 
   // output system
   VTKOutput vout;
