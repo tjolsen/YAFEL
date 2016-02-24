@@ -38,7 +38,7 @@ public:
   DirBC(const std::vector<size_type> bcdofs_,
 	       const std::vector<double> bcvals_,
 	       const std::vector<bool> bcmask_)
-    : bcdofs(bcdofs_), bcvals(bcvals_), bcmask(bcmask_)
+    : bcdofs(bcdofs_), bcvals(bcvals_), bcmask(bcmask_), DOFM(), ubc(bcmask_.size(),0)
   {};
   
   template<typename T>
@@ -53,7 +53,7 @@ public:
  */
 
 template<unsigned NSD>
-DirBC(const GmshMesh<MT,NSD> &m, const DoFManager &dofm, size_type tagID, 
+DirBC::DirBC(const GmshMesh<NSD> &M, const DoFManager &dofm, size_type tagID, 
       size_type comp, const SpatialFunction<NSD,double> &sfunc) 
   : bcdofs(), 
     bcvals(), 
@@ -62,19 +62,19 @@ DirBC(const GmshMesh<MT,NSD> &m, const DoFManager &dofm, size_type tagID,
     ubc(dofm.n_dofs(M.n_nodes()),0)
 {
 
-  size_type nNodes = m.get_n_nodes();
-  size_type nElems = m.get_n_elems();
+  size_type nNodes = M.get_n_nodes();
+  size_type nElems = M.get_n_elems();
   size_type ndofs = dofm.n_dofs(nNodes);
   
   for(size_type e=0; e<nElems; ++e) {
-    size_type id = m.el_tags[e][0];
+    size_type id = M.el_tags[e][0];
     if(id == tagID) {
-      for(size_type n=0; n<m.element(e).size(); ++n) {
-	size_type nodenum = m.element(e)[n];
+      for(size_type n=0; n<M.element(e).size(); ++n) {
+	size_type nodenum = M.element(e)[n];
 	size_type index = dofm.index(nodenum, comp);
 	bcdofs.push_back(index);
 	bcmask[index] = true;
-	double val = sfunc(m.node(nodenum));
+	double val = sfunc(M.node(nodenum));
         bcvals.push_back(val);
       }
     }
@@ -84,8 +84,10 @@ DirBC(const GmshMesh<MT,NSD> &m, const DoFManager &dofm, size_type tagID,
 
 
 template<>
-void apply(sparse_csr<double> &Kcsr, Vector<double> &Fsys) {
-
+void DirBC::apply(access_sparse_matrix<sparse_csr<double>,double> &Kcsr, Vector<double> &Fsys) {
+  
+  auto Ksys = static_cast<sparse_csr<double>&>(Kcsr);
+  
   for(std::size_t i=0; i<bcvals.size(); ++i) {
     ubc(bcdofs[i]) = bcvals[i];
   }

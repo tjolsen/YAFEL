@@ -8,7 +8,7 @@
 
 YAFEL_NAMESPACE_OPEN
 
-template<dataType>
+template<typename dataType>
 class JacobiPreconditioner : public Preconditioner<JacobiPreconditioner<dataType>, dataType> {
 
 private:
@@ -36,7 +36,7 @@ public:
     }
   }
   
-  Vector<dataType> MinvV(const Vector<dataTYpe> &rhs) const {
+  Vector<dataType> MinvV(const Vector<dataType> &rhs) const {
     
     Vector<dataType> retvec(rhs.size(), value_type(0));
     for(size_type i=0; i<rhs.size(); ++i) {

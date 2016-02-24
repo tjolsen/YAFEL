@@ -26,6 +26,8 @@
 
 #include "yafel_globals.hpp"
 #include "mesh/GenericMesh.hpp"
+#include "utils/ElementType.hpp"
+
 #include <vector>
 #include <exception>
 
@@ -82,6 +84,8 @@ public:
     }
     return ret;
   }
+
+  inline ElementType element_type(size_type) const {return ElementType::LINEAR_QUAD;}
   
   inline coordinate_type node(size_type nodenum) const {
     
