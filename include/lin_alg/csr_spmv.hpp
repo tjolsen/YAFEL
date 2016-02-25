@@ -32,7 +32,10 @@ Vector<dataType> csr_spmv(const sparse_csr<dataType> &A,
 #endif
   
   Vector<dataType> b(A.rows(), 0);
-  
+
+#ifdef _OPENMP 
+#pragma omp parallel for schedule(static,128)
+#endif
   for(std::size_t row = 0; row<A.rows(); ++row) {
 
     std::size_t idxmin, idxmax;
