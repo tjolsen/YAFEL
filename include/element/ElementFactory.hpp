@@ -36,7 +36,7 @@ private:
   LinQuad<NSD> linear_quad;
   LinTri<NSD> linear_tri;
   NullElement<NSD> null_element;
-  DoFManager DOFM;
+  const DoFManager & DOFM;
   size_type _dof_per_node;
 };
 
@@ -52,7 +52,7 @@ ElementFactory<MTYPE,NSD>::ElementFactory(const GenericMesh<MTYPE,NSD> &m, const
     linear_tri(dofm),
     null_element(dofm),
     DOFM(dofm),
-    _dof_per_node(dofm.getDofPerNode())
+    _dof_per_node(dofm.dof_per_node())
 {}
 
 template<typename MTYPE, unsigned NSD>

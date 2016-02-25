@@ -21,6 +21,7 @@
 
 //include utilities
 #include "utils/DoFManager.hpp"
+#include "utils/CG_DoFManager.hpp"
 #include "utils/ElementType.hpp"
 #include "utils/DirBC.hpp"
 
@@ -49,7 +50,7 @@ int main() {
 
   //set up basic structures
   RectilinearMesh<NSD> M(std::vector<double>(NSD,L), std::vector<std::size_t>(NSD,dim_elem));
-  DoFManager dofm;
+  CG_DoFManager<RectilinearMesh<NSD>,NSD> dofm(M,1);
   ElementFactory<RectilinearMesh<NSD>, NSD> EF(M,dofm);
 
   sparse_coo<double> COO;

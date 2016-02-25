@@ -62,16 +62,16 @@ DirBC::DirBC(const GmshMesh<NSD> &M, const DoFManager &dofm, size_type tagID,
 
   size_type nNodes = M.get_n_nodes();
   size_type nElems = M.get_n_elems();
-  size_type ndofs = dofm.n_dofs(nNodes);
+  size_type ndofs = dofm.n_dofs();
   
   for(size_type e=0; e<nElems; ++e) {
     size_type id = M.el_tags[e][0];
     if(id == tagID) {
       for(size_type n=0; n<M.element(e).size(); ++n) {
-	size_type nodenum = M.element(e)[n];
-	size_type index = dofm.index(nodenum, comp);
+	size_type index = dofm.global_index(e, n, comp);
 	bcdofs.push_back(index);
 	bcmask[index] = true;
+	size_type nodenum = M.element(e)[n];
 	double val = sfunc(M.node(nodenum));
         bcvals.push_back(val);
       }

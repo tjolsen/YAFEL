@@ -21,7 +21,7 @@ public:
 
   template<typename = typename std::enable_if<NSD>=2>::type>
   LinQuad(const DoFManager &dofm) : Element<NSD>(dofm, ElementType::LINEAR_QUAD, 
-                                                 2, 4, 4*dofm.getDofPerNode(), 9, 4) {
+                                                 2, 4, 4*dofm.dof_per_node(), 9, 4) {
     double a = 1.0/sqrt(3.0);
     this->quad_points.clear();
     this->quad_weights.resize(4,1.0);

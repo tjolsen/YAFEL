@@ -16,7 +16,7 @@ public:
   using coordinate_type = typename Element<NSD>::coordinate_type;
 
   LinTri(const DoFManager &dofm) : Element<NSD>(dofm, ElementType::LINEAR_TRI,
-                                           2, 1, 3*dofm.getDofPerNode(), 5, 3)
+                                           2, 1, 3*dofm.dof_per_node(), 5, 3)
   {
     double c = 1.0/3.0;
     this->xi_0.clear();

@@ -2,6 +2,7 @@
 #include "element/LinTri.hpp"
 #include "mesh/GmshMesh.hpp"
 #include "utils/DoFManager.hpp"
+#include "utils/CG_DoFManager.hpp"
 #include "utils/ElementType.hpp"
 #include <iostream>
 #include <cmath>
@@ -10,7 +11,8 @@ using namespace yafel;
 
 template<unsigned NSD>
 bool test_1() {
-  DoFManager dofm;
+  GmshMesh<NSD> M("minsquare.msh");
+  CG_DoFManager<GmshMesh<NSD>,NSD> dofm(M,1);
   LinTri<NSD> el(dofm);
   bool good = true;
 
@@ -30,7 +32,7 @@ bool test_1() {
 bool test_2() {
 
   GmshMesh<2> M("minsquare.msh");
-  DoFManager dofm;
+  CG_DoFManager<GmshMesh<2>,2> dofm(M,1);
   
   LinTri<2> el(dofm);
 

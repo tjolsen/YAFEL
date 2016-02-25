@@ -3,6 +3,7 @@
 #include "element/LinQuad.hpp"
 #include "mesh/RectilinearMesh.hpp"
 #include "utils/DoFManager.hpp"
+#include "utils/CG_DoFManager.hpp"
 #include "utils/ElementType.hpp"
 #include <iostream>
 
@@ -10,7 +11,8 @@ using namespace yafel;
 
 template<unsigned NSD>
 bool test_1() {
-  DoFManager dofm;
+  RectilinearMesh<NSD> M;
+  CG_DoFManager<RectilinearMesh<NSD>,NSD> dofm(M,1);
   LinQuad<NSD> el(dofm);
   bool good = true;
 
@@ -35,7 +37,7 @@ bool test_2() {
   std::vector<std::size_t> elres(NSD,1);
   
   RectilinearMesh<NSD> M(m_dims, elres);
-  DoFManager dofm;
+  CG_DoFManager<RectilinearMesh<NSD>,NSD> dofm(M,1);
 
   LinQuad<NSD> el(dofm);
   el.update_element(M, 0);
@@ -64,7 +66,8 @@ bool test_3() {
   std::vector<std::size_t> elres(NSD,10);
   
   RectilinearMesh<NSD> M(m_dims, elres);
-  DoFManager dofm;
+  CG_DoFManager<RectilinearMesh<NSD>,NSD> dofm(M,1);
+
 
   LinQuad<NSD> el(dofm);
 
@@ -95,7 +98,7 @@ bool test_4() {
   std::vector<std::size_t> elres(NSD,1);
   
   RectilinearMesh<NSD> M(m_dims, elres);
-  DoFManager dofm;
+  CG_DoFManager<RectilinearMesh<NSD>,NSD> dofm(M,1);
 
   LinQuad<NSD> el(dofm);
   

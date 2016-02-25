@@ -41,7 +41,7 @@ public:
   std::vector<size_type> element_nodes;
   std::vector<coordinate_type> nodal_coords;
   std::vector<size_type> global_dofs;
-  DoFManager DOFM;
+  const DoFManager & DOFM;
   ElementType element_type;
   
   Element(const DoFManager &dofm, ElementType eltype, size_type ntd, 
@@ -87,14 +87,13 @@ Element<NSD>::Element(const DoFManager &dofm, ElementType eltype, size_type ntd,
   n_spaceDim(NSD), 
   n_topoDim(ntd),
   n_quadPoints(nqp),
+  dof_per_node(dofm.dof_per_node()),
   dof_per_el(dofpe), 
   vtk_type(vtktype), 
   nodes_per_el(nodespe),
   DOFM(dofm),
   element_type(eltype)
-{
-  dof_per_node = dofm.getDofPerNode();
-}
+{}
 
 
 //---------------------------------------------------------------------
@@ -188,10 +187,11 @@ void Element<NSD>::update_element(const GenericMesh<MTYPE,MNSD> &M, size_type el
   nodal_coords.clear();
   element_nodes = M.element(elnum);
   
-  for(size_type nodeNum : element_nodes) {
-    nodal_coords.push_back(M.node(nodeNum));
+  for(size_type n=0; n<element_nodes.size(); ++n) {
+    
+    nodal_coords.push_back(M.node(element_nodes[n]));
     for(size_type j=0; j<dof_per_node; ++j) {
-      size_type dofNum = DOFM.index(nodeNum, j);//nodeNum*dof_per_node + j;
+      size_type dofNum = DOFM.global_index(elnum, n, j);
       global_dofs.push_back(dofNum);
     }
   }
