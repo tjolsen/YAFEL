@@ -7,7 +7,12 @@
  * Class to handle the mapping of element number, local node number,
  * and node DoF component to global DoF numbering. The primary purpose
  * for this is during the assembly process, when local element residual
- * vectors and tangent matrices are assembled into the global 
+ * vectors and tangent matrices are assembled into the global structures.
+ *
+ * The class is designed for use in continuous Galerkin FEM codes.
+ * As such, each node holds dof_per_node degrees of freedom, and the
+ * global degree of freedom can be computed directly from a global node
+ * number (taken from the mesh) without the need for additional data storage.
  */
 
 #include "yafel_globals.hpp"
