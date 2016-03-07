@@ -16,7 +16,7 @@ clean:
 	for dir in $(subdirs); do $(MAKE) -C $$dir clean; done
 	rm $(YAFELDIR)/lib/$(LIB)
 
-runtests: test
+runtests: all test
 	make -C test runtests
 
 .PHONY: all $(subdirs) runtests
