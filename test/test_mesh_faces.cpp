@@ -1,5 +1,6 @@
 #include "yafel_globals.hpp"
 #include "mesh/RectilinearMesh.hpp"
+#include "mesh/GmshMesh.hpp"
 #include <vector>
 #include <iostream>
 
@@ -19,20 +20,12 @@ bool test_1() {
 
 bool test_2() {
   
-  std::size_t N = 10;
-  RectilinearMesh<2> M(std::vector<double>{1,1}, std::vector<std::size_t>{N,N});
+  GmshMesh<2> M("minsquare.msh");
   M.build_faces();
   
-  //test right neighbor
-  for(std::size_t i=0; i<N; ++i) {
-    for(std::size_t j=0; j<N; ++j) {
-      
-      
-      
-    }
-  }
-  
-  return true;
+  //use Euler's formula for correct number of edges
+  //http://nrich.maths.org/1384
+  return M.n_elements() - M.mesh_faces.size() + M.n_nodes() == 1;
 }
 
 
@@ -43,6 +36,10 @@ int main() {
   if(!test_1()) {
     std::cerr << "Failed test_1()" << std::endl;
     retval |= 1<<0;
+  }
+  if(!test_2()) {
+    std::cerr << "Failed test_2()" << std::endl;
+    retval |= 1<<1;
   }
   
   return retval;
