@@ -164,7 +164,7 @@ void GmshMesh<NSD>::load_from_stream(std::istream &in) {
       {
 	id = atoi(words[0].c_str());
 	coordinate_type node;
-	for(int i=0; i<NSD; ++i) {
+	for(unsigned i=0; i<NSD; ++i) {
 	  node(i) = atof(words[i+1].c_str());
 	}
 	_nodes[id-1] = node;
