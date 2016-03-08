@@ -50,6 +50,6 @@ endif
 # Make dependencies
 #======================================================
 .depend:
-	$(CXX) $(shell ls *.cpp) $(CXXFLAGS) -MM > .depend
+	$(CXX) $(wildcard *.cpp) $(CXXFLAGS) -MM > .depend
 
 -include .depend
