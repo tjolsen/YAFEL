@@ -1,6 +1,8 @@
 YAFEL
 =====
 
+Linux, OSX: [![Build Status](https://api.travis-ci.org/tjolsen/YAFEL.svg?branch=master)](https://travis-ci.org/tjolsen/YAFEL)
+
 Yet Another Finite Element Library
 
 YAFEL is a general-purpose finite element library written entirely in C++/C++11.
