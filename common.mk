@@ -9,10 +9,14 @@ linalg_optimized = true
 parallel_matmul = true
 
 #define C++ compiler
-CXX = g++
+ifndef CXX
+ export CXX = g++
+endif
 
 #define C compiler
-CC = gcc
+ifndef CC
+ export CC = gcc
+endif
 
 #define archive utility
 AR = ar
