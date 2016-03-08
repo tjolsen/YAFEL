@@ -22,22 +22,47 @@
 YAFEL_NAMESPACE_OPEN
 
 template<typename dataType>
-class ILUPreconditioner : public Preconditioner<ILUPreconditioner<dataType>, dataType> {
-private:
-  sparse_csr<dataType> ILU;
-  
+class ILUPreconditioner : public Preconditioner<ILUPreconditioner<dataType>, dataType> {  
+
+public:
   using container_type = sparse_csr<dataType>;
   using value_type = typename sparse_csr<dataType>::value_type;
   using reference =  typename sparse_csr<dataType>::reference;
   using size_type = typename sparse_csr<dataType>::size_type;
 
-public:
+
+
   // construct an incomplete LU factorization with no extra fill-in.
   // filling options could be added later, for S&G.
   // At first, no pivoting will be used, as this tends to increase the
   // bandwidth of resulting matrices arising from PDE numerical methods.
-  ILUPreconditioner(const sparse_csr<dataType> &A) : ILU(A) {
+  ILUPreconditioner(const container_type &A);
 
+
+  void solve(Vector<dataType> &rhs) const;
+  const container_type & getILU() {return ILU;}
+
+
+private:
+  container_type ILU;
+
+  //backward substitution
+  void b_subst(Vector<dataType> &rhs) const;
+  
+  //forward substitution
+  void f_subst(Vector<dataType> &rhs) const;
+};
+
+//=============================================================================
+/*
+ * Implementation
+ */
+//=============================================================================
+
+template<typename dataType>
+ILUPreconditioner<dataType>::ILUPreconditioner(const sparse_csr<dataType> &A) 
+  : ILU(A) 
+{
 #ifndef _OPTIMIZED
     assert(A.rows() == A.cols() && "ILUPreconditioner dimension mismatch");
 #endif    
@@ -79,13 +104,36 @@ public:
       } // end i-loop
       
     } // end r-loop
-          
-    
-  } // end ctor
 
-  Vector<dataType> MinvV(const Vector<dataType> &rhs) const;
-  const container_type & getILU() {return ILU;}
-};
+}// end ctor
+
+
+//---------------------------------------------------------
+
+template<typename dataType>
+void ILUPreconditioner<dataType>::solve(Vector<dataType> &rhs) const {
+  
+  b_subst(rhs); // <---
+  f_subst(rhs); // <------- These functions modify teh ret vector in place to eliminate excess copying
+
+}
+
+
+//---------------------------------------------------------
+
+template<typename dataType>
+void ILUPreconditioner<dataType>::b_subst(Vector<dataType> &rhs) const {
+
+}
+
+//---------------------------------------------------------
+
+template<typename dataType>
+void ILUPreconditioner<dataType>::f_subst(Vector<dataType> &rhs) const {
+  
+  
+}
+
 
 
 YAFEL_NAMESPACE_CLOSE

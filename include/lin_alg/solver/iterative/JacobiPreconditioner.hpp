@@ -36,15 +36,12 @@ public:
     }
   }
   
-  Vector<dataType> MinvV(const Vector<dataType> &rhs) const {
-    
-    Vector<dataType> retvec(rhs.size(), value_type(0));
+  void solve(Vector<dataType> &rhs) const {
     for(size_type i=0; i<rhs.size(); ++i) {
-      retvec(i) = rhs(i)*AdiagInv(i);
+      rhs(i) *= AdiagInv(i);
     }
-    
-    return retvec;
   }
+
 };
 
 YAFEL_NAMESPACE_CLOSE

@@ -12,9 +12,10 @@ public:
   operator T&() {return static_cast<T&>(*this);}
   operator T const&() {return static_cast<T const&>(*this);}
   
-  //all preconditioners must implement a (hopefully fast) linear solve.
-  Vector<dataType> MinvV(const Vector<double> &rhs) const {
-    return static_cast<const T&>(*this).MinvV(rhs);
+  // all preconditioners must implement a (hopefully fast) linear solve
+  // that modifies a vector in-place.
+  void solve(Vector<double> &rhs) const {
+    static_cast<const T&>(*this).solve(rhs);
   }
 
 };
