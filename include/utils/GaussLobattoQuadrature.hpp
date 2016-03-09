@@ -13,6 +13,7 @@
 
 #include "yafel_globals.hpp"
 #include "utils/QuadratureRule.hpp"
+#include "lin_alg/tensor/Tensor.hpp"
 #include <vector>
 #include <cmath>
 
@@ -27,7 +28,9 @@ public:
   using coordinate_type = typename QuadratureRule<NSD>::coordinate_type;
 
   GaussLobattoQuadrature(size_type polyOrder);
-
+  
+  std::vector<value_type> nodes_1d;
+  std::vector<Tensor<NSD,1,size_type> > pairs;
 private:
   void compute_1d_points(std::vector<value_type> &nodes, 
                          std::vector<value_type> &weights,
@@ -43,47 +46,47 @@ private:
  */
 template<>
 GaussLobattoQuadrature<1>::GaussLobattoQuadrature(size_type Npoints)
-: QuadratureRule<1>(Npoints)
+: QuadratureRule<1>(Npoints), nodes_1d(Npoints), pairs(Npoints)
 {
-  std::vector<value_type> n1d(Npoints,0);
   std::vector<value_type> w1d(Npoints,0);
-  compute_1d_points(n1d, w1d, Npoints);
+  compute_1d_points(nodes_1d, w1d, Npoints);
 
   for(size_type i=0; i<Npoints; ++i) {
     this->weights[i] = w1d[i];
-    this->nodes[i] = coordinate_type{n1d[i]};
+    this->nodes[i] = coordinate_type{nodes_1d[i]};
+    this->pairs[i] = Tensor<1,1,size_type>{i};
   }
 }
 
 template<>
 GaussLobattoQuadrature<2>::GaussLobattoQuadrature(size_type Npoints)
-: QuadratureRule<2>(Npoints*Npoints)
+: QuadratureRule<2>(Npoints*Npoints), nodes_1d(Npoints), pairs(Npoints*Npoints)
 {
-  std::vector<value_type> n1d(nodes.size(),0);
   std::vector<value_type> w1d(nodes.size(),0);
-  compute_1d_points(n1d, w1d, Npoints);
+  compute_1d_points(nodes_1d, w1d, Npoints);
 
   for(size_type i=0; i<Npoints; ++i) {
     for(size_type j=0; j<Npoints; ++j) {
       this->weights[i*Npoints + j] = w1d[i]*w1d[j];
-      this->nodes[i*Npoints + j] = coordinate_type{n1d[j], n1d[i]};
+      this->nodes[i*Npoints + j] = coordinate_type{nodes_1d[j], nodes_1d[i]};
+      this->pairs[i*Npoints + j] = Tensor<2,1,size_type>{j,i};
     }
   }
 }
 
 template<>
 GaussLobattoQuadrature<3>::GaussLobattoQuadrature(size_type Npoints)
-: QuadratureRule<3>(Npoints*Npoints*Npoints)
+: QuadratureRule<3>(Npoints*Npoints*Npoints), nodes_1d(Npoints), pairs(Npoints*Npoints*Npoints)
 {
-  std::vector<value_type> n1d(nodes.size(),0);
   std::vector<value_type> w1d(nodes.size(),0);
-  compute_1d_points(n1d, w1d, Npoints);
+  compute_1d_points(nodes_1d, w1d, Npoints);
 
   for(size_type i=0; i<Npoints; ++i) {
     for(size_type j=0; j<Npoints; ++j) {
       for(size_type k=0; k<Npoints; ++k) {
         this->weights[(i*Npoints + j)*Npoints + k] = w1d[i]*w1d[j]*w1d[k];
-        this->nodes[(i*Npoints + j)*Npoints + k] = coordinate_type{n1d[k], n1d[j], n1d[i]};
+        this->nodes[(i*Npoints + j)*Npoints + k] = coordinate_type{nodes_1d[k], nodes_1d[j], nodes_1d[i]};
+        this->pairs[(i*Npoints + j)*Npoints + k] = Tensor<3,1,size_type>{k,j,i};
       }
     }
   }
@@ -99,7 +102,7 @@ void GaussLobattoQuadrature<NSD>::compute_1d_points(std::vector<value_type> &_no
   double TOL = 1.0e-15;
   //newton-raphson solve for quadrature points
   for(unsigned xi=0; xi<Npoints; ++xi) {
-    double x = -cos((PI*xi)/(Npoints-1));
+    double x = -std::cos((PI*xi)/(Npoints-1));
     double xold = x;
     double Pold, Pn, Pnew;
 

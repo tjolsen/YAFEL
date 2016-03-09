@@ -39,6 +39,9 @@ enum class ElementType {
     LINEAR_TET,
     QUADRATIC_TET,
     CUBIC_TET,
+
+  // DG Types
+    DG_QUAD,
     
   // Error Type
     NULL_ELEMENT

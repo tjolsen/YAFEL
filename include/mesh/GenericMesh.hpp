@@ -121,6 +121,7 @@ void GenericMesh<MT,NSD>::build_faces() {
         break;
       }
     case ElementType::NULL_ELEMENT:
+    default:
       break;
     }
   }
@@ -233,6 +234,7 @@ GenericMesh<MT,NSD>::n_cell_faces(size_type elnum) {
   case ElementType::CUBIC_HEX:
     return 6;
   case ElementType::NULL_ELEMENT:
+  default:
     return 0;
   }
 
@@ -267,6 +269,7 @@ GenericMesh<MT,NSD>::face_nodes(size_type elnum, size_type fnum) {
   case ElementType::QUADRATIC_HEX:
   case ElementType::CUBIC_HEX:
   case ElementType::NULL_ELEMENT:
+  default:
     throw std::invalid_argument("GenericMesh::face_nodes: 3D Elements currently not supported");
   }
 

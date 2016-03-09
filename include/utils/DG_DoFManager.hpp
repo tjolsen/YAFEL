@@ -49,7 +49,7 @@ public:
   size_type n_dofs() const {
     return dof_offset[M.n_elements()];
   }
-
+  
 private:
   const GenericMesh<MT,NSD> &M;
   std::vector<size_type> dof_offset;
@@ -107,6 +107,7 @@ DG_DoFManager<MT,NSD>::DG_DoFManager(const GenericMesh<MT,NSD> &m, size_type dof
         offset += dofpn*m.element(e).size();
         break;
       }
+    case ElementType::DG_QUAD:
     case ElementType::NULL_ELEMENT:
       break;
     }//end switch

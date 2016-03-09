@@ -3,6 +3,7 @@
 
 #include "yafel_globals.hpp"
 #include <cstddef>
+#include <vector>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -10,6 +11,7 @@ class DoFManager {
   
 public:
   using size_type = std::size_t;
+  using element_container = std::vector<size_type>;
 
   DoFManager() : DoFManager(1) {}
   DoFManager(size_type dofpn) : _dof_per_node(dofpn) {}

@@ -99,7 +99,7 @@ void GaussLegendreQuadrature<NSD>::compute_1d_points(std::vector<value_type> & _
   // Newton-Raphson solve for xi-th root of Legendre polynomial
   for(size_type xi=0; xi<polyOrder; ++xi) {
     
-    double x = -cos(PI*(1+xi-0.25)/(polyOrder+0.5));
+    double x = -std::cos(PI*(1+xi-0.25)/(polyOrder+0.5));
     double Pold, Pn, Pnew, dP;
     
     do {
