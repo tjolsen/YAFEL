@@ -111,12 +111,24 @@ public:
    */
   void calc_shape_values();
   void calc_jacobians();
+  void calc_shape_gradients();
+
+
+  /*
+   * Utility functions that may be convenient for the user
+   */
+  //compute a shape function at any location in xi-space
+  inline value_type shape_value_xi(size_type node, const coordinate_type & xi) const {
+    return lagrange_poly_xi(xi, node, nodes_ij, nodes_xi_1d);
+  }
+
+  //compute the physical location of a node in xi-space
+  coordinate_type xval(const coordinate_type &xi) const;
   
   /*
    * Utility functions that shouldn't be called by user,
    * but have been left public for the purposes of testing
    */
-  
   /*
    *compute j-th lagrange polynomial at point xi using basis nodes
    *arranged via tensor product with, with xi_0 being the 1D points.
@@ -130,12 +142,12 @@ public:
   T lagrange_poly_xi(const Tensor<NSD,1,T> & xi, 
                      size_type node,
                      const std::vector<Tensor<NSD,1,size_type> > &ij_pairs,
-                     const std::vector<value_type> & xi_0);
+                     const std::vector<value_type> & xi_0) const;
 
   template<typename T>
   T lagrange_poly_xi_1d(T xi, 
                         size_type j, 
-                        const std::vector<value_type> & xi_0);
+                        const std::vector<value_type> & xi_0) const;
   
   
 }; //end class
@@ -224,8 +236,9 @@ void DG_Quad<NSD,dataType>::update_element(const GenericMesh<MT,NSD> &M,
   //fill jacobians at quadrature points
   calc_jacobians();
 
-
   //calculate gradients of shape functions
+  calc_shape_gradients();
+  
 }
 
 
@@ -252,10 +265,12 @@ void DG_Quad<NSD,dataType>::calc_jacobians() {
   for(size_type qpi=0; qpi<Q2D.n_qp(); ++qpi) {
     Tensor<NSD,2,dataType> J;
     Tensor<NSD,1,DualNumber<dataType> > dual_xi;
-
+    for(size_type i=0; i<NSD; ++i) {
+      dual_xi(i) = make_dual(Q2D.qp(qpi)(i));
+    }
     for(size_type A=0; A<nodes_per_element; ++A) {
       for(size_type j=0; j<NSD; ++j) {
-        dual_xi(j).second = 1;
+        dual_xi(j).second = dataType(1);
 
         //shape func derivative wrt xi_j
         dataType dNAdxi_j = lagrange_poly_xi(dual_xi, A, nodes_ij, nodes_xi_1d).second;
@@ -274,11 +289,60 @@ void DG_Quad<NSD,dataType>::calc_jacobians() {
 }
 
 //--------------------------------------------------------
+template<unsigned NSD, typename dataType>
+void DG_Quad<NSD,dataType>::calc_shape_gradients() {
+  
+  shape_gradients.clear();
+  
+  for(size_type qpi=0; qpi<Q2D.n_qp(); ++qpi) {
+    
+    Tensor<NSD,2,dataType> Jinv = inv(jacobians[qpi]);
+    Matrix<dataType> dNA_dxj(nodes_per_element, NSD);
+    for(size_type A=0; A<nodes_per_element; ++A) {
+      Tensor<NSD,1,DualNumber<dataType> > dual_xi;
+      for(size_type i=0; i<NSD; ++i) {
+        dual_xi(i) = make_dual(Q2D.qp(qpi)(i));
+      }
+
+      for(size_type j=0; j<NSD; ++j) {
+        dual_xi(j).second = dataType(1);
+        dataType dNAdxi_j = lagrange_poly_xi(dual_xi, A, nodes_ij, nodes_xi_1d).second;
+        
+        for(size_type i=0; i<NSD; ++i) {
+          
+          dNA_dxj(A,i) += dNAdxi_j*Jinv(j,i);
+
+        }
+        
+        dual_xi(j).second = dataType(0);
+      }
+      
+    }//end A
+    shape_gradients.push_back(dNA_dxj);
+  }//end qpi
+}
+
+
+//--------------------------------------------------------
+template<unsigned NSD, typename dataType>
+typename DG_Quad<NSD,dataType>::coordinate_type
+DG_Quad<NSD,dataType>::xval(const coordinate_type &xi) const
+{
+  
+  coordinate_type x;
+  for(size_type A=0; A<nodes_per_element; ++A) {
+    x += shape_value_xi(A,xi)*nodes_x[A];
+  }
+  
+  return x;
+}
+
+//--------------------------------------------------------
 template<unsigned NSD, typename dataType> template<typename T>
 T DG_Quad<NSD,dataType>::lagrange_poly_xi(const Tensor<NSD,1,T> &xi, 
                                           size_type node,
                                           const std::vector<Tensor<NSD,1,size_type> > & ij_pairs,
-                                          const std::vector<value_type> & xi_0)
+                                          const std::vector<value_type> & xi_0) const
 {
   T ret(1);
   for(size_type dim=0; dim<NSD; ++dim) {
@@ -290,7 +354,7 @@ T DG_Quad<NSD,dataType>::lagrange_poly_xi(const Tensor<NSD,1,T> &xi,
 template<unsigned NSD, typename dataType> template<typename T>
 T DG_Quad<NSD,dataType>::lagrange_poly_xi_1d(T xi, 
                                              size_type j,
-                                             const std::vector<value_type> & xi_0)
+                                             const std::vector<value_type> & xi_0) const
 {
 
   T ret(1);
