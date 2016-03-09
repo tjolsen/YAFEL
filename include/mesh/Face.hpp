@@ -6,7 +6,8 @@
  *
  * Data structure to represent the boundary between two cells.
  * It is composed of a collection of nodes shared by two adjacent elements,
- * an "inner" element, an "outer" element, and a bool flag indicating whether
+ * an "inner" element, an "outer" element, numbers indicating the local face
+ * number of the inner and outer elements, and a bool flag indicating whether
  * the face comprises a part of the mesh boundary (in which case the "outer"
  * element will be the same as the "inner", and is meaningless!). 
  * The numbering convention is such that the element with the lower element 
@@ -23,11 +24,11 @@
 
  The face adjoining them would be:
 
- Face = { nodes={1,4}, inner=0, outer=1, boundary=false }
+ Face = { nodes={1,4}, inner=0, inner_face=1, outer=1, outer_face=3, boundary=false }
 
  The left-hand face of element 0 is:
 
- Face = { nodes={3,0}, inner=0, outer=0, boundary=true }
+ Face = { nodes={3,0}, inner=0, inner_face=3, outer=0, outer_face=3, boundary=true }
 
  3--------------4--------------5
  |              |              |
@@ -51,12 +52,16 @@ public:
 
   std::vector<size_type> nodes;
   size_type inner;
+  size_type inner_face;
   size_type outer;
+  size_type outer_face;
   bool boundary;
 
   Face();
   Face(const std::vector<size_type> &n,
-       size_type i, size_type o, bool b);
+       size_type _i, size_type _if,
+       size_type _o, size_type _of,
+       bool _b);
 
 };
 

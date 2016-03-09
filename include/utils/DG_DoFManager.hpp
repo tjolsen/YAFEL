@@ -35,7 +35,7 @@ public:
   
   DG_DoFManager(const GenericMesh<MT,NSD> &m, size_type dofpn);
 
-  size_type global_index(size_type elnum, size_type local_node, size_type component) const {
+  size_type global_index(size_type elnum, size_type local_node, size_type component=0) const {
     if(component >= _dof_per_node) {
       throw std::domain_error("Component exceeds dof_per_node");
     }

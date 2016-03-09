@@ -153,7 +153,7 @@ void GenericMesh<MT,NSD>::build_faces() {
       
       if(res.size() == 1) {
         //boundary face
-        Face F(f_nodes, e, e, true);
+        Face F(f_nodes, e, f, e, f, true);
         size_type fi_global = mesh_faces.size();
         mesh_faces.push_back(F);
         cell_faces[e][f] = fi_global;
@@ -173,10 +173,6 @@ void GenericMesh<MT,NSD>::build_faces() {
           continue;
         }
 
-        Face F(f_nodes, e, adj, false);
-        size_type fi_global = mesh_faces.size();
-        mesh_faces.push_back(F);
-        cell_faces[e][f] = fi_global;
 
         //find local face number of F in adjacent cell
         std::sort(f_nodes.begin(), f_nodes.end());
@@ -189,6 +185,11 @@ void GenericMesh<MT,NSD>::build_faces() {
           }
 
           if(sameface) {
+
+            Face F(f_nodes, e, f, adj, af, false);
+            size_type fi_global = mesh_faces.size();
+            mesh_faces.push_back(F);x
+            cell_faces[e][f] = fi_global;
             cell_faces[e][af] = fi_global;
             break;
           }

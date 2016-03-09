@@ -29,7 +29,7 @@ public:
 
   CG_DoFManager(const GenericMesh<MT,NSD> &m, size_type dofpn) : DoFManager(dofpn), M(m) {}
 
-  size_type global_index(size_type elnum, size_type local_node, size_type component) const {
+  size_type global_index(size_type elnum, size_type local_node, size_type component=0) const {
     return M.element(elnum)[local_node]*_dof_per_node + component;
   }
 
