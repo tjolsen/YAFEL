@@ -1,25 +1,38 @@
-#include "yafel.hpp"
+#include "yafel_globals.hpp"
+#include "utils/GaussLegendreQuadrature.hpp"
 #include <iostream>
 #include <cstdlib>
+#include <cmath>
 
 using namespace yafel;
 
+template<unsigned NSD>
+bool test_1(std::size_t np) {
+  GaussLegendreQuadrature<NSD> GQ(np);
+  double sum = 0;
+  for(auto w : GQ.weights)
+    sum += w;
 
-int main(int argc, char **argv) {
+  return std::abs(sum - pow(2.0,NSD)) < 1e-8;
+}
+
+int main() {
   
-  unsigned order = 3;
-  if(argc >=2)
-    order = atoi(argv[1]);
+  int retval = 0;
   
-  
-  GaussLegendreQuadrature GQ(order);
-  double wsum = 0;
-  for(unsigned i=0; i<GQ.get_nqp(); ++i) {
-    printf("x = %f\tw = %f\n", GQ.node(i), GQ.weight(i));
-    wsum += GQ.weight(i);
+  std::size_t npoints = 4;
+  if(!test_1<1>(npoints)) {
+    std::cerr << "Failed test_1<1>()" << std::endl;
+    retval |= 1<<0;
   }
-  
-  printf("sum(w) = %f\n", wsum);
+  if(!test_1<2>(npoints)) {
+    std::cerr << "Failed test_1<1>()" << std::endl;
+    retval |= 1<<0;
+  }
+  if(!test_1<3>(npoints)) {
+    std::cerr << "Failed test_1<1>()" << std::endl;
+    retval |= 1<<0;
+  }
 
-  return 0;
+  return retval;
 }

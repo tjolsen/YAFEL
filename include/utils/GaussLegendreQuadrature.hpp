@@ -5,6 +5,9 @@
  * Gauss-Legendre quadrature in multiple dimensions. The 1-D
  * quadrature is computed in the constructor, and then is extended
  * to multiple dimensions by forming tensor products.
+ *
+ * The "Npoints" parameter refers to the number of points in a 1D rule.
+ * The total number of quadrature points is Npoints^NSD.
  */
 
 
@@ -20,27 +23,83 @@ class GaussLegendreQuadrature : public QuadratureRule<NSD> {
   
 public:
   using size_type = typename QuadratureRule<NSD>::size_type;
+  using value_type = typename QuadratureRule<NSD>::value_type;
   using coordinate_type = typename QuadratureRule<NSD>::coordinate_type;
   
-  GaussLegendreQuadrature(size_type polynomialOrder);
+  GaussLegendreQuadrature(size_type Npoints);
 
 private:
-  std::vector<double> nodes;
-  std::vector<double> weights;
+  void compute_1d_points(std::vector<value_type> & _nodes,
+                         std::vector<value_type> & _weights,
+                         size_type polyOrder);
 };
 
+/* 
+ * Implementation
+ */
 
-GaussLegendreQuadrature::GaussLegendreQuadrature(size_type polyOrder) :
-  QuadratureRule(polyOrder)
+template<>
+GaussLegendreQuadrature<1>::GaussLegendreQuadrature(size_type Npoints) :
+QuadratureRule<1>(Npoints)
 {
-  
+  std::vector<value_type> n1d(Npoints, 0);
+  std::vector<value_type> w1d(Npoints, 0);
+  compute_1d_points(n1d, w1d, Npoints);
+
+  for(size_type i=0; i<Npoints; ++i) {
+    this->weights[i] = w1d[i];
+    this->nodes[i] = coordinate_type{n1d[i]};
+  }
+}
+
+template<>
+GaussLegendreQuadrature<2>::GaussLegendreQuadrature(size_type Npoints) :
+QuadratureRule<2>(Npoints*Npoints)
+{
+  std::vector<value_type> n1d(Npoints, 0);
+  std::vector<value_type> w1d(Npoints, 0);
+  compute_1d_points(n1d, w1d, Npoints);
+
+  for(size_type i=0; i<Npoints; ++i) {
+    for(size_type j=0; j<Npoints; ++j) {
+      this->weights[i*Npoints + j] = w1d[i]*w1d[j];
+      this->nodes[i*Npoints + j] = coordinate_type{n1d[j], n1d[i]};
+    }
+  }
+}
+
+template<>
+GaussLegendreQuadrature<3>::GaussLegendreQuadrature(size_type Npoints) :
+QuadratureRule<3>(Npoints*Npoints*Npoints)
+{
+  std::vector<value_type> n1d(Npoints, 0);
+  std::vector<value_type> w1d(Npoints, 0);
+  compute_1d_points(n1d, w1d, Npoints);
+
+  for(size_type i=0; i<Npoints; ++i) {
+    for(size_type j=0; j<Npoints; ++j) {
+      for(size_type k=0; k<Npoints; ++k) {
+        this->weights[(i*Npoints + j)*Npoints + k] = w1d[i]*w1d[j]*w1d[k];
+        this->nodes[(i*Npoints + j)*Npoints + k] = coordinate_type{n1d[k], n1d[j], n1d[i]};
+      }
+    }
+  }
+}
+
+template<unsigned NSD>
+void GaussLegendreQuadrature<NSD>::compute_1d_points(std::vector<value_type> & _nodes,
+                                                     std::vector<value_type> & _weights,
+                                                     size_type Npoints)
+{
+
+  size_type polyOrder = Npoints;
   double PI = atan2(1,1)*4;
   double TOL = 1.0e-14;
 
   // Newton-Raphson solve for xi-th root of Legendre polynomial
   for(size_type xi=0; xi<polyOrder; ++xi) {
     
-    double x = cos(PI*(1+xi-0.25)/(polyOrder+0.5));
+    double x = -cos(PI*(1+xi-0.25)/(polyOrder+0.5));
     double Pold, Pn, Pnew, dP;
     
     do {
@@ -59,18 +118,14 @@ GaussLegendreQuadrature::GaussLegendreQuadrature(size_type polyOrder) :
       x -= Pn/dP;
     } while(std::abs(Pn) > TOL);
     
-    nodes[xi] = x;
+    _nodes[xi] = x;
     //compute weight
     double w = 2.0/( (1 - x*x)*(dP*dP) );
-    weights[xi] = w;
+    _weights[xi] = w;
   }
-  
-  
+
+
 }
-
-
-
-
 
 
 

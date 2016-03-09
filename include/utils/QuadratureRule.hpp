@@ -24,11 +24,15 @@ public:
   using coordinate_type = Tensor<NSD,1,double>;
   using size_type = typename Tensor<NSD,1,double>::size_type;
   using value_type = typename Tensor<NSD,1,double>::value_type;
-  
-  virtual value_type weight(size_type qpi) const = 0;
-  virtual coordinate_type qp(size_type qpi) const = 0;
-  virtual size_type n_qp() const = 0;
 
+  QuadratureRule(size_type nPoints) : nodes(nPoints), weights(nPoints) {}
+  
+  virtual value_type weight(size_type qpi) const {return weights[qpi];}
+  virtual coordinate_type qp(size_type qpi) const {return nodes[qpi];}
+  inline size_type n_qp() const {return weights.size();}
+
+  std::vector<coordinate_type> nodes;
+  std::vector<double> weights;
 };
 
 YAFEL_NAMESPACE_CLOSE
