@@ -77,20 +77,6 @@ bool test_2() {
     good = good &&  normdiff < 1.0e-8;
   }
   
-  
-  /*
-    for(std::size_t qpi=0; qpi<DGQ.Q2D.n_qp(); ++qpi) {
-    
-    for(std::size_t A=0; A<DGQ.nodes_per_element; ++A) {
-    for(std::size_t i=0; i<2; ++i) {
-    std::cout << DGQ.shape_gradients[qpi](A,i) << "\t";
-    }
-    std::cout << std::endl;
-    }
-    std::cout << std::endl;
-    }
-  */
-  
   return good;
 }
 
