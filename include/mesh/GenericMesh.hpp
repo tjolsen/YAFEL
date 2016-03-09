@@ -188,7 +188,7 @@ void GenericMesh<MT,NSD>::build_faces() {
 
             Face F(f_nodes, e, f, adj, af, false);
             size_type fi_global = mesh_faces.size();
-            mesh_faces.push_back(F);x
+            mesh_faces.push_back(F);
             cell_faces[e][f] = fi_global;
             cell_faces[e][af] = fi_global;
             break;
