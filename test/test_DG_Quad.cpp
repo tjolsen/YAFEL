@@ -158,7 +158,7 @@ bool test_5() {
   double perimeter = 0;
 
   for(std::size_t elnum=0; elnum<M.n_elements(); ++elnum) {
-    std::cout << elnum << std::endl;
+
     DGQ.update_element(M, elnum);
     for(std::size_t f=0; f<4; ++f) {
       if(!DGQ.element_faces[f].boundary) {
@@ -179,7 +179,6 @@ bool test_5() {
     }//end eqpi
   }
 
-  std::cout << "computed="<< perimeter << "     true=" << 2*(Lx+Ly)<<std::endl;
   return std::abs(perimeter - 2*(Lx + Ly)) < 1.0e-8;
 }
 
