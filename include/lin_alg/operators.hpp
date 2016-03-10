@@ -48,6 +48,10 @@ template<typename T1, typename T2, typename dataType, typename = typename std::e
 VectorScaled<T1,dataType> operator*(T2 a, const VectorExpression<T1,dataType> &v) {
   return VectorScaled<T1,dataType>(v, a);
 }
+template<typename T1, typename T2, typename dataType, typename = typename std::enable_if<std::is_fundamental<T2>::value,T2>::type>
+VectorScaled<T1,dataType> operator/(const VectorExpression<T1,dataType> &v, T2 a) {
+  return VectorScaled<T1,dataType>(v, dataType(1)/a);
+}
 
 //-------------------------------------------------------------------------
 template<typename T1, typename T2, typename dataType>

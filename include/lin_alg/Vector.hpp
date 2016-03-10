@@ -9,15 +9,13 @@ YAFEL_NAMESPACE_OPEN
 template<typename dataType=double>
 class Vector: public VectorExpression<Vector<dataType>, dataType> {
   
-private:
+public:
   typedef typename VectorExpression<Vector<dataType>,dataType>::container_type container_type;
   typedef typename VectorExpression<Vector<dataType>,dataType>::value_type value_type;
   typedef typename VectorExpression<Vector<dataType>,dataType>::size_type size_type;
   typedef typename VectorExpression<Vector<dataType>,dataType>::reference reference;
-  container_type _data;
 
 
-public:
   reference operator()(size_type i) {return _data[i];}
   value_type operator()(size_type i) const {return _data[i];}
   size_type size() const {return _data.size();}
@@ -60,7 +58,7 @@ public:
   template<typename T>
   Vector<dataType>& operator-=(const VectorExpression<T,dataType> &rhs) {
 #ifndef _OPTIMIZED
-    assert(size() == rhs.size() && "Vector::operator+= dimension mismatch");
+    assert(size() == rhs.size() && "Vector::operator-= dimension mismatch");
 #endif
     for(size_type i=0; i<size(); ++i) {
       _data[i] -= rhs(i);
@@ -72,7 +70,7 @@ public:
   template<typename T>
   Vector<dataType>& operator*=(const VectorExpression<T,dataType> &rhs) {
 #ifndef _OPTIMIZED
-    assert(size() == rhs.size() && "Vector::operator+= dimension mismatch");
+    assert(size() == rhs.size() && "Vector::operator*= dimension mismatch");
 #endif
     for(size_type i=0; i<size(); ++i) {
       _data[i] *= rhs(i);
@@ -91,6 +89,10 @@ public:
   }
 
 
+
+
+private:
+  container_type _data;
 
 };
 

@@ -67,6 +67,46 @@ public:
     }
   }
 
+  /*
+   * Matrix-specific update operators. Cannot be used with MatrixExpressions
+   * as left-hand argument.
+   */
+  template<typename T>
+  Matrix<dataType>& operator+=(const MatrixExpression<T,dataType> &rhs) {
+#ifndef _OPTIMIZED
+    assert(rows() == rhs.rows() && cols() == rhs.cols() && "Matrix::operator+= dimension mismatch");
+#endif
+    for(size_type r=0; r<_rows; ++r) {
+      for(size_type c=0; c<_cols; ++c) {
+        (*this)(r,c) += rhs(r,c);
+      }
+    }
+
+    return *this;
+  }
+
+  template<typename T>
+  Matrix<dataType>& operator-=(const MatrixExpression<T,dataType> &rhs) {
+#ifndef _OPTIMIZED
+    assert(rows() == rhs.rows() && cols() == rhs.cols() && "Matrix::operator-= dimension mismatch");
+#endif
+    for(size_type r=0; r<_rows; ++r) {
+      for(size_type c=0; c<_cols; ++c) {
+        (*this)(r,c) -= rhs(r,c);
+      }
+    }
+    
+    return *this;
+  }
+  
+  Matrix<dataType>& operator*=(dataType rhs) {
+    for(size_type i=0; i<_data.size(); ++i) {
+      _data[i] *= rhs;
+    }
+
+    return *this;
+  }
+
 
 private:
   container_type _data;

@@ -2,12 +2,14 @@
 
 #include <cmath>
 
+YAFEL_NAMESPACE_OPEN
+
 //==============================================================
 LinearAdvection::LinearAdvection(const AdvectionParameters &ap)
   : M(ap.mesh_dims, ap.dir_elems),
     AP(ap),
-    dofm(M, 1)
-    DGQ(ap.polyOrder, 1, ap.Q2D, ap.Q1D)
+    dofm(M, 1),
+    DGQ(ap.polyOrder, dofm, ap.Q2D, ap.Q1D),
     Me(DGQ.nodes_per_element, DGQ.nodes_per_element),
     Se(DGQ.nodes_per_element, DGQ.nodes_per_element),
     LU_Me(Me)
@@ -66,14 +68,14 @@ void LinearAdvection::RK4()
   write_output(u, 0);
   
   //number of time steps
-  std::size_t Nt = std::size_t(T/dt); //round down. no point being more precise now
+  std::size_t Nt = std::size_t(AP.Tfinal/AP.dt); //round down. no point being more precise now
   
   for(std::size_t ti=1; ti<=Nt; ++ti) {
     
-    Vector<double> k1 = dt*residual(u);
-    Vector<double> k2 = dt*residual(u + 0.5*k1);
-    Vector<double> k3 = dt*residual(u + 0.5*k2);
-    Vector<double> k4 = dt*residual(u + k3);
+    Vector<double> k1 = AP.dt*residual(u);
+    Vector<double> k2 = AP.dt*residual(u + 0.5*k1);
+    Vector<double> k3 = AP.dt*residual(u + 0.5*k2);
+    Vector<double> k4 = AP.dt*residual(u + k3);
 
     u += (k1 + 2.0*k2 + 2.0*k3 + k4)/6.0;
     
@@ -90,12 +92,15 @@ Vector<double> LinearAdvection::residual(const Vector<double> &u) {
   std::size_t nnodes = DGQ.nodes_per_element;
   
   Vector<double> u_elem(nnodes);
-  
-  for(std::size_type elnum=0; elnum < M.n_elements(); ++e) {
-  
-    
+  Vector<double> R(nnodes*M.n_elements());
 
+  for(std::size_t elnum=0; elnum < M.n_elements(); ++elnum) {
+    
+    
+    
   }
+
+  return R;
 }
 
 
@@ -114,10 +119,10 @@ void LinearAdvection::set_Me_Se()
 
     for(std::size_t A=0; A<DGQ.nodes_per_element; ++A) {
       for(std::size_t B=0; B<DGQ.nodes_per_element; ++B) {
-        Me(A,B) += DGQ.shape_values[qpi][A]*DGQ.shape_values[qpi][B]*jxw;
+        Me(A,B) += DGQ.shape_values[qpi](A)*DGQ.shape_values[qpi](B)*jxw;
 
         for(std::size_t i=0; i<2; ++i) {
-          Se(A,B) += DGQ.shape_gradients[qpi](A,i)*AP.v_advect(i)*DGQ.shape_values[qpi][B]*jxw;
+          Se(A,B) += DGQ.shape_gradients[qpi](A,i)*AP.v_advect(i)*DGQ.shape_values[qpi](B)*jxw;
         }
       }
     }
@@ -133,3 +138,7 @@ void LinearAdvection::write_output(const Vector<double> &u, double ti)
 
 
 }
+
+
+
+YAFEL_NAMESPACE_CLOSE

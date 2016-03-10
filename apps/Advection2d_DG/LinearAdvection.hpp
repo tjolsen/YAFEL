@@ -72,7 +72,8 @@ public:
 
   //function used to define numerical fluxes at element boundaries
   Tensor<2,1,double> flux_function(double u_in, double u_out, 
-                                   Tensor<2,1,double> c, Tensor<2,1,double> n) const;
+                                   Tensor<2,1,double> c, Tensor<2,1,double> n,
+                                   bool is_boundary) const;
 
   //calculate element Mass, convection matrices
   void set_Me_Se();
@@ -86,7 +87,7 @@ public:
   RectilinearMesh<2> M;
   AdvectionParameters AP;
   DG_DoFManager<RectilinearMesh<2>,2> dofm;
-  DG_Quad<> DGQ;
+  DG_Quad<2,double> DGQ;
   Matrix<double> Me;
   Matrix<double> Se;
   LUDecomposition<double> LU_Me;
