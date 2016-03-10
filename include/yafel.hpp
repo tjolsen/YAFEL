@@ -17,11 +17,10 @@
 #include "utils/DG_DoFManager.hpp"
 #include "utils/DualNumber.hpp"
 #include "utils/ElementType.hpp"
-//#include "utils/QuadratureRule.hpp"
-//#include "utils/GaussLegendreQuadrature.hpp"
-//#include "utils/GaussLobattoQuadrature.hpp"
+#include "utils/QuadratureRule.hpp"
+#include "utils/GaussLegendreQuadrature.hpp"
+#include "utils/GaussLobattoQuadrature.hpp"
 #include "utils/SpatialFunction.hpp"
-
 
 
 // Linear Algebra
@@ -41,11 +40,7 @@
 #include "mesh/GenericMesh.hpp"
 #include "mesh/RectilinearMesh.hpp"
 #include "mesh/GmshMesh.hpp"
-#include "mesh/MeshTopology.hpp"
-#include "mesh/TopoPoint.hpp"
-#include "mesh/TopoLine.hpp"
-#include "mesh/TopoFace.hpp"
-//#include "mesh/TopoCell.hpp"  // <--- planned addition
+#include "mesh/Face.hpp"
 
 // Elements
 #include "element/Element.hpp"
@@ -53,6 +48,7 @@
 #include "element/LinTri.hpp"
 //#include "element/LinTet.hpp"
 #include "element/ElementFactory.hpp"
+#include "element/DG_Quad.hpp"
 
 // Output
 #include "output/VTKObject.hpp"

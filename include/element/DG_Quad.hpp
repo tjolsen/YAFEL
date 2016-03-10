@@ -67,7 +67,7 @@ public:
   //locations of nodes in physical space: [nNodes] x (NSD)
   std::vector<coordinate_type> nodes_x;
   
-  //shape function values at each node: [n_quadPoints] x [nNodes)
+  //shape function values at each node: [n_quadPoints] x [nNodes]
   std::vector<Vector<dataType> > shape_values;
   
   //shape function gradient at each node: [n_quadPoints] x (nNodes x NSD)

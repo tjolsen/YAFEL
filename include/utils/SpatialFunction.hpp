@@ -1,5 +1,5 @@
-#ifndef _SPATIALFUNCTION_HPP
-#define _SPATIALFUNCTION_HPP
+#ifndef __YAFEL_SPATIALFUNCTION_HPP
+#define __YAFEL_SPATIALFUNCTION_HPP
 
 #include "yafel_globals.hpp"
 #include "lin_alg/tensor/Tensor.hpp"

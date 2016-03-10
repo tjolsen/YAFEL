@@ -19,7 +19,12 @@ public:
 
   LUDecomposition(const Matrix<dataType> &A) : storage(A)
   {
-    computeLU(A);
+    computeLU();
+  }
+
+  void reinit(const Matrix<dataType> &A) {
+    storage = A;
+    computeLU();
   }
 
   value_type L(size_type i, size_type j) const {
@@ -37,12 +42,12 @@ public:
 private:
   Matrix<dataType> storage;
   
-  void computeLU(const Matrix<dataType> &A) {
-    size_type N = A.rows();
+  void computeLU() {
+    size_type N = storage.rows();
     
     for(size_type k=0; k<N; ++k) {
       for(size_type i=k+1; i<N; ++i) {
-        value_type m = storage(i,k)/storage(k,k);
+        value_type m = storage(i,k)/storage(k,k); //dies here if zero on diag
         for(size_type j=k; j<N; ++j) {
           storage(i,j) -= m*storage(k,j);
         }
