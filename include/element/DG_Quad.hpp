@@ -86,6 +86,9 @@ public:
   
   //matrix holding node numbers of edges in a clockwise direction: (poly_order+1 x 4)
   Matrix<size_type> edge_nodes_cw;
+
+  //Mesh normals, assuming straight-edge elements
+  std::vector<Tensor<NSD,1,dataType> > mesh_normals;
   
   // 2D quadrature rule for volume integrals
   QuadratureRule<NSD> Q2D;
@@ -124,6 +127,51 @@ public:
 
   //compute the physical location of a node in xi-space
   coordinate_type xval(const coordinate_type &xi) const;
+  
+  //get physical normal vector to a face (assuming straight edges)
+  inline Tensor<NSD,1,dataType> mesh_face_normal(size_type fnum) const {
+    return mesh_normals[fnum];
+  }
+
+  //get xi-coordinate for face quadrature point
+  inline Tensor<NSD,1,dataType> face_qp(size_type fnum, size_type fqpi) const {
+    coordinate_type qp;
+    switch(fnum) {
+    case 0:
+      return Tensor<NSD,1,dataType>{Q1D.qp(fqpi)(0), -1};
+    case 1:
+      return Tensor<NSD,1,dataType>{1, Q1D.qp(fqpi)(0)};
+    case 2:
+      return Tensor<NSD,1,dataType>{Q1D.qp(fqpi)(0), 1};
+    case 3:
+      return Tensor<NSD,1,dataType>{-1, Q1D.qp(fqpi)(0)};
+    default:
+      return Tensor<NSD,1,dataType>{0,0}; //<--garbage value not on an edge. don't wanna check for errors
+    }
+  }
+  
+  //get face quadrature weight
+  inline dataType face_weight(size_type fqpi) const {
+    return Q1D.weight(fqpi);
+  }
+
+  //get normal vector of parent (xi-space) element.
+  //assumes that people aren't dumb, so doesn't look for out of bounds fnums
+  //since the possibility of throwing an exception would slow it down probably
+  inline Tensor<NSD,1,dataType> parent_face_normal(size_type fnum) const {
+    switch(fnum) {
+    case 0:
+      return Tensor<NSD,1,dataType>{0, -1};
+    case 1:
+      return Tensor<NSD,1,dataType>{1, 0};
+    case 2:
+      return Tensor<NSD,1,dataType>{0, 1};
+    case 3:
+      return Tensor<NSD,1,dataType>{-1, 0};
+    default:
+      return Tensor<NSD,1,dataType>{0, 0}; //<--garbage value to catch errors
+    }
+  }
   
   /*
    * Utility functions that shouldn't be called by user,
@@ -183,6 +231,7 @@ DG_Quad<NSD,dataType>::DG_Quad(size_type polyOrder,
     global_dofs(nodes_per_element, dof_per_node),
     edge_nodes_ccw(poly_order+1, 4),
     edge_nodes_cw(poly_order+1, 4),
+    mesh_normals(),
     Q2D(_q2d),
     Q1D(_q1d)
 {
@@ -256,6 +305,15 @@ void DG_Quad<NSD,dataType>::update_element(const GenericMesh<MT,NSD> &M,
       x += x_corners[B]*lagrange_poly_xi(nodes_xi[A], B, ij_corners, xi0_corners);
     }
     nodes_x.push_back(x);
+  }
+
+  //create mesh face normal vectors (cross prod of edge with 3-vector (0,0,1)
+  mesh_normals.clear();
+  for(size_type f=0; f<4; ++f) {
+    coordinate_type dx = x_corners[(f+1)%4] - x_corners[f];
+    coordinate_type n{dx(1), -dx(0)};
+    n = n/std::sqrt(contract<1>(n,n));
+    mesh_normals.push_back(n);
   }
 
   //fill global dofs

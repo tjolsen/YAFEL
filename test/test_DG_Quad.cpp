@@ -107,8 +107,10 @@ bool test_3() {
 // integrate boundary of a rectangle to get perimeter
 bool test_4() {
 
-  RectilinearMesh<2> M(std::vector<double>{1,1}, std::vector<std::size_t>{1,1});
-  std::size_t N = 3;
+  double Lx = 1.5;
+  double Ly = .25;
+  RectilinearMesh<2> M(std::vector<double>{Lx, Ly}, std::vector<std::size_t>{1,1});
+  std::size_t N = 1;
   GaussLegendreQuadrature<2> Q2(N);
   GaussLegendreQuadrature<1> Q1(N);
   DG_DoFManager<RectilinearMesh<2>,2> dofm(M, 1);
@@ -118,59 +120,22 @@ bool test_4() {
   DGQ.update_element(M, 0);
 
   double perimeter = 0;
-  for(std::size_t eqpi=0; eqpi<DGQ.Q1D.n_qp(); ++eqpi) {
-    
-    //face 0
-    {
-      Tensor<2,1,double> xi{DGQ.Q1D.qp(eqpi)(0), -1};
-      Tensor<2,1,double> n{0, -1}, N{0, -1};
-      Tensor<2,2,double> J = DGQ.calc_J_xi(xi);
+  for(std::size_t f=0; f<4; ++f) {
+
+    for(std::size_t eqpi=0; eqpi<DGQ.Q1D.n_qp(); ++eqpi) {      
+      auto xi = DGQ.face_qp(f, eqpi);
+      auto n = DGQ.mesh_face_normal(f);
+      auto N = DGQ.parent_face_normal(f);
+      auto J = DGQ.calc_J_xi(xi);
+      
       auto Jinv = inv(J);
       auto detJ = det(J);
-      
-      perimeter += detJ*contract<1>(Jinv*n, N)*DGQ.Q1D.weight(eqpi);
-    }
-
-    //face 1
-    {
-      Tensor<2,1,double> xi{1, DGQ.Q1D.qp(eqpi)(0)};
-      Tensor<2,1,double> n{1,0}, N{1,0};
-      Tensor<2,2,double> J = DGQ.calc_J_xi(xi);
-      auto Jinv = inv(J);
-      auto detJ = det(J);
-      
-      perimeter += detJ*contract<1>(Jinv*n, N)*DGQ.Q1D.weight(eqpi);
-    }
-
-
-    //face 2
-    {
-      Tensor<2,1,double> xi{DGQ.Q1D.qp(eqpi)(0), 1};
-      Tensor<2,1,double> n{0, 1}, N{0, 1};
-      Tensor<2,2,double> J = DGQ.calc_J_xi(xi);
-      auto Jinv = inv(J);
-      auto detJ = det(J);
-      
-      perimeter += detJ*contract<1>(Jinv*n, N)*DGQ.Q1D.weight(eqpi);
-    }
-
-
-    //face 3
-    {
-      Tensor<2,1,double> xi{-1, DGQ.Q1D.qp(eqpi)(0)};
-      Tensor<2,1,double> n{-1,0}, N{-1,0};
-      Tensor<2,2,double> J = DGQ.calc_J_xi(xi);
-      auto Jinv = inv(J);
-      auto detJ = det(J);
-      
-      perimeter += detJ*contract<1>(Jinv*n, N)*DGQ.Q1D.weight(eqpi);
+      perimeter += detJ*contract<1>(Jinv*n,N)*DGQ.face_weight(eqpi);
     }
 
   }//end eqpi
   
-  
-  std::cout << perimeter << std::endl;
-  return true;
+  return std::abs(perimeter - 2*(Lx + Ly)) < 1.0e-8;
 }
 
 int main() {

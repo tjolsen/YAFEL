@@ -100,6 +100,13 @@ operator*(T2 alpha, const TensorExpression<T1,DIM,RANK,dataType> &u) {
   return TensorScaled<T1,DIM,RANK,dataType>(u,alpha);
 }
 
+template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType, 
+	 typename = typename std::enable_if<std::is_fundamental<T2>::value, T2>::type>
+TensorScaled<T1,DIM,RANK,dataType>
+operator/(const TensorExpression<T1,DIM,RANK,dataType> &u, T2 alpha) {
+  return TensorScaled<T1,DIM,RANK,dataType>(u,dataType(1)/alpha);
+}
+
 //--------------------------------------------------------------------------------
 /*
  * Class representing the sum of two TensorExpressions.
