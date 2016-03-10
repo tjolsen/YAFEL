@@ -33,6 +33,9 @@ public:
   //pointers to faces for each cell (offsets in mesh_faces vector)
   std::vector<std::vector<size_type>> cell_faces; 
 
+  //boolean to indicate if build_faces has been called
+  bool faces_built;
+
 
   // Functions that all meshes must support
   inline size_type n_nodes() const {return static_cast<T const&>(*this).n_nodes();}
@@ -40,6 +43,9 @@ public:
   inline ElementType element_type(size_type elnum) const {
     return static_cast<T const&>(*this).element_type(elnum);
   }
+
+  //constructor
+  GenericMesh() : mesh_faces(), cell_faces(), faces_built(false) {}
   
   coordinate_type node(size_type nodenum) const {return static_cast<T const&>(*this).node(nodenum);}
   element_container element(size_type elnum) const {return static_cast<T const&>(*this).element(elnum);}
@@ -161,14 +167,9 @@ void GenericMesh<MT,NSD>::build_faces() {
       }
       else if(res.size() == 2) {
         //construct face
-        size_type adj;
-        if(*nset.begin() == e) {
-          adj = *(++res.begin());
-        }
-        else {
-          adj = *res.begin();
-        }
-        
+        size_type adj, tmp1, tmp2;
+        adj = (e==res[0]) ? res[1] : res[0];
+
         //if e > adj, do nothing
         if(e > adj) {
           continue;
@@ -191,7 +192,7 @@ void GenericMesh<MT,NSD>::build_faces() {
             size_type fi_global = mesh_faces.size();
             mesh_faces.push_back(F);
             cell_faces[e][f] = fi_global;
-            cell_faces[e][af] = fi_global;
+            cell_faces[adj][af] = fi_global;
             break;
           }
         }
@@ -203,7 +204,9 @@ void GenericMesh<MT,NSD>::build_faces() {
     }
 
   }
-  
+
+  //set the "faces_built" flag so this doesn't have to be done again
+  faces_built = true;
 } //end build_faces()
   
   

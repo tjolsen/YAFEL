@@ -18,18 +18,17 @@ using namespace yafel;
 bool test_1() {
   
   RectilinearMesh<2> M(std::vector<double>{1,1}, std::vector<std::size_t>{1,1});
-
+  M.build_faces();
   //use polynomials of order 15 along each edge, and 15-point 1d integration rule (super overkill!)
   //hopefully this high-order test exposes numerical stability issues, if present (which they are not)
   std::size_t N = 15;
   GaussLegendreQuadrature<2> Q2(N);
   GaussLegendreQuadrature<1> Q1(N);
   DG_DoFManager<RectilinearMesh<2>,2> dofm(M, 1);
-
-  DG_Quad<> DGQ(N, dofm, Q2, Q1);
-
-  DGQ.update_element(M, 0);
   
+  DG_Quad<> DGQ(N, dofm, Q2, Q1);
+  DGQ.update_element(M, 0);
+
   return std::abs(DGQ.detJ[0] - 1.0/4.0) < 1.0e-8;
 }
 
@@ -46,7 +45,7 @@ T func(T x, T y) {
 bool test_2() {
 
   RectilinearMesh<2> M(std::vector<double>{1,1}, std::vector<std::size_t>{1,1});
-
+  M.build_faces();
   std::size_t N = 2;
   GaussLegendreQuadrature<2> Q2(N);
   GaussLegendreQuadrature<1> Q1(N);
@@ -55,7 +54,7 @@ bool test_2() {
   DG_Quad<> DGQ(N, dofm, Q2, Q1);
 
   DGQ.update_element(M, 0);
-  
+
   bool good = true;
   for(std::size_t qpi=0; qpi<DGQ.Q2D.n_qp(); ++qpi) {
     
@@ -82,14 +81,14 @@ bool test_2() {
 
 //test faces built correctly. ccw and cw edges must be compatible
 bool test_3() {
-  RectilinearMesh<2> M(std::vector<double>{1,1}, std::vector<std::size_t>{1,1});
+  RectilinearMesh<2> M(std::vector<double>{1,1}, std::vector<std::size_t>{2,2});
+  M.build_faces();
   std::size_t N = 3;
   GaussLegendreQuadrature<2> Q2(N);
   GaussLegendreQuadrature<1> Q1(N);
   DG_DoFManager<RectilinearMesh<2>,2> dofm(M, 1);
 
   DG_Quad<> DGQ(N, dofm, Q2, Q1);
-
   DGQ.update_element(M, 0);
 
   bool good = true;
@@ -110,15 +109,15 @@ bool test_4() {
   double Lx = 1.5;
   double Ly = .25;
   RectilinearMesh<2> M(std::vector<double>{Lx, Ly}, std::vector<std::size_t>{1,1});
+  M.build_faces();
+
   std::size_t N = 1;
   GaussLegendreQuadrature<2> Q2(N);
   GaussLegendreQuadrature<1> Q1(N);
   DG_DoFManager<RectilinearMesh<2>,2> dofm(M, 1);
 
   DG_Quad<> DGQ(N, dofm, Q2, Q1);
-
   DGQ.update_element(M, 0);
-
   double perimeter = 0;
   for(std::size_t f=0; f<4; ++f) {
 
@@ -135,6 +134,52 @@ bool test_4() {
 
   }//end eqpi
   
+  return std::abs(perimeter - 2*(Lx + Ly)) < 1.0e-8;
+}
+
+//integrate perimeter of mesh using a multi-element mesh.
+//will need to use the element_faces field of DG_Quad to do this.
+bool test_5() {
+
+  double Lx = 1.5;
+  double Ly = .25;
+  std::size_t Nx = 40;
+  std::size_t Ny = 40;
+  RectilinearMesh<2> M(std::vector<double>{Lx, Ly}, std::vector<std::size_t>{Nx,Ny});
+  M.build_faces();
+  
+  std::size_t N = 2;
+  GaussLegendreQuadrature<2> Q2(N);
+  GaussLegendreQuadrature<1> Q1(N);
+  DG_DoFManager<RectilinearMesh<2>,2> dofm(M, 1);
+
+  DG_Quad<> DGQ(N, dofm, Q2, Q1);
+
+  double perimeter = 0;
+
+  for(std::size_t elnum=0; elnum<M.n_elements(); ++elnum) {
+    std::cout << elnum << std::endl;
+    DGQ.update_element(M, elnum);
+    for(std::size_t f=0; f<4; ++f) {
+      if(!DGQ.element_faces[f].boundary) {
+        continue; //this is an internal face. skip for this test.
+      }
+      
+      for(std::size_t eqpi=0; eqpi<DGQ.Q1D.n_qp(); ++eqpi) {
+        auto xi = DGQ.face_qp(f, eqpi);
+        auto n = DGQ.mesh_face_normal(f);
+        auto N = DGQ.parent_face_normal(f);
+        auto J = DGQ.calc_J_xi(xi);
+        
+        auto Jinv = inv(J);
+        auto detJ = det(J);
+        perimeter += detJ*contract<1>(Jinv*n,N)*DGQ.face_weight(eqpi);
+      }
+      
+    }//end eqpi
+  }
+
+  std::cout << "computed="<< perimeter << "     true=" << 2*(Lx+Ly)<<std::endl;
   return std::abs(perimeter - 2*(Lx + Ly)) < 1.0e-8;
 }
 
@@ -157,6 +202,10 @@ int main() {
   if(!test_4()) {
     std::cout << "Failed test_4()" << std::endl;
     retval |= 1<<3;
+  }
+  if(!test_5()) {
+    std::cout << "Failed test_5()" << std::endl;
+    retval |= 1<<4;
   }
 
   return retval;

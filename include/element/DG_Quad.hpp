@@ -19,6 +19,7 @@
 #include "lin_alg/Matrix.hpp"
 #include "lin_alg/Vector.hpp"
 #include "mesh/GenericMesh.hpp"
+#include "mesh/Face.hpp"
 #include "utils/ElementType.hpp"
 #include "utils/DG_DoFManager.hpp"
 #include "utils/DualNumber.hpp"
@@ -89,6 +90,9 @@ public:
 
   //Mesh normals, assuming straight-edge elements
   std::vector<Tensor<NSD,1,dataType> > mesh_normals;
+
+  //vector of element Faces (taken from mesh, after build_faces has been called)
+  std::vector<Face> element_faces;
   
   // 2D quadrature rule for volume integrals
   QuadratureRule<NSD> Q2D;
@@ -107,7 +111,7 @@ public:
    * Function that updates all element quantities
    */
   template<typename MT>
-  void update_element(const GenericMesh<MT,NSD> &M, size_type elnum);
+  void update_element(GenericMesh<MT,NSD> &M, size_type elnum);
   
   /*
    * Functions to fill members
@@ -232,6 +236,7 @@ DG_Quad<NSD,dataType>::DG_Quad(size_type polyOrder,
     edge_nodes_ccw(poly_order+1, 4),
     edge_nodes_cw(poly_order+1, 4),
     mesh_normals(),
+    element_faces(),
     Q2D(_q2d),
     Q1D(_q1d)
 {
@@ -274,9 +279,15 @@ DG_Quad<NSD,dataType>::DG_Quad(size_type polyOrder,
 
 //------------------------------------------------------------------
 template<unsigned NSD, typename dataType> template<typename MT>
-void DG_Quad<NSD,dataType>::update_element(const GenericMesh<MT,NSD> &M, 
+void DG_Quad<NSD,dataType>::update_element(GenericMesh<MT,NSD> &M, 
                                            size_type elnum)
 {
+
+  //faces must be built for this element. This is a one-time only cost.
+  // Will not be called every time update_element is called
+  if(!M.faces_built) {
+    M.build_faces();
+  }
 
   //interpolate x-values of xi-nodes assuming (for now) straight-edged
   // bilinear interpolation from corners.
@@ -314,6 +325,15 @@ void DG_Quad<NSD,dataType>::update_element(const GenericMesh<MT,NSD> &M,
     coordinate_type n{dx(1), -dx(0)};
     n = n/std::sqrt(contract<1>(n,n));
     mesh_normals.push_back(n);
+  }
+
+  //fill element faces
+  element_faces.clear();
+  for(size_type f=0; f<4; ++f) {
+
+    size_type fi = M.cell_faces[elnum][f];
+
+    element_faces.push_back(M.mesh_faces[fi]);
   }
 
   //fill global dofs
