@@ -80,7 +80,7 @@ bool test_2() {
   return good;
 }
 
-//test faces built correctly
+//test faces built correctly. ccw and cw edges must be compatible
 bool test_3() {
   RectilinearMesh<2> M(std::vector<double>{1,1}, std::vector<std::size_t>{1,1});
   std::size_t N = 3;
@@ -91,18 +91,85 @@ bool test_3() {
   DG_Quad<> DGQ(N, dofm, Q2, Q1);
 
   DGQ.update_element(M, 0);
-  
+
+  bool good = true;
   for(std::size_t A=0; A<N+1; ++A) {
     for(std::size_t f=0; f<4; ++f) {
-      std::cout << DGQ.edge_nodes_ccw(A,f) << "  ";
+      
+      good = good && (DGQ.edge_nodes_ccw(A,f)==DGQ.edge_nodes_cw(N-A,f));
     }
-    std::cout << "         ";
-    for(std::size_t f=0; f<4; ++f) {
-      std::cout << DGQ.edge_nodes_cw(A,f) << "  ";
-    }
-    std::cout << std::endl;
   }
+  
+  return true;
+}
 
+
+// integrate boundary of a rectangle to get perimeter
+bool test_4() {
+
+  RectilinearMesh<2> M(std::vector<double>{1,1}, std::vector<std::size_t>{1,1});
+  std::size_t N = 3;
+  GaussLegendreQuadrature<2> Q2(N);
+  GaussLegendreQuadrature<1> Q1(N);
+  DG_DoFManager<RectilinearMesh<2>,2> dofm(M, 1);
+
+  DG_Quad<> DGQ(N, dofm, Q2, Q1);
+
+  DGQ.update_element(M, 0);
+
+  double perimeter = 0;
+  for(std::size_t eqpi=0; eqpi<DGQ.Q1D.n_qp(); ++eqpi) {
+    
+    //face 0
+    {
+      Tensor<2,1,double> xi{DGQ.Q1D.qp(eqpi)(0), -1};
+      Tensor<2,1,double> n{0, -1}, N{0, -1};
+      Tensor<2,2,double> J = DGQ.calc_J_xi(xi);
+      auto Jinv = inv(J);
+      auto detJ = det(J);
+      
+      perimeter += detJ*contract<1>(Jinv*n, N)*DGQ.Q1D.weight(eqpi);
+    }
+
+    //face 1
+    {
+      Tensor<2,1,double> xi{1, DGQ.Q1D.qp(eqpi)(0)};
+      Tensor<2,1,double> n{1,0}, N{1,0};
+      Tensor<2,2,double> J = DGQ.calc_J_xi(xi);
+      auto Jinv = inv(J);
+      auto detJ = det(J);
+      
+      perimeter += detJ*contract<1>(Jinv*n, N)*DGQ.Q1D.weight(eqpi);
+    }
+
+
+    //face 2
+    {
+      Tensor<2,1,double> xi{DGQ.Q1D.qp(eqpi)(0), 1};
+      Tensor<2,1,double> n{0, 1}, N{0, 1};
+      Tensor<2,2,double> J = DGQ.calc_J_xi(xi);
+      auto Jinv = inv(J);
+      auto detJ = det(J);
+      
+      perimeter += detJ*contract<1>(Jinv*n, N)*DGQ.Q1D.weight(eqpi);
+    }
+
+
+    //face 3
+    {
+      Tensor<2,1,double> xi{-1, DGQ.Q1D.qp(eqpi)(0)};
+      Tensor<2,1,double> n{-1,0}, N{-1,0};
+      Tensor<2,2,double> J = DGQ.calc_J_xi(xi);
+      auto Jinv = inv(J);
+      auto detJ = det(J);
+      
+      perimeter += detJ*contract<1>(Jinv*n, N)*DGQ.Q1D.weight(eqpi);
+    }
+
+  }//end eqpi
+  
+  
+  std::cout << perimeter << std::endl;
   return true;
 }
 
@@ -121,6 +188,10 @@ int main() {
   if(!test_3()) {
     std::cout << "Failed test_3()" << std::endl;
     retval |= 1<<2;
+  }
+  if(!test_4()) {
+    std::cout << "Failed test_4()" << std::endl;
+    retval |= 1<<3;
   }
 
   return retval;

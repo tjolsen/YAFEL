@@ -150,6 +150,11 @@ public:
                         const std::vector<value_type> & xi_0) const;
   
   
+  /*
+   * Compute jacobian transformation at a point
+   */
+  Tensor<NSD,2,dataType> calc_J_xi(const coordinate_type &xi) const;
+  
 }; //end class
 
 //=====================================================================
@@ -253,6 +258,15 @@ void DG_Quad<NSD,dataType>::update_element(const GenericMesh<MT,NSD> &M,
     nodes_x.push_back(x);
   }
 
+  //fill global dofs
+  for(size_type A=0; A<nodes_per_element; ++A) {
+    for(size_type i=0; i<dof_per_node; ++i) {
+      //hack: need to fix DG_DoFManager to play nice with this...
+      //manually computing global dofs ASSUMING ONLY DG_QUADS IN MESH
+      global_dofs(A,i) = (elnum*nodes_per_element + A)*dof_per_node + i;
+    }
+  }
+
   //fill jacobians at quadrature points
   calc_jacobians();
 
@@ -283,25 +297,9 @@ void DG_Quad<NSD,dataType>::calc_jacobians() {
   jacobians.clear();
   
   for(size_type qpi=0; qpi<Q2D.n_qp(); ++qpi) {
-    Tensor<NSD,2,dataType> J;
-    Tensor<NSD,1,DualNumber<dataType> > dual_xi;
-    for(size_type i=0; i<NSD; ++i) {
-      dual_xi(i) = make_dual(Q2D.qp(qpi)(i));
-    }
-    for(size_type A=0; A<nodes_per_element; ++A) {
-      for(size_type j=0; j<NSD; ++j) {
-        dual_xi(j).second = dataType(1);
-
-        //shape func derivative wrt xi_j
-        dataType dNAdxi_j = lagrange_poly_xi(dual_xi, A, nodes_ij, nodes_xi_1d).second;
-
-        for(size_type i=0; i<NSD; ++i) {
-          J(i,j) += dNAdxi_j*nodes_x[A](i);
-        }
-        dual_xi(j).second = 0;
-      }
-    }//end A
-
+    
+    auto J = calc_J_xi(Q2D.qp(qpi));
+    
     jacobians.push_back(J);
     detJ.push_back(det(J));
   }//end qpi
@@ -329,11 +327,8 @@ void DG_Quad<NSD,dataType>::calc_shape_gradients() {
         dataType dNAdxi_j = lagrange_poly_xi(dual_xi, A, nodes_ij, nodes_xi_1d).second;
         
         for(size_type i=0; i<NSD; ++i) {
-          
           dNA_dxj(A,i) += dNAdxi_j*Jinv(j,i);
-
         }
-        
         dual_xi(j).second = dataType(0);
       }
       
@@ -348,7 +343,6 @@ template<unsigned NSD, typename dataType>
 typename DG_Quad<NSD,dataType>::coordinate_type
 DG_Quad<NSD,dataType>::xval(const coordinate_type &xi) const
 {
-  
   coordinate_type x;
   for(size_type A=0; A<nodes_per_element; ++A) {
     x += shape_value_xi(A,xi)*nodes_x[A];
@@ -371,24 +365,48 @@ T DG_Quad<NSD,dataType>::lagrange_poly_xi(const Tensor<NSD,1,T> &xi,
   return ret;
 }
 
+//--------------------------------------------------------
 template<unsigned NSD, typename dataType> template<typename T>
 T DG_Quad<NSD,dataType>::lagrange_poly_xi_1d(T xi, 
                                              size_type j,
                                              const std::vector<value_type> & xi_0) const
 {
-
   T ret(1);
-
   for(size_type i=0; i<xi_0.size(); ++i) {
     if(i != j) {
       ret *= (xi - xi_0[i]) / (xi_0[j] - xi_0[i]);
     }
   }
-  
   return ret;
-
-
 }
+
+//--------------------------------------------------------
+template<unsigned NSD, typename dataType>
+Tensor<NSD,2,dataType> DG_Quad<NSD,dataType>::calc_J_xi(const coordinate_type &xi) const
+{
+
+  Tensor<NSD,2,dataType> J;
+  Tensor<NSD,1,DualNumber<dataType> > dual_xi;
+  for(size_type i=0; i<NSD; ++i) {
+    dual_xi(i) = make_dual(xi(i));
+  }
+  for(size_type A=0; A<nodes_per_element; ++A) {
+    for(size_type j=0; j<NSD; ++j) {
+      dual_xi(j).second = dataType(1);
+      
+      //shape func derivative wrt xi_j
+      dataType dNAdxi_j = lagrange_poly_xi(dual_xi, A, nodes_ij, nodes_xi_1d).second;
+      
+      for(size_type i=0; i<NSD; ++i) {
+        J(i,j) += dNAdxi_j*nodes_x[A](i);
+      }
+      dual_xi(j).second = 0;
+    }
+  }//end A
+
+  return J;
+}
+
 
 YAFEL_NAMESPACE_CLOSE
 
