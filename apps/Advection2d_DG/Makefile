@@ -1,4 +1,4 @@
-cppfiles = $(wildcard *.cpp)
+cppfiles = main.cpp LinearAdvection.cpp
 ofiles = $(cppfiles:.cpp=.o)
 exefile = linear_advection.exe
 
@@ -7,7 +7,7 @@ all: .depend $(exefile)
 include $(YAFELDIR)/common.mk
 
 $(exefile): $(ofiles)
-	$(CXX) $< $(LDFLAGS) -o $@
+	$(CXX) $(ofiles) $(LDFLAGS) -o $@
 
 %.o: %.cpp
 	$(CXX) $< $(CXXFLAGS)

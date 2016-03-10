@@ -19,6 +19,7 @@ YAFEL_NAMESPACE_OPEN
 
 class AdvectionParameters {
 public:
+  
   // Mesh parameters
   std::vector<double> mesh_dims;
   std::vector<std::size_t> dir_elems;
@@ -28,8 +29,8 @@ public:
 
   // DG parameters
   std::size_t polyOrder;
-  QuadratureRule<2> & Q2D; //volume quadrature
-  QuadratureRule<1> & Q1D; //face quadrature
+  QuadratureRule<2> &Q2D; //volume quadrature
+  QuadratureRule<1> &Q1D; //face quadrature
 
   // Time parameters
   double dt;
@@ -40,6 +41,28 @@ public:
   
   // Output parameters
   std::string output_file_base;
+
+  AdvectionParameters(std::vector<double> &md,
+                      std::vector<std::size_t> &de,
+                      Tensor<2,1,double> v,
+                      std::size_t p,
+                      QuadratureRule<2> &q2d,
+                      QuadratureRule<1> &q1d,
+                      double _dt,
+                      double _T,
+                      SpatialFunction<2,double> ufunc,
+                      std::string &outbase)
+    : mesh_dims(md), 
+      dir_elems(de),
+      v_advection(v),
+      polyOrder(p),
+      Q2D(q2d),
+      Q1D(q1d),
+      dt(_dt),
+      Tfinal(_T),
+      u0_func(ufunc),
+      output_file_base(outbase)
+  {}
 };
 
 
@@ -68,7 +91,9 @@ public:
 
   //return the element residual, not solved by mass matrix.
   //this will be handled in calling function
-  Vector<double> element_residual(const Vector<double> & u_elem);
+  Vector<double> element_residual(std::size_t elnum, 
+                                  const DG_Quad<2,double> &E,
+                                  const Vector<double> & u);
 
   //function used to define numerical fluxes at element boundaries
   Tensor<2,1,double> flux_function(double u_in, double u_out, 

@@ -55,6 +55,7 @@ public:
   //Reference to a DoFManager
   DoFManager & dofm;
 
+
   //locations of parent nodes in xi-space: [nNodes] x (NSD)
   std::vector<coordinate_type> nodes_xi;
   
@@ -95,10 +96,10 @@ public:
   std::vector<Face> element_faces;
   
   // 2D quadrature rule for volume integrals
-  QuadratureRule<NSD> Q2D;
+  QuadratureRule<NSD> &Q2D;
 
   // 1D quadrature rule for surface integrals
-  QuadratureRule<NSD-1> Q1D;
+  QuadratureRule<NSD-1> &Q1D;
   
   
   /*
