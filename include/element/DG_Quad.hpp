@@ -196,6 +196,26 @@ DG_Quad<NSD,dataType>::DG_Quad(size_type polyOrder,
   //fill shape_values
   calc_shape_values();
 
+
+  //fill faces
+  for(size_type i=0; i<polyOrder+1; ++i) {
+    //face 0 (bottom face)
+    edge_nodes_ccw(i,0) = i;
+    edge_nodes_cw(i,0) = polyOrder - i;
+
+    //face 1 (right face)
+    edge_nodes_ccw(i,1) = (polyOrder+1)*i + polyOrder;
+    edge_nodes_cw(i,1) = (polyOrder+1)*(polyOrder - i) + polyOrder;
+
+    //face 2 (top face)
+    edge_nodes_ccw(i,2) = (polyOrder+1)*polyOrder + (polyOrder-i);
+    edge_nodes_cw(i,2) = (polyOrder+1)*polyOrder + i;
+    
+    //face 3 (left face)
+    edge_nodes_ccw(i,3) = (polyOrder+1)*(polyOrder-i);
+    edge_nodes_cw(i,3) = (polyOrder+1)*i;
+  }
+
 }
 
 //------------------------------------------------------------------

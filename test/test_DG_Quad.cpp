@@ -80,6 +80,32 @@ bool test_2() {
   return good;
 }
 
+//test faces built correctly
+bool test_3() {
+  RectilinearMesh<2> M(std::vector<double>{1,1}, std::vector<std::size_t>{1,1});
+  std::size_t N = 3;
+  GaussLegendreQuadrature<2> Q2(N);
+  GaussLegendreQuadrature<1> Q1(N);
+  DG_DoFManager<RectilinearMesh<2>,2> dofm(M, 1);
+
+  DG_Quad<> DGQ(N, dofm, Q2, Q1);
+
+  DGQ.update_element(M, 0);
+  
+  for(std::size_t A=0; A<N+1; ++A) {
+    for(std::size_t f=0; f<4; ++f) {
+      std::cout << DGQ.edge_nodes_ccw(A,f) << "  ";
+    }
+    std::cout << "         ";
+    for(std::size_t f=0; f<4; ++f) {
+      std::cout << DGQ.edge_nodes_cw(A,f) << "  ";
+    }
+    std::cout << std::endl;
+  }
+
+  return true;
+}
+
 int main() {
 
   int retval = 0;
@@ -91,6 +117,10 @@ int main() {
   if(!test_2()) {
     std::cout << "Failed test_2()" << std::endl;
     retval |= 1<<1;
+  }
+  if(!test_3()) {
+    std::cout << "Failed test_3()" << std::endl;
+    retval |= 1<<2;
   }
 
   return retval;
