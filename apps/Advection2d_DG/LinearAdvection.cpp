@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <fstream>
 #include <stdio.h>
 
 YAFEL_NAMESPACE_OPEN
@@ -23,6 +24,7 @@ LinearAdvection::LinearAdvection(const AdvectionParameters &ap)
   
   //add mesh to vtk output object
   vout.addVTKObject(&vtkm);
+  
 }
 
 
@@ -63,7 +65,6 @@ LinearAdvection::flux_function(double u_in, double u_out,
 void LinearAdvection::setup()
 {
   
-  M.build_faces();
   set_Me_Se();
   LU_Me.reinit(Me);
 
@@ -79,6 +80,9 @@ void LinearAdvection::RK4()
   
   //number of time steps
   std::size_t Nt = std::size_t(AP.Tfinal/AP.dt); //round down. no point being more precise now
+
+  std::vector<double> conserved_qty(Nt,0);
+  conserved_qty[0] = integrate_field(u);
   
   for(std::size_t ti=1; ti<=Nt; ++ti) {
     
@@ -88,10 +92,19 @@ void LinearAdvection::RK4()
     Vector<double> k4 = AP.dt*residual(u + k3);
 
     u += (k1 + 2.0*k2 + 2.0*k3 + k4)/6.0;
-    
+
+    conserved_qty[ti] = integrate_field(u);
     write_output(u, ti);
   }
 
+  //write conserved quantity out to a file
+  std::string fname(AP.output_file_base);
+  fname += "_conserved.csv";
+  std::ofstream out(fname.c_str());
+  for(std::size_t ti=0; ti<Nt; ++ti) {
+    out << ti*AP.dt << ", " << conserved_qty[ti] << std::endl;
+  }
+  out.close();
 }
 
 
@@ -273,6 +286,28 @@ void LinearAdvection::write_output(const Vector<double> &u, std::size_t ti)
   vout.clearData();
 }
 
+
+//==============================================================
+double LinearAdvection::integrate_field(const Vector<double> &u)
+{
+  
+  double integral = 0;
+
+  for(std::size_t elnum=0; elnum<M.n_elements(); ++elnum) {
+    //DGQ.update_nodes();
+    DGQ.update_dofs(elnum);
+
+    for(std::size_t qpi=0; qpi<DGQ.Q2D.n_qp(); ++qpi) {
+      for(std::size_t A=0; A<DGQ.nodes_per_element; ++A) {
+	
+	std::size_t GA = DGQ.global_dofs(A,0);
+	
+	integral += u(GA)*DGQ.shape_values[qpi](A)*DGQ.detJ[qpi]*DGQ.Q2D.weight(qpi);
+      }
+    }
+  }
+  return integral;
+}
 
 
 YAFEL_NAMESPACE_CLOSE

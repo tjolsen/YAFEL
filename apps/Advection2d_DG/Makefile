@@ -13,7 +13,7 @@ $(exefile): $(ofiles)
 	$(CXX) $< $(CXXFLAGS)
 
 clean:
-	rm $(ofiles) $(exefile) *.vtu *.pvd
+	rm $(ofiles) $(exefile) *.vtu *.pvd *.csv
 
 run: all
 	./$(exefile)

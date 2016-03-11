@@ -106,7 +106,7 @@ public:
   //write a timestep out to disk
   void write_output(const Vector<double> &u, std::size_t ti);
 
-
+  double integrate_field(const Vector<double> &u);
 
   // Member variables
   RectilinearMesh<2> M;
