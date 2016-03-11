@@ -104,7 +104,7 @@ public:
   void set_Me_Se();
 
   //write a timestep out to disk
-  void write_output(const Vector<double> &u, double ti);
+  void write_output(const Vector<double> &u, std::size_t ti);
 
 
 
@@ -116,6 +116,8 @@ public:
   Matrix<double> Me;
   Matrix<double> Se;
   LUDecomposition<double> LU_Me;
+  VTKOutput vout;
+  VTKDGMesh<RectilinearMesh<2>,2,double> vtkm;
 };
 
 

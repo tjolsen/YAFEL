@@ -105,7 +105,10 @@ public:
   /*
    * Constructor(s)
    */
-  DG_Quad(size_type polyOrder, DoFManager & _dofm, QuadratureRule<NSD> &_q2d, QuadratureRule<NSD-1> & _q1d);
+  DG_Quad(size_type polyOrder, 
+          DoFManager & _dofm, 
+          QuadratureRule<NSD> &_q2d, 
+          QuadratureRule<NSD-1> & _q1d);
   
   
   /*
@@ -114,9 +117,17 @@ public:
   template<typename MT>
   void update_element(GenericMesh<MT,NSD> &M, size_type elnum);
   
+  
   /*
    * Functions to fill members
    */
+  template<typename MT>
+  void update_nodes(const GenericMesh<MT,NSD> &M, size_type elnum);
+  
+  //template<typename MT>
+  //void update_faces(const GenericMesh<MT,NSD> &M, size_type elnum);
+
+  void update_dofs(size_type elnum);
   void calc_shape_values();
   void calc_jacobians();
   void calc_shape_gradients();
@@ -280,8 +291,7 @@ DG_Quad<NSD,dataType>::DG_Quad(size_type polyOrder,
 
 //------------------------------------------------------------------
 template<unsigned NSD, typename dataType> template<typename MT>
-void DG_Quad<NSD,dataType>::update_element(GenericMesh<MT,NSD> &M, 
-                                           size_type elnum)
+void DG_Quad<NSD,dataType>::update_element(GenericMesh<MT,NSD> &M, size_type elnum)
 {
 
   //faces must be built for this element. This is a one-time only cost.
@@ -289,6 +299,28 @@ void DG_Quad<NSD,dataType>::update_element(GenericMesh<MT,NSD> &M,
   if(!M.faces_built) {
     M.build_faces();
   }
+
+  //update element node locations and face information
+  update_nodes(M,elnum);
+
+  //update face information
+  //update_faces(M,elnum);
+
+  //fill global dofs
+  update_dofs(elnum);
+
+  //fill jacobians at quadrature points
+  calc_jacobians();
+
+  //calculate gradients of shape functions
+  calc_shape_gradients();
+  
+}
+
+//--------------------------------------------------------
+template<unsigned NSD, typename dataType> template<typename MT>
+void DG_Quad<NSD,dataType>::update_nodes(const GenericMesh<MT,NSD> &M, size_type elnum)
+{
 
   //interpolate x-values of xi-nodes assuming (for now) straight-edged
   // bilinear interpolation from corners.
@@ -337,7 +369,37 @@ void DG_Quad<NSD,dataType>::update_element(GenericMesh<MT,NSD> &M,
     element_faces.push_back(M.mesh_faces[fi]);
   }
 
-  //fill global dofs
+}
+
+//--------------------------------------------------------
+/*
+template<unsigned NSD, typename dataType> template<typename MT>
+void DG_Quad<NSD,dataType>::update_faces(const GenericMesh<MT,NSD> &M, size_type elnum)
+{
+  //create mesh face normal vectors (cross prod of edge with 3-vector (0,0,1)
+  mesh_normals.clear();
+  for(size_type f=0; f<4; ++f) {
+    coordinate_type dx = x_corners[(f+1)%4] - x_corners[f];
+    coordinate_type n{dx(1), -dx(0)};
+    n = n/std::sqrt(contract<1>(n,n));
+    mesh_normals.push_back(n);
+  }
+
+  //fill element faces
+  element_faces.clear();
+  for(size_type f=0; f<4; ++f) {
+
+    size_type fi = M.cell_faces[elnum][f];
+
+    element_faces.push_back(M.mesh_faces[fi]);
+  }
+
+}
+*/
+//--------------------------------------------------------
+template<unsigned NSD, typename dataType>
+void DG_Quad<NSD,dataType>::update_dofs(size_type elnum)
+{
   for(size_type A=0; A<nodes_per_element; ++A) {
     for(size_type i=0; i<dof_per_node; ++i) {
       //hack: need to fix DG_DoFManager to play nice with this...
@@ -345,15 +407,7 @@ void DG_Quad<NSD,dataType>::update_element(GenericMesh<MT,NSD> &M,
       global_dofs(A,i) = (elnum*nodes_per_element + A)*dof_per_node + i;
     }
   }
-
-  //fill jacobians at quadrature points
-  calc_jacobians();
-
-  //calculate gradients of shape functions
-  calc_shape_gradients();
-  
 }
-
 
 //--------------------------------------------------------
 template<unsigned NSD, typename dataType>

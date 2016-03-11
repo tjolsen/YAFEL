@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <stdio.h>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -13,8 +14,16 @@ LinearAdvection::LinearAdvection(const AdvectionParameters &ap)
     DGQ(ap.polyOrder, dofm, ap.Q2D, ap.Q1D),
     Me(DGQ.nodes_per_element, DGQ.nodes_per_element),
     Se(DGQ.nodes_per_element, DGQ.nodes_per_element),
-    LU_Me(Me)
-{}
+    LU_Me(Me),
+    vout(),
+    vtkm(DGQ,M)
+{
+  //build mesh faces
+  M.build_faces();
+  
+  //add mesh to vtk output object
+  vout.addVTKObject(&vtkm);
+}
 
 
 //==============================================================
@@ -46,7 +55,7 @@ LinearAdvection::flux_function(double u_in, double u_out,
   }
   else {
   //Upwind flux
-  return c*((u_in + u_out)/2) + (1.0/2.0)*std::abs(contract<1>(c,n))*(u_out-u_in)*n;
+  return c*((u_in + u_out)/2) - (1.0/2.0)*std::abs(contract<1>(c,n))*(u_out-u_in)*n;
   }
 }
 
@@ -97,13 +106,19 @@ Vector<double> LinearAdvection::residual(const Vector<double> &u)
   Vector<double> R(nnodes*M.n_elements());
 
   for(std::size_t elnum=0; elnum < M.n_elements(); ++elnum) {
-    DGQ.update_element(M,elnum); // <--currently wasteful, don't update gradients to get more speed    
+    DGQ.update_nodes(M,elnum);
+    DGQ.update_dofs(elnum);
     
     //passing reference to element to enable easier parallelization later.
     Vector<double> r_elem = element_residual(elnum, DGQ, u);
     
     //solve local residual (due to block-diag structure)
     Vector<double> MinvR_elem = LU_Me.linsolve(r_elem);
+
+    //assemble local residual into global
+    for(std::size_t A=0; A<DGQ.nodes_per_element; ++A) {
+      R(DGQ.global_dofs(A,0)) = MinvR_elem(A);
+    }
   }
 
   return R;
@@ -124,6 +139,12 @@ Vector<double> LinearAdvection::element_residual(std::size_t elnum,
   
   //put convection contribution into local residual
   Vector<double> r_elem = Se*u_elem;
+
+  //stuff that won't change
+  auto J = E.jacobians[0];//E.calc_J_xi(E.nodes_xi[A]);
+  auto Jinv = inv(J);
+  double detJ = det(J);
+
   
   //integrate faces
   std::size_t nfaces = 4;
@@ -133,47 +154,53 @@ Vector<double> LinearAdvection::element_residual(std::size_t elnum,
     auto N = E.parent_face_normal(f);
     
     for(std::size_t fqpi=0; fqpi<E.Q1D.n_qp(); ++fqpi) {
+      Face F = E.element_faces[f];
+      //elnum of adjacent element
+      std::size_t adj_elem = (elnum==F.inner) ? F.outer : F.inner;
+      
+      //face in adjacent element corresponding to interface
+      std::size_t adj_elem_face = (elnum==F.inner) ? F.outer_face : F.inner_face;
+        
 
       auto xi_qp = E.face_qp(f,fqpi);
       
-      double qp_flux = 0;
+      //double qp_flux = 0;
 
       //compute flux*N at quadrature point
       for(std::size_t fA=0; fA<E.poly_order+1; ++fA) {
         //local node number
         std::size_t A = E.edge_nodes_ccw(fA, f);
-        
-        Face F = E.element_faces[f];
-        
-        //elnum of adjacent element
-        std::size_t adj_elem = (elnum==F.inner) ? F.outer : F.inner;
 
-        //face in adjacent element corresponding to interface
-        std::size_t adj_elem_face = (elnum==F.inner) ? F.outer_face : F.inner_face;
-        
-        //adjacent element local node number
-        std::size_t adj_A = E.edge_nodes_cw(fA, adj_elem_face);
-
-        //global dof of adjacent node
-        std::size_t adj_global_dof = adj_elem*nnodes + adj_A;
-
-        double u_in = u_elem(A);
-        double u_out = u(adj_global_dof);
-
-        auto flux = flux_function(u_in, u_out, AP.v_advection, n, F.boundary);
-        auto J = E.calc_J_xi(E.nodes_xi[A]);
-        auto Jinv = inv(J);
-        double detJ = det(J);
-        
-        qp_flux += detJ*contract<1>(Jinv*flux,N)*E.shape_value_xi(A, xi_qp);
+        for(std::size_t fB=0; fB<E.poly_order+1; ++fB) {
+          //local node number
+          std::size_t B = E.edge_nodes_ccw(fB, f);
+          
+          //adjacent element local node number
+          std::size_t adj_B = E.edge_nodes_cw(fB, adj_elem_face);
+          
+          //global dof of adjacent node
+          std::size_t adj_global_dof = adj_elem*nnodes + adj_B;
+          
+          double u_in = u_elem(A);
+          double u_out = u(adj_global_dof);
+          
+          auto flux = flux_function(u_in, u_out, AP.v_advection, n, F.boundary);
+          //auto J = E.jacobians[0];//E.calc_J_xi(E.nodes_xi[A]);
+          //auto Jinv = inv(J);
+          //double detJ = det(J);
+          
+          r_elem(A) -= E.shape_value_xi(B,xi_qp)*
+            (detJ*contract<1>(Jinv*flux,N)*E.shape_value_xi(A, xi_qp))*E.face_weight(fqpi);
+        }
       }
-      
+
+      /*      
       //distribute flux to nodes
       for(std::size_t fA=0; fA<E.poly_order+1; ++fA) {
         std::size_t A = E.edge_nodes_ccw(fA, f);
         r_elem(A) += qp_flux*E.shape_value_xi(A,xi_qp)*E.face_weight(fqpi);
       }
-      
+      */
     }//end fqpi-loop
     
   } //end f-loop
@@ -228,12 +255,22 @@ Vector<double> LinearAdvection::set_initial_condition()
 }
 
 //==============================================================
-void LinearAdvection::write_output(const Vector<double> &u, double ti)
+void LinearAdvection::write_output(const Vector<double> &u, std::size_t ti)
 {
-  
-  std::cout << "writing ti=" << ti << "u(0)=" << u(0) <<std::endl;
-  
+  std::string fname(AP.output_file_base);
+  char buf[10];
+  sprintf(buf, "%06lu", ti);
+  buf[6] = '\0';
+  fname += "_";
+  fname += buf;
+  fname += ".vtu";
 
+  std::cout << "writing ti=" << ti << " u(0)="<<u(0) <<std::endl;
+  
+  VTKScalarData vtku(u, VTKObject::VTKPOINTDATA, "u");
+  vout.addVTKObject(&vtku);
+  vout.write(fname);
+  vout.clearData();
 }
 
 

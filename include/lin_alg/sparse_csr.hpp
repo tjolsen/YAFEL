@@ -181,7 +181,7 @@ template<typename dataType>
 typename sparse_csr<dataType>::value_type 
 sparse_csr<dataType>::operator()(size_type i, size_type j, bool & in_sparsity) const {
 #ifndef _OPTIMIZED
-  if(i>=_rows || j >= cols) {
+  if(i>=_rows || j >= _cols) {
     std::cerr << "error:sparse_csr:operator() out of bounds\n";
     exit(1);
   }

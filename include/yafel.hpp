@@ -57,6 +57,7 @@
 #include "output/VTKVectorData.hpp"
 #include "output/VTKTensorData.hpp"
 #include "output/VTKMesh.hpp"
+#include "output/VTKDGMesh.hpp"
 #include "output/VTKTimeOutput.hpp"
 #include "output/MatrixVisualization.hpp"
 

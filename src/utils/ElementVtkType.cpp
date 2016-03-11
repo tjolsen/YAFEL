@@ -36,6 +36,9 @@ ElementVtkType ElementType_to_ElementVtkType(ElementType e) {
   case ElementType::QUADRATIC_TET:
     return ElementVtkType::VTK_QUADRATIC_TETRA;
 
+  case ElementType::DG_QUAD:
+    return ElementVtkType::VTK_POLY_VERTEX;
+
   default:
     return ElementVtkType::VTK_ERROR;
   }
