@@ -44,7 +44,7 @@ LinearAdvection::flux_function(double u_in, double u_out,
 {
   if(is_boundary) {
     //boundary conditions handled here
-    if(contract<1>(c,n) < 0) {
+    if(contract<1>(c,n) <= 0) {
       //inflow
       return Tensor<2,1,double>{0,0};
     }
