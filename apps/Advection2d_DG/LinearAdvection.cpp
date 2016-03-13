@@ -196,43 +196,6 @@ Vector<double> LinearAdvection::element_residual(std::size_t elnum,
         r_elem(E.edge_nodes_ccw(fA,f)) -= vals[fA]*contract<1>(Jinv*flux,N)*detJ*E.face_weight(fqpi);
       }
 
-      /*
-      //compute flux*N at quadrature point
-      for(std::size_t fA=0; fA<E.poly_order+1; ++fA) {
-        //local node number
-        std::size_t A = E.edge_nodes_ccw(fA, f);
-
-        for(std::size_t fB=0; fB<E.poly_order+1; ++fB) {
-          //local node number
-          std::size_t B = E.edge_nodes_ccw(fB, f);
-          
-          //adjacent element local node number
-          std::size_t adj_B = E.edge_nodes_cw(fB, adj_elem_face);
-          
-          //global dof of adjacent node
-          std::size_t adj_global_dof = adj_elem*nnodes + adj_B;
-          
-          double u_in = u_elem(A);
-          double u_out = u(adj_global_dof);
-          
-          auto flux = flux_function(u_in, u_out, AP.v_advection, n, F.boundary);
-          //auto J = E.jacobians[0];//E.calc_J_xi(E.nodes_xi[A]);
-          //auto Jinv = inv(J);
-          //double detJ = det(J);
-          
-          r_elem(A) -= E.shape_value_xi(B,xi_qp)*
-            (detJ*contract<1>(Jinv*flux,N)*E.shape_value_xi(A, xi_qp))*E.face_weight(fqpi);
-        }
-      }
-      */
-      
-      /*      
-      //distribute flux to nodes
-      for(std::size_t fA=0; fA<E.poly_order+1; ++fA) {
-        std::size_t A = E.edge_nodes_ccw(fA, f);
-        r_elem(A) += qp_flux*E.shape_value_xi(A,xi_qp)*E.face_weight(fqpi);
-      }
-      */
     }//end fqpi-loop
     
   } //end f-loop
