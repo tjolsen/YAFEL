@@ -81,7 +81,7 @@ void LinearAdvection::RK4()
   //number of time steps
   std::size_t Nt = std::size_t(AP.Tfinal/AP.dt); //round down. no point being more precise now
 
-  std::vector<double> conserved_qty(Nt,0);
+  std::vector<double> conserved_qty(Nt+1,0);
   conserved_qty[0] = integrate_field(u);
   
   for(std::size_t ti=1; ti<=Nt; ++ti) {
@@ -177,8 +177,26 @@ Vector<double> LinearAdvection::element_residual(std::size_t elnum,
 
       auto xi_qp = E.face_qp(f,fqpi);
       
-      //double qp_flux = 0;
+      //compute u_in and u_out at quadrature point
+      double u_in=0;
+      double u_out=0;
+      std::vector<double> vals(E.poly_order+1,0);
+      for(std::size_t fA=0; fA<E.poly_order+1; ++fA) {
+        std::size_t A_in = E.edge_nodes_ccw(fA,f);
+        std::size_t A_out = E.edge_nodes_cw(fA,adj_elem_face);
+        std::size_t A_out_global = adj_elem*nnodes + A_out;
+        
+        vals[fA] = E.shape_value_xi(A_in,xi_qp);
+        u_in += u_elem(A_in)*vals[fA];
+        u_out += u(A_out_global)*vals[fA];
+      }
+      for(std::size_t fA=0; fA<E.poly_order+1; ++fA) {
+        
+        auto flux =flux_function(u_in, u_out, AP.v_advection, n, F.boundary);
+        r_elem(E.edge_nodes_ccw(fA,f)) -= vals[fA]*contract<1>(Jinv*flux,N)*detJ*E.face_weight(fqpi);
+      }
 
+      /*
       //compute flux*N at quadrature point
       for(std::size_t fA=0; fA<E.poly_order+1; ++fA) {
         //local node number
@@ -206,7 +224,8 @@ Vector<double> LinearAdvection::element_residual(std::size_t elnum,
             (detJ*contract<1>(Jinv*flux,N)*E.shape_value_xi(A, xi_qp))*E.face_weight(fqpi);
         }
       }
-
+      */
+      
       /*      
       //distribute flux to nodes
       for(std::size_t fA=0; fA<E.poly_order+1; ++fA) {
