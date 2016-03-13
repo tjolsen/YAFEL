@@ -190,6 +190,8 @@ Vector<double> LinearAdvection::element_residual(std::size_t elnum,
         u_in += u_elem(A_in)*vals[fA];
         u_out += u(A_out_global)*vals[fA];
       }
+
+      //distribute over face
       for(std::size_t fA=0; fA<E.poly_order+1; ++fA) {
         
         auto flux =flux_function(u_in, u_out, AP.v_advection, n, F.boundary);
