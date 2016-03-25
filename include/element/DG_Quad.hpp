@@ -324,7 +324,7 @@ void DG_Quad<NSD,dataType>::update_nodes(const GenericMesh<MT,NSD> &M, size_type
 
   //interpolate x-values of xi-nodes assuming (for now) straight-edged
   // bilinear interpolation from corners.
-  std::vector<Tensor<NSD,1,size_type>> ij_corners{
+  std::vector<Tensor<NSD,1,size_type> > ij_corners{
     Tensor<NSD,1,size_type>{0,0},
     Tensor<NSD,1,size_type>{1,0},
     Tensor<NSD,1,size_type>{1,1},

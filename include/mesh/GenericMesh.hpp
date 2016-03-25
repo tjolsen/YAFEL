@@ -31,7 +31,7 @@ public:
   std::vector<Face> mesh_faces;
 
   //pointers to faces for each cell (offsets in mesh_faces vector)
-  std::vector<std::vector<size_type>> cell_faces; 
+  std::vector<std::vector<size_type> > cell_faces; 
 
   //boolean to indicate if build_faces has been called
   bool faces_built;
@@ -134,7 +134,7 @@ void GenericMesh<MT,NSD>::build_faces() {
   
   
   //loop over elements and build node-element adjacency sets
-  std::vector<std::set<size_type>> node_sets(n_nodes());
+  std::vector<std::set<size_type> > node_sets(n_nodes());
   for(auto e : vol_elements) {
     element_container elem = element(e);
 
