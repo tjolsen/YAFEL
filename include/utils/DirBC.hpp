@@ -53,7 +53,7 @@ public:
 
 template<unsigned NSD>
 DirBC::DirBC(const GmshMesh<NSD> &M, const DoFManager &dofm, size_type tagID, 
-      size_type comp, const SpatialFunction<NSD,double> &sfunc) 
+             size_type comp, const SpatialFunction<NSD,double> &sfunc) 
   : bcdofs(), 
     bcvals(), 
     bcmask(dofm.n_dofs(M.n_nodes()),false), 

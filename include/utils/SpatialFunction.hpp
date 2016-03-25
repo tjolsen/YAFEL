@@ -4,18 +4,13 @@
 #include "yafel_globals.hpp"
 #include "lin_alg/tensor/Tensor.hpp"
 
+#include <functional>
+
 YAFEL_NAMESPACE_OPEN
 
-template<unsigned NSD, typename T=double>
-class SpatialFunction {
+template<unsigned NSD, typename R, typename dataType=double>
+using SpatialFunction = std::function<R(const Tensor<NSD,1,dataType>&)>;
 
-private:
-  T (*func)(const Tensor<NSD,1,T> &x);
-
-public:
-  SpatialFunction(T (*fp)(const Tensor<NSD,1,T> &x)) : func(fp) {}
-  T operator()(const Tensor<NSD,1,T> &x) const {return func(x);}
-};
 
 YAFEL_NAMESPACE_CLOSE
 
