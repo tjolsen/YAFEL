@@ -1,5 +1,5 @@
-#ifndef __YAFEL_VTKDGMESH_HPP
-#define __YAFEL_VTKDGMESH_HPP
+#ifndef _YAFEL_VTKDGMESH_HPP
+#define _YAFEL_VTKDGMESH_HPP
 
 /*
  * VTKDGMesh:

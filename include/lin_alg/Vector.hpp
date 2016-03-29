@@ -1,5 +1,5 @@
-#ifndef __YAFEL_VECTOR_HPP
-#define __YAFEL_VECTOR_HPP
+#ifndef _YAFEL_VECTOR_HPP
+#define _YAFEL_VECTOR_HPP
 
 #include "yafel_globals.hpp"
 #include "lin_alg/VectorExpression.hpp"

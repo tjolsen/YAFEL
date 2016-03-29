@@ -1,5 +1,5 @@
-#ifndef __YAFEL_MESHITERATOR_HPP
-#define __YAFEL_MESHITERATOR_HPP
+#ifndef _YAFEL_MESHITERATOR_HPP
+#define _YAFEL_MESHITERATOR_HPP
 
 #include "yafel_globals.hpp"
 #include <exception>

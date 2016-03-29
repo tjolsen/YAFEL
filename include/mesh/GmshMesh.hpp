@@ -1,5 +1,5 @@
-#ifndef __YAFEL_GMSHMESH_HPP
-#define __YAFEL_GMSHMESH_HPP
+#ifndef _YAFEL_GMSHMESH_HPP
+#define _YAFEL_GMSHMESH_HPP
 
 
 /* 

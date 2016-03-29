@@ -1,5 +1,5 @@
-#ifndef __YAFEL_CSR_SPARSITY_PATTERN_HPP
-#define __YAFEL_CSR_SPARSITY_PATTERN_HPP
+#ifndef _YAFEL_CSR_SPARSITY_PATTERN_HPP
+#define _YAFEL_CSR_SPARSITY_PATTERN_HPP
 
 
 #include "lin_alg/sparsity_pattern.hpp"

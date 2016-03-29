@@ -1,5 +1,5 @@
-#ifndef __YAFEL_CSR_SPMV
-#define __YAFEL_CSR_SPMV
+#ifndef _YAFEL_CSR_SPMV
+#define _YAFEL_CSR_SPMV
 
 
 /*

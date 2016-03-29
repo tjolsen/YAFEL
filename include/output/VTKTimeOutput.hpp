@@ -1,5 +1,5 @@
-#ifndef _VTKTIMEOUTPUT_HPP
-#define _VTKTIMEOUTPUT_HPP
+#ifndef _YAFEL_VTKTIMEOUTPUT_HPP
+#define _YAFEL_VTKTIMEOUTPUT_HPP
 
 #include "yafel_globals.hpp"
 #include <string>

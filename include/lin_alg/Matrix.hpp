@@ -1,5 +1,5 @@
-#ifndef __YAFEL_MATRIX_HPP
-#define __YAFEL_MATRIX_HPP
+#ifndef _YAFEL_MATRIX_HPP
+#define _YAFEL_MATRIX_HPP
 
 #include "yafel_globals.hpp"
 #include "lin_alg/MatrixExpression.hpp"

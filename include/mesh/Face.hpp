@@ -1,5 +1,5 @@
-#ifndef __YAFEL_FACE_HPP
-#define __YAFEL_FACE_HPP
+#ifndef _YAFEL_FACE_HPP
+#define _YAFEL_FACE_HPP
 
 /*
  * Face: 

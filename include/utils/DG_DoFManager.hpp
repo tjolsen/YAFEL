@@ -1,5 +1,5 @@
-#ifndef __YAFEL_DG_DOFMANAGER_HPP
-#define __YAFEL_DG_DOFMANAGER_HPP
+#ifndef _YAFEL_DG_DOFMANAGER_HPP
+#define _YAFEL_DG_DOFMANAGER_HPP
 
 
 /*
@@ -39,10 +39,13 @@ public:
     if(component >= _dof_per_node) {
       throw std::domain_error("Component exceeds dof_per_node");
     }
+
+    //not implemented correctly for DG meshes. Ignoring check, assuming correct use.
+    /*
     if(local_node >= M.element(elnum).size()) {
       throw std::domain_error("local_node exceeds number of nodes in element");
     }
-    
+    */
     return dof_offset[elnum] + local_node*_dof_per_node + component;
   }
 

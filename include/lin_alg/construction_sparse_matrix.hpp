@@ -1,5 +1,5 @@
-#ifndef __YAFEL_CONSTRUCTION_SPARSE_MATRIX
-#define __YAFEL_CONSTRUCTION_SPARSE_MATRIX
+#ifndef _YAFEL_CONSTRUCTION_SPARSE_MATRIX_HPP
+#define _YAFEL_CONSTRUCTION_SPARSE_MATRIX_HPP
 
 #include "yafel_globals.hpp"
 #include "lin_alg/sparse_matrix.hpp"

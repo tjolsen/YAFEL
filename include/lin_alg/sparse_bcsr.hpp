@@ -1,5 +1,5 @@
-#ifndef __YAFEL_SPARSE_BCSR_HPP
-#define __YAFEL_SPARSE_BCSR_HPP
+#ifndef _YAFEL_SPARSE_BCSR_HPP
+#define _YAFEL_SPARSE_BCSR_HPP
 
 #include "yafel_globals.hpp"
 #include "lin_alg/sparse_matrix.hpp"

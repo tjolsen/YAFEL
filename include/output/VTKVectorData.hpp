@@ -22,7 +22,7 @@ private:
   std::vector<Tensor<NSD,1> > data;
 
 public:
-  VTKVectorData(const std::vector<Tensor<NSD,1> > &d, VTKObject::VTKObjectType ot, const std::string &s);
+  VTKVectorData(const std::vector<Tensor<NSD,1> > &d, VTKObject::VTKObjectType ot, const std::string s);
 
   void write(FILE *fp);
 };
@@ -34,8 +34,10 @@ public:
  */ 
 template<unsigned NSD>
 VTKVectorData<NSD>::VTKVectorData(const std::vector<Tensor<NSD,1> > &d, 
-                                    VTKObject::VTKObjectType ot, const std::string &s) :
-                                  VTKObject(VTKObject::VTKVECTORDATA, ot, s), data(d) {}
+                                  VTKObject::VTKObjectType ot, const std::string s) :
+  VTKObject(VTKObject::VTKVECTORDATA, ot, s), 
+  data(d) 
+{}
 
 
 template<unsigned NSD>
@@ -43,9 +45,8 @@ void VTKVectorData<NSD>::write(FILE *fp) {
   
   fprintf(fp, "<DataArray type=\"Float32\" format=\"ascii\" Name=\"%s\" NumberOfComponents=\"3\">\n",
 	  getName().c_str());
-  
+
   for(unsigned i=0; i<data.size(); ++i) {
-    
     fprintf(fp, "%f %f %f\n", 
 	    data[i](0),
 	    (NSD>=2)?data[i](1):0,

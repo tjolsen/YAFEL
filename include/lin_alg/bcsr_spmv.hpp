@@ -1,5 +1,5 @@
-#ifndef __YAFEL_BCSR_SPMV
-#define __YAFEL_BCSR_SPMV
+#ifndef _YAFEL_BCSR_SPMV_HPP
+#define _YAFEL_BCSR_SPMV_HPP
 
 /*
  * Sparse matrix-vector multiplication subroutine for a 

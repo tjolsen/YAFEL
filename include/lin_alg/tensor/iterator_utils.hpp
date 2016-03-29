@@ -1,5 +1,5 @@
-#ifndef __YAFEL_ITERATOR_UTILS
-#define __YAFEL_ITERATOR_UTILS
+#ifndef _YAFEL_ITERATOR_UTILS
+#define _YAFEL_ITERATOR_UTILS
 
 #include "yafel_globals.hpp"
 #include <tuple>

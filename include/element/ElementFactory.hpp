@@ -1,5 +1,5 @@
-#ifndef __YAFEL_ELEMENTFACTORY_HPP
-#define __YAFEL_ELEMENTFACTORY_HPP
+#ifndef _YAFEL_ELEMENTFACTORY_HPP
+#define _YAFEL_ELEMENTFACTORY_HPP
 
 #include "yafel_globals.hpp"
 #include "element/Element.hpp"

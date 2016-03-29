@@ -1,5 +1,5 @@
-#ifndef __YAFEL_ACCESS_SPARSE_MATRIX
-#define __YAFEL_ACCESS_SPARSE_MATRIX
+#ifndef _YAFEL_ACCESS_SPARSE_MATRIX
+#define _YAFEL_ACCESS_SPARSE_MATRIX
 
 
 #include "yafel_globals.hpp"

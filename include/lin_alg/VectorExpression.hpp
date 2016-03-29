@@ -1,5 +1,5 @@
-#ifndef __YAFEL_VECTOREXPRESSION_HPP
-#define __YAFEL_VECTOREXPRESSION_HPP
+#ifndef _YAFEL_VECTOREXPRESSION_HPP
+#define _YAFEL_VECTOREXPRESSION_HPP
 
 #include "yafel_globals.hpp"
 

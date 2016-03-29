@@ -1,5 +1,5 @@
-#ifndef __YAFEL_MATRIXEXPRESSION_HPP
-#define __YAFEL_MATRIXEXPRESSION_HPP
+#ifndef _YAFEL_MATRIXEXPRESSION_HPP
+#define _YAFEL_MATRIXEXPRESSION_HPP
 
 #include "yafel_globals.hpp"
 

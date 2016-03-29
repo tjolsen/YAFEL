@@ -1,5 +1,5 @@
-#ifndef __YAFEL_DUALNUMBER_HPP
-#define __YAFEL_DUALNUMBER_HPP
+#ifndef _YAFEL_DUALNUMBER_HPP
+#define _YAFEL_DUALNUMBER_HPP
 
 #include "yafel_globals.hpp"
 #include <cmath>

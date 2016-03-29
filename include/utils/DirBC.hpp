@@ -1,5 +1,5 @@
-#ifndef __YAFEL_DIRBC_HPP
-#define __YAFEL_DIRBC_HPP
+#ifndef _YAFEL_DIRBC_HPP
+#define _YAFEL_DIRBC_HPP
 
 /*
  * Class to represent and facilitate the application of Dirichlet boundary conditions

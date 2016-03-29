@@ -1,5 +1,5 @@
-#ifndef __YAFEL_OPERATORS_HPP
-#define __YAFEL_OPERATORS_HPP
+#ifndef _YAFEL_OPERATORS_HPP
+#define _YAFEL_OPERATORS_HPP
 
 #include "yafel_globals.hpp"
 

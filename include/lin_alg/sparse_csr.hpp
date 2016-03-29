@@ -1,5 +1,5 @@
-#ifndef __YAFEL_SPARSE_CSR_HPP
-#define __YAFEL_SPARSE_CSR_HPP
+#ifndef _YAFEL_SPARSE_CSR_HPP
+#define _YAFEL_SPARSE_CSR_HPP
 
 #include "yafel_globals.hpp"
 

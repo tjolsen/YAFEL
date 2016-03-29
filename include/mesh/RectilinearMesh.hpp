@@ -1,5 +1,5 @@
-#ifndef __YAFEL_RECTILINEAR_MESH
-#define __YAFEL_RECTILINEAR_MESH
+#ifndef _YAFEL_RECTILINEAR_MESH
+#define _YAFEL_RECTILINEAR_MESH
 
 /*
  * RectilinearMesh:

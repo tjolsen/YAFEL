@@ -1,5 +1,5 @@
-#ifndef __YAFEL_CG_DOFMANAGER_HPP
-#define __YAFEL_CG_DOFMANAGER_HPP
+#ifndef _YAFEL_CG_DOFMANAGER_HPP
+#define _YAFEL_CG_DOFMANAGER_HPP
 
 /*
  * CG_DoFManager:

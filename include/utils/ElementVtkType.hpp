@@ -1,5 +1,5 @@
-#ifndef __YAFEL_ELEMENTVTKTYPE_HPP
-#define __YAFEL_ELEMENTVTKTYPE_HPP
+#ifndef _YAFEL_ELEMENTVTKTYPE_HPP
+#define _YAFEL_ELEMENTVTKTYPE_HPP
 
 /*
  * Utility (enum) class to provide descriptive names for VTK output

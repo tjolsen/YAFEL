@@ -1,5 +1,5 @@
-#ifndef __YAFEL_NULLELEMENT_HPP
-#define __YAFEL_NULLELEMENT_HPP
+#ifndef _YAFEL_NULLELEMENT_HPP
+#define _YAFEL_NULLELEMENT_HPP
 
 #include "yafel_globals.hpp"
 #include "element/Element.hpp"

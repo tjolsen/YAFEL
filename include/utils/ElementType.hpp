@@ -1,5 +1,5 @@
-#ifndef __YAFEL_ELEMENTTYPE_HPP
-#define __YAFEL_ELEMENTTYPE_HPP
+#ifndef _YAFEL_ELEMENTTYPE_HPP
+#define _YAFEL_ELEMENTTYPE_HPP
 
 /*
  * Utility (enum) class to provide a unified way to describe an element

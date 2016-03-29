@@ -1,5 +1,5 @@
-#ifndef __YAFEL_TENSOR_SPECIALIZATIONS_HPP
-#define __YAFEL_TENSOR_SPECIALIZATIONS_HPP
+#ifndef _YAFEL_TENSOR_SPECIALIZATIONS_HPP
+#define _YAFEL_TENSOR_SPECIALIZATIONS_HPP
 
 #include "yafel_globals.hpp"
 #include "lin_alg/tensor/TensorExpression.hpp"

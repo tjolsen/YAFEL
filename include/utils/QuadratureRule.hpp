@@ -1,5 +1,5 @@
-#ifndef __YAFEL_QUADRATURERULE_HPP
-#define __YAFEL_QUADRATURERULE_HPP
+#ifndef _YAFEL_QUADRATURERULE_HPP
+#define _YAFEL_QUADRATURERULE_HPP
 
 /*
  * Class defining the interface for quadrature rules.

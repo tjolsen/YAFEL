@@ -1,5 +1,5 @@
-#ifndef __YAFEL_DG_QUAD_HPP
-#define __YAFEL_DG_QUAD_HPP
+#ifndef _YAFEL_DG_QUAD_HPP
+#define _YAFEL_DG_QUAD_HPP
 
 /*
  * Class for a quadrilateral element of polynomial order P
@@ -148,6 +148,15 @@ public:
   inline Tensor<NSD,1,dataType> mesh_face_normal(size_type fnum) const {
     return mesh_normals[fnum];
   }
+
+  //return number of dofs in element
+  inline size_type dof_per_element() const { return dof_per_node*nodes_per_element; }
+
+  //return base node of a dof
+  inline size_type base(size_type dof) const {return dof/dof_per_node;}
+
+  //return component number of a dof
+  inline size_type component(size_type dof) const {return dof%dof_per_node;}
 
   //get xi-coordinate for face quadrature point
   inline Tensor<NSD,1,dataType> face_qp(size_type fnum, size_type fqpi) const {

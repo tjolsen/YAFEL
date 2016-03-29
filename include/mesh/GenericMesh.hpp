@@ -1,5 +1,5 @@
-#ifndef __YAFEL_GENERIC_MESH_HPP
-#define __YAFEL_GENERIC_MESH_HPP
+#ifndef _YAFEL_GENERIC_MESH_HPP
+#define _YAFEL_GENERIC_MESH_HPP
 
 /*
  * GenericMesh: Base class utilizing CRTP to define the interface for finite element

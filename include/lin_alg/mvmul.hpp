@@ -1,5 +1,5 @@
-#ifndef __YAFEL_MVMUL_HPP
-#define __YAFEL_MVMUL_HPP
+#ifndef _YAFEL_MVMUL_HPP
+#define _YAFEL_MVMUL_HPP
 
 /*
  * Dense MatrixExpression-VectorExpression multiplication.

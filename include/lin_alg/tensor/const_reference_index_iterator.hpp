@@ -1,5 +1,5 @@
-#ifndef __YAFEL_CONST_REFERENCE_INDEX_ITERATOR_HPP
-#define __YAFEL_CONST_REFERENCE_INDEX_ITERATOR_HPP
+#ifndef _YAFEL_CONST_REFERENCE_INDEX_ITERATOR_HPP
+#define _YAFEL_CONST_REFERENCE_INDEX_ITERATOR_HPP
 
 #include "yafel_globals.hpp"
 #include "lin_alg/tensor/generic_index_iterator.hpp"

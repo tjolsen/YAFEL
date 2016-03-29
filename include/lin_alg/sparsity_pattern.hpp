@@ -1,5 +1,5 @@
-#ifndef __YAFEL_SPARSITY_PATTERN_HPP
-#define __YAFEL_SPARSITY_PATTERN_HPP
+#ifndef _YAFEL_SPARSITY_PATTERN_HPP
+#define _YAFEL_SPARSITY_PATTERN_HPP
 
 /*
  * Base class to define interface for the sparsity pattern for sparse matrices.

@@ -1,5 +1,5 @@
-#ifndef _YAFEL_GLOBAL_HPP
-#define _YAFEL_GLOBAL_HPP
+#ifndef _YAFEL_GLOBALS_HPP
+#define _YAFEL_GLOBALS_HPP
 
 /*
 
