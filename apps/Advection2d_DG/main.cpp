@@ -10,7 +10,7 @@ int main() {
 
   Tensor<2,1,double> c0{1,.1}; // <-- un-normalized velocity vector. Control direction here.
 
-  std::size_t P = 5;
+  std::size_t P = 1;
   GaussLegendreQuadrature<2> Q2D(P+1);
   GaussLegendreQuadrature<1> Q1D(P+1);
 

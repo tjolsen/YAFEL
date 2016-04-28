@@ -3,7 +3,7 @@ useOpenMP = false
 
 #compile lin_alg routines in "optimized" mode:
 #  disables certain bounds checks
-linalg_optimized = true
+linalg_optimized = false
 
 # Use Parallel Matrix multiplication algorithm
 parallel_matmul = true
@@ -22,7 +22,7 @@ endif
 AR = ar
 
 #compiler optimization and linking flags
-CXXFLAGS = -O3 -Wall -Werror -Wextra #-fmax-errors=5
+CXXFLAGS = -O3 -g -Wall -Werror -Wextra #-fmax-errors=5
 LDFLAGS = -L$(YAFELDIR)/lib/ -lyafel 
 ARFLAGS = -ru
 
