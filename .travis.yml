@@ -5,7 +5,7 @@ before_install:
         - sudo apt-get -qq update
 
 install:
-        - sudo apt-get install -y g++-6
+        - sudo apt-get install -y g++-6 binutils
         - export CXX="g++-6"
         - export CC="gcc-6"
 
