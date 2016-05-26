@@ -19,11 +19,11 @@ ifndef CC
 endif
 
 #define archive utility
-AR = ar
+AR = gcc-ar
 
 #compiler optimization and linking flags
-CXXFLAGS = -O3 -g -Wall -Werror -Wextra #-fmax-errors=5
-LDFLAGS = -L$(YAFELDIR)/lib/ -lyafel 
+CXXFLAGS = -O3 -Wall -Werror -Wextra -flto #-fmax-errors=5
+LDFLAGS = -L$(YAFELDIR)/lib/ -lyafel -flto
 ARFLAGS = -ru
 
 #output library name

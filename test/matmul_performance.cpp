@@ -3,13 +3,10 @@
 #include "lin_alg/MatrixExpression.hpp"
 #include "lin_alg/matmul.hpp"
 #include "lin_alg/operators.hpp"
-//#include "output/MatrixVisualization.hpp"
+#include "output/MatrixVisualization.hpp"
 
 #include <chrono>
 #include <mutex>
-
-//horrible horrible hack. need to fix library compilation
-//#include "../src/output/MatrixVisualization.cpp"
 
 
 using namespace yafel;
@@ -90,9 +87,7 @@ int main() {
       Gflops2.push_back(work/dt2);
     }
   }  
-//  MatrixVisualization MV;
-//  
-//  MV.scatter_xy(Nvec, Gflops1);
+  MatrixVisualization::scatter_xy(Nvec, Gflops1);
 //  MV.scatter_xy(Nvec, Gflops2);
   return 0;
 }
