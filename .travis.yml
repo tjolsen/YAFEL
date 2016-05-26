@@ -5,8 +5,8 @@ before_install:
         - sudo apt-get -qq update
 
 install:
-        - sudo apt-get install -y g++-4.8
-        - export CXX="g++-4.8"
-        - export CC="gcc-4.8"
+        - sudo apt-get install -y g++-6
+        - export CXX="g++-6"
+        - export CC="gcc-6"
 
 script: make runtests
