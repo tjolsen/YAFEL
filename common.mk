@@ -22,8 +22,8 @@ endif
 AR = gcc-ar
 
 #compiler optimization and linking flags
-CXXFLAGS = -O3 -Wall -Werror -Wextra -flto #-fmax-errors=5
-LDFLAGS = -L$(YAFELDIR)/lib/ -lyafel -flto
+CXXFLAGS = -O3 -Wall -Werror -Wextra #-fmax-errors=5
+LDFLAGS = -L$(YAFELDIR)/lib/ -lyafel
 ARFLAGS = -ru
 
 #output library name
