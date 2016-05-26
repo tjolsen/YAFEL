@@ -19,7 +19,7 @@ ifndef CC
 endif
 
 #define archive utility
-AR = gcc-ar
+AR = ar
 
 #compiler optimization and linking flags
 CXXFLAGS = -O3 -Wall -Werror -Wextra #-fmax-errors=5
