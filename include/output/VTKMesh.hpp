@@ -119,7 +119,7 @@ void VTKMesh<MT,NSD>::write(FILE *fp) {
     if(et == ElementType::NULL_ELEMENT)
       continue;
     
-    fprintf(fp, "%d\n", ElementType_to_ElementVtkType(et));
+    fprintf(fp, "%d\n", (int)ElementType_to_ElementVtkType(et));
   }
   fprintf(fp, "</DataArray>\n");
   fprintf(fp, "</Cells>\n");
