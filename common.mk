@@ -8,14 +8,16 @@ linalg_optimized = true
 # Use Parallel Matrix multiplication algorithm
 parallel_matmul = true
 
+export CXX = clang++
+
 #define C++ compiler
 ifndef CXX
- export CXX = g++
+ export CXX = clang++
 endif
 
 #define C compiler
 ifndef CC
- export CC = gcc
+ export CC = clang
 endif
 
 #define archive utility
