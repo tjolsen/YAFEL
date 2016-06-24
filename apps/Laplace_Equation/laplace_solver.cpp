@@ -37,7 +37,7 @@
 
 using namespace yafel;
 
-constexpr unsigned NSD = 2;
+constexpr unsigned NSD = 3;
 
 
 int main() {
@@ -46,7 +46,7 @@ int main() {
    * Problem Parameters
    */
   double L = 1; // box length
-  double dim_elem = 1000; // elements along each dimension
+  double dim_elem = 100; // elements along each dimension
 
   //set up basic structures
   RectilinearMesh<NSD> M(std::vector<double>(NSD,L), std::vector<std::size_t>(NSD,dim_elem));
