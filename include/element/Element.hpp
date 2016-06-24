@@ -36,8 +36,9 @@ public:
     std::vector<coordinate_type> xi_0;
     std::vector<Tensor<NSD,2> > jacobians;
     std::vector<double> detJ;
-    std::vector<Vector<double> > shape_vals; //vector of n_qp Vectors. holds values of shape funcs at qp's
-    std::vector<Matrix<double> > shape_grads; //vector of n_qp Matrix objects, hold grads of shape funcs at qp's
+    std::vector<Vector<double> > shape_vals; //vector of n_qp Vectors. holds values of shape funcs at qps
+    std::vector<Matrix<double> > shape_grads; //vector of n_qp Matrix objects, hold grads wrt "x" of shape funcs at qps
+    std::vector<Matrix<double> > shape_grads_0;//vector of n_qp Matrix objects, holds shape grads of canonical element at qps.
     std::vector<size_type> element_nodes;
     std::vector<coordinate_type> nodal_coords;
     std::vector<size_type> global_dofs;
@@ -75,6 +76,10 @@ public:
     //return spatial interpolation at point xi
     coordinate_type xval(const coordinate_type & xi) const;
 
+    
+    // Function to initialize element. MUST be called before using element.
+    // Cannot be placed into ctor due to virtual function calls.
+    void init_element();
 };
 
 
@@ -97,7 +102,14 @@ Element<NSD>::Element(const DoFManager &dofm, ElementType eltype, size_type ntd,
     nodes_per_el(nodespe),
     DOFM(dofm),
     element_type(eltype)
-{}
+{
+
+    //fill shape_grads vector of matrices
+    shape_grads.clear();
+    for(size_type qpi=0; qpi<n_quadPoints; ++qpi) {
+        shape_grads.emplace_back(Matrix<double>(nodes_per_el, NSD, 0));
+    }
+}
 
 
 //---------------------------------------------------------------------
@@ -106,8 +118,8 @@ Tensor<NSD,2> Element<NSD>::calcJ_xi(const coordinate_type &xi) const {
   
     Tensor<NSD,2> ret;
   
-    for(size_type i=0; i<n_spaceDim; ++i) {
-        for(size_type j=0; j<n_spaceDim; ++j) {
+    for(size_type i=0; i<NSD; ++i) {
+        for(size_type j=0; j<NSD; ++j) {
             for(size_type A=0; A<nodes_per_el; ++A) {
                 ret(i,j) += shape_grad_xi(A, j, xi) * nodal_coords[A](i);
             }
@@ -123,8 +135,18 @@ void Element<NSD>::calcJacobians() {
     jacobians.clear();
     detJ.clear();
   
-    for(size_type i=0; i<n_quadPoints; ++i) {
-        auto J = calcJ_xi(quad_points[i]);
+    for(size_type qpi=0; qpi<n_quadPoints; ++qpi) {
+
+        Tensor<NSD,2> J;
+        
+        for(size_type i=0; i<NSD; ++i) {
+            for(size_type j=0; j<NSD; ++j) {
+                for(size_type A=0; A<nodes_per_el; ++A) {
+                    J(i,j) += shape_grads_0[qpi](A, j) * nodal_coords[A](i);
+                }
+            }
+        }
+
         jacobians.push_back(J);
     
         detJ.push_back(det(J));
@@ -137,23 +159,19 @@ void Element<NSD>::calcJacobians() {
 template<unsigned NSD>
 void Element<NSD>::calcGrads() {
   
-    shape_grads.clear();
-  
     for(size_type qpi=0; qpi<n_quadPoints; ++qpi) {
-        coordinate_type qp = quad_points[qpi];
     
         auto Jinv = inv(jacobians[qpi]);
-        Matrix<double> NG(nodes_per_el, n_spaceDim, 0.0);
+        auto & NG = shape_grads[qpi];
 
         for(size_type A=0; A<nodes_per_el; ++A) {
-            for(size_type j=0; j<n_spaceDim; ++j) {
-                for(size_type k=0; k<n_spaceDim; ++k) {
-                    NG(A,j) += shape_grad_xi(A,k,qp)*Jinv(k,j);
+            for(size_type j=0; j<NSD; ++j) {
+                NG(A,j) = 0;
+                for(size_type k=0; k<NSD; ++k) {
+                    NG(A,j) += shape_grads_0[qpi](A,k)*Jinv(k,j);
                 }
             }
         }
-    
-        shape_grads.push_back(NG);
     }
 }
 
@@ -202,7 +220,7 @@ void Element<NSD>::update_element(const GenericMesh<MTYPE,MNSD> &M, size_type el
   
     calcJacobians();
     calcGrads();
-    calcVals();
+    //calcVals();
 }
 
 
@@ -216,6 +234,36 @@ Element<NSD>::xval(const coordinate_type & xi) const {
     }
   
     return x;
+}
+
+
+
+template<unsigned NSD>
+void Element<NSD>::init_element() {
+
+    //populate shape values
+    shape_vals.clear();
+    for(size_type qpi=0; qpi<n_quadPoints; ++qpi) {
+        auto qp = quad_points[qpi];
+        Vector<double> V(nodes_per_el, 0.0);
+        for(size_type A=0; A<nodes_per_el; ++A) {
+            V(A) = shape_value_xi(A, qp);
+        }
+        shape_vals.push_back(V);
+    }
+    
+    //populate shape value gradients of parent element
+    shape_grads_0.clear();
+    for(size_type qpi=0; qpi<n_quadPoints; ++qpi) {
+        shape_grads_0.emplace_back(Matrix<double>(nodes_per_el, NSD));
+
+        for(size_type A=0; A<nodes_per_el; ++A) {
+            for(size_type dim=0; dim<NSD; ++dim) {
+                shape_grads_0[qpi](A,dim) = shape_grad_xi(A,dim,quad_points[qpi]);
+            }
+        }
+    }
+
 }
 
 YAFEL_NAMESPACE_CLOSE

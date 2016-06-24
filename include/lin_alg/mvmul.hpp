@@ -39,9 +39,20 @@ Vector<dataType> mvmul(const MatrixExpression<MT,dataType> &A,
   
   Vector<dataType> b(A.rows());
   
+#ifdef _OPENMP
+  #pragma omp for
+#endif
   for(std::size_t i=0; i<A.rows(); ++i) {
     dataType sum(0);
-    for(std::size_t j=0; j<A.cols(); ++j) {
+    auto N = A.cols()/4;
+    auto NN = 4*N;
+    for(std::size_t j=0; j<NN; j+= 4) {
+      sum += A(i,j+0)*x(j+0);
+      sum += A(i,j+1)*x(j+1);
+      sum += A(i,j+2)*x(j+2);
+      sum += A(i,j+3)*x(j+3);
+    }
+    for(std::size_t j=NN; j<A.cols(); ++j) {
       sum += A(i,j)*x(j);
     }
     b(i) = sum;

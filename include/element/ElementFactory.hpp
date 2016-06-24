@@ -56,7 +56,13 @@ ElementFactory<MTYPE,NSD>::ElementFactory(const GenericMesh<MTYPE,NSD> &m, const
       null_element(dofm),
       DOFM(dofm),
       _dof_per_node(dofm.dof_per_node())
-{}
+{
+
+    linear_quad.init_element();
+    linear_tri.init_element();
+    linear_hex.init_element();
+
+}
 
 template<typename MTYPE, unsigned NSD>
 Element<NSD> & ElementFactory<MTYPE,NSD>::getElement(size_type elnum) {

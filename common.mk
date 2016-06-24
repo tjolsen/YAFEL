@@ -1,9 +1,9 @@
 #parallelize with OpenMP
-useOpenMP = true
+useOpenMP = false
 
 #compile lin_alg routines in "optimized" mode:
 #  disables certain bounds checks
-linalg_optimized = true
+linalg_optimized = false
 
 # Use Parallel Matrix multiplication algorithm
 parallel_matmul = true
