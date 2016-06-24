@@ -3,6 +3,7 @@
 
 #include "yafel_globals.hpp"
 #include "element/Element.hpp"
+#include "element/LinHex.hpp"
 #include "element/LinQuad.hpp"
 #include "element/LinTri.hpp"
 #include "element/NullElement.hpp"
@@ -19,25 +20,26 @@ template<typename MTYPE, unsigned NSD>
 class ElementFactory {
 
 public:
-  using size_type = typename GenericMesh<MTYPE,NSD>::size_type;
+    using size_type = typename GenericMesh<MTYPE,NSD>::size_type;
 
-  ElementFactory()=delete;
-  ElementFactory(const GenericMesh<MTYPE,NSD> &M, const DoFManager &dofm);
+    ElementFactory()=delete;
+    ElementFactory(const GenericMesh<MTYPE,NSD> &M, const DoFManager &dofm);
 
-  Element<NSD> & getElement(size_type elnum); //return NullElement if not implemented
+    Element<NSD> & getElement(size_type elnum); //return NullElement if not implemented
 
-  inline const GenericMesh<MTYPE,NSD> & getMesh() const {return M;}
-  inline size_type n_dof() const { return dof_per_node()*(M.n_nodes()); }
-  inline size_type dof_per_node() const { return _dof_per_node; }
+    inline const GenericMesh<MTYPE,NSD> & getMesh() const {return M;}
+    inline size_type n_dof() const { return dof_per_node()*(M.n_nodes()); }
+    inline size_type dof_per_node() const { return _dof_per_node; }
 
 
 private:
-  const GenericMesh<MTYPE,NSD> &M;
-  LinQuad<NSD> linear_quad;
-  LinTri<NSD> linear_tri;
-  NullElement<NSD> null_element;
-  const DoFManager & DOFM;
-  size_type _dof_per_node;
+    const GenericMesh<MTYPE,NSD> &M;
+    LinQuad<NSD> linear_quad;
+    LinTri<NSD> linear_tri;
+    LinHex<NSD> linear_hex;
+    NullElement<NSD> null_element;
+    const DoFManager & DOFM;
+    size_type _dof_per_node;
 };
 
 
@@ -47,25 +49,30 @@ private:
 
 template<typename MTYPE, unsigned NSD>
 ElementFactory<MTYPE,NSD>::ElementFactory(const GenericMesh<MTYPE,NSD> &m, const DoFManager &dofm)
-  : M(m),
-    linear_quad(dofm),
-    linear_tri(dofm),
-    null_element(dofm),
-    DOFM(dofm),
-    _dof_per_node(dofm.dof_per_node())
+    : M(m),
+      linear_quad(dofm),
+      linear_tri(dofm),
+      linear_hex(dofm),
+      null_element(dofm),
+      DOFM(dofm),
+      _dof_per_node(dofm.dof_per_node())
 {}
 
 template<typename MTYPE, unsigned NSD>
 Element<NSD> & ElementFactory<MTYPE,NSD>::getElement(size_type elnum) {
   
-  ElementType t = M.element_type(elnum);
+    ElementType t = M.element_type(elnum);
   
-  switch(t) {
-  case ElementType::LINEAR_QUAD:
-    return linear_quad;
-  default:
-    return null_element;
-  }
+    switch(t) {
+    case ElementType::LINEAR_QUAD:
+        return linear_quad;
+    case ElementType::LINEAR_TRI:
+        return linear_tri;
+    case ElementType::LINEAR_HEX:
+        return linear_hex;
+    default:
+        return null_element;
+    }
 }
 
 YAFEL_NAMESPACE_CLOSE

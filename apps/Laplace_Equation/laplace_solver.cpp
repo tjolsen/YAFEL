@@ -37,7 +37,7 @@
 
 using namespace yafel;
 
-constexpr unsigned NSD = 2;
+constexpr unsigned NSD = 3;
 
 
 int main() {
@@ -46,7 +46,7 @@ int main() {
    * Problem Parameters
    */
   double L = 1; // box length
-  double dim_elem = 100; // elements along each dimension
+  double dim_elem = 50; // elements along each dimension
 
   //set up basic structures
   RectilinearMesh<NSD> M(std::vector<double>(NSD,L), std::vector<std::size_t>(NSD,dim_elem));
@@ -56,17 +56,19 @@ int main() {
   sparse_coo<double> COO;
 
   // assemble system
+  std::cout << "Assembling..." << std::endl;
   for(std::size_t elnum=0; elnum<M.n_elements(); ++elnum) {
     Element<NSD> & el = EF.getElement(elnum);
 
     if(el.element_type == ElementType::NULL_ELEMENT) {
       continue;
     }
+
     //update element shape values, gradients
     el.update_element(M,elnum);
-
-    std::size_t dof_per_el = el.dof_per_el;
     
+    std::size_t dof_per_el = el.dof_per_el;
+
     Matrix<double> Kloc(dof_per_el, dof_per_el, 0);
     
     for(std::size_t qpi=0; qpi<el.n_quadPoints; ++qpi) {
@@ -88,7 +90,10 @@ int main() {
     }
     
   }//end element loop
-
+  
+  std::cout << "done" << std::endl
+            << "Boundary conditions..." << std::endl;
+  
   //manually construct boundary conditions.
   // this will be abstracted away into something nicer at some point
   std::vector<std::size_t> bcnodes;
@@ -120,7 +125,7 @@ int main() {
   //make dirichlet bc object using vectors created above
   DirBC BC(bcnodes, bcvals, bcmask);
 
-
+  
   //set up sparse matrix data structure for solving
   sparse_csr<double> Ksys(COO);
   Vector<double> Fsys(Ksys.rows(), 0);
@@ -128,9 +133,14 @@ int main() {
   //apply bc to linear system
   BC.apply(Ksys, Fsys);
 
+  std::cout << "done" << std::endl; // bc done
+
   //solve linear system using Conjugate Gradient, with the boundary conditions
   // as an initial guess (rather than just zero)
+
+  std::cout << "Solving..." << std::endl;
   Vector<double> U = cg_solve(Ksys, Fsys, BC.get_ubc());
+  std::cout << "done" << std::endl;
 
   // output system
   VTKOutput vout;

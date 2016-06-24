@@ -10,14 +10,14 @@ int main() {
 
   Tensor<2,1,double> c0{1,.1}; // <-- un-normalized velocity vector. Control direction here.
 
-  std::size_t P = 1;
+  std::size_t P = 2;
   GaussLegendreQuadrature<2> Q2D(P+1);
   GaussLegendreQuadrature<1> Q1D(P+1);
 
 
 
   std::vector<double> mesh_dims{2, 1};
-  std::vector<std::size_t> dir_elems{22,11};
+  std::vector<std::size_t> dir_elems{50,25};
   Tensor<2,1,double> v_advection = c0/std::sqrt(contract<1>(c0,c0)); // <--normalize to 1 for now
   double dt = .003;
   double T = 1;

@@ -29,7 +29,10 @@
 #include "utils/ElementType.hpp"
 
 #include <vector>
+#include <type_traits>
 #include <exception>
+
+
 
 YAFEL_NAMESPACE_OPEN
 
@@ -37,78 +40,91 @@ template<unsigned NSD>
 class RectilinearMesh : public GenericMesh<RectilinearMesh<NSD>, NSD> {
   
 public:
-  using coordinate_type = typename GenericMesh<RectilinearMesh<NSD>,NSD>::coordinate_type;
-  using size_type = typename GenericMesh<RectilinearMesh<NSD>,NSD>::size_type;
-  using element_container = typename GenericMesh<RectilinearMesh<NSD>,NSD>::element_container;
+    using coordinate_type = typename GenericMesh<RectilinearMesh<NSD>,NSD>::coordinate_type;
+    using size_type = typename GenericMesh<RectilinearMesh<NSD>,NSD>::size_type;
+    using element_container = typename GenericMesh<RectilinearMesh<NSD>,NSD>::element_container;
   
-  // mesh characteristics
-  std::vector<double> dims; //hyper-rectangle dimensions
-  std::vector<size_type> dim_elems; // <-- number of elements along each dimension; dx = dims[i]/dim_elems[i]
+    // mesh characteristics
+    std::vector<double> dims; //hyper-rectangle dimensions
+    std::vector<size_type> dim_elems; // <-- number of elements along each dimension; dx = dims[i]/dim_elems[i]
   
 
-  // default is 1 x 1 x ... cube with 10 elements along each dimension
-  RectilinearMesh(const std::vector<double> & _dims,
-                  const std::vector<size_type> & _dim_elems) :
-    dims(_dims), dim_elems(_dim_elems)
-  {
-    // only supporting 1D, 2D, 3D for now. Unlikely to need anything else.
-    static_assert(NSD>0 && NSD<4, "Rectilinear mesh currently intended for NSD={1,2,3}");
+    // default is 1 x 1 x ... cube with 10 elements along each dimension
+    RectilinearMesh(const std::vector<double> & _dims,
+                    const std::vector<size_type> & _dim_elems) :
+        dims(_dims), dim_elems(_dim_elems)
+    {
+        // only supporting 1D, 2D, 3D for now. Unlikely to need anything else.
+        static_assert(NSD>0 && NSD<4, "Rectilinear mesh currently intended for NSD={1,2,3}");
     
-    if(dims.size() != NSD) {
-      throw(std::invalid_argument("RectilinearMesh: wrong size _dims argument"));
+        if(dims.size() != NSD) {
+            throw(std::invalid_argument("RectilinearMesh: wrong size _dims argument"));
+        }
+        if(dim_elems.size() != NSD) {
+            throw(std::invalid_argument("RectilinearMesh: wrong size _dim_elems argument"));
+        }
     }
-    if(dim_elems.size() != NSD) {
-      throw(std::invalid_argument("RectilinearMesh: wrong size _dim_elems argument"));
-    }
-  }
 
-  RectilinearMesh() : RectilinearMesh(std::vector<double>(NSD,1.0),
-                                      std::vector<size_type>(NSD,10))
-  {}
+    RectilinearMesh() : RectilinearMesh(std::vector<double>(NSD,1.0),
+                                        std::vector<size_type>(NSD,10))
+    {}
 
 
-  // Interface implementation
+    // Interface implementation
   
-  inline size_type n_nodes() const {
-    size_type ret(1);
-    for(auto de : dim_elems) {
-      ret *= (de+1);
+    inline size_type n_nodes() const {
+        size_type ret(1);
+        for(auto de : dim_elems) {
+            ret *= (de+1);
+        }
+        return ret;
     }
-    return ret;
-  }
 
-  inline size_type n_elements() const {
-    size_type ret(1);
-    for(auto de : dim_elems) {
-      ret *= de;
+    inline size_type n_elements() const {
+        size_type ret(1);
+        for(auto de : dim_elems) {
+            ret *= de;
+        }
+        return ret;
     }
-    return ret;
-  }
 
-  inline ElementType element_type(size_type) const {return ElementType::LINEAR_QUAD;}
+
+    ElementType element_type(size_type) const 
+    {
+        switch(NSD) {
+        case 1:
+            return ElementType::LINEAR_LINE;
+        case 2:
+            return ElementType::LINEAR_QUAD;
+        case 3:
+            return ElementType::LINEAR_HEX;
+        default:
+            return ElementType::NULL_ELEMENT;
+        }
+    }
   
-  inline coordinate_type node(size_type nodenum) const {
+    coordinate_type node(size_type nodenum) const {
     
-    coordinate_type ret;
-    size_type stride(1);
-    for(size_type i=0; i<NSD; ++i) {
-      //get mesh spacing
-      double dx = dims[i]/dim_elems[i];
+        coordinate_type ret;
+        size_type stride(1);
+        for(size_type i=0; i<NSD; ++i) {
+            //get mesh spacing
+            double dx = dims[i]/dim_elems[i];
       
-      // get node index along dimension i
-      size_type idx = (nodenum/stride) % (dim_elems[i]+1);
+            // get node index along dimension i
+            size_type idx = (nodenum/stride) % (dim_elems[i]+1);
       
-      //set coordinate
-      ret(i) = dx*idx;
+            //set coordinate
+            ret(i) = dx*idx;
 
-      // update stride for next dim
-      stride *= (dim_elems[i]+1);
-    }
+            // update stride for next dim
+            stride *= (dim_elems[i]+1);
+        }
     
-    return ret;
-  }
+        return ret;
+    }
   
-  inline element_container element(size_type elnum) const;
+    element_container element(size_type elnum) const;
   
 private:
   
@@ -123,20 +139,20 @@ private:
 template<>
 inline typename RectilinearMesh<1>::element_container
 RectilinearMesh<1>::element(size_type elnum) const {
-  return element_container{elnum, elnum+1};
+    return element_container{elnum, elnum+1};
 }
 
 template<>
 inline typename RectilinearMesh<2>::element_container
 RectilinearMesh<2>::element(size_type elnum) const {
   
-  size_type el_x = elnum % dim_elems[0];
-  size_type el_y = (elnum/dim_elems[0]) % dim_elems[1];
+    size_type el_x = elnum % dim_elems[0];
+    size_type el_y = (elnum/dim_elems[0]) % dim_elems[1];
   
-  //id of lower-left node
-  size_type LL = el_y*(dim_elems[0]+1) + el_x;
+    //id of lower-left node
+    size_type LL = el_y*(dim_elems[0]+1) + el_x;
 
-  return element_container{LL, LL+1, LL+dim_elems[0]+2, LL+dim_elems[0]+1};
+    return element_container{LL, LL+1, LL+dim_elems[0]+2, LL+dim_elems[0]+1};
 }
 
 
@@ -144,22 +160,21 @@ template<>
 inline typename RectilinearMesh<3>::element_container
 RectilinearMesh<3>::element(size_type elnum) const {
 
-  size_type y_stride = dim_elems[0]+1;
-  size_type z_stride = (dim_elems[0]+1)*(dim_elems[1]+1);
+    size_type y_stride = dim_elems[0]+1;
+    size_type z_stride = (dim_elems[0]+1)*(dim_elems[1]+1);
   
-  size_type el_x = elnum % dim_elems[0];
-  size_type el_y = (elnum/dim_elems[0]) % dim_elems[1];
-  size_type el_z = (elnum/dim_elems[0]/dim_elems[1]) % dim_elems[2];
+    size_type el_x = elnum % dim_elems[0];
+    size_type el_y = (elnum/dim_elems[0]) % dim_elems[1];
+    size_type el_z = (elnum/dim_elems[0]/dim_elems[1]) % dim_elems[2];
 
-  //id of lower-left node
-  size_type LL = el_z*z_stride + el_y*y_stride + el_x;
+    //id of lower-left node
+    size_type LL = el_z*z_stride + el_y*y_stride + el_x;
 
-  return element_container{LL, LL+1, 
-      LL+y_stride+1, LL+y_stride,
-      LL+z_stride, LL+z_stride+1, 
-      LL+z_stride+y_stride+1, LL+z_stride+y_stride};
+    return element_container{LL, LL+1, 
+            LL+y_stride+1, LL+y_stride,
+            LL+z_stride, LL+z_stride+1, 
+            LL+z_stride+y_stride+1, LL+z_stride+y_stride};
 }
-
 
 
 YAFEL_NAMESPACE_CLOSE
