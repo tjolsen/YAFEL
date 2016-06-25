@@ -139,10 +139,11 @@ void Element<NSD>::calcJacobians() {
 
         Tensor<NSD,2> J;
         
-        for(size_type i=0; i<NSD; ++i) {
-            for(size_type j=0; j<NSD; ++j) {
-                for(size_type A=0; A<nodes_per_el; ++A) {
-                    J(i,j) += shape_grads_0[qpi](A, j) * nodal_coords[A](i);
+        for(size_type A=0; A<nodes_per_el; ++A) {
+            for(size_type i=0; i<NSD; ++i) {
+                auto x = nodal_coords[A](i);
+                for(size_type j=0; j<NSD; ++j) {
+                    J(i,j) += shape_grads_0[qpi](A, j) * x;
                 }
             }
         }

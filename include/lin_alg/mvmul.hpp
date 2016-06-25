@@ -40,7 +40,7 @@ Vector<dataType> mvmul(const MatrixExpression<MT,dataType> &A,
   Vector<dataType> b(A.rows());
   
 #ifdef _OPENMP
-  #pragma omp for
+  #pragma omp parallel for
 #endif
   for(std::size_t i=0; i<A.rows(); ++i) {
     dataType sum(0);

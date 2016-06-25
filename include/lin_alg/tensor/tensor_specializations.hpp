@@ -53,13 +53,15 @@ dataType det(const TensorExpression<T,3,2,dataType> &A) {
 template<typename T, typename dataType>
 Tensor<2,2,dataType> inv(const TensorExpression<T,2,2,dataType> &A) {
   
-  dataType detA = det(A);
+  dataType invdet = 1/det(A);
   Tensor<2,2,dataType> Ainv;
+
+
   
-  Ainv(0,0) = A(1,1)/detA;
-  Ainv(0,1) = -A(0,1)/detA;
-  Ainv(1,0) = -A(1,0)/detA;
-  Ainv(1,1) = A(0,0)/detA;
+  Ainv(0,0) = A(1,1)*invdet;
+  Ainv(0,1) = -A(0,1)*invdet;
+  Ainv(1,0) = -A(1,0)*invdet;
+  Ainv(1,1) = A(0,0)*invdet;
   
   return Ainv;
 }
@@ -67,18 +69,18 @@ Tensor<2,2,dataType> inv(const TensorExpression<T,2,2,dataType> &A) {
 template<typename T, typename dataType>
 Tensor<3,2,dataType> inv(const TensorExpression<T,3,2,dataType> &A) {
   
-  dataType detA = det(A);
+  dataType invdet = 1/det(A);
   Tensor<3,2,dataType> Ainv;
   
-  Ainv(0,0) =  (A(1,1)*A(2,2) - A(2,1)*A(1,2))/detA;
-  Ainv(0,1) = -(A(0,1)*A(2,2) - A(0,2)*A(2,1))/detA;
-  Ainv(0,2) =  (A(0,1)*A(1,2) - A(0,2)*A(1,1))/detA;
-  Ainv(1,0) = -(A(1,0)*A(2,2) - A(1,2)*A(2,0))/detA;
-  Ainv(1,1) =  (A(0,0)*A(2,2) - A(0,2)*A(2,0))/detA;
-  Ainv(1,2) = -(A(0,0)*A(1,2) - A(0,2)*A(1,0))/detA;
-  Ainv(2,0) =  (A(1,0)*A(2,1) - A(1,1)*A(2,0))/detA;
-  Ainv(2,1) = -(A(0,0)*A(2,1) - A(0,1)*A(2,0))/detA;
-  Ainv(2,2) =  (A(0,0)*A(1,1) - A(0,1)*A(1,0))/detA;
+  Ainv(0,0) =  (A(1,1)*A(2,2) - A(2,1)*A(1,2))*invdet;
+  Ainv(0,1) = -(A(0,1)*A(2,2) - A(0,2)*A(2,1))*invdet;
+  Ainv(0,2) =  (A(0,1)*A(1,2) - A(0,2)*A(1,1))*invdet;
+  Ainv(1,0) = -(A(1,0)*A(2,2) - A(1,2)*A(2,0))*invdet;
+  Ainv(1,1) =  (A(0,0)*A(2,2) - A(0,2)*A(2,0))*invdet;
+  Ainv(1,2) = -(A(0,0)*A(1,2) - A(0,2)*A(1,0))*invdet;
+  Ainv(2,0) =  (A(1,0)*A(2,1) - A(1,1)*A(2,0))*invdet;
+  Ainv(2,1) = -(A(0,0)*A(2,1) - A(0,1)*A(2,0))*invdet;
+  Ainv(2,2) =  (A(0,0)*A(1,1) - A(0,1)*A(1,0))*invdet;
   return Ainv;
 }
 
