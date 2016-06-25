@@ -24,25 +24,25 @@ YAFEL_NAMESPACE_OPEN
 class DirBC {
 
 public:
-  using size_type = std::size_t;
+    using size_type = std::size_t;
 
-  std::vector<size_type> bcdofs;
-  std::vector<double> bcvals;
-  std::vector<bool> bcmask;
-  Vector<double> ubc;
+    std::vector<size_type> bcdofs;
+    std::vector<double> bcvals;
+    std::vector<bool> bcmask;
+    Vector<double> ubc;
   
-  template<unsigned NSD>
-  DirBC(const GmshMesh<NSD> &m, const DoFManager &dofm, size_type tagID, 
-        size_type comp, const SpatialFunction<NSD,double> &sfunc);
+    template<unsigned NSD>
+    DirBC(const GmshMesh<NSD> &m, const DoFManager &dofm, size_type tagID, 
+	  size_type comp, const SpatialFunction<NSD,double> &sfunc);
 
-  DirBC(const std::vector<size_type> bcdofs_,
-	       const std::vector<double> bcvals_,
-	       const std::vector<bool> bcmask_)
-    : bcdofs(bcdofs_), bcvals(bcvals_), bcmask(bcmask_), ubc(bcmask_.size(),0)
-  {};
+    DirBC(const std::vector<size_type> bcdofs_,
+	  const std::vector<double> bcvals_,
+	  const std::vector<bool> bcmask_)
+	: bcdofs(bcdofs_), bcvals(bcvals_), bcmask(bcmask_), ubc(bcmask_.size(),0)
+	{};
   
-  void apply(sparse_csr<double> &Ksys, Vector<double> &Fsys);
-  inline Vector<double> get_ubc() const {return ubc;}
+    void apply(sparse_csr<double> &Ksys, Vector<double> &Fsys);
+    inline Vector<double> get_ubc() const {return ubc;}
 };
 
 
@@ -54,29 +54,29 @@ public:
 template<unsigned NSD>
 DirBC::DirBC(const GmshMesh<NSD> &M, const DoFManager &dofm, size_type tagID, 
              size_type comp, const SpatialFunction<NSD,double> &sfunc) 
-  : bcdofs(), 
-    bcvals(), 
-    bcmask(dofm.n_dofs(M.n_nodes()),false), 
-    ubc(dofm.n_dofs(M.n_nodes()),0)
+    : bcdofs(), 
+      bcvals(), 
+      bcmask(dofm.n_dofs(M.n_nodes()),false), 
+      ubc(dofm.n_dofs(M.n_nodes()),0)
 {
 
-  size_type nNodes = M.get_n_nodes();
-  size_type nElems = M.get_n_elems();
-  size_type ndofs = dofm.n_dofs();
+    //size_type nNodes = M.get_n_nodes();
+    size_type nElems = M.get_n_elems();
+    //size_type ndofs = dofm.n_dofs();
   
-  for(size_type e=0; e<nElems; ++e) {
-    size_type id = M.el_tags[e][0];
-    if(id == tagID) {
-      for(size_type n=0; n<M.element(e).size(); ++n) {
-	size_type index = dofm.global_index(e, n, comp);
-	bcdofs.push_back(index);
-	bcmask[index] = true;
-	size_type nodenum = M.element(e)[n];
-	double val = sfunc(M.node(nodenum));
-        bcvals.push_back(val);
-      }
+    for(size_type e=0; e<nElems; ++e) {
+	size_type id = M.el_tags[e][0];
+	if(id == tagID) {
+	    for(size_type n=0; n<M.element(e).size(); ++n) {
+		size_type index = dofm.global_index(e, n, comp);
+		bcdofs.push_back(index);
+		bcmask[index] = true;
+		size_type nodenum = M.element(e)[n];
+		double val = sfunc(M.node(nodenum));
+		bcvals.push_back(val);
+	    }
+	}
     }
-  }
   
 }
 
