@@ -22,17 +22,19 @@ constexpr double CG_SOLVER_TOL = 1.0e-14;
 
 template<typename T, typename dataType>
 Vector<dataType> cg_solve(const access_sparse_matrix<T, dataType> &A,
-                          const Vector<dataType> &rhs)
+                          const Vector<dataType> &rhs,
+                          dataType TOL = static_cast<dataType>(CG_SOLVER_TOL))
 {
   Vector<dataType> x0(rhs.size(), dataType(0));
-  return cg_solve(A,rhs,x0);
+  return cg_solve(A,rhs,x0,TOL);
 }
 
 
 template<typename T, typename dataType>
 Vector<dataType> cg_solve(const access_sparse_matrix<T, dataType> &A,
                           const Vector<dataType> &rhs,
-                          const Vector<dataType> &x0) {
+                          const Vector<dataType> &x0,
+                          dataType TOL = static_cast<dataType>(CG_SOLVER_TOL)) {
   
   
   Vector<dataType> x(x0);
@@ -62,7 +64,7 @@ Vector<dataType> cg_solve(const access_sparse_matrix<T, dataType> &A,
     dataType rTr_new = r.dot(r);
 
     //convergence check
-    if(rTr_new/rTr_0 < CG_SOLVER_TOL) {
+    if(rTr_new/rTr_0 < TOL) {
       break;
     }
 

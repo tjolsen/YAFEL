@@ -46,7 +46,7 @@ int main() {
    * Problem Parameters
    */
   double L = 1; // box length
-  double dim_elem = 750; // elements along each dimension
+  double dim_elem = 1000; // elements along each dimension
 
   //set up basic structures
   RectilinearMesh<NSD> M(std::vector<double>(NSD,L), std::vector<std::size_t>(NSD,dim_elem));
@@ -139,7 +139,10 @@ int main() {
   // as an initial guess (rather than just zero)
 
   std::cout << "Solving..." << std::endl;
-  Vector<double> U = cg_solve(Ksys, Fsys, BC.get_ubc());
+
+  double TOL = 1.0e-14; // relative residual tolerance for iterative solver
+
+  Vector<double> U = cg_solve(Ksys, Fsys, BC.get_ubc(), TOL);
   std::cout << "done" << std::endl;
 
   // output system

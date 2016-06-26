@@ -113,9 +113,34 @@ ILUPreconditioner<dataType>::ILUPreconditioner(const sparse_csr<dataType> &A)
 template<typename dataType>
 void ILUPreconditioner<dataType>::solve(Vector<dataType> &rhs) const {
   
-  b_subst(rhs); // <---
-  f_subst(rhs); // <------- These functions modify teh ret vector in place to eliminate excess copying
+  f_subst(rhs); // <---
+  b_subst(rhs); // <------- These functions modify the ret vector in place to eliminate excess copying
 
+}
+
+
+//---------------------------------------------------------
+
+template<typename dataType>
+void ILUPreconditioner<dataType>::f_subst(Vector<dataType> &rhs) const {
+  
+    for(size_type row=0; row<ILU.rows(); ++row) {
+
+        size_type idxmin = ILU.row_ptr[row];
+        size_type idxmax = ILU.row_ptr[row+1];
+        
+        for(size_type i=idxmin; i<idxmax; ++i) {
+
+            size_type col = ILU.col_index[i];
+
+            if(col >= row) {
+                break;
+            }
+
+            rhs(row) -= ILU.data[i]*rhs(col);
+        }
+    }
+    
 }
 
 
@@ -123,17 +148,32 @@ void ILUPreconditioner<dataType>::solve(Vector<dataType> &rhs) const {
 
 template<typename dataType>
 void ILUPreconditioner<dataType>::b_subst(Vector<dataType> &rhs) const {
+    
+    
+    for(size_type idx=0; idx<ILU.rows(); ++idx) {
+        
+        size_type row = ILU.rows() - idx - 1;
+        
+        size_type idxmin = ILU.row_ptr[row];
+        size_type idxmax = ILU.row_ptr[row+1];
 
+        size_type i_diag(0);
+        for(size_type i=idxmin; i<idxmax; ++i) {
+            if(ILU.col_index[i] == row) {
+                i_diag = i;
+                break;
+            }
+        }
+
+        for(size_type i=i_diag+1; i<idxmax; ++i) {
+            size_type col = ILU.col_index[i];
+
+            rhs(row) -= ILU.data[i]*rhs(col);
+        }
+        rhs(row) /= ILU.data[i_diag];
+    }
+    
 }
-
-//---------------------------------------------------------
-
-template<typename dataType>
-void ILUPreconditioner<dataType>::f_subst(Vector<dataType> &rhs) const {
-  
-  
-}
-
 
 
 YAFEL_NAMESPACE_CLOSE
