@@ -37,9 +37,11 @@ public:
     
         value_type s0(0), s1(0), s2(0), s3(0);
 
-        auto N = size()/4;
-        auto NN = 4*N;
-        for(size_type i=0; i<NN; i+=4) {
+        constexpr size_type UNROLL = 4;
+
+        auto N = size()/UNROLL;
+        auto NN = UNROLL*N;
+        for(size_type i=0; i<NN; i+=UNROLL) {
             s0 += (*this)(i)*rhs(i);
             s1 += (*this)(i+1)*rhs(i+1);
             s2 += (*this)(i+2)*rhs(i+2);
