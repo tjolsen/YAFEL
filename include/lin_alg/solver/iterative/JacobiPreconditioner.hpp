@@ -37,9 +37,19 @@ public:
   }
   
   void solve(Vector<dataType> &rhs) const {
-    for(size_type i=0; i<rhs.size(); ++i) {
-      rhs(i) *= AdiagInv(i);
-    }
+
+      constexpr size_type UNROLL = 4;
+      size_type N = rhs.size()/UNROLL;
+      size_type NN = UNROLL*N;
+      for(size_type i=0; i<NN; i+=UNROLL) {
+          rhs(i) *= AdiagInv(i);
+          rhs(i+1) *= AdiagInv(i+1);
+          rhs(i+2) *= AdiagInv(i+2);
+          rhs(i+3) *= AdiagInv(i+3);
+      }
+      for(size_type i=NN; i<rhs.size(); ++i) {
+          rhs(i) *= AdiagInv(i);
+      }
   }
 
 };
