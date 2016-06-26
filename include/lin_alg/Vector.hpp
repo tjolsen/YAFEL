@@ -43,6 +43,36 @@ public:
      * Vector-specific operators. Cannot be used with VectorExpressions as
      * left-hand argument.
      */
+
+
+    template<typename T>
+    Vector<dataType>& operator=(const VectorExpression<T,dataType> &rhs) {
+#ifndef _OPTIMIZED
+        assert(size() == rhs.size() && "Vector::operator+= dimension mismatch");
+#endif
+
+        constexpr size_type UNROLL = 8;
+
+        auto N = size()/UNROLL;
+        auto NN = UNROLL*N;
+        for(size_type i=0; i<NN; i+=UNROLL) {
+            _data[i] = rhs(i);
+            _data[i+1] = rhs(i+1);
+            _data[i+2] = rhs(i+2);
+            _data[i+3] = rhs(i+3);
+            _data[i+4] = rhs(i+4);
+            _data[i+5] = rhs(i+5);
+            _data[i+6] = rhs(i+6);
+            _data[i+7] = rhs(i+7);
+        }
+        for(size_type i=NN; i<size(); ++i) {
+            _data[i] = rhs(i);
+        }
+    
+        return *this;
+    }
+
+
     template<typename T>
     Vector<dataType>& operator+=(const VectorExpression<T,dataType> &rhs) {
 #ifndef _OPTIMIZED

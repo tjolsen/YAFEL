@@ -137,7 +137,7 @@ void ILUPreconditioner<dataType>::f_subst(Vector<dataType> &rhs) const {
                 break;
             }
 
-            rhs(row) -= ILU.data[i]*rhs(col);
+            rhs(row) -= ILU._data[i]*rhs(col);
         }
     }
     
@@ -168,9 +168,9 @@ void ILUPreconditioner<dataType>::b_subst(Vector<dataType> &rhs) const {
         for(size_type i=i_diag+1; i<idxmax; ++i) {
             size_type col = ILU.col_index[i];
 
-            rhs(row) -= ILU.data[i]*rhs(col);
+            rhs(row) -= ILU._data[i]*rhs(col);
         }
-        rhs(row) /= ILU.data[i_diag];
+        rhs(row) /= ILU._data[i_diag];
     }
     
 }

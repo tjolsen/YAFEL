@@ -135,14 +135,20 @@ int main() {
 
   std::cout << "done" << std::endl; // bc done
 
-  //solve linear system using Conjugate Gradient, with the boundary conditions
+  //solve linear system using Preconditioned Conjugate Gradient, with the boundary conditions
   // as an initial guess (rather than just zero)
 
+  std::cout << "Making preconditioner..." << std::endl;
+  ILUPreconditioner<double> precond(Ksys);
+  std::cout << "done\n";
   std::cout << "Solving..." << std::endl;
 
   double TOL = 1.0e-14; // relative residual tolerance for iterative solver
 
-  Vector<double> U = cg_solve(Ksys, Fsys, BC.get_ubc(), TOL);
+
+
+  Vector<double> U = pcg_solve(Ksys, Fsys, precond, BC.get_ubc(), TOL);
+  //Vector<double> U = cg_solve(Ksys, Fsys, BC.get_ubc(), TOL);
   std::cout << "done" << std::endl;
 
   // output system

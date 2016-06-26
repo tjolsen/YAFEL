@@ -6,8 +6,10 @@
 
 // Iterative Solvers and preconditioners
 #include "lin_alg/solver/iterative/cg_solve.hpp"
+#include "lin_alg/solver/iterative/pcg_solve.hpp"
 #include "lin_alg/solver/iterative/bicgstab_solve.hpp"
 #include "lin_alg/solver/iterative/Preconditioner.hpp"
+#include "lin_alg/solver/iterative/IdentityPreconditioner.hpp"
 #include "lin_alg/solver/iterative/JacobiPreconditioner.hpp"
 #include "lin_alg/solver/iterative/ILUPreconditioner.hpp"
 

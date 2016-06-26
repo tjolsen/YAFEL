@@ -69,7 +69,7 @@ private:
   size_type _cols;
   value_type _zero; // <-- this holds a zero so that I can return value_type& from a operator() call
   
-  inline size_type index_of(size_type i, size_type j, bool &in_sparsity) {
+  inline size_type index_of(size_type i, size_type j, bool &in_sparsity) const {
     for(size_type idx=row_ptr[i]; idx<row_ptr[i+1]; ++idx) {
       if(j==col_index[idx]) {
 	return idx;
