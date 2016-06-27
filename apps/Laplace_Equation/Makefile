@@ -1,14 +1,14 @@
 cppfiles = $(wildcard *.cpp)
 ofiles = $(cppfiles:.cpp=.o)
-exefile = laplace_solver.exe
+exefiles = laplace_solver.exe laplace_solver_instrumented.exe
+ofiles := $(filter-out $(exefiles:.exe=.o), $(ofiles))
 
 
-
-all: .depend $(exefile)
+all: .depend $(exefiles)
 
 include $(YAFELDIR)/common.mk
 
-$(exefile): $(ofiles)
+%.exe: %.o $(ofiles)
 	$(CXX) $< $(LDFLAGS) -o $@
 
 %.o: %.cpp
