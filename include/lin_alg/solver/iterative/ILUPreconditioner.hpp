@@ -95,6 +95,7 @@ ILUPreconditioner<dataType>::ILUPreconditioner(const sparse_csr<dataType> &A)
             size_type idx_ir = ILU.row_ptr[i];
             bool in_sparsity(false);
             value_type A_ir(0);
+
             //get starting index in this row
             for(size_type idx = ILU.row_ptr[i]; idx<ILU.row_ptr[i+1]; ++idx) {
                 size_type col = ILU.col_index[idx];
@@ -123,7 +124,6 @@ ILUPreconditioner<dataType>::ILUPreconditioner(const sparse_csr<dataType> &A)
             size_type col_i = ILU.col_index[idx_i];
 
             while(idx_i<idx_imax && idx_r<idx_rmax) {
-                //std::cout << "col_r = " << col_r << "    col_i = " << col_i << std::endl;
                 
                 if(col_i == col_r) {
                     ILU._data[idx_i] -= m_ir*ILU._data[idx_r];
