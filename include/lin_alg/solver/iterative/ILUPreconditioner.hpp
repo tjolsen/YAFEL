@@ -19,7 +19,17 @@
 #include <cassert>
 #include <iostream>
 
+#ifdef _PARALLEL_ILU
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#endif
+
 YAFEL_NAMESPACE_OPEN
+
+
+
+
 
 template<typename dataType>
 class ILUPreconditioner : public Preconditioner<ILUPreconditioner<dataType>, dataType> {  
@@ -46,11 +56,37 @@ public:
 private:
     container_type ILU;
 
+    struct elimParams {
+	size_type istart;
+	size_type iend;
+	size_type idx_pivot;
+	size_type pivot_r;
+	value_type pivot;
+	bool done;
+
+	elimParams() :istart(0), iend(0), idx_pivot(0), pivot_r(0), pivot(0), done(false) {}
+    };
+
+    static constexpr std::size_t ILU_MIN_BLOCK_SIZE = 64*64;
+
     //backward substitution
     void b_subst(Vector<dataType> &rhs) const;
   
     //forward substitution
     void f_subst(Vector<dataType> &rhs) const;
+
+    //subroutine that implements elimination of a single pivot (can be parallelized block-by-block)
+    void block_eliminate(elimParams &params);
+
+//member variables that need only exist in parallel version
+#ifdef _PARALLEL_ILU
+    std::mutex block_elim_mtx;
+    std::mutex barrier_mtx;
+    size_type barrier_count;
+    std::condition_variable block_elim_cv;
+    std::condition_variable barrier_cv;
+#endif
+
 };
 
 //=============================================================================
@@ -67,10 +103,71 @@ ILUPreconditioner<dataType>::ILUPreconditioner(const sparse_csr<dataType> &A)
     assert(A.rows() == A.cols() && "ILUPreconditioner dimension mismatch");
 #endif    
 
+
+#ifdef _PARALLEL_ILU
+    //parallel version initialization
+    size_type nthreads = (ILU.rows()/ILU_MIN_BLOCK_SIZE >= std::thread::hardware_concurrency()) ?
+	std::thread::hardware_concurrency() : ILU.rows()/ILU_MIN_BLOCK_SIZE;
+
+    std::vector<std::thread> workers(nthreads);
+    std::vector<elimParams> elim_params(nthreads);
+
+    //assign blocks to threads
+    size_type block_size = ILU.rows()/nthreads;
+    size_type first_block = ILU.rows() - (nthreads-1)*block_size;
+
+    elim_params[0].istart=1;
+    elim_params[0].iend=first_block;
+    for(size_type t=1; t<nthreads; ++t) {
+	elim_params[t].istart = first_block + (t-1)*block_size;
+	elim_params[t].iend = first_block + t*block_size;
+    }
+
+    //create and launch threads
+    barrier_count = 0;
+    //std::cerr << "launching threads" << std::endl;
+    for(size_type t=0; t<nthreads; ++t) {
+	//std::cerr << t << std::endl;
+	workers[t] = std::thread([this, &elim_params](size_type t_id)
+				 {
+
+				     while(true) {
+					 {
+					     std::unique_lock<std::mutex> lck(block_elim_mtx);
+					     {
+						 std::unique_lock<std::mutex> b_lck(barrier_mtx);
+						 ++barrier_count;
+						 barrier_cv.notify_one();
+						 //std::cout << "Thread " << t_id << " notifying" << std::endl;
+					     }
+					     block_elim_cv.wait(lck);
+					 }
+					 if(elim_params[t_id].done)
+					     return;
+					 
+					 block_eliminate(elim_params[t_id]);
+
+				     }
+				     
+				 }, t);
+    }
+
+    {
+	std::unique_lock<std::mutex> barrier_lck(barrier_mtx);
+	barrier_cv.wait(barrier_lck, [this,nthreads](){return barrier_count >= nthreads;});
+	barrier_count = 0;
+	std::cout << "Messages received. Proceeding." << std::endl;
+    }
+    
+#else
+    //serial version initialization
+    elimParams elim_params;
+#endif
+
     //loop over pivots
     for(size_type r=0; r<ILU.rows()-1; ++r) {
 
-      
+	
         //get pivot index and value
         size_type idx_pivot = ILU.row_ptr[r];
         value_type pivot(0);
@@ -82,67 +179,57 @@ ILUPreconditioner<dataType>::ILUPreconditioner(const sparse_csr<dataType> &A)
                 break;
             }
         }
-      
+	
         if(pivot == 0) {
             std::cerr << "\\[\\e[1;31m\\]Warning: ILUPreconditioner: Found zero-valued pivot element.\n"
                       << "Continuing without eliminating with this pivot. \\[\\e[m\\]" << std::endl;
             continue;
         }
+	
+#ifdef _PARALLEL_ILU
+	for(auto &ep : elim_params) {
+	    ep.idx_pivot = idx_pivot;
+	    ep.pivot_r = r;
+	    ep.pivot = pivot;
+	}
+	//dispatch threads on this iteration
+	{
+	    std::unique_lock<std::mutex> lck(block_elim_mtx);
+	    block_elim_cv.notify_all();
+	}
 
-        //eliminate below pivot
-        for(size_type i=r+1; i<ILU.rows(); ++i) {
+	{
+	    std::unique_lock<std::mutex> barrier_lck(barrier_mtx);
+	    barrier_cv.wait(barrier_lck, [this,nthreads](){return barrier_count >= nthreads;});
+	    barrier_count = 0;
+	}
 
-            size_type idx_ir = ILU.row_ptr[i];
-            bool in_sparsity(false);
-            value_type A_ir(0);
 
-            //get starting index in this row
-            for(size_type idx = ILU.row_ptr[i]; idx<ILU.row_ptr[i+1]; ++idx) {
-                size_type col = ILU.col_index[idx];
-                if(col == r) {
-                    idx_ir = idx;
-                    in_sparsity = true;
-                    A_ir = ILU._data[idx];
-                }
-                if(col > r) {
-                    break;
-                }
-            }
+	
+#else
+	elim_params.istart = r+1;
+	elim_params.iend = ILU.rows();
+	elim_params.idx_pivot = idx_pivot;
+	elim_params.pivot_r = r;
+	elim_params.pivot = pivot;
 
-            if(!in_sparsity) {
-                continue;
-            }
-
-            
-            //eliminate common elements in rows "r" and "i"
-            value_type m_ir = A_ir/pivot;
-            size_type idx_i = idx_ir;
-            size_type idx_r = idx_pivot;
-            size_type idx_imax = ILU.row_ptr[i+1];
-            size_type idx_rmax = ILU.row_ptr[r+1];
-            size_type col_r = ILU.col_index[idx_r];
-            size_type col_i = ILU.col_index[idx_i];
-
-            while(idx_i<idx_imax && idx_r<idx_rmax) {
-                
-                if(col_i == col_r) {
-                    ILU._data[idx_i] -= m_ir*ILU._data[idx_r];
-                    col_i = ILU.col_index[++idx_i];
-                    col_r = ILU.col_index[++idx_r];
-                }
-                else if(col_i < col_r) {
-                    col_i = ILU.col_index[++idx_i];
-                }
-                else if(col_i > col_r) {
-                    col_r = ILU.col_index[++idx_r];
-                }
-                
-            }
-            ILU._data[idx_ir] = m_ir;
-
-        }// end i-loop
+	//dispatch block elimination
+	block_eliminate(elim_params);
+#endif
       
     } // end r-loop (pivot loop)
+
+
+#ifdef _PARALLEL_ILU
+    for(auto &ep : elim_params) {
+	ep.done = true;
+    }
+    block_elim_cv.notify_all();
+
+    for(auto &t : workers) {
+	t.join();
+    }
+#endif
 
 }// end ctor
 
@@ -213,6 +300,83 @@ void ILUPreconditioner<dataType>::b_subst(Vector<dataType> &rhs) const {
     }
     
 }
+
+//----------------------------------------------------------
+template<typename dataType>
+void ILUPreconditioner<dataType>::block_eliminate(elimParams &params)
+{
+
+    size_type istart = params.istart;
+    size_type iend = params.iend;
+    size_type idx_pivot = params.idx_pivot;
+    size_type r = params.pivot_r;
+    value_type pivot = params.pivot;
+
+    istart = (istart > r) ? istart : r+1;
+    if(istart >= iend) {
+	return;
+    }
+
+    //eliminate below pivot
+    for(size_type i=istart; i<iend; ++i) { //istart = r+1 for first block, iend=ILU.rows() for last block
+
+	size_type idx_ir = ILU.row_ptr[i];
+	bool in_sparsity(false);
+	value_type A_ir(0);
+
+	//get starting index in this row
+	for(size_type idx = ILU.row_ptr[i]; idx<ILU.row_ptr[i+1]; ++idx) {
+	    size_type col = ILU.col_index[idx];
+	    if(col == r) {
+		idx_ir = idx;
+		in_sparsity = true;
+		A_ir = ILU._data[idx];
+	    }
+	    if(col > r) {
+		break;
+	    }
+	}
+
+	if(!in_sparsity) {
+	    continue;
+	}
+
+            
+	//eliminate common elements in rows "r" and "i"
+	value_type m_ir = A_ir/pivot;
+	size_type idx_i = idx_ir;
+	size_type idx_r = idx_pivot;
+	size_type idx_imax = ILU.row_ptr[i+1];
+	size_type idx_rmax = ILU.row_ptr[r+1];
+	size_type col_r = ILU.col_index[idx_r];
+	size_type col_i = ILU.col_index[idx_i];
+
+	while(idx_i<idx_imax && idx_r<idx_rmax) {
+                
+	    if(col_i == col_r) {
+		ILU._data[idx_i] -= m_ir*ILU._data[idx_r];
+		col_i = ILU.col_index[++idx_i];
+		col_r = ILU.col_index[++idx_r];
+	    }
+	    else if(col_i < col_r) {
+		col_i = ILU.col_index[++idx_i];
+	    }
+	    else if(col_i > col_r) {
+		col_r = ILU.col_index[++idx_r];
+	    }
+                
+	}
+	ILU._data[idx_ir] = m_ir;
+
+    }// end i-loop
+
+
+
+
+
+
+} //end block_eliminate
+						  
 
 
 YAFEL_NAMESPACE_CLOSE

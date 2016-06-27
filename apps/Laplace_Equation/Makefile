@@ -4,9 +4,11 @@ exefiles = laplace_solver.exe laplace_solver_instrumented.exe
 ofiles := $(filter-out $(exefiles:.exe=.o), $(ofiles))
 
 
+
 all: .depend $(exefiles)
 
 include $(YAFELDIR)/common.mk
+CXXFLAGS += -D_PARALLEL_ILU
 
 %.exe: %.o $(ofiles)
 	$(CXX) $< $(LDFLAGS) -o $@
@@ -15,7 +17,7 @@ include $(YAFELDIR)/common.mk
 	$(CXX) $< $(CXXFLAGS)
 
 clean:
-	rm $(ofiles) $(exefile) *.vtu *.pvd
+	rm $(ofiles) $(exefiles) *.vtu *.pvd $(exefiles:.exe=.o)
 
 run: all
 	./$(exefile)

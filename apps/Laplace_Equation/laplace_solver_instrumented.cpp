@@ -46,7 +46,7 @@ int main() {
    * Problem Parameters
    */
   double L = 1; // box length
-  double dim_elem = 250; // elements along each dimension
+  double dim_elem = 200; // elements along each dimension
 
   //set up basic structures
   RectilinearMesh<NSD> M(std::vector<double>(NSD,L), std::vector<std::size_t>(NSD,dim_elem));
@@ -173,6 +173,23 @@ int main() {
 
       cg_times.push_back(cgtime);
       pcg_times.push_back(pcgtime);
+
+
+      if(i == 0) {
+	  // output system
+	  VTKOutput vout;
+	  VTKMesh<RectilinearMesh<NSD>, NSD> vtkm(M);
+	  VTKScalarData vtku(U, VTKObject::VTKPOINTDATA, "U");
+	  VTKScalarData vtkubc(BC.get_ubc(), VTKObject::VTKPOINTDATA, "U BC");
+	  
+	  vout.addVTKObject(&vtkm);
+	  vout.addVTKObject(&vtku);
+	  vout.addVTKObject(&vtkubc);
+	  
+	  vout.write("output.vtu");
+      }
+
+
   }
   double cgavg(0), pcgavg(0);
   for(auto t : cg_times)
@@ -188,19 +205,5 @@ int main() {
   std::cout << "CG average time: " << cgavg << std::endl;
   std::cout << "PCG average time: " << pcgavg << std::endl;
 
-/*
-  // output system
-  VTKOutput vout;
-  VTKMesh<RectilinearMesh<NSD>, NSD> vtkm(M);
-  VTKScalarData vtku(U, VTKObject::VTKPOINTDATA, "U");
-  VTKScalarData vtkubc(BC.get_ubc(), VTKObject::VTKPOINTDATA, "U BC");
-
-  vout.addVTKObject(&vtkm);
-  vout.addVTKObject(&vtku);
-  vout.addVTKObject(&vtkubc);
-  
-  vout.write("output.vtu");
-
-*/
   return 0;
 }
