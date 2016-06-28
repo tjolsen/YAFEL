@@ -11,5 +11,8 @@ This header defines any global macros, etc that are used throughout the library
 #define YAFEL_NAMESPACE_OPEN namespace yafel {
 #define YAFEL_NAMESPACE_CLOSE }
 
+namespace yafel {
+    using size_type = std::size_t;
+}
 
 #endif // end #ifndef _YAFEL_GLOBAL_HPP
