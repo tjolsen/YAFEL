@@ -20,9 +20,7 @@
 #include <iostream>
 
 #ifdef _PARALLEL_ILU
-#include <thread>
-#include <mutex>
-#include <condition_variable>
+#include "utils/ThreadPool.hpp"
 #endif
 
 YAFEL_NAMESPACE_OPEN
@@ -67,7 +65,7 @@ private:
 	elimParams() :istart(0), iend(0), idx_pivot(0), pivot_r(0), pivot(0), done(false) {}
     };
 
-    static constexpr std::size_t ILU_MIN_BLOCK_SIZE = 64*64;
+    static constexpr std::size_t ILU_BLOCK_SIZE = 32*64;
 
     //backward substitution
     void b_subst(Vector<dataType> &rhs) const;
@@ -76,7 +74,7 @@ private:
     void f_subst(Vector<dataType> &rhs) const;
 
     //subroutine that implements elimination of a single pivot (can be parallelized block-by-block)
-    void block_eliminate(elimParams &params);
+    void block_eliminate(const elimParams &params);
 
 //member variables that need only exist in parallel version
 #ifdef _PARALLEL_ILU
@@ -106,10 +104,9 @@ ILUPreconditioner<dataType>::ILUPreconditioner(const sparse_csr<dataType> &A)
 
 #ifdef _PARALLEL_ILU
     //parallel version initialization
-    size_type nthreads = (ILU.rows()/ILU_MIN_BLOCK_SIZE >= std::thread::hardware_concurrency()) ?
-	std::thread::hardware_concurrency() : ILU.rows()/ILU_MIN_BLOCK_SIZE;
+    size_type nthreads = std::thread::hardware_concurrency();
+    ThreadPool pool(nthreads);
 
-    std::vector<std::thread> workers(nthreads);
     std::vector<elimParams> elim_params(nthreads);
 
     //assign blocks to threads
@@ -123,42 +120,6 @@ ILUPreconditioner<dataType>::ILUPreconditioner(const sparse_csr<dataType> &A)
 	elim_params[t].iend = first_block + t*block_size;
     }
 
-    //create and launch threads
-    barrier_count = 0;
-    //std::cerr << "launching threads" << std::endl;
-    for(size_type t=0; t<nthreads; ++t) {
-	//std::cerr << t << std::endl;
-	workers[t] = std::thread([this, &elim_params](size_type t_id)
-				 {
-
-				     while(true) {
-					 {
-					     std::unique_lock<std::mutex> lck(block_elim_mtx);
-					     {
-						 std::unique_lock<std::mutex> b_lck(barrier_mtx);
-						 ++barrier_count;
-						 barrier_cv.notify_one();
-						 //std::cout << "Thread " << t_id << " notifying" << std::endl;
-					     }
-					     block_elim_cv.wait(lck);
-					 }
-					 if(elim_params[t_id].done)
-					     return;
-					 
-					 block_eliminate(elim_params[t_id]);
-
-				     }
-				     
-				 }, t);
-    }
-
-    {
-	std::unique_lock<std::mutex> barrier_lck(barrier_mtx);
-	barrier_cv.wait(barrier_lck, [this,nthreads](){return barrier_count >= nthreads;});
-	barrier_count = 0;
-	std::cout << "Messages received. Proceeding." << std::endl;
-    }
-    
 #else
     //serial version initialization
     elimParams elim_params;
@@ -187,25 +148,26 @@ ILUPreconditioner<dataType>::ILUPreconditioner(const sparse_csr<dataType> &A)
         }
 	
 #ifdef _PARALLEL_ILU
-	for(auto &ep : elim_params) {
-	    ep.idx_pivot = idx_pivot;
-	    ep.pivot_r = r;
-	    ep.pivot = pivot;
-	}
-	//dispatch threads on this iteration
-	{
-	    std::unique_lock<std::mutex> lck(block_elim_mtx);
-	    block_elim_cv.notify_all();
-	}
+	std::vector<std::future<void>> results;
+	results.reserve(ILU.rows()/ILU_BLOCK_SIZE + 1);
+	elimParams ep;
+	ep.idx_pivot = idx_pivot;
+	ep.pivot_r = r;
+	ep.pivot = pivot;
+	for(size_type offset=r+1; offset < ILU.rows(); offset += ILU_BLOCK_SIZE) {
+	    ep.istart=offset;
+	    size_type speculative_end = offset+ILU_BLOCK_SIZE;
+	    ep.iend = (speculative_end < ILU.rows()) ? speculative_end : ILU.rows();
 
-	{
-	    std::unique_lock<std::mutex> barrier_lck(barrier_mtx);
-	    barrier_cv.wait(barrier_lck, [this,nthreads](){return barrier_count >= nthreads;});
-	    barrier_count = 0;
+	    results.emplace_back(pool.enqueue([this,ep](){block_eliminate(ep);}));
 	}
 
 
-	
+	//wait for results to come in (dtor for std::future should do this too)
+	for(auto &r : results) {
+	    r.get();
+	}
+
 #else
 	elim_params.istart = r+1;
 	elim_params.iend = ILU.rows();
@@ -219,17 +181,6 @@ ILUPreconditioner<dataType>::ILUPreconditioner(const sparse_csr<dataType> &A)
       
     } // end r-loop (pivot loop)
 
-
-#ifdef _PARALLEL_ILU
-    for(auto &ep : elim_params) {
-	ep.done = true;
-    }
-    block_elim_cv.notify_all();
-
-    for(auto &t : workers) {
-	t.join();
-    }
-#endif
 
 }// end ctor
 
@@ -303,7 +254,7 @@ void ILUPreconditioner<dataType>::b_subst(Vector<dataType> &rhs) const {
 
 //----------------------------------------------------------
 template<typename dataType>
-void ILUPreconditioner<dataType>::block_eliminate(elimParams &params)
+void ILUPreconditioner<dataType>::block_eliminate(const elimParams &params)
 {
 
     size_type istart = params.istart;
