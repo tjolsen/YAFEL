@@ -1,0 +1,121 @@
+\documentclass[11pt]{article}
+
+
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{listings}
+
+\newcommand{\tensor}[1]{\mathbf{#1}}
+
+
+%--------------------------------------------
+
+
+\begin{document}
+
+
+\section*{Element Class(es) Re-organization}
+\subsection*{Sketch of current element class system}
+
+\begin{itemize}
+\item
+  Element
+  \begin{itemize}
+  \item LinearTri
+  \item LinearQuad
+  \item Linear Hex
+  \item ...
+  \end{itemize}
+\end{itemize}
+Each class is templated on NSD and (currently) has an inner typedef
+``coordinate\_type'' that is an alias for Tensor{\textless}NSD,1,double\textgreater.
+I had to disable some nice compile-time constructor validity checks for this 
+tensor class in order to get the hex elements to compile in a 2D solver.
+I can't simply disable the hex entirely since the ElementFactory instantiates
+each element that it supports regardless of NSD.
+
+My biggest gripe with the current system is that the way I handle the
+runtime polymorphism of element types means that none of the functions
+that loop from 0 up to the number of spatial dimensions (NSD) can be
+unrolled without templating on NSD.
+In addition, there are plenty of loops over the number of nodes in
+an element that could be unrolled, if it were known at compile time.
+These are precisely the reasons that Deal.II doesn't support different
+element types.
+They deemed the loss of efficiency to be too great (and the extra machinery
+to be too cumbersome) to justify the capability.
+
+
+\subsection*{Proposed solution}
+Step one will be to fix the ``coordinate\_type'' as a 3D point.
+The overhead of carrying around an extra double will be (I believe)
+negligible compared to the more readable and more efficnet code.
+
+My next idea will entirely eliminate the type hierarchy of different Element types,
+instead having a ``make\_element'' function templated on a element specialization
+type.
+The specialization types will be very light-weight structs that provide a
+shape function and the ordering/location of the nodes in the canonical element.
+This would be the LinearTri element:
+
+\begin{lstlisting}[language=C++]
+struct LinearTri {
+  
+  std::vector<coordinate_type> parent_nodes()
+  {
+    return std::vector<coordinate_type>{ coordinate_type{1,0},
+                                         coordinate_type{0,1},
+                                         coordinate_type{0,0} };
+  }
+
+  template<typename T>
+  T shape_function(int node, Tensor<3,1,T> xi) {
+    
+    switch(node) {
+      case 0: return xi(0)
+    
+      case 1: return xi(1);
+
+      case 2: return 1 - xi(0) - xi(1);
+
+      default: return 0;
+    }
+  }
+};
+\end{lstlisting}
+
+The shape function is templated on the data type of the coordinate
+(rather than just using coordinate\_type) so that no shape function gradients
+need be supplied, thanks to the DualNumber class.
+
+There would be an ElementTraits class as well, which would be specialized
+for the LinearTri something like this.
+
+\begin{lstlisting}[language=C++]
+template<>
+struct ElementTraits<LinearTri> {
+  static constexpr int nodes_per_element = 3;
+  static constexpr int DIM = 2; // <-- topological dimension of element
+  static constexpr ElementType eltype = ElementType::LinearTri;
+  static constexpr ElementVTKType vtktype = ElementVTKType::LinearTri;
+};
+\end{lstlisting}
+
+
+
+All of this comes together in the ElementFactory class
+(I think I'll keep the factory name, since it's pretty clear what it's doing).
+When it is constructing elements, it will call a ``make\_element'' method,
+which is templated on a specializaton type and simply returns an ``Element'' object.
+The Element type will essentially lose all of its current methods other than getters, 
+and the ElementFactory will be responsible for updating an element in place 
+(again, with a template-specialized function to get be able to use the 
+ElementTraits as loop bounds).
+
+
+\end{document}
+
+
+%-------------------------------------------
