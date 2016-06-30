@@ -20,7 +20,7 @@
 #include <iostream>
 
 #ifdef _PARALLEL_ILU
-#include "utils/ThreadPool.hpp"
+#include "utils/TaskScheduler.hpp"
 #endif
 
 YAFEL_NAMESPACE_OPEN
@@ -104,8 +104,8 @@ ILUPreconditioner<dataType>::ILUPreconditioner(const sparse_csr<dataType> &A)
 
 #ifdef _PARALLEL_ILU
     //parallel version initialization
-    size_type nthreads = std::thread::hardware_concurrency() - 1; //heuristic, seems to work well
-    ThreadPool pool(nthreads);
+    size_type nthreads = std::thread::hardware_concurrency(); //heuristic, seems to work well
+    TaskScheduler pool(nthreads);
 
     std::vector<elimParams> elim_params(nthreads);
 

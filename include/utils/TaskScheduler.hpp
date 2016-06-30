@@ -1,4 +1,4 @@
-#include _YAFEL_TASK_SCHEDULER
+#ifndef _YAFEL_TASK_SCHEDULER
 #define  _YAFEL_TASK_SCHEDULER
 
 /**
@@ -12,6 +12,7 @@
 #include <future>
 #include <functional>
 #include <type_traits>
+#include <atomic>
 
 /**
  * \class TaskScheduler
@@ -40,7 +41,7 @@ public:
     std::vector<std::mutex> mtxs;
     std::vector<std::condition_variable> cvs;
     std::vector<bool> done;
-
+    std::atomic<unsigned> _index;
 
     inline TaskScheduler(unsigned nthreads = std::thread::hardware_concurrency())
         : count(nthreads), 
@@ -48,15 +49,16 @@ public:
           tq(nthreads), 
           mtxs(nthreads), 
           cvs(nthreads),
-          done(nthreads,false)
+          done(nthreads,false),
+          _index(0)
     {
         for(unsigned i=0; i<nthreads; ++i) {
-            workers[i] = std::thread( [&, this](){ run(i); } );
+            workers[i] = std::thread( [i, this](){ run(i); } );
         }
     }
 
     inline ~TaskScheduler() {
-        for(unsigned i=0; i<nthreads; ++i) {
+        for(unsigned i=0; i<count; ++i) {
             {
                 std::unique_lock<std::mutex> lock{mtxs[i]};
                 done[i] = true;
@@ -73,7 +75,7 @@ public:
         -> std::future<typename std::result_of<F(Args...)>::type>
     {
         
-        using ret_type = std::future<typename std::result_of<F(Args...)>::type>;
+        using ret_type = typename std::result_of<F(Args...)>::type;
 
         auto task = std::make_shared<std::packaged_task<ret_type()> >
             (std::bind(std::forward<F>(f), std::forward<Args>(args)...));
@@ -82,20 +84,20 @@ public:
         auto i = _index++;
 
         //try to push without blocking
-        for(unsigned n=0; n != _count*spin_count; ++n) {
+        for(unsigned n=0; n != count*spin_count; ++n) {
             auto idx = (i+n)%count;
             {
-                lock_t lock{mtx[idx], std::try_to_lock};
+                lock_t lock{mtxs[idx], std::try_to_lock};
                 if(!lock) continue;
 
-                tq[idx].emplace_back([task](){*task();});
+                tq[idx].emplace_back([task](){(*task)();});
             }
             cvs[idx].notify_one();
             return ret;
         }
         {
-            lock_t lock{mtx[i]};
-            tq[i].emplace_back([task](){*task();});
+            lock_t lock{mtxs[i]};
+            tq[i].emplace_back([task](){(*task)();});
         }
         cvs[i].notify_one();
         return ret;
@@ -115,18 +117,22 @@ private:
                 
                 if(!lock || tq[idx].empty()) continue;
                 
-                f = move(tq[idx].front());
+                f = std::move(tq[idx].front());
                 tq[idx].pop_front();
-                try_success = false;
+                try_failure = false;
                 break;
             }
             if(try_failure) {
-                lock_t lock{mtx[i]};
+                lock_t lock{mtxs[i]};
+                while(tq[i].empty() && !done[i])
+                    cvs[i].wait(lock);
+                if(tq[i].empty())
+                    break;
                 f = std::move(tq[i].front());
                 tq[i].pop_front();
             }
             if(!f) break;
-
+            
             f();
         } //end while
 

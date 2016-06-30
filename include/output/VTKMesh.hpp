@@ -14,7 +14,6 @@ template<typename MT, unsigned NSD>
 class VTKMesh : public VTKObject {
   
 public:
-  using size_type = typename GenericMesh<MT,NSD>::size_type;
   using coordinate_type = typename GenericMesh<MT,NSD>::coordinate_type;
   const GenericMesh<MT,NSD> & M;
 

@@ -20,8 +20,6 @@ template<typename MTYPE, unsigned NSD>
 class ElementFactory {
 
 public:
-    using size_type = typename GenericMesh<MTYPE,NSD>::size_type;
-
     ElementFactory()=delete;
     ElementFactory(const GenericMesh<MTYPE,NSD> &M, const DoFManager &dofm);
 
