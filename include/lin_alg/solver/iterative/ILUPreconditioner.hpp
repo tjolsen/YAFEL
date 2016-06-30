@@ -104,7 +104,7 @@ ILUPreconditioner<dataType>::ILUPreconditioner(const sparse_csr<dataType> &A)
 
 #ifdef _PARALLEL_ILU
     //parallel version initialization
-    size_type nthreads = std::thread::hardware_concurrency();
+    size_type nthreads = std::thread::hardware_concurrency() - 1; //heuristic, seems to work well
     ThreadPool pool(nthreads);
 
     std::vector<elimParams> elim_params(nthreads);
