@@ -77,7 +77,7 @@ auto ThreadPool::enqueue(F&& f, Args&&... args)
     auto task = std::make_shared< std::packaged_task<return_type()> >(
 	std::bind(std::forward<F>(f), std::forward<Args>(args)...)
         );
-        
+       
     std::future<return_type> res = task->get_future();
     {
 	std::unique_lock<std::mutex> lock(queue_mutex);
