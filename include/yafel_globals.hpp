@@ -1,6 +1,8 @@
 #ifndef _YAFEL_GLOBALS_HPP
 #define _YAFEL_GLOBALS_HPP
 
+#include<cstddef>
+
 /*
 
 This header defines any global macros, etc that are used throughout the library

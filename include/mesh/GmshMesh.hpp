@@ -31,7 +31,6 @@ class GmshMesh : public GenericMesh<GmshMesh<NSD>, NSD> {
 
 public:
   using coordinate_type = typename GenericMesh<GmshMesh<NSD>,NSD>::coordinate_type;
-  using size_type = typename GenericMesh<GmshMesh<NSD>,NSD>::size_type;
   using element_container = typename GenericMesh<GmshMesh<NSD>,NSD>::element_container;
 
   std::vector<coordinate_type> _nodes;

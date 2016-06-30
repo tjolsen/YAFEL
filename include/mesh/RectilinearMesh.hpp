@@ -41,7 +41,6 @@ class RectilinearMesh : public GenericMesh<RectilinearMesh<NSD>, NSD> {
   
 public:
     using coordinate_type = typename GenericMesh<RectilinearMesh<NSD>,NSD>::coordinate_type;
-    using size_type = typename GenericMesh<RectilinearMesh<NSD>,NSD>::size_type;
     using element_container = typename GenericMesh<RectilinearMesh<NSD>,NSD>::element_container;
   
     // mesh characteristics

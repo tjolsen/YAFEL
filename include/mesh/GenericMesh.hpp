@@ -24,6 +24,7 @@ class GenericMesh {
 
 public:
     using coordinate_type = Tensor<NSD,1,double>;
+    //using size_type = typename yafel::size_type;
     using element_container = std::vector<size_type>;
 
     // vector of all Faces in mesh. Only constructed if build_faces() is called.
@@ -212,7 +213,7 @@ void GenericMesh<MT,NSD>::build_faces() {
   
 //==================================================================
 template<typename MT, unsigned NSD>
-typename GenericMesh<MT,NSD>::size_type 
+size_type 
 GenericMesh<MT,NSD>::n_cell_faces(size_type elnum) {
     ElementType et = element_type(elnum);
     switch(et) {
