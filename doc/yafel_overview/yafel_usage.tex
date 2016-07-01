@@ -141,6 +141,8 @@
       Location \& weight of each quadrature point
     \end{itemize}
   \item
+    Some other auxiliary data
+  \item
     At each quadrature point
     \begin{itemize}
     \item
@@ -238,7 +240,7 @@
 %===========================================================
 \subsection{System Solve}
 %===========================================================
-\begin{frame}[fragile]{Solving the system}
+\begin{frame}[fragile]{Solving the system: Boundary Conditions}
   \begin{itemize}
   \item
     Only need to explicitly apply the Dirichlet boundary conditions
@@ -259,10 +261,53 @@
   \end{lstlisting}
 \end{frame}
 
+\begin{frame}[fragile]{Solving the system: Linear solve}
+  \begin{itemize}
+  \item
+    Once boundary conditions are constructed, call
+    \texttt{DirBC::apply(sparse\_csr \&K\_sys, Vector \&F\_sys)}
+    to alter the linear system
+  \item
+    Then, the system is ready for solving with the method of your choice
+  \item
+    YAFEL has CG, PCG, and BiCGSTAB iterative solvers
+  \end{itemize}
+  \begin{lstlisting}
+    // Solve using Conjugate Gradient
+    Vector<double> U = cg_solve(K_sys, F_sys, 
+                                [x_0], [TOL]);
+  \end{lstlisting}
+\end{frame}
+
 %===========================================================
 \subsection{Writing Output}
 %===========================================================
 
+\begin{frame}{Writing Output}
+  
+  \begin{itemize}
+  \item
+    YAFEL supports output to unstructured VTK files (.vtu)
+  \item
+    Output can be visualized in Paraview, Visit
+  \item
+    Driver class is the \texttt{VTKOutput} class
+  \item
+    You attach data that you want written to this class, then call \texttt{write(fname)}
+  \item
+    Data can be \texttt{VTKMesh}, 
+    \texttt{VTKScalarData}, 
+    \texttt{VTKVectorData}, 
+    \texttt{VTKTensorData}
+  \item
+    Data fields live either on nodes or cells, depending on what you specify
+  \item
+    Data fields have a user-supplied name, which will appear in the visualization program
+  \item
+    Must \emph{always} attach a mesh, otherwise an error will be thrown
+  \end{itemize}
+  
+\end{frame}
 
 %===========================================================
 \subsection{YAFEL-isms}
