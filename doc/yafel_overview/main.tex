@@ -1,0 +1,54 @@
+\documentclass{beamer}
+\usetheme{CambridgeUS}
+\usefonttheme{serif}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{geometry}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{algorithmicx}
+\usepackage{algorithm}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+
+\newcommand{\tensor}[1]{\mathbf{#1}}
+\newcommand{\dV}{\,\mathrm{d}V}
+
+
+\title[YAFEL]{Yet Another Finite Element Library}
+\author{Tyler Olsen}
+\date{June 30, 2016}
+
+\AtBeginSection[]{
+  \begin{frame}{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+
+%===========================================================
+%===========================================================
+\begin{document}
+
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\section{FEM Overview}
+\input{example_problem.tex}
+
+
+
+
+\section{YAFEL Library}
+\subsection{General Workflow}
+\subsection{Mesh Handling}
+\subsection{Element Types}
+\subsection{YAFEL-isms}
+
+
+\end{document}
+%===========================================================
+%===========================================================
