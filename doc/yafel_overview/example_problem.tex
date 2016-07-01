@@ -295,3 +295,20 @@
     \end{align*}
   \end{itemize}
 \end{frame}
+
+
+%==============================================================
+\begin{frame}{Finishing it off}
+  \begin{itemize}
+  \item
+    The previous expression produces a local $\tensor{K}_e \in \mathbb{R}^{Npe\times Npe}$ (stiffness) matrix
+  \item
+    These matrices must be ``added'' together via assembly into a global linear system
+  \item
+    Boundary conditions can be either added at the element level or at the global
+    linear system level
+  \item
+    Flux boundary conditions (given by surface integral ignored since beginning)
+    must also be integrated (via quadrature over faces comprising $\partial \Omega_N$)
+  \end{itemize}
+\end{frame}
