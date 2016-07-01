@@ -306,10 +306,35 @@
   \item
     Must \emph{always} attach a mesh, otherwise an error will be thrown
   \end{itemize}
-  
+
 \end{frame}
 
 %===========================================================
 \subsection{YAFEL-isms}
 %===========================================================
 
+\begin{frame}{YAFEL-isms}
+
+  \begin{itemize} 
+  \item
+    Currently, a TON of stuff is templated on NSD, since the
+    ``coordinate\_type'' is an alias for \texttt{Tensor\textless NSD,1,double\textgreater}
+  \item
+    I am in the process of making it simple a 3D fixed-size array, which will enable
+    a lot of de-templating (and improve compile times quite a bit!)
+  \item
+    When assembling, you have to loop over elements. To get a \emph{reference} to
+    the current element, you must use a pre-instantiated \texttt{ElementFactory} object
+  \item
+    The \texttt{ElementFactory} handles creation of specialized elements, and is the
+    mechanism by which runtime element polymorphism is enabled in the code
+  \item
+    I am in process of flattening type hierarchy so that virtual function calls aren't necessary
+    \begin{itemize}
+    \item
+      Not a performance bottleneck
+    \item
+      It bothers me that I can't copy an element by value at runtime
+    \end{itemize}
+  \end{itemize}
+\end{frame}
