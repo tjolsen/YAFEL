@@ -1,0 +1,175 @@
+\lstset{
+  language=C++,
+  basicstyle=\small\ttfamily,
+  commentstyle=\color{red},
+  keywordstyle=\color{blue},
+  breaklines
+}
+
+
+%===========================================================
+\subsection{General Workflow}
+%===========================================================
+\begin{frame}{YAFEL workflow for steady-state problem}
+  \begin{itemize}
+  \item
+    Problem Setup
+    \begin{itemize}
+    \item Read/create geometry
+    \item Specify boundary conditions
+    \item Define problem-specific parameters (eg: material properties)
+    \item Allocate persistent/problem-global data structures
+    \end{itemize}
+  \item
+    Assemble element residuals/tangents
+  \item
+    Apply boundary conditions \& solve system
+  \item
+    Write output
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{YAFEL workflow for implicit time-dependent problem}
+  \begin{itemize}
+  \item
+    Problem Setup
+    \begin{itemize}
+    \item Read/create geometry
+    \item Specify boundary conditions
+    \item Define problem-specific parameters (eg: material properties)
+    \item Allocate persistent/problem-global data structures
+    \end{itemize}
+  \item
+    Time loop
+    \begin{itemize}
+    \item
+      Assemble element residuals/tangents
+    \item
+      Apply boundary conditions, solve system, update solution
+    \end{itemize}
+  \item
+    Write output (really can do this whenever)
+  \item
+    Under appropriate circumstances, assembly and boundary conditions
+    are moved out of the time loop, and only the linear solve/update remains
+  \end{itemize}
+\end{frame}
+
+%===========================================================
+\subsection{Mesh Handling}
+%===========================================================
+\begin{frame}[fragile]{Creating/handling Meshes}
+  \begin{itemize}
+  \item
+    All (both) mesh types inherit from the \texttt{GenericMesh<NSD>} type
+  \item
+    Meshes are templated on the number of spatial dimensions
+  \item
+    This lets the mesh know how many components to expect for a coordinate (x, [y, [z]])
+  \item
+    Read mesh from Gmsh file or create a simple rectilinear mesh
+  \end{itemize}
+
+  \begin{lstlisting}[basicstyle=\small\ttfamily]
+    // Read from file
+    GmshMesh<3> GM(``my_mesh.msh''); 
+
+    // Define rectilinear mesh 
+    //(nodes/elements calculated, not stored)
+    RectilinearMesh<3> RM(vector<double>{1,1,1}, 
+                          vector<size_t>{10,10,10});
+  \end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{GenericMesh supported operations}
+  \begin{lstlisting}[]
+    //Return a node
+    coordinate_type node(size_t nodenum);
+    
+    //Return nodes comprising an element
+    vector<size_t> element(size_t elnum);
+
+    //Build list of internal faces
+    void build_faces();
+
+    //Get global node numbers of ``f''-th face of element ``e''
+    vector<size_t> face_nodes(size_t e, size_t f);
+
+    //Get iterator over mesh elements 
+    MeshIterator<T> begin() const;
+    MeshIterator<T> end() const;
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Handling problem degrees of freedom}
+  \begin{itemize}
+  \item
+    For assembly, you need a way to uniquely identify each
+    degree of freedom in the global problem
+  \item
+    For this example problem, it's easy, because you can use
+    \[
+    global\_dof = node\_number
+    \]
+  \item
+    This isn't generally the case, so the DoFManager does the mapping for you
+  \item
+    Currently, a basic one that works for continuous galerkin FEM
+    is included in YAFEL (assuming 0-based indexing)
+    \[
+    global\_dof = (dof\_per\_node*node\_number) + local\_dof\_num
+    \]
+  \end{itemize}
+\end{frame}
+
+%===========================================================
+\subsection{Elements}
+%===========================================================
+
+
+%===========================================================
+\subsection{Assembly}
+%===========================================================
+\begin{frame}[fragile]{Assembly process}
+  \begin{itemize}
+  \item
+    Assembly is at the heart of FEM, and is the process by which
+    global integrals can be expressed as sums of integrals over elements
+  \item
+    Example code for assembling a local matrix $\tensor{K}_e$ into 
+    global matrix $K_{global}$
+  \end{itemize}
+  \begin{lstlisting}[basicstyle=\tiny\ttfamily]
+
+    /* Assume that an element object ``E'' exists */
+    for(int A=0; A<dof_per_element; ++A) {
+      int A_base = E.base(A); //element-local node number
+      int A_comp = E.comp(A); //node-local dof number
+      int A_g = DOFM.global_dof(elnum, A_base, A_comp);
+
+      for(int B=0; B<dof_per_element; ++B) {
+        int B_base = E.base(B); //element-local node number
+        int B_comp = E.comp(B); //node-local dof number
+        int B_global = DOFM.global_dof(elnum, B_base, B_comp);
+        
+        K_global(A_g, B_g) += K_e(A,B); // <--may not use precisely this syntax
+      }
+    }
+  \end{lstlisting}
+\end{frame}
+
+%===========================================================
+\subsection{System Solve}
+%===========================================================
+
+
+%===========================================================
+\subsection{Writing Output}
+%===========================================================
+
+
+%===========================================================
+\subsection{YAFEL-isms}
+%===========================================================
+
