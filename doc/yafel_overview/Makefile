@@ -13,7 +13,7 @@ main.pdf: $(texfiles)
 	pdflatex main.tex
 
 clean:
-	rm *.aux *.log *.out *.nav *.toc *.snm $(output) main.pdf
+	rm *.aux *.log *.out *.nav *.toc *.snm *.vrb $(output) main.pdf
 
 open: $(output)
 	gnome-open $<
