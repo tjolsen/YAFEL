@@ -26,7 +26,7 @@
     Multiply by a ``test function'' $v$ that satisfies boundary conditions and 
     certain integrability requirements, then integrate by parts
     \begin{align*}
-      \int_{\partial \Omega_N} v (\nabla u \cdot \tensor{n})\,\mathrm{d}A - 
+      \int_{\partial \Omega_N} v \underbrace{(\nabla u \cdot \tensor{n})}_{g(\tensor{x})}\,\mathrm{d}A - 
       &\int_{\Omega} \nabla v \cdot \nabla u \dV = 0  \\
       &\forall\;\; v \in 
       \{\text{a set satisfying above requirements}\}
