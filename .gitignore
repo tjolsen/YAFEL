@@ -61,3 +61,6 @@ experimental/
 
 # garbage files that are slowly being removed
 *.old
+
+# pdf files (should just keep tex sources)
+*.pdf

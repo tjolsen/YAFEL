@@ -46,6 +46,7 @@
 #include "element/Element.hpp"
 #include "element/LinQuad.hpp"
 #include "element/LinTri.hpp"
+#include "element/LinHex.hpp"
 //#include "element/LinTet.hpp"
 #include "element/ElementFactory.hpp"
 #include "element/DG_Quad.hpp"
