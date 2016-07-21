@@ -28,7 +28,7 @@ template<typename MT, unsigned NSD, typename dataType>
 class VTKDGMesh : public VTKMesh<MT,NSD> {
 
 public:
-  using size_type = typename VTKMesh<MT,NSD>::size_type;
+    //using size_type = typename VTKMesh<MT,NSD>::size_type;
   using coordinate_type = typename VTKMesh<MT,NSD>::coordinate_type;
 
   VTKDGMesh(DG_Quad<NSD,dataType> &dgq, GenericMesh<MT,NSD> &M) : VTKMesh<MT,NSD>(M), DGQ(dgq) {}

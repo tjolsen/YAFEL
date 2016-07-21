@@ -58,7 +58,7 @@ int main() {
   std::vector<double> Gflops1;
   std::vector<double> Gflops2;
 
-  std::size_t Nmax = 4096;
+  std::size_t Nmax = 1024;
   std::size_t Nstart = 4;
   
   int Niters = 5;
@@ -76,11 +76,11 @@ int main() {
       double work = 2*n*n*n;
       
       auto deltaTime1 = time_matmul(n,A,B,C);
-      //auto deltaTime2 = time_naive_matmul(n,A,B,C);
+      auto deltaTime2 = time_naive_matmul(n,A,B,C);
       
       //time in seconds
       double dt1 = ((double)deltaTime1.count()*std::chrono::steady_clock::period::num)/std::chrono::steady_clock::period::den;
-      double dt2 = dt1;//((double)deltaTime2.count()*std::chrono::steady_clock::period::num)/std::chrono::steady_clock::period::den;
+      double dt2 = ((double)deltaTime2.count()*std::chrono::steady_clock::period::num)/std::chrono::steady_clock::period::den;
       
       std::cout << dt1 << ", " << dt2 << std::endl;
       Gflops1.push_back(work/dt1);
