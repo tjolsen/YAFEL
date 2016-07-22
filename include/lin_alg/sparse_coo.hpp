@@ -161,7 +161,10 @@ public:
     //compress();
     return _data;
   }
-  
+
+    std::size_t size() const { return _data.size(); }
+    void reserve(size_type sz) { return _data.reserve(sz); }
+    
 private:
   std::vector<triplet> _data;
   size_type _rows;

@@ -37,7 +37,7 @@
 
 using namespace yafel;
 
-constexpr unsigned NSD = 2;
+constexpr unsigned NSD = 3;
 
 
 int main() {
@@ -46,7 +46,7 @@ int main() {
    * Problem Parameters
    */
   double L = 1; // box length
-  double dim_elem = 350; // elements along each dimension
+  double dim_elem = 120; // elements along each dimension
 
   //set up basic structures
   RectilinearMesh<NSD> M(std::vector<double>(NSD,L), std::vector<std::size_t>(NSD,dim_elem));
@@ -54,7 +54,8 @@ int main() {
   ElementFactory<RectilinearMesh<NSD>, NSD> EF(M,dofm);
 
   sparse_coo<double> COO;
-
+  COO.reserve(M.n_elements()*64);
+  
   // assemble system
   std::cout << "Assembling..." << std::endl;
   for(std::size_t elnum=0; elnum<M.n_elements(); ++elnum) {
@@ -125,6 +126,8 @@ int main() {
   //make dirichlet bc object using vectors created above
   DirBC BC(bcnodes, bcvals, bcmask);
 
+  std::cout << COO.size() << std::endl;
+  
   
   //set up sparse matrix data structure for solving
   sparse_csr<double> Ksys(COO);
