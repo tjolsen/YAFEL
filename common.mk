@@ -22,7 +22,7 @@ endif
 AR = ar
 
 #compiler optimization and linking flags
-CXXFLAGS = -g -Og -Wall -Werror -Wextra #-fmax-errors=5 
+CXXFLAGS = -O3 -Wall -Werror -Wextra #-fmax-errors=5 
 LDFLAGS = -L$(YAFELDIR)/lib/ -lyafel
 ARFLAGS = -ru
 
