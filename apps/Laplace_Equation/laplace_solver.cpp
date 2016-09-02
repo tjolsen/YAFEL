@@ -45,13 +45,18 @@ int main() {
     /*
      * Problem Parameters
      */
-    double L = 1; // box length
-    double dim_elem = 120; // elements along each dimension
+    //double L = 1; // box length
+    //double dim_elem = 120; // elements along each dimension
 
     //set up basic structures
-    RectilinearMesh<NSD> M(std::vector<double>(NSD,L), std::vector<std::size_t>(NSD,dim_elem));
-    CG_DoFManager<RectilinearMesh<NSD>,NSD> dofm(M,1);
-    ElementFactory<RectilinearMesh<NSD>, NSD> EF(M,dofm);
+    //RectilinearMesh<NSD> M(std::vector<double>(NSD,L), std::vector<std::size_t>(NSD,dim_elem));
+    //CG_DoFManager<RectilinearMesh<NSD>,NSD> dofm(M,1);
+    //ElementFactory<RectilinearMesh<NSD>, NSD> EF(M,dofm);
+    
+    GmshMesh<NSD> M("square.msh");
+
+    CG_DoFManager<GmshMesh<NSD>,NSD> dofm(M,1);
+    ElementFactory<GmshMesh<NSD>, NSD> EF(M,dofm);
 
     sparse_coo<double> COO;
 
@@ -60,15 +65,15 @@ int main() {
     for(std::size_t elnum=0; elnum<M.n_elements(); ++elnum) {
         Element<NSD> & el = EF.getElement(elnum);
 
-        if(el.element_type == ElementType::NULL_ELEMENT) {
-            continue;
+        if(el.element_type == ElementType::NULL_ELEMENT || el.n_topoDim != NSD) {
+	    continue;
         }
-
+	
         //update element shape values, gradients
         el.update_element(M,elnum);
-    
-        std::size_t dof_per_el = el.dof_per_el;
 
+        std::size_t dof_per_el = el.dof_per_el;
+	
         Matrix<double> Kloc(dof_per_el, dof_per_el, 0);
 
         //loop over quadrature points
@@ -101,38 +106,17 @@ int main() {
   
     std::cout << "done" << std::endl
               << "Boundary conditions..." << std::endl;
-  
-    //manually construct boundary conditions.
-    // this will be abstracted away into something nicer at some point
-    std::vector<std::size_t> bcnodes;
-    std::vector<double> bcvals;
-    std::vector<bool> bcmask(M.n_nodes(),false);
 
-    std::vector<double> x0_bcvals(NSD,0), x1_bcvals(NSD,0);
-    for(std::size_t i=0; i<NSD; ++i) {
-        x0_bcvals[i] = i+1;
-    }
 
-    for(std::size_t i=0; i<M.n_nodes(); ++i) {
-        Tensor<NSD,1> x = M.node(i);
-        for(std::size_t dim=0; dim<NSD; ++dim) {
 
-            if(x(dim) == 0) {
-                bcnodes.push_back(i);
-                bcvals.push_back(x0_bcvals[dim]);
-                bcmask[i] = true;
-            }
-            else if(x(dim) == L) {
-                bcnodes.push_back(i);
-                bcvals.push_back(x1_bcvals[dim]);
-                bcmask[i] = true;
-            }
-        }
-    }
-  
-    //make dirichlet bc object using vectors created above
-    DirBC BC(bcnodes, bcvals, bcmask);
+    //Set up BCs using physical ID of boundary
+    int pid_1 = 10;
+    int pid_2 = 11;
 
+    SpatialFunction<NSD,double> zero_func{[](const Tensor<NSD,1,double>&){return 0.0;} };
+    SpatialFunction<NSD,double> one_func{[](const Tensor<NSD,1,double>&){return 1.0;} };
+    DirBC BC(M, dofm, pid_1, 0, zero_func);
+    DirBC BC2(M, dofm, pid_2, 0, one_func);
   
     //set up sparse matrix data structure for solving
     sparse_csr<double> Ksys(COO);
@@ -140,6 +124,12 @@ int main() {
 
     //apply bc to linear system
     BC.apply(Ksys, Fsys);
+    BC2.apply(Ksys, Fsys);
+
+    auto trips = Ksys.copy_triplets();
+    for(auto t : trips) {
+	std::cout << std::get<0>(t) << " " << std::get<1>(t) << " " << std::get<2>(t) << std::endl;
+    }
 
     std::cout << "done" << std::endl; // bc done
 
@@ -154,7 +144,8 @@ int main() {
 
     // output system
     VTKOutput vout;
-    VTKMesh<RectilinearMesh<NSD>, NSD> vtkm(M);
+    //VTKMesh<RectilinearMesh<NSD>, NSD> vtkm(M);
+    VTKMesh<GmshMesh<NSD>, NSD> vtkm(M);
     VTKScalarData vtku(U, VTKObject::VTKPOINTDATA, "U");
     VTKScalarData vtkubc(BC.get_ubc(), VTKObject::VTKPOINTDATA, "U BC");
 

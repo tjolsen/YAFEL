@@ -10,47 +10,50 @@
 
 #include "yafel_globals.hpp"
 #include <cstddef>
+#include <string>
 
 YAFEL_NAMESPACE_OPEN
 
 enum class ElementType {
-  // 1-D Elements
-  LINEAR_LINE,
-    QUADRATIC_LINE,
-    CUBIC_LINE,
+    // 1-D Elements
+    LINEAR_LINE,
+	QUADRATIC_LINE,
+	CUBIC_LINE,
     
 
-  // 2-D Quadrilateral Elements
-    LINEAR_QUAD,
-    QUADRATIC_QUAD,
-    CUBIC_QUAD,
+    // 2-D Quadrilateral Elements
+	LINEAR_QUAD,
+	QUADRATIC_QUAD,
+	CUBIC_QUAD,
     
-  // 2-D Triangle Elements
-    LINEAR_TRI,
-    QUADRATIC_TRI,
-    CUBIC_TRI,
+    // 2-D Triangle Elements
+	LINEAR_TRI,
+	QUADRATIC_TRI,
+	CUBIC_TRI,
     
-  // 3-D Hexahedral Elements
-    LINEAR_HEX,
-    QUADRATIC_HEX,
-    CUBIC_HEX,
+    // 3-D Hexahedral Elements
+	LINEAR_HEX,
+	QUADRATIC_HEX,
+	CUBIC_HEX,
     
-  // 3-D Tetrahedral Elements
-    LINEAR_TET,
-    QUADRATIC_TET,
-    CUBIC_TET,
+    // 3-D Tetrahedral Elements
+	LINEAR_TET,
+	QUADRATIC_TET,
+	CUBIC_TET,
 
-  // DG Types
-    DG_QUAD,
+    // DG Types
+	DG_QUAD,
     
-  // Error Type
-    NULL_ELEMENT
-};
+    // Error Type
+	NULL_ELEMENT
+	};
 
 //functions for mapping preprocessor-specific element types to yafel representation
 namespace ElementType_Mappings{
-  ElementType gmsh_to_ElementType(std::size_t eltype);
+    ElementType gmsh_to_ElementType(std::size_t eltype);
 }  
+
+std::string to_string(ElementType ET);
 
 YAFEL_NAMESPACE_CLOSE
 

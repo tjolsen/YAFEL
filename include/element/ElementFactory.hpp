@@ -7,7 +7,7 @@
 #include "element/LinQuad.hpp"
 #include "element/LinTri.hpp"
 #include "element/NullElement.hpp"
-//#include "element/LinTet.hpp"
+#include "element/LinTet.hpp"
 //#include "element/LinLine.hpp"
 //#include "element/LagrangeLine.hpp"
 #include "mesh/GenericMesh.hpp"
@@ -35,6 +35,7 @@ private:
     LinQuad<NSD> linear_quad;
     LinTri<NSD> linear_tri;
     LinHex<NSD> linear_hex;
+    LinTet<NSD> linear_tet;
     NullElement<NSD> null_element;
     const DoFManager & DOFM;
     size_type _dof_per_node;
@@ -51,6 +52,7 @@ ElementFactory<MTYPE,NSD>::ElementFactory(const GenericMesh<MTYPE,NSD> &m, const
       linear_quad(dofm),
       linear_tri(dofm),
       linear_hex(dofm),
+      linear_tet(dofm),
       null_element(dofm),
       DOFM(dofm),
       _dof_per_node(dofm.dof_per_node())
@@ -59,7 +61,7 @@ ElementFactory<MTYPE,NSD>::ElementFactory(const GenericMesh<MTYPE,NSD> &m, const
     linear_quad.init_element();
     linear_tri.init_element();
     linear_hex.init_element();
-
+    linear_tet.init_element();
 }
 
 template<typename MTYPE, unsigned NSD>
@@ -74,6 +76,8 @@ Element<NSD> & ElementFactory<MTYPE,NSD>::getElement(size_type elnum) {
         return linear_tri;
     case ElementType::LINEAR_HEX:
         return linear_hex;
+    case ElementType::LINEAR_TET:
+        return linear_tet;
     default:
         return null_element;
     }

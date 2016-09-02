@@ -11,6 +11,7 @@
 #include "utils/ElementType.hpp"
 
 #include <vector>
+#include <iostream>
 
 YAFEL_NAMESPACE_OPEN
 

@@ -37,5 +37,62 @@ namespace ElementType_Mappings {
 
 
 
+std::string to_string(ElementType ET) {
+    switch(ET) {
+    // 1-D Elements
+    case ElementType::LINEAR_LINE:
+	return "LINEAR_LINE";
+    case ElementType::QUADRATIC_LINE:
+	return "QUADRATIC_LINE";
+    case ElementType::CUBIC_LINE:
+	return "CUBIC_LINE";
+
+    // 2-D Quadrilateral Elements
+    case ElementType::LINEAR_QUAD:
+	return "LINEAR_QUAD";
+    case ElementType::QUADRATIC_QUAD:
+	return "QUADRATIC_QUAD";
+    case ElementType::CUBIC_QUAD:
+	return "CUBIC_QUAD";
+    
+    // 2-D Triangle Elements
+    case ElementType::LINEAR_TRI:
+	return "LINEAR_TRI";
+    case ElementType::QUADRATIC_TRI:
+	return "QUADRATIC_TRI";
+    case ElementType::CUBIC_TRI:
+	return "CUBIC_TRI";
+    
+    // 3-D Hexahedral Elements
+    case ElementType::LINEAR_HEX:
+	return "LINEAR_HEX";
+    case ElementType::QUADRATIC_HEX:
+	return "QUADRATIC_HEX";
+    case ElementType::CUBIC_HEX:
+	return "CUBIC_HEX";
+    
+    // 3-D Tetrahedral Elements
+    case ElementType::LINEAR_TET:
+	return "LINEAR_TET";
+    case ElementType::QUADRATIC_TET:
+	return "QUADRATIC_TET";
+    case ElementType::CUBIC_TET:
+	return "CUBIC_TET";
+
+    // DG Types
+    case ElementType::DG_QUAD:
+	return "DG_QUAD";
+    
+    // Error Type
+    case ElementType::NULL_ELEMENT:
+    default:
+	return "NULL_ELEMENT";
+
+    }
+}
+
+
+
+
 
 YAFEL_NAMESPACE_CLOSE
