@@ -126,11 +126,6 @@ int main() {
     BC.apply(Ksys, Fsys);
     BC2.apply(Ksys, Fsys);
 
-    auto trips = Ksys.copy_triplets();
-    for(auto t : trips) {
-	std::cout << std::get<0>(t) << " " << std::get<1>(t) << " " << std::get<2>(t) << std::endl;
-    }
-
     std::cout << "done" << std::endl; // bc done
 
     //solve linear system using the Conjugate Gradient method, with the boundary conditions
