@@ -18,7 +18,8 @@ private:
   }
   
 public:
-  const_reference_tensor_iterator(const TENSTYPE &t) : _t(t)
+    const_reference_tensor_iterator(const TENSTYPE &t,unsigned val=0) :
+	generic_tensor_iterator<DIM,RANK>(val), _t(t)
   {}
   
   typename TENSTYPE::value_type operator*() const {

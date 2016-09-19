@@ -21,7 +21,12 @@ public:
   
     //get a reference_tensor_iterator to the beginning
     reference_tensor_iterator<Tensor<DIM,RANK,dataType>,DIM,RANK> begin() {
-        return reference_tensor_iterator<Tensor<DIM,RANK,dataType>,DIM,RANK>(*this);
+        return reference_tensor_iterator<Tensor<DIM,RANK,dataType>,DIM,RANK>(*this,0);
+    }
+
+    //get a reference_tensor_iterator to the end
+    reference_tensor_iterator<Tensor<DIM,RANK,dataType>,DIM,RANK> end() {
+        return reference_tensor_iterator<Tensor<DIM,RANK,dataType>,DIM,RANK>(*this,DIM);
     }
 
 

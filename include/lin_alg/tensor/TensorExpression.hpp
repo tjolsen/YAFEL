@@ -23,7 +23,7 @@
 YAFEL_NAMESPACE_OPEN
 
 constexpr unsigned _tensorStorage(unsigned dim, unsigned rank) {
-  return (rank==0) ? 1 : dim*_tensorStorage(dim,rank-1);
+    return (rank==0) ? 1 : dim*_tensorStorage(dim,rank-1);
 }
 
 //--------------------------------------------------------------------------------
@@ -36,21 +36,25 @@ template <typename T, unsigned DIM, unsigned RANK, typename dataType>
 class TensorExpression {
 
 public:
-  using size_type = std::size_t;
-  using value_type = dataType;
+    using size_type = std::size_t;
+    using value_type = dataType;
 
-  size_type rank() const {return RANK;}
-  size_type dim() const {return DIM;}
+    size_type rank() const {return RANK;}
+    size_type dim() const {return DIM;}
 
-  template <typename ...Args>
-  value_type operator()(Args ...args) const { return static_cast<const T&>(*this)(args...); }
+    template <typename ...Args>
+    value_type operator()(Args ...args) const { return static_cast<const T&>(*this)(args...); }
   
-  operator T&() {return static_cast<const T&>(*this);}
-  operator T const&() const {return static_cast<const T&>(*this);}
+    operator T&() {return static_cast<const T&>(*this);}
+    operator T const&() const {return static_cast<const T&>(*this);}
 
-  const_reference_tensor_iterator<TensorExpression<T,DIM,RANK,dataType>,DIM,RANK> begin() const {
-    return const_reference_tensor_iterator<TensorExpression<T,DIM,RANK,dataType>,DIM,RANK>(*this);
-  }
+    const_reference_tensor_iterator<TensorExpression<T,DIM,RANK,dataType>,DIM,RANK> begin() const {
+	return const_reference_tensor_iterator<TensorExpression<T,DIM,RANK,dataType>,DIM,RANK>(*this);
+    }
+
+    const_reference_tensor_iterator<TensorExpression<T,DIM,RANK,dataType>,DIM,RANK> end() const {
+	return const_reference_tensor_iterator<TensorExpression<T,DIM,RANK,dataType>,DIM,RANK>(*this,DIM);
+    }
 
 };
 
@@ -68,43 +72,43 @@ public:
 template<typename T1, unsigned DIM, unsigned RANK, typename dataType>
 class TensorScaled : public TensorExpression<TensorScaled<T1,DIM,RANK,dataType>, DIM, RANK, dataType> {
 public:
-  using value_type = typename TensorExpression<TensorScaled<T1,DIM,RANK,dataType>,DIM,RANK,dataType>::value_type;
+    using value_type = typename TensorExpression<TensorScaled<T1,DIM,RANK,dataType>,DIM,RANK,dataType>::value_type;
 private:
-  const T1 &_u;
-  const dataType alpha;
+    const T1 &_u;
+    const dataType alpha;
   
 public:
-  template<typename T2>
-  TensorScaled(const TensorExpression<T1,DIM,RANK,dataType> &u, T2 a)
-    : _u(u), alpha(dataType(a))
-  {
-    static_assert(std::is_fundamental<T2>::value,
-		  "Error: TensorScaled currently only intended for primitive types");
-  }
+    template<typename T2>
+    TensorScaled(const TensorExpression<T1,DIM,RANK,dataType> &u, T2 a)
+	: _u(u), alpha(dataType(a))
+	{
+	    static_assert(std::is_fundamental<T2>::value,
+			  "Error: TensorScaled currently only intended for primitive types");
+	}
   
-  template<typename ...Args>
-  value_type operator()(Args ...args) const {return _u(args...)*alpha;}
+    template<typename ...Args>
+    value_type operator()(Args ...args) const {return _u(args...)*alpha;}
 };
 
 template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType, 
 	 typename = typename std::enable_if<std::is_fundamental<T2>::value, T2>::type>
 TensorScaled<T1,DIM,RANK,dataType>
 operator*(const TensorExpression<T1,DIM,RANK,dataType> &u, T2 alpha) {
-  return TensorScaled<T1,DIM,RANK,dataType>(u,alpha);
+    return TensorScaled<T1,DIM,RANK,dataType>(u,alpha);
 }
 
 template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType,
 	 typename = typename std::enable_if<std::is_fundamental<T2>::value, T2>::type>
 TensorScaled<T1,DIM,RANK,dataType>
 operator*(T2 alpha, const TensorExpression<T1,DIM,RANK,dataType> &u) {
-  return TensorScaled<T1,DIM,RANK,dataType>(u,alpha);
+    return TensorScaled<T1,DIM,RANK,dataType>(u,alpha);
 }
 
 template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType, 
 	 typename = typename std::enable_if<std::is_fundamental<T2>::value, T2>::type>
 TensorScaled<T1,DIM,RANK,dataType>
 operator/(const TensorExpression<T1,DIM,RANK,dataType> &u, T2 alpha) {
-  return TensorScaled<T1,DIM,RANK,dataType>(u,dataType(1)/alpha);
+    return TensorScaled<T1,DIM,RANK,dataType>(u,dataType(1)/alpha);
 }
 
 //--------------------------------------------------------------------------------
@@ -116,20 +120,20 @@ operator/(const TensorExpression<T1,DIM,RANK,dataType> &u, T2 alpha) {
 template <typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType>
 class TensorSum : public TensorExpression<TensorSum<T1,T2,DIM,RANK,dataType>, DIM, RANK, dataType> {
 public:
-  using value_type = typename TensorExpression<TensorSum<T1,T2,DIM,RANK,dataType>,DIM,RANK,dataType>::value_type;
+    using value_type = typename TensorExpression<TensorSum<T1,T2,DIM,RANK,dataType>,DIM,RANK,dataType>::value_type;
 private:
-  const T1 &_u;
-  const T2 &_v;
+    const T1 &_u;
+    const T2 &_v;
 
 public:
 
-  TensorSum(const TensorExpression<T1,DIM,RANK,dataType> &u,
-	    const TensorExpression<T2,DIM,RANK,dataType> &v)
-    : _u(u), _v(v)
-  {}
+    TensorSum(const TensorExpression<T1,DIM,RANK,dataType> &u,
+	      const TensorExpression<T2,DIM,RANK,dataType> &v)
+	: _u(u), _v(v)
+	{}
   
-  template<typename ...Args>
-  value_type operator()(Args ...args) const {return _u(args...)+_v(args...);}
+    template<typename ...Args>
+    value_type operator()(Args ...args) const {return _u(args...)+_v(args...);}
 
 };
 
@@ -137,7 +141,7 @@ template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataTyp
 TensorSum<T1,T2,DIM,RANK,dataType>
 operator+(const TensorExpression<T1,DIM,RANK,dataType> &u,
 	  const TensorExpression<T2,DIM,RANK,dataType> &v) {
-  return TensorSum<T1,T2,DIM,RANK,dataType>(u,v);
+    return TensorSum<T1,T2,DIM,RANK,dataType>(u,v);
 }
 
 //--------------------------------------------------------------------------------
@@ -148,23 +152,23 @@ operator+(const TensorExpression<T1,DIM,RANK,dataType> &u,
 //--------------------------------------------------------------------------------
 template <typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataType>
 class TensorDifference : 
-  public TensorExpression<TensorDifference<T1,T2,DIM,RANK,dataType>, DIM, RANK, dataType> 
+    public TensorExpression<TensorDifference<T1,T2,DIM,RANK,dataType>, DIM, RANK, dataType> 
 {
 public:
-  using value_type = typename TensorExpression<TensorDifference<T1,T2,DIM,RANK,dataType>,DIM,RANK,dataType>::value_type;
+    using value_type = typename TensorExpression<TensorDifference<T1,T2,DIM,RANK,dataType>,DIM,RANK,dataType>::value_type;
 private:
-  const T1 &_u;
-  const T2 &_v;
+    const T1 &_u;
+    const T2 &_v;
 
 public:
 
-  TensorDifference(const TensorExpression<T1,DIM,RANK,dataType> &u,
-		   const TensorExpression<T2,DIM,RANK,dataType> &v)
-    : _u(u), _v(v)
-  {}
+    TensorDifference(const TensorExpression<T1,DIM,RANK,dataType> &u,
+		     const TensorExpression<T2,DIM,RANK,dataType> &v)
+	: _u(u), _v(v)
+	{}
   
-  template<typename ...Args>
-  value_type operator()(Args ...args) const {return _u(args...)-_v(args...);}
+    template<typename ...Args>
+    value_type operator()(Args ...args) const {return _u(args...)-_v(args...);}
 
 };
 
@@ -172,7 +176,7 @@ template<typename T1, typename T2, unsigned DIM, unsigned RANK, typename dataTyp
 TensorDifference<T1,T2,DIM,RANK,dataType>
 operator-(const TensorExpression<T1,DIM,RANK,dataType> &u,
 	  const TensorExpression<T2,DIM,RANK,dataType> &v) {
-  return TensorDifference<T1,T2,DIM,RANK,dataType>(u,v);
+    return TensorDifference<T1,T2,DIM,RANK,dataType>(u,v);
 }
 
 
@@ -185,35 +189,35 @@ template <typename T1, typename T2, unsigned DIM, unsigned R1, unsigned R2, type
 class OuterProduct : public TensorExpression<OuterProduct<T1,T2,DIM,R1,R2,dataType>,DIM,R1+R2,dataType>
 {
 public:
-  using value_type = typename TensorExpression<OuterProduct<T1,T2,DIM,R1,R2,dataType>,DIM,R1+R2,dataType>::value_type;
+    using value_type = typename TensorExpression<OuterProduct<T1,T2,DIM,R1,R2,dataType>,DIM,R1+R2,dataType>::value_type;
 private:
-  const T1 & _u;
-  const T2 & _v;
+    const T1 & _u;
+    const T2 & _v;
   
-  template <int ...S, typename ...Args>
-  value_type lhs(seq<S...>, const std::tuple<Args...> &params) const {
-    return _u(std::get<S>(params)...);
-  }
+    template <int ...S, typename ...Args>
+	value_type lhs(seq<S...>, const std::tuple<Args...> &params) const {
+	return _u(std::get<S>(params)...);
+    }
   
-  template <int ...S, typename ...Args>
-  value_type rhs(seq<S...>, const std::tuple<Args...> &params) const {
-    return _v(std::get<S+R1>(params)...);
-  }
+    template <int ...S, typename ...Args>
+	value_type rhs(seq<S...>, const std::tuple<Args...> &params) const {
+	return _v(std::get<S+R1>(params)...);
+    }
   
 public:
-  OuterProduct(const TensorExpression<T1,DIM,R1,dataType> &u, 
-	       const TensorExpression<T2,DIM,R2,dataType> &v) 
-  : _u(u), _v(v)
-  {}
+    OuterProduct(const TensorExpression<T1,DIM,R1,dataType> &u, 
+		 const TensorExpression<T2,DIM,R2,dataType> &v) 
+	: _u(u), _v(v)
+    {}
   
-  template<typename ...Args>
-  value_type operator()(Args ...args) const {
-    static_assert(sizeof...(args) == R1+R2, 
-		  "OuterProduct::operator() error wrong number of arguments");
+    template<typename ...Args>
+	value_type operator()(Args ...args) const {
+	static_assert(sizeof...(args) == R1+R2, 
+		      "OuterProduct::operator() error wrong number of arguments");
 
-    return lhs(typename gens<R1>::type(), std::forward_as_tuple(args...))
-      *rhs(typename gens<R2>::type(), std::forward_as_tuple(args...));
-  }
+	return lhs(typename gens<R1>::type(), std::forward_as_tuple(args...))
+	    *rhs(typename gens<R2>::type(), std::forward_as_tuple(args...));
+    }
   
 };
 
@@ -222,7 +226,7 @@ OuterProduct<T1,T2,DIM,R1,R2,dataType>
 otimes(const TensorExpression<T1, DIM, R1, dataType> &u,
        const TensorExpression<T2, DIM, R2, dataType> &v) 
 {
-  return OuterProduct<T1, T2, DIM, R1, R2, dataType>(u,v);
+    return OuterProduct<T1, T2, DIM, R1, R2, dataType>(u,v);
 }
 
 
@@ -242,67 +246,67 @@ otimes(const TensorExpression<T1, DIM, R1, dataType> &u,
 template <typename T1, typename T2, unsigned DIM, unsigned R1, unsigned R2, 
 	  unsigned NCONTRACT, typename dataType>
 class TensorContraction :
-  public TensorExpression<TensorContraction<T1,T2,DIM,R1,R2,NCONTRACT,dataType>,
-			  DIM,R1+R2-2*NCONTRACT, dataType>
+    public TensorExpression<TensorContraction<T1,T2,DIM,R1,R2,NCONTRACT,dataType>,
+			    DIM,R1+R2-2*NCONTRACT, dataType>
 {
 public:
-  using value_type = typename TensorExpression<TensorContraction<T1,T2,DIM,R1,R2,NCONTRACT,dataType>,
-					       DIM, R1+R2-2*NCONTRACT, dataType>::value_type;
+    using value_type = typename TensorExpression<TensorContraction<T1,T2,DIM,R1,R2,NCONTRACT,dataType>,
+						 DIM, R1+R2-2*NCONTRACT, dataType>::value_type;
 
 private:
-  const T1 &_u;
-  const T2 &_v;
+    const T1 &_u;
+    const T2 &_v;
 
-  template<int ...S, int ...ZSEQ, int ...NCSEQ, typename ...Args>
-    const_reference_index_iterator<T1,DIM,R1,R1-NCONTRACT+NCSEQ...>
-    lhs_iterator(seq<S...>, seq<NCSEQ...>, zseq<ZSEQ...>, const std::tuple<Args...> &params) const {
+    template<int ...S, int ...ZSEQ, int ...NCSEQ, typename ...Args>
+	const_reference_index_iterator<T1,DIM,R1,R1-NCONTRACT+NCSEQ...>
+	lhs_iterator(seq<S...>, seq<NCSEQ...>, zseq<ZSEQ...>, const std::tuple<Args...> &params) const {
     
-    const_reference_index_iterator<T1,DIM,R1,R1-NCONTRACT+NCSEQ...> 
-      it(_u, std::get<S>(params)..., ZSEQ...);
+	const_reference_index_iterator<T1,DIM,R1,R1-NCONTRACT+NCSEQ...> 
+	    it(_u, std::get<S>(params)..., ZSEQ...);
     
-    return it;
-  }
+	return it;
+    }
   
-  template<int ...S, int ...ZSEQ, int ...NCSEQ, typename ...Args>
-    const_reference_index_iterator<T2,DIM,R2,NCSEQ...>
-    rhs_iterator(seq<S...>, seq<NCSEQ...>, zseq<ZSEQ...>, const std::tuple<Args...> &params) const {
+    template<int ...S, int ...ZSEQ, int ...NCSEQ, typename ...Args>
+	const_reference_index_iterator<T2,DIM,R2,NCSEQ...>
+	rhs_iterator(seq<S...>, seq<NCSEQ...>, zseq<ZSEQ...>, const std::tuple<Args...> &params) const {
     
-    const_reference_index_iterator<T2,DIM,R2,NCSEQ...> 
-      it(_v, ZSEQ..., std::get<S+R1-NCONTRACT>(params)...);
+	const_reference_index_iterator<T2,DIM,R2,NCSEQ...> 
+	    it(_v, ZSEQ..., std::get<S+R1-NCONTRACT>(params)...);
     
-    return it;
-  }
+	return it;
+    }
   
 
 public:
   
-  TensorContraction(const TensorExpression<T1,DIM,R1,dataType> &u,
-		    const TensorExpression<T2,DIM,R2,dataType> &v)
-    : _u(u), _v(v)
-  {
-    static_assert(NCONTRACT>=1 && NCONTRACT<=R1 && NCONTRACT<=R2 && (R1+R2-2*NCONTRACT)>0,
-		  "TensorContraction: bad value of NCONTRACT");
-  }
-
-  template <typename ...Args>
-  value_type operator()(Args ...args) const {
-    
-    auto lhsit = lhs_iterator(typename gens<R1-NCONTRACT>::type(), 
-			      typename gens<NCONTRACT>::type(), 
-			      typename zeroGen<NCONTRACT>::type(),
-			      std::forward_as_tuple(args...));
-    auto rhsit = rhs_iterator(typename gens<R2-NCONTRACT>::type(), 
-			      typename gens<NCONTRACT>::type(), 
-			      typename zeroGen<NCONTRACT>::type(),
-			      std::forward_as_tuple(args...));
-    
-    value_type ret(0);
-    for(; !lhsit.end(); lhsit.next(), rhsit.next()) {
-      ret += (*lhsit)*(*rhsit);
+    TensorContraction(const TensorExpression<T1,DIM,R1,dataType> &u,
+		      const TensorExpression<T2,DIM,R2,dataType> &v)
+	: _u(u), _v(v)
+    {
+	static_assert(NCONTRACT>=1 && NCONTRACT<=R1 && NCONTRACT<=R2 && (R1+R2-2*NCONTRACT)>0,
+		      "TensorContraction: bad value of NCONTRACT");
     }
+
+    template <typename ...Args>
+	value_type operator()(Args ...args) const {
     
-    return ret;
-  }
+	auto lhsit = lhs_iterator(typename gens<R1-NCONTRACT>::type(), 
+				  typename gens<NCONTRACT>::type(), 
+				  typename zeroGen<NCONTRACT>::type(),
+				  std::forward_as_tuple(args...));
+	auto rhsit = rhs_iterator(typename gens<R2-NCONTRACT>::type(), 
+				  typename gens<NCONTRACT>::type(), 
+				  typename zeroGen<NCONTRACT>::type(),
+				  std::forward_as_tuple(args...));
+    
+	value_type ret(0);
+	for(; !lhsit.end(); lhsit.next(), rhsit.next()) {
+	    ret += (*lhsit)*(*rhsit);
+	}
+    
+	return ret;
+    }
   
 };
 
@@ -310,29 +314,29 @@ public:
 template<unsigned NCONTRACT, typename T1, typename T2, unsigned DIM, 
          unsigned R1, unsigned R2, typename dataType,
          typename = typename std::enable_if<R1+R2-2*NCONTRACT>::type >
-TensorContraction<T1, T2, DIM, R1, R2, NCONTRACT, dataType>
-contract(const TensorExpression<T1,DIM,R1,dataType> &lhs,
-	 const TensorExpression<T2,DIM,R2,dataType> &rhs) {
+    TensorContraction<T1, T2, DIM, R1, R2, NCONTRACT, dataType>
+    contract(const TensorExpression<T1,DIM,R1,dataType> &lhs,
+	     const TensorExpression<T2,DIM,R2,dataType> &rhs) {
   
-  return TensorContraction<T1,T2,DIM,R1,R2,NCONTRACT,dataType>(lhs,rhs);
+    return TensorContraction<T1,T2,DIM,R1,R2,NCONTRACT,dataType>(lhs,rhs);
 }
 
 
 template<unsigned NCONTRACT, typename T1, typename T2, unsigned DIM, 
          unsigned R1, unsigned R2, typename dataType,
          typename = typename std::enable_if<R1+R2-2*NCONTRACT==0>::type >
-dataType contract(const TensorExpression<T1,DIM,R1,dataType> &lhs,
-                  const TensorExpression<T2,DIM,R2,dataType> &rhs) {
+    dataType contract(const TensorExpression<T1,DIM,R1,dataType> &lhs,
+		      const TensorExpression<T2,DIM,R2,dataType> &rhs) {
   
-  auto l_it = lhs.begin();
-  auto r_it = rhs.begin();
-  dataType accum(0);
+    auto l_it = lhs.begin();
+    auto r_it = rhs.begin();
+    dataType accum(0);
   
-  for(; !l_it.end(); l_it.next(), r_it.next()) {
-    accum += (*l_it)*(*r_it);
-  }
+    for(; !l_it.end(); l_it.next(), r_it.next()) {
+	accum += (*l_it)*(*r_it);
+    }
   
-  return accum;
+    return accum;
 }
 
 
