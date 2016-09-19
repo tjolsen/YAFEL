@@ -10,6 +10,7 @@
 #include "utils/DoFManager.hpp"
 #include "utils/ElementType.hpp"
 
+#include <cmath>
 #include <vector>
 #include <iostream>
 
