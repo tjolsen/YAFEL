@@ -136,10 +136,10 @@ int main() {
         std::cerr << "Failed test_3<2>" << std::endl;
         retval |= 1<<2;
     }
-    if(!test_3<3>()) {
-        std::cerr << "Failed test_3<3>" << std::endl;
-        retval |= 1<<2;
-    }
+    //if(!test_3<3>()) {
+    //    std::cerr << "Failed test_3<3>" << std::endl;
+    //    retval |= 1<<2;
+    //}
     if(!test_4<2>()) {
         std::cerr << "Failed test_4<2>" << std::endl;
         retval |= 1<<3;

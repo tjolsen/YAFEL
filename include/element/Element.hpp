@@ -68,7 +68,7 @@ public:
     void update_element(const GenericMesh<MTYPE,MNSD> & M, size_type elnum);
 
     inline double JxW(size_type qpi) const { return quad_weights[qpi]*detJ[qpi]; }
-  
+    
   
     //utility functions, might need to use in program so make public
     inline size_type getComp(size_type dof) const { return (dof % dof_per_node); }
@@ -120,7 +120,7 @@ Tensor<NSD,2> Element<NSD>::calcJ_xi(const coordinate_type &xi) const {
     Tensor<NSD,2> ret;
   
     for(size_type i=0; i<NSD; ++i) {
-        for(size_type j=0; j<NSD; ++j) {
+        for(size_type j=0; j<n_topoDim; ++j) {
             for(size_type A=0; A<nodes_per_el; ++A) {
                 ret(i,j) += shape_grad_xi(A, j, xi) * nodal_coords[A](i);
             }
@@ -135,7 +135,7 @@ template<unsigned NSD>
 void Element<NSD>::calcJacobians() {
     jacobians.clear();
     detJ.clear();
-  
+
     for(size_type qpi=0; qpi<n_quadPoints; ++qpi) {
 
         Tensor<NSD,2> J;
@@ -143,15 +143,38 @@ void Element<NSD>::calcJacobians() {
         for(size_type A=0; A<nodes_per_el; ++A) {
             for(size_type i=0; i<NSD; ++i) {
                 auto x = nodal_coords[A](i);
-                for(size_type j=0; j<NSD; ++j) {
+                for(size_type j=0; j<n_topoDim; ++j) {
                     J(i,j) += shape_grads_0[qpi](A, j) * x;
                 }
             }
         }
 
         jacobians.push_back(J);
-    
-        detJ.push_back(det(J));
+
+	if(n_topoDim == NSD) {
+	    detJ.push_back(det(J));
+	}
+	else {
+	    //topological dimension < spatial dimension
+	    //This is true for boundary elements.
+	    
+	    if(n_topoDim == 1) {
+		double sq_sum = 0;
+		for(size_type d=0; d<NSD; ++d) {
+		    sq_sum += J(d,0)*J(d,0);
+		}
+
+		detJ.push_back(std::sqrt(sq_sum));
+	    }
+	    else if(n_topoDim == 2) {
+		//This branch is only triggered when NSD==3, n_topoDim==2
+		double a = J(1,0)*J(2,1) - J(2,0)*J(1,1);
+		double b = -(J(0,0)*J(2,1) - J(2,0)*J(0,1));
+		double c = J(0,0)*J(1,1) - J(1,0)*J(0,1);
+
+		detJ.push_back(std::sqrt(a*a + b*b + c*c));
+	    }
+	}
     }
   
 }

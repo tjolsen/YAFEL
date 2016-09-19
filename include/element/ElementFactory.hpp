@@ -8,7 +8,7 @@
 #include "element/LinTri.hpp"
 #include "element/NullElement.hpp"
 #include "element/LinTet.hpp"
-//#include "element/LinLine.hpp"
+#include "element/LinLine.hpp"
 //#include "element/LagrangeLine.hpp"
 #include "mesh/GenericMesh.hpp"
 #include "utils/DoFManager.hpp"
@@ -32,6 +32,7 @@ public:
 
 private:
     const GenericMesh<MTYPE,NSD> &M;
+    LinLine<NSD> linear_line;
     LinQuad<NSD> linear_quad;
     LinTri<NSD> linear_tri;
     LinHex<NSD> linear_hex;
@@ -49,6 +50,7 @@ private:
 template<typename MTYPE, unsigned NSD>
 ElementFactory<MTYPE,NSD>::ElementFactory(const GenericMesh<MTYPE,NSD> &m, const DoFManager &dofm)
     : M(m),
+      linear_line(dofm),
       linear_quad(dofm),
       linear_tri(dofm),
       linear_hex(dofm),
@@ -58,6 +60,7 @@ ElementFactory<MTYPE,NSD>::ElementFactory(const GenericMesh<MTYPE,NSD> &m, const
       _dof_per_node(dofm.dof_per_node())
 {
 
+    linear_line.init_element();
     linear_quad.init_element();
     linear_tri.init_element();
     linear_hex.init_element();
@@ -70,6 +73,8 @@ Element<NSD> & ElementFactory<MTYPE,NSD>::getElement(size_type elnum) {
     ElementType t = M.element_type(elnum);
   
     switch(t) {
+    case ElementType::LINEAR_LINE:
+	return linear_line;
     case ElementType::LINEAR_QUAD:
         return linear_quad;
     case ElementType::LINEAR_TRI:
