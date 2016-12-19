@@ -52,13 +52,11 @@ std::chrono::steady_clock::duration time_naive_matmul(std::size_t N, Matrix<T> &
 
 int main() {
 
-  std::cout << "Thread depth limit = " << thread_depth_limit(std::thread::hardware_concurrency()) << "\n";
-
   std::vector<double> Nvec;
   std::vector<double> Gflops1;
   std::vector<double> Gflops2;
 
-  std::size_t Nmax = 1024;
+  std::size_t Nmax = 4096;
   std::size_t Nstart = 4;
   
   int Niters = 5;
@@ -76,7 +74,7 @@ int main() {
       double work = 2*n*n*n;
       
       auto deltaTime1 = time_matmul(n,A,B,C);
-      auto deltaTime2 = time_naive_matmul(n,A,B,C);
+      auto deltaTime2 = deltaTime1;//time_naive_matmul(n,A,B,C);
       
       //time in seconds
       double dt1 = ((double)deltaTime1.count()*std::chrono::steady_clock::period::num)/std::chrono::steady_clock::period::den;

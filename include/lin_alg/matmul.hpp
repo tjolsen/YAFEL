@@ -44,11 +44,14 @@ const std::size_t recursion_cutoff = 128;
 // limit thread-spawning depth to floor( log2(NProcessors) )
 // This minimizes threading overhead while eliminating the need for
 // more complex thread scheduling
+#ifdef _YAFEL_PARALLEL_MATMUL
 constexpr std::size_t thread_depth_limit(std::size_t N) {
   return (N/2 == 0) ? 0 : 1 + thread_depth_limit(N/2);
 }
 
 const std::size_t max_threads = thread_depth_limit(std::thread::hardware_concurrency());
+#endif
+
 
 //forward function declaration
 template<typename T1, typename T2, typename dataType>
