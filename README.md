@@ -16,7 +16,8 @@ the need for them arises. If you have any good ideas for something to add, pleas
 contact with me to discuss them.
 
 I'd like to give credit where it's due: this library was *heavily* inspired by the Deal.II
-library (https://github.com/dealii/dealii), which is maintained by Professor Wolfgang Bangerth at Texas A&M.
+library (https://github.com/dealii/dealii), which is maintained by Professor Wolfgang Bangerth
+at Colorado State University (formerly Texas A&M).
 I had the privilege of using his library in a class, and it inspired me to really get my
 hands dirty learning what goes on in these codes.
 As such, many of the workflows in this library are similar to those in the Deal.II library,
@@ -47,8 +48,8 @@ Using the library
 =================
 
 To compile a program using the YAFEL library, simply  include the file 'common.mk' 
-in a makefile to have access to the necessary compiler and linker flags. CFLAGS and
-LFLAGS are defined in here, so if you wish to add your own, you should use the +=
+in a makefile to have access to the necessary compiler and linker flags. CXXFLAGS and
+LDFLAGS are defined in here, so if you wish to add your own, you should use the +=
 operator.
 
 Warning
