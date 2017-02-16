@@ -9,6 +9,7 @@
 #include "mesh/GenericMesh.hpp"
 #include "utils/DoFManager.hpp"
 #include "utils/ElementType.hpp"
+#include "utils/ElementVtkType.hpp"
 
 #include <cmath>
 #include <vector>
@@ -20,16 +21,14 @@ template<unsigned NSD>
 class Element {
   
 public:
-    using coordinate_type = Tensor<NSD,1>;
-    using size_type = typename coordinate_type::size_type;
-
+    using coordinate_type = Tensor<3,1>;
 
     size_type n_spaceDim; // number of spatial dimensions = dimension of coordinate_type
     size_type n_topoDim; // topological dimension of element (line = 1, quad/tri=2, hex/tet = 3)
     size_type n_quadPoints; // number of quadrature points. may be shifted into a QuadratureRule object in the future
     size_type dof_per_node; 
     size_type dof_per_el;
-    int vtk_type;
+    ElementVtkType vtk_type;
     size_type el_num;
     size_type nodes_per_el;
   
@@ -48,9 +47,15 @@ public:
     ElementType element_type;
 
 
+
+    /**
+     * \brief Default element constructor. Fields filled using make_element<ELTYPE>(...)
+     */
+    Element();
+
     //  
-    Element(const DoFManager &dofm, ElementType eltype, size_type ntd, 
-            size_type nqp, size_type dofpe, int vtktype, size_type nodespe);
+    //Element(const DoFManager &dofm, ElementType eltype, size_type ntd, 
+    //size_type nqp, size_type dofpe, int vtktype, size_type nodespe);
   
     // Virtual functions, specialized in child classes
     //virtual ~Element() {}

@@ -1,0 +1,340 @@
+\lstset{
+  language=C++,
+  basicstyle=\small\ttfamily,
+  commentstyle=\color{red},
+  keywordstyle=\color{blue},
+  breaklines
+}
+
+
+%===========================================================
+\subsection{General Workflow}
+%===========================================================
+\begin{frame}{YAFEL workflow for steady-state problem}
+  \begin{itemize}
+  \item
+    Problem Setup
+    \begin{itemize}
+    \item Read/create geometry
+    \item Specify boundary conditions
+    \item Define problem-specific parameters (eg: material properties)
+    \item Allocate persistent/problem-global data structures
+    \end{itemize}
+  \item
+    Assemble element residuals/tangents
+  \item
+    Apply boundary conditions \& solve system
+  \item
+    Write output
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{YAFEL workflow for implicit time-dependent problem}
+  \begin{itemize}
+  \item
+    Problem Setup
+    \begin{itemize}
+    \item Read/create geometry
+    \item Specify boundary conditions
+    \item Define problem-specific parameters (eg: material properties)
+    \item Allocate persistent/problem-global data structures
+    \end{itemize}
+  \item
+    Time loop
+    \begin{itemize}
+    \item
+      Assemble element residuals/tangents
+    \item
+      Apply boundary conditions, solve system, update solution
+    \end{itemize}
+  \item
+    Write output (really can do this whenever)
+  \item
+    Under appropriate circumstances, assembly and boundary conditions
+    are moved out of the time loop, and only the linear solve/update remains
+  \end{itemize}
+\end{frame}
+
+%===========================================================
+\subsection{Mesh Handling}
+%===========================================================
+\begin{frame}[fragile]{Creating/handling Meshes}
+  \begin{itemize}
+  \item
+    All (both) mesh types inherit from the \texttt{GenericMesh<NSD>} type
+  \item
+    Meshes are templated on the number of spatial dimensions
+  \item
+    This lets the mesh know how many components to expect for a coordinate (x, [y, [z]])
+  \item
+    Read mesh from Gmsh file or create a simple rectilinear mesh
+  \end{itemize}
+
+  \begin{lstlisting}[basicstyle=\small\ttfamily]
+    // Read from file
+    GmshMesh<3> GM(``my_mesh.msh''); 
+
+    // Define rectilinear mesh 
+    //(nodes/elements calculated, not stored)
+    RectilinearMesh<3> RM(vector<double>{1,1,1}, 
+                          vector<size_t>{10,10,10});
+  \end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{GenericMesh supported operations}
+  \begin{lstlisting}[]
+    //Return a node
+    coordinate_type node(size_t nodenum);
+    
+    //Return nodes comprising an element
+    vector<size_t> element(size_t elnum);
+
+    //Build list of internal faces
+    void build_faces();
+
+    //Get global node numbers of ``f''-th face of element ``e''
+    vector<size_t> face_nodes(size_t e, size_t f);
+
+    //Get iterator over mesh elements 
+    MeshIterator<T> begin() const;
+    MeshIterator<T> end() const;
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Handling problem degrees of freedom}
+  \begin{itemize}
+  \item
+    For assembly, you need a way to uniquely identify each
+    degree of freedom in the global problem
+  \item
+    For this example problem, it's easy, because you can use
+    \[
+    global\_dof = node\_number
+    \]
+  \item
+    This isn't generally the case, so the DoFManager does the mapping for you
+  \item
+    Currently, a basic one that works for continuous galerkin FEM
+    is included in YAFEL (assuming 0-based indexing)
+    \[
+    global\_dof = (dof\_per\_node*node\_number) + local\_dof\_num
+    \]
+  \end{itemize}
+\end{frame}
+
+%===========================================================
+\subsection{Elements}
+%===========================================================
+\begin{frame}{Element Types}
+  \begin{itemize}
+  \item
+    All elements, regardless of geometry, have to store very similar information
+  \item
+    Thus, base class \texttt{Element} is used to hold this common info
+  \item
+    Global info
+    \begin{itemize}
+    \item
+      Node Numbers (vector, length=nodes\_per\_el)
+    \item
+      Location \& weight of each quadrature point
+    \end{itemize}
+  \item
+    Some other auxiliary data
+  \item
+    At each quadrature point
+    \begin{itemize}
+    \item
+      Value of all shape functions (Vector, length=nodes\_per\_el)
+    \item
+      Gradient of all shape functions wrt parent coordinates 
+      (Matrix, size=(nodes\_per\_el, NSD))
+    \item
+      Jacobian of transformation to parent element
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Specializing elements}
+  \begin{itemize}
+  \item
+    To specialize an element, you must provide
+    \begin{enumerate}
+    \item Quadrature rule (points \& weights)
+    \item Shape functions
+    \end{enumerate}
+  \item
+    The Element class can take care of the rest
+  \end{itemize}
+  \begin{columns}
+    \begin{column}{.6\textwidth}
+      \begin{lstlisting}[basicstyle=\tiny\ttfamily]
+        template<typename T>
+        LinTri::shape_value(size_t node, 
+                            Tensor<3,1,T> xi) {
+          switch(node) {
+          case 0: return 1 - xi(0) - xi(1);
+          case 1: return xi(0);
+          case 2: return xi(1);
+          default:
+            //Something is wrong!
+            throw std::runtime_error(``Bad 'node' argument to LinTri::shape_value'');
+          }
+        }
+      \end{lstlisting}
+      \begin{align*}
+        N^0(\tensor{\xi}) &= 1 - \xi_0 - \xi_1 \\
+        N^1(\tensor{\xi}) &= \xi_0 \\
+        N^2(\tensor{\xi}) &= \xi_1 \\
+      \end{align*}
+    \end{column}
+    \begin{column}{.4\textwidth}
+      \begin{figure}
+        \centering
+        \begin{tikzpicture}[scale=2]
+          \draw (0,0) circle[radius=.05] node[below]{0}
+          -- (1,0) circle[radius=.05] node[right]{1}
+          -- (0,1) circle[radius=.05] node[left]{2}
+          -- (0,0);
+
+          \draw[color=gray,dashed, -latex] (0,0) -- (1.5,0) node[right]{$\xi_0$};
+          \draw[color=gray,dashed, -latex] (0,0) -- (0,1.5) node[above]{$\xi_1$};
+        \end{tikzpicture}
+      \end{figure}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+%===========================================================
+\subsection{Assembly}
+%===========================================================
+\begin{frame}[fragile]{Assembly process}
+  \begin{itemize}
+  \item
+    Assembly is at the heart of FEM, and is the process by which
+    global integrals can be expressed as sums of integrals over elements
+  \item
+    Example code for assembling a local matrix $\tensor{K}_e$ into 
+    global matrix $K_{global}$
+  \end{itemize}
+  \begin{lstlisting}[basicstyle=\tiny\ttfamily]
+
+    /* Assume that an element object ``E'' exists */
+    for(int A=0; A<dof_per_element; ++A) {
+      int A_base = E.base(A); //element-local node number
+      int A_comp = E.comp(A); //node-local dof number
+      int A_g = DOFM.global_dof(elnum, A_base, A_comp);
+
+      for(int B=0; B<dof_per_element; ++B) {
+        int B_base = E.base(B); //element-local node number
+        int B_comp = E.comp(B); //node-local dof number
+        int B_global = DOFM.global_dof(elnum, B_base, B_comp);
+        
+        K_global(A_g, B_g) += K_e(A,B); // <--may not use precisely this syntax
+      }
+    }
+  \end{lstlisting}
+\end{frame}
+
+%===========================================================
+\subsection{System Solve}
+%===========================================================
+\begin{frame}[fragile]{Solving the system: Boundary Conditions}
+  \begin{itemize}
+  \item
+    Only need to explicitly apply the Dirichlet boundary conditions
+  \item
+    Neumann BCs occur naturally in formulation of weak form, so are
+    handled during assembly
+  \item
+    In YAFEL, there is an object that handles it for you
+  \item
+    Object created by passing a mesh, a gmsh physical-id number, local dof component,
+    and a \texttt{SpatialFunction<NSD>} 
+    (an alias for \texttt{std::function<double(coordinate\_type)>})
+  \end{itemize}
+  \begin{lstlisting}
+    DirBC bc(M, phys_id, dof_comp, 
+             [](const coordinate_type &x)->double
+             { return 0; });
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Solving the system: Linear solve}
+  \begin{itemize}
+  \item
+    Once boundary conditions are constructed, call
+    \texttt{DirBC::apply(sparse\_csr \&K\_sys, Vector \&F\_sys)}
+    to alter the linear system
+  \item
+    Then, the system is ready for solving with the method of your choice
+  \item
+    YAFEL has CG, PCG, and BiCGSTAB iterative solvers
+  \end{itemize}
+  \begin{lstlisting}
+    // Solve using Conjugate Gradient
+    Vector<double> U = cg_solve(K_sys, F_sys, 
+                                [x_0], [TOL]);
+  \end{lstlisting}
+\end{frame}
+
+%===========================================================
+\subsection{Writing Output}
+%===========================================================
+
+\begin{frame}{Writing Output}
+  
+  \begin{itemize}
+  \item
+    YAFEL supports output to unstructured VTK files (.vtu)
+  \item
+    Output can be visualized in Paraview, Visit
+  \item
+    Driver class is the \texttt{VTKOutput} class
+  \item
+    You attach data that you want written to this class, then call \texttt{write(fname)}
+  \item
+    Data can be \texttt{VTKMesh}, 
+    \texttt{VTKScalarData}, 
+    \texttt{VTKVectorData}, 
+    \texttt{VTKTensorData}
+  \item
+    Data fields live either on nodes or cells, depending on what you specify
+  \item
+    Data fields have a user-supplied name, which will appear in the visualization program
+  \item
+    Must \emph{always} attach a mesh, otherwise an error will be thrown
+  \end{itemize}
+
+\end{frame}
+
+%===========================================================
+\subsection{YAFEL-isms}
+%===========================================================
+
+\begin{frame}{YAFEL-isms}
+
+  \begin{itemize} 
+  \item
+    Currently, a TON of stuff is templated on NSD, since the
+    ``coordinate\_type'' is an alias for \texttt{Tensor\textless NSD,1,double\textgreater}
+  \item
+    I am in the process of making it simple a 3D fixed-size array, which will enable
+    a lot of de-templating (and improve compile times quite a bit!)
+  \item
+    When assembling, you have to loop over elements. To get a \emph{reference} to
+    the current element, you must use a pre-instantiated \texttt{ElementFactory} object
+  \item
+    The \texttt{ElementFactory} handles creation of specialized elements, and is the
+    mechanism by which runtime element polymorphism is enabled in the code
+  \item
+    I am in process of flattening type hierarchy so that virtual function calls aren't necessary
+    \begin{itemize}
+    \item
+      Not a performance bottleneck
+    \item
+      It bothers me that I can't copy an element by value at runtime
+    \end{itemize}
+  \end{itemize}
+\end{frame}
