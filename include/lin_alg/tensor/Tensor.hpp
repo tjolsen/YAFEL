@@ -114,6 +114,13 @@ private:
 };
 
 
+/**
+ * \typedef
+ * \brief Common "coordinate<T>" type across library
+ */
+template<typename T=double>
+using coordinate = Tensor<3,1,T>;
+
 YAFEL_NAMESPACE_CLOSE
 
 #endif

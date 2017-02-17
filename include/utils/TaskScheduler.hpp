@@ -13,6 +13,7 @@
 #include <functional>
 #include <type_traits>
 #include <atomic>
+#include <vector>
 
 /**
  * \class TaskScheduler
@@ -33,7 +34,7 @@ class TaskScheduler {
 public:
     using lock_t = std::unique_lock<std::mutex>;
 
-    const static unsigned spin_count{32};
+    constexpr static unsigned spin_count{32};
     const unsigned count;
 
     std::vector<std::thread> workers;

@@ -64,3 +64,8 @@ experimental/
 
 # pdf files (should just keep tex sources)
 *.pdf
+
+# Clion files
+.idea
+cmake-build-debug
+cmake-build-release
