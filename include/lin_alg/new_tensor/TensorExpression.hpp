@@ -52,26 +52,26 @@ public:
 
     // Compute linear index of a (i,j,k...) component
     template<int S, typename INT>
-    int index(sequence<S>, INT i)
+    inline int index(sequence<S>, INT i) noexcept
     {
         return i * S;
     }
 
     template<int S, int ...SS, typename INT, typename ...Args>
-    int index(sequence<S, SS...>, INT i, Args ...args)
+    inline int index(sequence<S, SS...>, INT i, Args ...args) noexcept
     {
         return S * i + index(sequence<SS...>(), args...);
     }
 
 
     // Access tensor via linear indexing
-    inline dataType linearIndexing(int idx) const
+    inline dataType linearIndexing(int idx) const noexcept
     {
         return self().linearIndexing(idx);
     }
 
     template<bool dummy_bool = assignable, typename = typename std::enable_if<dummy_bool>::type>
-    inline dataType &linearIndexing(int idx)
+    inline dataType &linearIndexing(int idx) noexcept
     {
         return self().linearIndexing(idx);
     }
@@ -79,12 +79,12 @@ public:
 
     // Parenthesis indexing operator
     template<typename ...Args>
-    dataType operator()(Args... args) const
+    dataType operator()(Args... args) const noexcept
     { return linearIndexing(stride_sequence(), index(args...)); }
 
     template<bool dummy_bool = assignable, typename = typename std::enable_if<dummy_bool>::type,
             typename ...Args>
-    dataType &operator()(Args... args)
+    dataType &operator()(Args... args) noexcept
     { return linearIndexing(index(stride_sequence(), args...)); }
 
 
@@ -99,25 +99,25 @@ public:
                 : te_ref(te.self()), offset(off)
         {}
 
-        bool operator!=(const TensorExpressionIterator &other)
+        inline bool operator!=(const TensorExpressionIterator &other)
         {
             return offset != other.offset;
         }
 
-        auto operator++()
+        inline auto operator++()
         {
             ++offset;
             return *this;
         }
 
 
-        dataType operator*() const
+        inline dataType operator*() const noexcept
         {
             return te_ref.linearIndexing(offset);
         }
 
         template<bool dummy_bool = assignable, typename = typename std::enable_if<dummy_bool>::type>
-        dataType &operator*()
+        inline dataType &operator*() noexcept
         {
             return te_ref.linearIndexing(offset);
         }
@@ -134,25 +134,25 @@ public:
                 : te_ref(te.self()), offset(off)
         {}
 
-        bool operator!=(const TensorExpressionIterator &other)
+        inline bool operator!=(const TensorExpressionIterator &other) const noexcept
         {
             return offset != other.offset;
         }
 
-        auto operator++()
+        inline auto operator++()
         {
             ++offset;
             return *this;
         }
 
 
-        dataType operator*() const
+        dataType operator*() const noexcept
         {
             return te_ref.linearIndexing(offset);
         }
 
         template<bool dummy_bool = assignable, typename = typename std::enable_if<dummy_bool>::type>
-        dataType const &operator*()
+        dataType const &operator*() const noexcept
         {
             return te_ref.linearIndexing(offset);
         }

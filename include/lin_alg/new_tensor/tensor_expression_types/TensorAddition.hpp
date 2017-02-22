@@ -20,14 +20,10 @@ public:
     template<typename dt1, typename dt2, bool b1, bool b2>
     TensorAddition(const TensorExpression<TE1, D, R, dt1, b1> &l,
                    const TensorExpression<TE2, D, R, dt2, b2> &r)
-            : lhs(l.self()), rhs(r.self())
-    {
-        //static_assert(l.rank() == r.rank(), "TensorAddition: lhs.rank() must match rhs.rank()");
-        //static_assert(l.dim() == r.dim(), "TensorAddition: lhs.dim() must match rhs.dim()");
-    }
+            : lhs(l.self()), rhs(r.self()) {}
 
 
-    dataType linearIndexing(int idx) const
+    inline dataType linearIndexing(int idx) const noexcept
     {
         return lhs.linearIndexing(idx) + rhs.linearIndexing(idx);
     }

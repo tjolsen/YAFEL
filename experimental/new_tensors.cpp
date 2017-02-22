@@ -4,34 +4,36 @@
 
 #include "lin_alg/new_tensor/Tensor.hpp"
 #include "lin_alg/new_tensor/tensor_expression_types/TensorAddition.hpp"
-#include "lin_alg/new_tensor/mp_utils/sequences.hpp"
-#include "lin_alg/new_tensor/mp_utils/sequence_functions.hpp"
-
-#include <iostream>
+#include "lin_alg/new_tensor/tensor_expression_types/TensorSubtraction.hpp"
+#include "lin_alg/new_tensor/tensor_expression_types/TensorScaled.hpp"
 
 using namespace yafel;
 
 
 int main()
 {
+    constexpr int N = 3;
 
-    Tensor<3,2,int> x,y;
 
+    Tensor<N,2,int> x,y;
+
+    int count{1};
     for(auto &xi : x) {
-        xi = 1;
+        xi = count++;
     }
 
+    count = 1;
     for(auto &yi : y) {
-        yi = 2;
+        yi = count++;
     }
 
-    Tensor<3,2,int> z = x+y;
+    Tensor<N,2,int> z = 3*(x+y);
 
     int s{0};
     for(auto zi : z) {
         s += zi;
     }
-    std::cout << s << std::endl;
+    //std::cout << s << std::endl;
 
-    return 0;
+    return s;
 }
