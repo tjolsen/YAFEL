@@ -8,11 +8,30 @@
 #include "yafel_globals.hpp"
 #include "mp_utils/sequences.hpp"
 #include "mp_utils/sequence_functions.hpp"
+#include "mp_utils/TypeList.hpp"
+#include "mp_utils/slice_mp_utils.hpp"
 
 #include <type_traits>
 
 YAFEL_NAMESPACE_OPEN
 
+// Forward declaration of TensorSlice, so that it can be used from the base class
+template<typename TE, int D, int R, typename dataType, bool assignable, int ...PARENT_STRIDES>
+class TensorSlice;
+
+template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R, typename dataType, bool assignable, int ...PARENT_STRIDES, typename ...Args>
+auto make_slice(const TE<T, D, R, dataType, assignable> &te, Args... args);
+
+
+/**
+ * \class TensorExpression
+ * \brief Base class for tensor expressions. All others derive from this.
+ * @tparam TE Tensor expression type
+ * @tparam D Dimension
+ * @tparam R Tensor rank
+ * @tparam dataType data type of tensor entries
+ * @tparam assignable flag to indicate whether underlying expression is assignable
+ */
 template<typename TE, int D, int R, typename dataType, bool assignable>
 class TensorExpression
 {
@@ -52,13 +71,13 @@ public:
 
     // Compute linear index of a (i,j,k...) component
     template<int S, typename INT>
-    inline int index(sequence<S>, INT i) noexcept
+    inline int index(sequence<S>, INT i) const noexcept
     {
         return i * S;
     }
 
     template<int S, int ...SS, typename INT, typename ...Args>
-    inline int index(sequence<S, SS...>, INT i, Args ...args) noexcept
+    inline int index(sequence<S, SS...>, INT i, Args ...args) const noexcept
     {
         return S * i + index(sequence<SS...>(), args...);
     }
@@ -78,14 +97,27 @@ public:
 
 
     // Parenthesis indexing operator
-    template<typename ...Args>
-    dataType operator()(Args... args) const noexcept
-    { return linearIndexing(stride_sequence(), index(args...)); }
+    template<typename ...Args,
+            typename=typename std::enable_if<all_of_type<int>(type_list<Args...>())>::type>
+    dataType operator()(Args... args) const noexcept { return linearIndexing(index(stride_sequence(),args...)); }
+
 
     template<bool dummy_bool = assignable, typename = typename std::enable_if<dummy_bool>::type,
-            typename ...Args>
-    dataType &operator()(Args... args) noexcept
-    { return linearIndexing(index(stride_sequence(), args...)); }
+            typename ...Args,
+            typename=typename std::enable_if<all_of_type<int>(type_list<Args...>())>::type>
+    dataType &operator()(Args... args) noexcept { return linearIndexing(index(stride_sequence(), args...)); }
+
+
+    //Slicing indexing operator
+    template<typename ...Args,
+            typename=typename std::enable_if<contains<slice_sentinel>(type_list<Args...>())>::type
+    >
+    auto operator()(Args ...args) const noexcept
+    {
+        return make_slice(*this,
+                          make_slice_offset(stride_sequence(), args...),
+                          make_slice_strides(stride_sequence(), args...));
+    }
 
 
     // Iterator classes for looping over all tensor elements in memory order
@@ -96,8 +128,7 @@ public:
         int offset;
 
         TensorExpressionIterator(TensorExpression<TE, D, R, dataType, assignable> &te, int off)
-                : te_ref(te.self()), offset(off)
-        {}
+                : te_ref(te.self()), offset(off) {}
 
         inline bool operator!=(const TensorExpressionIterator &other)
         {
@@ -131,8 +162,7 @@ public:
         int offset;
 
         ConstTensorExpressionIterator(const TensorExpression<TE, D, R, dataType, assignable> &te, int off)
-                : te_ref(te.self()), offset(off)
-        {}
+                : te_ref(te.self()), offset(off) {}
 
         inline bool operator!=(const TensorExpressionIterator &other) const noexcept
         {
@@ -177,6 +207,16 @@ public:
     {
         return TensorExpressionIterator(*this, tensor_storage(R));
     }
+
+};
+
+
+template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R,
+        typename dataType, bool assignable, int ...PARENT_STRIDES>
+auto make_slice(const TE<T, D, R, dataType, assignable> &te, int offset, sequence<PARENT_STRIDES...>)
+{
+    return TensorSlice<T, D, sizeof...(PARENT_STRIDES), dataType,
+            false, PARENT_STRIDES...>(te, offset, sequence<PARENT_STRIDES...>());
 
 };
 

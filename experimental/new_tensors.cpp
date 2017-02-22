@@ -6,34 +6,45 @@
 #include "lin_alg/new_tensor/tensor_expression_types/TensorAddition.hpp"
 #include "lin_alg/new_tensor/tensor_expression_types/TensorSubtraction.hpp"
 #include "lin_alg/new_tensor/tensor_expression_types/TensorScaled.hpp"
+#include "lin_alg/new_tensor/tensor_expression_types/TensorSlice.hpp"
+#include "lin_alg/new_tensor/mp_utils/sequence_functions.hpp"
+#include "lin_alg/new_tensor/mp_utils/slice_mp_utils.hpp"
+
+#include <iostream>
 
 using namespace yafel;
-
+using namespace std;
 
 int main()
 {
-    constexpr int N = 3;
+
+    Tensor<3,3> x;
+
+    int idx=0;
+    for(auto& xi : x)
+        xi = idx++;
 
 
-    Tensor<N,2,int> x,y;
+    auto xslice = x(slice_sentinel(), 0,slice_sentinel());
 
-    int count{1};
-    for(auto &xi : x) {
-        xi = count++;
+    for(int i=0; i<3; ++i) {
+        cout << "i = " << i <<":"<<std::endl;
+        for(int j=0; j<3; ++j) {
+            for(int k=0; k<3; ++k) {
+                cout << x(i, j, k) << "  ";
+            }
+            cout << endl;
+        }
+        cout << endl;
     }
 
-    count = 1;
-    for(auto &yi : y) {
-        yi = count++;
+
+    cout << "Slice:"<<endl;
+    for(int i=0; i<3; ++i) {
+        for(int j=0; j<3; ++j) {
+            cout << xslice(i,j) << "  ";
+        }
+        cout << endl;
     }
-
-    Tensor<N,2,int> z = 3*(x+y);
-
-    int s{0};
-    for(auto zi : z) {
-        s += zi;
-    }
-    //std::cout << s << std::endl;
-
-    return s;
+    return 0;
 }
