@@ -35,7 +35,7 @@ LIB = libyafel.a
 #=================================================================
 
 # These will always be necessary, so they're moved away from the configurable line
-CXXFLAGS += -c -I. -I$(YAFELDIR)/include -std=c++11 -march=native -mtune=native -funroll-loops -mavx -ffast-math
+CXXFLAGS += -c -I. -I$(YAFELDIR)/include -std=c++14 -march=native -mtune=native -funroll-loops -mavx -ffast-math
 
 ifeq ($(useOpenMP), true)
 	CXXFLAGS += -fopenmp

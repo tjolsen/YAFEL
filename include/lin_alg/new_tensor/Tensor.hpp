@@ -6,44 +6,50 @@
 #define YAFEL_TENSOR_HPP
 
 #include "TensorExpression.hpp"
-#include "mp_utils/sequences.hpp"
 #include <array>
 
 YAFEL_NAMESPACE_OPEN
 
 template<int D, int R, typename dataType=double>
-class Tensor : public TensorExpression<Tensor<D, R, dataType>, D, R, dataType>
+class Tensor : public TensorExpression<Tensor<D, R, dataType>, D, R, dataType, true>
 {
 
 public:
-    //Sequence holding strides of each index through memory
-    using stride_sequence = typename geometric_sequence<R,D,1>::type;
+    // super-type
+    using super = TensorExpression<Tensor<D, R, dataType>, D, R, dataType, true>;
 
-    template<typename ...Args>
-    dataType operator()(Args... args) const
+    // Initialize an empty tensor with all zeros
+    Tensor()
     {
-        static_assert(sizeof...(Args) == R, "Rank/argument mismatch");
-        return data[index(stride_sequence(), args...)];
+        for (int i = 0; i < super::tensor_storage(R); ++i) {
+            data[i] = 0;
+        }
     }
 
-    template<typename ...Args>
-    dataType &operator()(Args... args)
+    // Construct from a TensorExpression
+    template<typename TE, bool b>
+    Tensor(const TensorExpression<TE,D,R,dataType,b> &rhs)
     {
-        static_assert(sizeof...(Args) == R, "Rank/argument mismatch");
-        return data[index(stride_sequence(), args...)];
+        auto rit = rhs.begin();
+        for(int i=0; i<super::tensor_storage(R); ++i, ++rit)
+        {
+            data[i] = *rit;
+        }
+    };
+
+    //implement indexing operations
+    dataType linearIndexing(int idx) const
+    {
+        return data[idx];
     }
 
-    static constexpr int tensor_storage(int N) { return (N==0) ? 1 : D*tensor_storage(N-1); }
-
-    template<int S, typename INT>
-    int index(sequence<S>, INT i) { return i*S; }
-
-    template<int S, int ...SS, typename INT, typename ...Args>
-    int index(sequence<S, SS...>, INT i, Args ...args) { return S*i + index(sequence<SS...>(), args...); }
-
+    dataType &linearIndexing(int idx)
+    {
+        return data[idx];
+    }
 
     // array to store tensor data
-    std::array<dataType, tensor_storage(R)> data;
+    std::array<dataType, super::tensor_storage(R)> data;
 };
 
 
