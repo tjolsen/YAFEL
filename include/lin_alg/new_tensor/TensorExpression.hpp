@@ -19,8 +19,14 @@ YAFEL_NAMESPACE_OPEN
 template<typename TE, int D, int R, typename dataType, bool assignable, int ...PARENT_STRIDES>
 class TensorSlice;
 
+template<typename TE, int D, int R, typename dataType, bool assignable, int ...PARENT_STRIDES>
+class ConstTensorSlice;
+
 template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R, typename dataType, bool assignable, int ...PARENT_STRIDES, typename ...Args>
 auto make_slice(const TE<T, D, R, dataType, assignable> &te, Args... args);
+
+template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R, typename dataType, bool assignable, int ...PARENT_STRIDES, typename ...Args>
+auto make_const_slice(const TE<T, D, R, dataType, assignable> &te, Args... args);
 
 
 /**
@@ -112,9 +118,19 @@ public:
     template<typename ...Args,
             typename=typename std::enable_if<contains<slice_sentinel>(type_list<Args...>())>::type
     >
-    auto operator()(Args ...args) const noexcept
+    auto operator()(Args ...args) noexcept
     {
         return make_slice(*this,
+                          make_slice_offset(stride_sequence(), args...),
+                          make_slice_strides(stride_sequence(), args...));
+    }
+
+    template<typename ...Args,
+            typename=typename std::enable_if<contains<slice_sentinel>(type_list<Args...>())>::type
+    >
+    auto operator()(Args ...args) const noexcept
+    {
+        return make_const_slice(*this,
                           make_slice_offset(stride_sequence(), args...),
                           make_slice_strides(stride_sequence(), args...));
     }
@@ -213,9 +229,19 @@ public:
 
 template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R,
         typename dataType, bool assignable, int ...PARENT_STRIDES>
-auto make_slice(const TE<T, D, R, dataType, assignable> &te, int offset, sequence<PARENT_STRIDES...>)
+auto make_slice(TE<T, D, R, dataType, assignable> &te, int offset, sequence<PARENT_STRIDES...>)
 {
     return TensorSlice<T, D, sizeof...(PARENT_STRIDES), dataType,
+            assignable, PARENT_STRIDES...>(te, offset, sequence<PARENT_STRIDES...>());
+
+};
+
+
+template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R,
+        typename dataType, bool assignable, int ...PARENT_STRIDES>
+auto make_const_slice(const TE<T, D, R, dataType, assignable> &te, int offset, sequence<PARENT_STRIDES...>)
+{
+    return ConstTensorSlice<T, D, sizeof...(PARENT_STRIDES), dataType,
             false, PARENT_STRIDES...>(te, offset, sequence<PARENT_STRIDES...>());
 
 };

@@ -18,14 +18,14 @@ using namespace std;
 int main()
 {
 
-    Tensor<3,3> x;
+    Tensor<3,3,int> x;
 
     int idx=0;
     for(auto& xi : x)
         xi = idx++;
 
 
-    auto xslice = x(slice_sentinel(), 0,slice_sentinel());
+    auto xslice = x(slice_sentinel(),0,slice_sentinel());
 
     for(int i=0; i<3; ++i) {
         cout << "i = " << i <<":"<<std::endl;
@@ -46,5 +46,32 @@ int main()
         }
         cout << endl;
     }
+
+
+    for(auto &xsi : xslice)
+        xsi = 0;
+
+
+    cout << endl << endl;
+    for(int i=0; i<3; ++i) {
+        cout << "i = " << i <<":"<<std::endl;
+        for(int j=0; j<3; ++j) {
+            for(int k=0; k<3; ++k) {
+                cout << x(i, j, k) << "  ";
+            }
+            cout << endl;
+        }
+        cout << endl;
+    }
+
+    cout << "Slice 2:"<<endl;
+    for(int i=0; i<3; ++i) {
+        for(int j=0; j<3; ++j) {
+            cout << xslice(i,j) << "  ";
+        }
+        cout << endl;
+    }
+
+
     return 0;
 }

@@ -38,12 +38,12 @@ public:
     };
 
     //implement indexing operations
-    dataType linearIndexing(int idx) const
+    dataType linearIndexing(int idx) const noexcept
     {
         return data[idx];
     }
 
-    dataType &linearIndexing(int idx)
+    dataType &linearIndexing(int idx) noexcept
     {
         return data[idx];
     }

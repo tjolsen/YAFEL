@@ -2,6 +2,8 @@ cppfile = new_tensors.cpp
 ofile = $(cppfile:.cpp=.o)
 exefile = $(cppfile:.cpp=.exe)
 
+CXX=clang++
+
 $(exefile): $(ofile)
 	$(CXX) $< -o $@
 

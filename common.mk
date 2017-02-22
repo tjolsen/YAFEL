@@ -10,12 +10,12 @@ parallel_matmul = true
 
 #define C++ compiler
 ifndef CXX
- export CXX = g++
+ export CXX = clang++
 endif
 
 #define C compiler
 ifndef CC
- export CC = gcc
+ export CC = clang
 endif
 
 #define archive utility
