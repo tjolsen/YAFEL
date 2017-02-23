@@ -22,7 +22,11 @@ class TensorSlice : public TensorExpression<TensorSlice<TE,D,R,dataType,assignab
 {
 public:
     using super = TensorExpression<TensorSlice<TE,D,R,dataType,assignable,PARENT_STRIDES...>, D,R,dataType,assignable>;
+    using super::operator=;
+
     using parent_strides = sequence<PARENT_STRIDES...>;
+
+
 
     TE &te_ref;
     int offset;
@@ -33,6 +37,17 @@ public:
     {
         static_assert(sizeof...(PARENT_STRIDES) == R, "PARENT_STRIDES size must equal rank");
     }
+
+    template<typename TT, typename dt2, bool Tb>
+    auto& operator=(const TensorExpression<TT,D,R,dt2,Tb> &rhs) noexcept
+    {
+        auto rit=rhs.begin();
+        for(auto it=super::begin(); it!=super::end(); ++it, ++rit) {
+            *it = *rit;
+        }
+
+        return *this;
+    };
 
 
     inline dataType linearIndexing(int idx) const noexcept

@@ -15,63 +15,26 @@
 using namespace yafel;
 using namespace std;
 
-int main()
+int main(int argc, char **argv)
 {
+    int val;
+    if(argc > 1)
+        val = atoi(argv[1]);
+    else
+        val = 1;
 
     Tensor<3,3,int> x;
 
-    int idx=0;
+    //int idx=0;
     for(auto& xi : x)
-        xi = idx++;
+        xi = val;
 
+    //zero out the x(0,:,:) slice
+    x(0,colon(),colon()) = Tensor<3,2,int>();
 
-    auto xslice = x(slice_sentinel(),0,slice_sentinel());
+    int s{0};
+    for(auto xit : x)
+        s += xit;
 
-    for(int i=0; i<3; ++i) {
-        cout << "i = " << i <<":"<<std::endl;
-        for(int j=0; j<3; ++j) {
-            for(int k=0; k<3; ++k) {
-                cout << x(i, j, k) << "  ";
-            }
-            cout << endl;
-        }
-        cout << endl;
-    }
-
-
-    cout << "Slice:"<<endl;
-    for(int i=0; i<3; ++i) {
-        for(int j=0; j<3; ++j) {
-            cout << xslice(i,j) << "  ";
-        }
-        cout << endl;
-    }
-
-
-    for(auto &xsi : xslice)
-        xsi = 0;
-
-
-    cout << endl << endl;
-    for(int i=0; i<3; ++i) {
-        cout << "i = " << i <<":"<<std::endl;
-        for(int j=0; j<3; ++j) {
-            for(int k=0; k<3; ++k) {
-                cout << x(i, j, k) << "  ";
-            }
-            cout << endl;
-        }
-        cout << endl;
-    }
-
-    cout << "Slice 2:"<<endl;
-    for(int i=0; i<3; ++i) {
-        for(int j=0; j<3; ++j) {
-            cout << xslice(i,j) << "  ";
-        }
-        cout << endl;
-    }
-
-
-    return 0;
+    return s;
 }

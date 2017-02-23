@@ -75,6 +75,21 @@ public:
     }
 
 
+    template<bool dummy_bool=assignable, typename T, typename dt2, bool Tb,
+            typename=typename std::enable_if<dummy_bool>::type,
+            typename=typename std::enable_if<std::is_assignable<dataType, dt2>::value>::type
+            >
+    auto& operator=(const TensorExpression<T,D,R,dt2,Tb> &rhs) noexcept
+    {
+        if(this != &rhs) {
+            for (auto it = begin(), rit = rhs.begin(); it != end(); ++it, ++rit)
+                *it = *rit;
+        }
+
+        return self();
+    };
+
+
     // Compute linear index of a (i,j,k...) component
     template<int S, typename INT>
     inline int index(sequence<S>, INT i) const noexcept

@@ -19,7 +19,7 @@ YAFEL_NAMESPACE_OPEN
 struct slice_sentinel
 {
 };
-
+using colon = slice_sentinel;
 
 
 //-----------------------------------------------------------------
