@@ -18,21 +18,24 @@ public:
     // super-type
     using super = TensorExpression<Tensor<D, R, dataType>, D, R, dataType, true>;
 
-    // Initialize an empty tensor with all zeros
-    Tensor()
+    // Initialize a tensor with all elements set to "d"
+    template<typename dt, typename=typename std::enable_if<std::is_convertible<dataType, dt>::value>::type>
+    Tensor(dt d = dt(0))
     {
         for (int i = 0; i < super::tensor_storage(R); ++i) {
-            data[i] = 0;
+            data[i] = d;
         }
     }
 
+    // Initialize an empty tensor with all zeros
+    Tensor() : Tensor(dataType(0)) {}
+
     // Construct from a TensorExpression
     template<typename TE, bool b>
-    Tensor(const TensorExpression<TE,D,R,dataType,b> &rhs)
+    Tensor(const TensorExpression<TE, D, R, dataType, b> &rhs)
     {
         auto rit = rhs.begin();
-        for(int i=0; i<super::tensor_storage(R); ++i, ++rit)
-        {
+        for (int i = 0; i < super::tensor_storage(R); ++i, ++rit) {
             data[i] = *rit;
         }
     };

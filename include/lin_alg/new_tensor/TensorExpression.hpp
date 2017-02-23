@@ -74,7 +74,7 @@ public:
         return static_cast<TE &>(*this);
     }
 
-
+    /*
     template<bool dummy_bool=assignable, typename T, typename dt2, bool Tb,
             typename=typename std::enable_if<dummy_bool>::type,
             typename=typename std::enable_if<std::is_assignable<dataType, dt2>::value>::type
@@ -89,6 +89,7 @@ public:
         return self();
     };
 
+     */
 
     // Compute linear index of a (i,j,k...) component
     template<int S, typename INT>

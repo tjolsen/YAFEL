@@ -15,22 +15,12 @@
 using namespace yafel;
 using namespace std;
 
-int main(int argc, char **argv)
+int main()//(int argc, char **argv)
 {
-    int val;
-    if(argc > 1)
-        val = atoi(argv[1]);
-    else
-        val = 1;
+    Tensor<3,3,int> x(1);
+    Tensor<3,2,int> y(2);
 
-    Tensor<3,3,int> x;
-
-    //int idx=0;
-    for(auto& xi : x)
-        xi = val;
-
-    //zero out the x(0,:,:) slice
-    x(0,colon(),colon()) = Tensor<3,2,int>();
+    x(0,colon(), colon()) = 2*x(2,colon(),colon());
 
     int s{0};
     for(auto xit : x)

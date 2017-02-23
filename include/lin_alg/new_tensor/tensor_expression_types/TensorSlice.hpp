@@ -22,11 +22,7 @@ class TensorSlice : public TensorExpression<TensorSlice<TE,D,R,dataType,assignab
 {
 public:
     using super = TensorExpression<TensorSlice<TE,D,R,dataType,assignable,PARENT_STRIDES...>, D,R,dataType,assignable>;
-    using super::operator=;
-
     using parent_strides = sequence<PARENT_STRIDES...>;
-
-
 
     TE &te_ref;
     int offset;
@@ -45,7 +41,6 @@ public:
         for(auto it=super::begin(); it!=super::end(); ++it, ++rit) {
             *it = *rit;
         }
-
         return *this;
     };
 
