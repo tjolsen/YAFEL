@@ -196,7 +196,7 @@ public:
         ConstTensorExpressionIterator(const TensorExpression<TE, D, R, dataType, assignable> &te, int off)
                 : te_ref(te.self()), offset(off) {}
 
-        inline bool operator!=(const TensorExpressionIterator &other) const noexcept
+        inline bool operator!=(const ConstTensorExpressionIterator &other) const noexcept
         {
             return offset != other.offset;
         }

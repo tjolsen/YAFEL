@@ -7,6 +7,7 @@
 #include "lin_alg/new_tensor/tensor_expression_types/TensorSubtraction.hpp"
 #include "lin_alg/new_tensor/tensor_expression_types/TensorScaled.hpp"
 #include "lin_alg/new_tensor/tensor_expression_types/TensorSlice.hpp"
+#include "lin_alg/new_tensor/tensor_functions/tensor_dot.hpp"
 #include "lin_alg/new_tensor/mp_utils/sequence_functions.hpp"
 #include "lin_alg/new_tensor/mp_utils/slice_mp_utils.hpp"
 
@@ -17,14 +18,8 @@ using namespace std;
 
 int main()//(int argc, char **argv)
 {
-    Tensor<3,3,int> x(1);
+    Tensor<3,2,int> x(1);
     Tensor<3,2,int> y(2);
 
-    x(0,colon(), colon()) = 2*x(2,colon(),colon());
-
-    int s{0};
-    for(auto xit : x)
-        s += xit;
-
-    return s;
+    return dot(x,y);
 }
