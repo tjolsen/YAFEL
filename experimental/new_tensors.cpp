@@ -7,6 +7,7 @@
 #include "lin_alg/new_tensor/tensor_expression_types/TensorSubtraction.hpp"
 #include "lin_alg/new_tensor/tensor_expression_types/TensorScaled.hpp"
 #include "lin_alg/new_tensor/tensor_expression_types/TensorSlice.hpp"
+#include "lin_alg/new_tensor/tensor_expression_types/TensorPermutation.hpp"
 #include "lin_alg/new_tensor/tensor_functions/tensor_dot.hpp"
 #include "lin_alg/new_tensor/mp_utils/sequence_functions.hpp"
 #include "lin_alg/new_tensor/mp_utils/slice_mp_utils.hpp"
@@ -18,8 +19,25 @@ using namespace std;
 
 int main()//(int argc, char **argv)
 {
-    Tensor<3,2,int> x(1);
-    Tensor<3,2,int> y(2);
+    constexpr int N = 3;
+    Tensor<N,3,int> x(1);
 
-    return dot(x,y);
+    int count = 0;
+    for(auto &xi : x)
+        xi = count++;
+
+
+    auto xT = permute(x, sequence<1,0,2>());
+
+    for(int i=0; i<N; ++i) {
+        for(int j=0; j<N; ++j){
+            for(int k=0; k<N; ++k) {
+                cout << xT(i, j, k) << "  ";
+            }
+            cout << endl;
+        }
+        cout << endl << endl;
+    }
+
+    return 0;
 }
