@@ -9,6 +9,7 @@
 #include "lin_alg/new_tensor/tensor_expression_types/TensorSlice.hpp"
 #include "lin_alg/new_tensor/tensor_expression_types/TensorPermutation.hpp"
 #include "lin_alg/new_tensor/tensor_expression_types/TensorContraction.hpp"
+#include "lin_alg/new_tensor/tensor_expression_types/TensorFunctor.hpp"
 #include "lin_alg/new_tensor/tensor_functions/tensor_dot.hpp"
 #include "lin_alg/new_tensor/mp_utils/sequence_functions.hpp"
 #include "lin_alg/new_tensor/mp_utils/slice_mp_utils.hpp"
@@ -17,6 +18,15 @@
 
 using namespace yafel;
 using namespace std;
+
+/*
+template<typename T, bool b>
+Tensor<3, 2, double> Hookean_stress(const TensorExpression<T, 3, 2, double, b> &strain)
+{
+
+
+};
+
 
 double do_contract2(double a)
 {
@@ -35,7 +45,7 @@ double do_contract2(double a)
     Tensor<3, 2, double> res;
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
-            res(i,j) = dot(lhs(colon()), rhs(colon(), i, j));
+            res(i, j) = dot(lhs(colon()), rhs(colon(), i, j));
         }
     }
 
@@ -59,15 +69,17 @@ double do_contract(double a)
 
     Tensor<3, 2, double> res = contract(lhs, rhs, sequence<1>());
 
-    return contract(res,res,sequence<2>());
+    return contract(res, res, sequence<2>());
 }
 
+*/
 
 int main()//(int argc, char **argv)
 {
 
-    double a = 2.5;
+    auto eye = make_TensorFunctor([](int i, int j) { return 1.0 * (i == j); }, sequence<3,2>(), type_list<int>());
 
-    cout << do_contract(a) << "  " << do_contract2(a) << endl;
-    return 0;
+    Tensor<3,2,int> x(2);
+
+    return dot(x,eye);
 }
