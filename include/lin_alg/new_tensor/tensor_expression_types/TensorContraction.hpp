@@ -76,6 +76,14 @@ inline auto contract(const TensorExpression<TE1, D, R1, dt1, b1> &lhs,
     return TensorContraction<TE1, TE2, D, R1, R2, N, dt1, dt2, b1, b2>(lhs, rhs);
 };
 
+template<typename TE1, typename TE2, int D, int R, typename dt1, typename dt2, bool b1, bool b2>
+inline auto contract(const TensorExpression<TE1, D, R, dt1, b1> &lhs,
+                     const TensorExpression<TE2, D, R, dt2, b2> &rhs,
+                     sequence<R>)
+{
+    return dot(lhs, rhs);
+};
+
 YAFEL_NAMESPACE_CLOSE
 
 #endif //YAFEL_TENSORCONTRACTION_HPP

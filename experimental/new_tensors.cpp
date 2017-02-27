@@ -59,7 +59,7 @@ double do_contract(double a)
 
     Tensor<3, 2, double> res = contract(lhs, rhs, sequence<1>());
 
-    return dot(res, res);
+    return contract(res,res,sequence<2>());
 }
 
 
