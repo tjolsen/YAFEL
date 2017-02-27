@@ -121,7 +121,7 @@ public:
     // Parenthesis indexing operator
     template<typename ...Args,
             typename=typename std::enable_if<all_of_type<int>(type_list<Args...>())>::type>
-    dataType operator()(Args... args) const noexcept { return linearIndexing(index(stride_sequence(),args...)); }
+    dataType operator()(Args... args) const noexcept { return linearIndexing(index(stride_sequence(), args...)); }
 
 
     template<bool dummy_bool = assignable, typename = typename std::enable_if<dummy_bool>::type,
@@ -147,8 +147,8 @@ public:
     auto operator()(Args ...args) const noexcept
     {
         return make_const_slice(*this,
-                          make_slice_offset(stride_sequence(), args...),
-                          make_slice_strides(stride_sequence(), args...));
+                                make_slice_offset(stride_sequence(), args...),
+                                make_slice_strides(stride_sequence(), args...));
     }
 
 

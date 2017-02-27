@@ -10,8 +10,20 @@
 YAFEL_NAMESPACE_OPEN
 
 template<int ...S>
-struct sequence{};
+struct sequence{
+    constexpr static int size() {return sizeof...(S);}
+};
 
+//----------------------------------------------------------
+//Generate a sequence of N integer values "V"
+template<int V, int N, int ...SS>
+struct value_sequence : value_sequence<V,N-1,V, SS...> {};
+
+template<int V, int ...SS>
+struct value_sequence<V,0,SS...>
+{
+    using type = sequence<SS...>;
+};
 
 //----------------------------------------------------------
 template<int N, int ...S>
@@ -33,9 +45,6 @@ struct geometric_sequence<0,Base,S,SS...>
 {
     using type = sequence<SS...>;
 };
-
-//template<int N, int Base>
-//struct geometric_sequence<N,Base> : public geometric_sequence<N-1, Base, 1>{};
 
 
 YAFEL_NAMESPACE_CLOSE

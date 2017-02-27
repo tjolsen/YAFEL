@@ -8,6 +8,7 @@
 #include "lin_alg/new_tensor/tensor_expression_types/TensorScaled.hpp"
 #include "lin_alg/new_tensor/tensor_expression_types/TensorSlice.hpp"
 #include "lin_alg/new_tensor/tensor_expression_types/TensorPermutation.hpp"
+#include "lin_alg/new_tensor/tensor_expression_types/TensorContraction.hpp"
 #include "lin_alg/new_tensor/tensor_functions/tensor_dot.hpp"
 #include "lin_alg/new_tensor/mp_utils/sequence_functions.hpp"
 #include "lin_alg/new_tensor/mp_utils/slice_mp_utils.hpp"
@@ -17,27 +18,54 @@
 using namespace yafel;
 using namespace std;
 
-int main()//(int argc, char **argv)
+double do_contract2(double a)
 {
-    constexpr int N = 3;
-    Tensor<N,3,int> x(1);
+    Tensor<3, 3> lhs, rhs;
 
-    int count = 0;
-    for(auto &xi : x)
-        xi = count++;
-
-
-    auto xT = permute(x, sequence<1,0,2>());
-
-    for(int i=0; i<N; ++i) {
-        for(int j=0; j<N; ++j){
-            for(int k=0; k<N; ++k) {
-                cout << xT(i, j, k) << "  ";
-            }
-            cout << endl;
-        }
-        cout << endl << endl;
+    for (auto &li : lhs) {
+        li = a;
+        a *= 1.1;
+    }
+    for (auto &ri : rhs) {
+        ri = a;
+        a /= 1.2;
     }
 
+    Tensor<3, 2, double> res;
+    for(int i=0; i<3; ++i) {
+        for(int j=0; j<3; ++j){
+            res(i,j) = dot(lhs(i,colon(),colon()), rhs(colon(),colon(),j));
+        }
+    }
+
+    return dot(res, res);
+}
+
+double do_contract(double a)
+{
+
+    Tensor<3, 3> lhs, rhs;
+
+    for (auto &li : lhs) {
+        li = a;
+        a *= 1.1;
+    }
+    for (auto &ri : rhs) {
+        ri = a;
+        a /= 1.2;
+    }
+
+    Tensor<3, 2, double> res = contract(lhs, rhs, sequence<2>());
+
+    return dot(res, res);
+}
+
+
+int main()//(int argc, char **argv)
+{
+
+    double a = 2.5;
+
+    cout << do_contract(a) << "  " << do_contract2(a) << endl;
     return 0;
 }

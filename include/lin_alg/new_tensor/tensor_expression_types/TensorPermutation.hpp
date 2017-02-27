@@ -40,14 +40,15 @@ public:
     TensorPermutation(const TensorExpression<TE,D,R,dt,b> &T, idx_perm)
             : te_ref(T.self())
     {
-        static_assert(sizeof...(IDX_PERM) == R, "Invalid permutation length");
+        validate_idx_perm();
     }
 
     template<int S, int ...SS, int I, int ...II>
     int local_to_parent(int idx, stride_sequence, sequence<S, SS...>, sequence<I, II...>) const noexcept
     {
-        return index_at(stride_sequence(), I)*(idx/S) + local_to_parent(idx%S, stride_sequence(),
-                                                                        sequence<SS...>(), sequence<II...>());
+        auto p_stride = index_at(stride_sequence(), sequence<index_at(idx_perm(), sequence<I>())>());
+        return p_stride*(idx/S)
+               + local_to_parent(idx%S, stride_sequence(), sequence<SS...>(), sequence<II...>());
     };
 
     int local_to_parent(int, stride_sequence, sequence<>, sequence<>) const noexcept
@@ -57,10 +58,17 @@ public:
 
     inline dt linearIndexing(int idx) const noexcept
     {
-        return te_ref.linearIndexing(local_to_parent(idx,stride_sequence(), stride_sequence(), idx_perm()));
+        return te_ref.linearIndexing(local_to_parent(idx,stride_sequence(), stride_sequence(), typename counting_sequence<R>::type()));
     }
 
 
+    void validate_idx_perm()
+    {
+        static_assert(sizeof...(IDX_PERM) == R, "Invalid permutation length");
+        static_assert(all_ge(idx_perm(), sequence<0>()), "Error: IDX_PERM contains negative number");
+        static_assert(all_lt(idx_perm(), sequence<R>()), "Error: IDX_PERM contains indices >= Rank. Remember, zero-based indexing!");
+        static_assert(!contains_duplicates(idx_perm()), "Error: IDX_PERM contains duplicates. IDX_PERM must valid permutation of {0...R-1}.");
+    }
 };
 
 
