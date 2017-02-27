@@ -20,7 +20,8 @@ using namespace std;
 
 double do_contract2(double a)
 {
-    Tensor<3, 3> lhs, rhs;
+    Tensor<3, 1> lhs;
+    Tensor<3, 3> rhs;
 
     for (auto &li : lhs) {
         li = a;
@@ -32,9 +33,9 @@ double do_contract2(double a)
     }
 
     Tensor<3, 2, double> res;
-    for(int i=0; i<3; ++i) {
-        for(int j=0; j<3; ++j){
-            res(i,j) = dot(lhs(i,colon(),colon()), rhs(colon(),colon(),j));
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            res(i,j) = dot(lhs(colon()), rhs(colon(), i, j));
         }
     }
 
@@ -44,7 +45,8 @@ double do_contract2(double a)
 double do_contract(double a)
 {
 
-    Tensor<3, 3> lhs, rhs;
+    Tensor<3, 1> lhs;
+    Tensor<3, 3> rhs;
 
     for (auto &li : lhs) {
         li = a;
@@ -55,7 +57,7 @@ double do_contract(double a)
         a /= 1.2;
     }
 
-    Tensor<3, 2, double> res = contract(lhs, rhs, sequence<2>());
+    Tensor<3, 2, double> res = contract(lhs, rhs, sequence<1>());
 
     return dot(res, res);
 }

@@ -51,7 +51,8 @@ public:
                                     get_first_N(sequence<R1 - N>(), typename TE1::super::stride_sequence()), idx);
 
         int rhs_offset = get_offset(typename super::stride_sequence(),
-                                    get_last_N(sequence<R2 - N + 1>(), typename TE2::super::stride_sequence()),
+                                    get_last_N(sequence<(R1 == N) ? R2 - N : R2 - N + 1>(),
+                                               typename TE2::super::stride_sequence()),
                                     idx % index_at(typename TE2::super::stride_sequence(), sequence<N - 1>()));
 
         return dot(

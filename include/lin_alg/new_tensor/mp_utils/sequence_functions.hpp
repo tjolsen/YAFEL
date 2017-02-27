@@ -121,6 +121,12 @@ struct last_N<N, N, SS...>
     using type = sequence<SS...>;
 };
 
+template<int ...SS>
+constexpr auto get_last_N(sequence<0>,sequence<SS...>)
+{
+    return sequence<>();
+}
+
 template<int N, int ...SS>
 constexpr auto get_last_N(sequence<N>, sequence<SS...>)
 {
