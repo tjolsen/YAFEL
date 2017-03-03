@@ -15,18 +15,25 @@
 
 YAFEL_NAMESPACE_OPEN
 
-// Forward declaration of TensorSlice, so that it can be used from the base class
+// Forward declaration of TensorSlice and TensorPermutation so that they can be used from the base class
 template<typename TE, int D, int R, typename dataType, bool assignable, int ...PARENT_STRIDES>
 class TensorSlice;
 
 template<typename TE, int D, int R, typename dataType, bool assignable, int ...PARENT_STRIDES>
 class ConstTensorSlice;
 
+template<typename TE, int D, int R, typename dt, bool b, int ...IDX_PERM>
+class TensorPermutation;
+
+
 template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R, typename dataType, bool assignable, int ...PARENT_STRIDES, typename ...Args>
 auto make_slice(const TE<T, D, R, dataType, assignable> &te, Args... args);
 
 template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R, typename dataType, bool assignable, int ...PARENT_STRIDES, typename ...Args>
 auto make_const_slice(const TE<T, D, R, dataType, assignable> &te, Args... args);
+
+template<template<typename,int,int,typename,bool>class TE, typename T, int D, int R, typename dt, bool b, int ...IDX_PERM>
+auto permute(const TE<T,D,R,dt,b>& te, sequence<IDX_PERM...>);
 
 
 /**
@@ -151,6 +158,14 @@ public:
                                 make_slice_strides(stride_sequence(), args...));
     }
 
+    /**
+     * Permute the tensor expression
+     * @return
+     */
+     template<int ...IDXS>
+    auto perm() {
+        return permute(*this, sequence<IDXS...>());
+    }
 
     // Iterator classes for looping over all tensor elements in memory order
     class TensorExpressionIterator
@@ -261,6 +276,14 @@ auto make_const_slice(const TE<T, D, R, dataType, assignable> &te, int offset, s
             false, PARENT_STRIDES...>(te, offset, sequence<PARENT_STRIDES...>());
 
 };
+
+template<template<typename,int,int,typename,bool>class TE, typename T, int D, int R, typename dt, bool b, int ...IDX_PERM>
+auto permute(const TE<T,D,R,dt,b>& te, sequence<IDX_PERM...>) {
+ return TensorPermutation<T,D,R,dt,b,IDX_PERM...>(te,sequence<IDX_PERM...>());
+};
+
+//template<typename TE, int D, int R, typename dt, bool b, int ...IDX_PERM>
+//auto permute(const TensorExpression<TE,D,R,dt,b>& te, sequence<IDX_PERM...>) {
 
 
 YAFEL_NAMESPACE_CLOSE

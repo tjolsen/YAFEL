@@ -77,9 +77,15 @@ double do_contract(double a)
 int main()//(int argc, char **argv)
 {
 
-    auto eye = make_TensorFunctor([](int i, int j) { return 1.0 * (i == j); }, sequence<3,2>(), type_list<int>());
+    //auto eye = make_TensorFunctor([](int i, int j) { return 1.0 * (i == j); }, sequence<3,2>(), type_list<int>());
 
-    Tensor<3,2,int> x(2);
+    Tensor<3,3,int> x(1);
+    /*
+    int count = 1;
+    for(auto &xi : x)
+        xi = count++;
+*/
+    int s = dot(x.perm<0,1,2>(), x);
 
-    return dot(x,eye);
+    return s;
 }

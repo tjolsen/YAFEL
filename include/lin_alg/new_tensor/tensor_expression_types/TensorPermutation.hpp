@@ -72,11 +72,6 @@ public:
 };
 
 
-template<typename TE, int D, int R, typename dt, bool b, int ...IDX_PERM>
-auto permute(const TensorExpression<TE,D,R,dt,b>& te, sequence<IDX_PERM...>) {
-    return TensorPermutation<TE,D,R,dt,b,IDX_PERM...>(te,sequence<IDX_PERM...>());
-};
-
 YAFEL_NAMESPACE_CLOSE
 
 #endif //YAFEL_TENSORPERMUTATION_HPP
