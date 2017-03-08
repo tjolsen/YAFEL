@@ -10,6 +10,7 @@
 #include "lin_alg/new_tensor/tensor_expression_types/TensorPermutation.hpp"
 #include "lin_alg/new_tensor/tensor_expression_types/TensorContraction.hpp"
 #include "lin_alg/new_tensor/tensor_expression_types/TensorFunctor.hpp"
+#include "lin_alg/new_tensor/tensor_expression_types/TensorMap.hpp"
 #include "lin_alg/new_tensor/tensor_functions/tensor_dot.hpp"
 #include "lin_alg/new_tensor/mp_utils/sequence_functions.hpp"
 #include "lin_alg/new_tensor/mp_utils/slice_mp_utils.hpp"
@@ -74,18 +75,32 @@ double do_contract(double a)
 
 */
 
+template<typename T>
+void const_fancy_func(T const* ptr)
+{
+    auto xmap = make_TensorMap<3,2>(ptr);
+    //xmap(1,1) *= 3;
+    cout << dot(xmap,xmap) << endl;
+}
+
+template<typename T>
+void fancy_func(T* ptr)
+{
+    auto xmap = make_TensorMap<3,2>(ptr);
+
+    xmap(0,0) *= 2;
+
+    const_fancy_func(ptr);
+}
+
 int main()//(int argc, char **argv)
 {
 
-    //auto eye = make_TensorFunctor([](int i, int j) { return 1.0 * (i == j); }, sequence<3,2>(), type_list<int>());
+    array<int,81> buffer;
+    buffer.fill(1);
 
-    Tensor<3,3,int> x(1);
-    /*
-    int count = 1;
-    for(auto &xi : x)
-        xi = count++;
-*/
-    int s = dot(x.perm<0,1,2>(), x);
+    //const_fancy_func(buffer.data());
+    fancy_func(buffer.data());
 
-    return s;
+    return 0;
 }
