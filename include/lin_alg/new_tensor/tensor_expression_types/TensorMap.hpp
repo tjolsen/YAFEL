@@ -21,8 +21,26 @@ YAFEL_NAMESPACE_OPEN
  * Since it is constructed via pointer, it cannot check that enough memory
  * has been allocated.
  *
- * The TensorMap supports a variety of const combinations via the PtrType
- * and RefType metaprogramming construct
+ * TensorMap respects const-ness of the underlying pointer type via
+ * its metaprogramming PtrType and RefType constructs, which account
+ * for whether this TensorMap is assignable.
+ * Because of this complication, it is easier (and advisable) to construct
+ * a TensorMap using the "make_TensorMap" function with an auto return type.
+ * Eg:
+ *
+ * \code{.cpp}
+ * double buffer[9];
+ * auto myMap = make_TensorMap<3,2>(buffer);
+ * \endcode
+ *
+ * This code block will map the "buffer" array as a dimension=3, rank=2
+ * TensorMap, with the "double" type deduced by the compiler.
+ * In this context, since "buffer" is not a pointer to const,
+ * it can be assigned to via the usual Tensor machinery.
+ *
+ * \code{.cpp}
+ * myMap(0,0) = 1;
+ * \endcode
  *
  * @tparam D Tensor Dimension
  * @tparam R Tensor Rank/Order
