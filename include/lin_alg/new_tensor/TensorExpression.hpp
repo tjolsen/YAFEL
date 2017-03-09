@@ -58,7 +58,12 @@ public:
     // Compute required storage for a tensor of dimension D and rank R
     static constexpr int tensor_storage(int N)
     {
-        return (N == 0) ? 1 : D * tensor_storage(N - 1);
+        int sz{1};
+        while(N>0){
+            sz *= D;
+            --N;
+        }
+        return sz;
     }
 
 

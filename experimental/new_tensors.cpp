@@ -26,7 +26,7 @@ using namespace std;
 int main()
 {
 
-    Tensor<3,1,int> x,y;
+    Tensor<4,1,int> x,y;
     int count = 1;
     auto yit = y.begin();
     for(auto &xi : x) {
