@@ -57,11 +57,11 @@ public:
     inline void linear_to_index(idx_tuple &, sequence<I>, sequence<>, int) const noexcept {}
 };
 
-template<typename LAMBDA, int D, int R, typename dt=double>
-auto make_TensorFunctor(LAMBDA &&lambda, sequence<D, R>, type_list<dt>)
+template<int D, int R, typename dt=double, typename LAMBDA>
+auto make_TensorFunctor(LAMBDA &&lambda)
 {
     return TensorFunctor<LAMBDA, D, R, dt>(std::forward<LAMBDA>(lambda));
-};
+}
 
 YAFEL_NAMESPACE_CLOSE
 

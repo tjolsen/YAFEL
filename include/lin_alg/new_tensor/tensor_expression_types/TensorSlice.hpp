@@ -42,7 +42,7 @@ public:
             *it = *rit;
         }
         return *this;
-    };
+    }
 
 
     inline dataType linearIndexing(int idx) const noexcept
@@ -91,13 +91,6 @@ public:
         return te_ref.linearIndexing(offset+local_to_parent(idx,typename super::stride_sequence(), parent_strides()));
     }
 
-    /*
-    template<bool dummy_bool=assignable, typename=typename std::enable_if<dummy_bool>::type>
-    inline dataType &linearIndexing(int idx) noexcept
-    {
-        return te_ref.linearIndexing(offset+local_to_parent(idx,typename super::stride_sequence(), parent_strides()));
-    }
-    */
 
     inline int local_to_parent(int, sequence<>, sequence<>) const noexcept { return 0; }
 

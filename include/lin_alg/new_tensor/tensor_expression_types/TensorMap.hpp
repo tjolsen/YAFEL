@@ -82,7 +82,7 @@ auto make_TensorMap(PTR ptr)
     using value_type = typename std::remove_pointer<PTR>::type;
 
     return TensorMap<D, R, value_type, !PtrToConst>(ptr);
-};
+}
 
 YAFEL_NAMESPACE_CLOSE
 #endif //YAFEL_TENSORMAP_HPP

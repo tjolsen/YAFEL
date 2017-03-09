@@ -15,7 +15,10 @@
 
 YAFEL_NAMESPACE_OPEN
 
-// Forward declaration of TensorSlice and TensorPermutation so that they can be used from the base class
+// Forward declaration of Tensor, TensorSlice and TensorPermutation so that they can be used from the base class
+template<int D, int R, typename dataType>
+class Tensor;
+
 template<typename TE, int D, int R, typename dataType, bool assignable, int ...PARENT_STRIDES>
 class TensorSlice;
 
@@ -32,8 +35,8 @@ auto make_slice(const TE<T, D, R, dataType, assignable> &te, Args... args);
 template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R, typename dataType, bool assignable, int ...PARENT_STRIDES, typename ...Args>
 auto make_const_slice(const TE<T, D, R, dataType, assignable> &te, Args... args);
 
-template<template<typename,int,int,typename,bool>class TE, typename T, int D, int R, typename dt, bool b, int ...IDX_PERM>
-auto permute(const TE<T,D,R,dt,b>& te, sequence<IDX_PERM...>);
+template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R, typename dt, bool b, int ...IDX_PERM>
+auto permute(const TE<T, D, R, dt, b> &te, sequence<IDX_PERM...>);
 
 
 /**
@@ -59,26 +62,18 @@ public:
     }
 
 
-    int dim() const
-    {
-        return D;
-    }
+    int dim() const { return D; }
 
-    int rank() const
-    {
-        return R;
-    }
-
+    int rank() const { return R; }
 
     // Down-casting functions
-    TE const &self() const
-    {
-        return static_cast<TE const &>(*this);
-    }
+    TE const &self() const { return static_cast<TE const &>(*this); }
 
-    TE &self()
-    {
-        return static_cast<TE &>(*this);
+    TE &self() { return static_cast<TE &>(*this); }
+
+    // Evaluate the current expression into a Tensor<D,R,dataType>
+    auto eval() const noexcept {
+        return Tensor<D,R,dataType>(self());
     }
 
     /*
@@ -162,8 +157,9 @@ public:
      * Permute the tensor expression
      * @return
      */
-     template<int ...IDXS>
-    auto perm() {
+    template<int ...IDXS>
+    auto perm()
+    {
         return permute(*this, sequence<IDXS...>());
     }
 
@@ -265,7 +261,7 @@ auto make_slice(TE<T, D, R, dataType, assignable> &te, int offset, sequence<PARE
     return TensorSlice<T, D, sizeof...(PARENT_STRIDES), dataType,
             assignable, PARENT_STRIDES...>(te, offset, sequence<PARENT_STRIDES...>());
 
-};
+}
 
 
 template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R,
@@ -275,12 +271,13 @@ auto make_const_slice(const TE<T, D, R, dataType, assignable> &te, int offset, s
     return ConstTensorSlice<T, D, sizeof...(PARENT_STRIDES), dataType,
             false, PARENT_STRIDES...>(te, offset, sequence<PARENT_STRIDES...>());
 
-};
+}
 
-template<template<typename,int,int,typename,bool>class TE, typename T, int D, int R, typename dt, bool b, int ...IDX_PERM>
-auto permute(const TE<T,D,R,dt,b>& te, sequence<IDX_PERM...>) {
- return TensorPermutation<T,D,R,dt,b,IDX_PERM...>(te,sequence<IDX_PERM...>());
-};
+template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R, typename dt, bool b, int ...IDX_PERM>
+auto permute(const TE<T, D, R, dt, b> &te, sequence<IDX_PERM...>)
+{
+    return TensorPermutation<T, D, R, dt, b, IDX_PERM...>(te, sequence<IDX_PERM...>());
+}
 
 //template<typename TE, int D, int R, typename dt, bool b, int ...IDX_PERM>
 //auto permute(const TensorExpression<TE,D,R,dt,b>& te, sequence<IDX_PERM...>) {

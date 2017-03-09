@@ -31,7 +31,7 @@ template<typename T, typename Arg, typename ...Args>
 constexpr bool all_of_type(type_list<Arg, Args...>)
 {
     return std::is_same<T,Arg>::value && all_of_type<T>(type_list<Args...>());
-};
+}
 
 
 
@@ -39,12 +39,12 @@ constexpr bool all_of_type(type_list<Arg, Args...>)
 template<typename T>
 constexpr bool contains(type_list<>) {
     return false;
-};
+}
 
 template<typename T, typename Arg, typename ...Args>
 constexpr bool contains(type_list<Arg, Args...>) {
     return std::is_same<T,Arg>::value || contains<T>(type_list<Args...>());
-};
+}
 
 
 YAFEL_NAMESPACE_CLOSE

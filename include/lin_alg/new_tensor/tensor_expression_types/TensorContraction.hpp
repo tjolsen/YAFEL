@@ -8,7 +8,6 @@
 #include "yafel_globals.hpp"
 #include "lin_alg/new_tensor/TensorExpression.hpp"
 #include "lin_alg/new_tensor/mp_utils/contraction_mp_utils.hpp"
-#include <iostream>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -31,11 +30,11 @@ YAFEL_NAMESPACE_OPEN
  */
 template<typename TE1, typename TE2, int D, int R1, int R2, int N, typename dt1, typename dt2, bool b1, bool b2>
 class TensorContraction : public TensorExpression<TensorContraction<TE1, TE2, D, R1, R2, N, dt1, dt2, b1, b2>, D,
-        R1 + R2 - 2 * N, decltype(dt1(0) * dt2(0)), false>
+        R1 + R2 - 2 * N, decltype(dt1() * dt2()), false>
 {
 public:
     using super = TensorExpression<TensorContraction<TE1, TE2, D, R1, R2, N, dt1, dt2, b1, b2>, D,
-            R1 + R2 - 2 * N, decltype(dt1(0) * dt2(0)), false>;
+            R1 + R2 - 2 * N, decltype(dt1() * dt2()), false>;
     const TE1 &te_lhs;
     const TE2 &te_rhs;
 
@@ -68,21 +67,27 @@ public:
 
 };
 
+template<int N, typename T1, typename T2>
+inline auto contract(const T1 &lhs, const T2 &rhs)
+{
+    return make_contraction(lhs, rhs, sequence<N>());
+}
+
 template<typename TE1, typename TE2, int D, int R1, int R2, int N, typename dt1, typename dt2, bool b1, bool b2>
-inline auto contract(const TensorExpression<TE1, D, R1, dt1, b1> &lhs,
-                     const TensorExpression<TE2, D, R2, dt2, b2> &rhs,
-                     sequence<N>)
+inline auto make_contraction(const TensorExpression<TE1, D, R1, dt1, b1> &lhs,
+                             const TensorExpression<TE2, D, R2, dt2, b2> &rhs,
+                             sequence<N>)
 {
     return TensorContraction<TE1, TE2, D, R1, R2, N, dt1, dt2, b1, b2>(lhs, rhs);
-};
+}
 
 template<typename TE1, typename TE2, int D, int R, typename dt1, typename dt2, bool b1, bool b2>
-inline auto contract(const TensorExpression<TE1, D, R, dt1, b1> &lhs,
-                     const TensorExpression<TE2, D, R, dt2, b2> &rhs,
-                     sequence<R>)
+inline auto make_contraction(const TensorExpression<TE1, D, R, dt1, b1> &lhs,
+                             const TensorExpression<TE2, D, R, dt2, b2> &rhs,
+                             sequence<R>)
 {
     return dot(lhs, rhs);
-};
+}
 
 YAFEL_NAMESPACE_CLOSE
 

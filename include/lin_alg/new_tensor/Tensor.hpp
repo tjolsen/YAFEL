@@ -38,7 +38,7 @@ public:
         for (int i = 0; i < super::tensor_storage(R); ++i, ++rit) {
             data[i] = *rit;
         }
-    };
+    }
 
     //implement indexing operations
     dataType linearIndexing(int idx) const noexcept

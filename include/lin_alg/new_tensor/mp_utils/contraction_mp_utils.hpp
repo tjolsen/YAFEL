@@ -46,7 +46,7 @@ template<int S, int ...SS, int P, int ...PP>
 inline int get_offset(sequence<S, SS...>, sequence<P, PP...>, int idx)
 {
     return P * (idx / S) + get_offset(sequence<SS...>(), sequence<PP...>(), idx % S);
-};
+}
 
 
 YAFEL_NAMESPACE_CLOSE

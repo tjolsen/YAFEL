@@ -10,14 +10,15 @@
 YAFEL_NAMESPACE_OPEN
 
 template<typename TE, typename scaleT, int D, int R, typename dataType>
-class TensorScaled : public TensorExpression<TensorScaled<TE,scaleT,D,R,dataType>,D,R,dataType,false>
+class TensorScaled : public TensorExpression<TensorScaled<TE,scaleT,D,R,dataType>,D,R,decltype(dataType()*scaleT()),false>
 {
 public:
+    using super = TensorExpression<TensorScaled<TE,scaleT,D,R,dataType>,D,R,decltype(dataType()*scaleT()),false>;
     const TE& te_ref;
-    const scaleT &scale;
+    const scaleT scale;
 
     template<typename dt1, typename dt2, bool b>
-    TensorScaled(const TensorExpression<TE,D,R,dt1,b> &te, const dt2 &s)
+    TensorScaled(const TensorExpression<TE,D,R,dt1,b> &te, dt2 s)
             : te_ref(te.self()), scale(s)
     {}
 
@@ -26,19 +27,6 @@ public:
     {
         return scale*te_ref.linearIndexing(idx);
     }
-};
-
-
-template<typename dt1, typename TE, int D, int R, typename dt2, bool b>
-auto operator*(const dt1& lhs, const TensorExpression<TE,D,R,dt2,b> &rhs)
-{
-    return TensorScaled<TE,dt1,D,R,decltype(dt1(0)*dt2(0))>(rhs, lhs);
-};
-
-template<typename dt1, typename TE, int D, int R, typename dt2, bool b>
-auto operator*(const TensorExpression<TE,D,R,dt2,b> &lhs, const dt1& rhs)
-{
-    return TensorScaled<TE,dt1,D,R,decltype(dt1(0)*dt2(0))>(lhs, rhs);
 };
 
 YAFEL_NAMESPACE_CLOSE

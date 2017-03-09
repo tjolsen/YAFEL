@@ -49,7 +49,7 @@ public:
         auto p_stride = index_at(stride_sequence(), sequence<index_at(idx_perm(), sequence<I>())>());
         return p_stride*(idx/S)
                + local_to_parent(idx%S, stride_sequence(), sequence<SS...>(), sequence<II...>());
-    };
+    }
 
     int local_to_parent(int, stride_sequence, sequence<>, sequence<>) const noexcept
     {
