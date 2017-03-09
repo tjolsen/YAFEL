@@ -111,34 +111,6 @@ constexpr int seq_find(sequence<Val>, sequence<S, SS...>)
 
 
 // Get last N elements of sequence
-
-
-/*
-template<int N, int remaining, bool barrier, int S, int ...SS>
-struct last_N : public last_N<N, remaining - 1, barrier, SS...>
-{
-};
-
-template<int N, bool barrier, int ...SS>
-struct last_N<N, N, barrier, SS...>
-{
-    using type = sequence<SS...>;
-};
-
-template<int ...SS>
-constexpr auto get_last_N(sequence<0>,sequence<SS...>)
-{
-    return sequence<>();
-}
-
-template<int N, int S, int ...SS>
-constexpr auto get_last_N(sequence<N>, sequence<S,SS...>)
-{
-    static_assert(N<=sizeof...(SS)+1,"Error: Cannot get last N of sequence. Sequence too short.");
-    return typename last_N<N, sizeof...(SS), false, SS...>::type();
-};
-*/
-
 template<int N>
 constexpr auto get_last_N_impl(sequence<N>, sequence<>)
 {

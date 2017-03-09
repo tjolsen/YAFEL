@@ -18,7 +18,6 @@ public:
     using super = TensorExpression<TensorCwiseBinaryOp<T1, T2, D, R, dt1, dt2, b1, b2, BinaryOpType>,
             D, R, typename BinaryOpType<dt1, dt2>::result_type, false>;
 
-
     using result_type = typename BinaryOpType<dt1, dt2>::result_type;
 
     const T1 &lhs_;
@@ -28,7 +27,7 @@ public:
                         const TensorExpression<T2, D, R, dt2, b2> &rhs)
             : lhs_(lhs.self()), rhs_(rhs.self()) {}
 
-    result_type linearIndexing(int idx) const noexcept
+    inline result_type linearIndexing(int idx) const noexcept
     {
         return BinaryOpType<dt1, dt2>::BinaryOp(lhs_.linearIndexing(idx), rhs_.linearIndexing(idx));
     }

@@ -52,7 +52,7 @@ public:
     }
 
     // array to store tensor data
-    alignas(64) std::array<dataType, super::tensor_storage(R)> data;
+    dataType data[super::tensor_storage(R)]; //std::array<dataType, super::tensor_storage(R)> data;
 };
 
 

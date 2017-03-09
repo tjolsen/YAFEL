@@ -9,36 +9,37 @@
 #include "lin_alg/new_tensor/tensor_expression_types/TensorContraction.hpp"
 #include "lin_alg/new_tensor/tensor_expression_types/TensorFunctor.hpp"
 #include "lin_alg/new_tensor/tensor_expression_types/TensorMap.hpp"
+#include "lin_alg/new_tensor/tensor_expression_types/TensorDyadicProduct.hpp"
 #include "lin_alg/new_tensor/tensor_functions/tensor_dot.hpp"
 #include "lin_alg/new_tensor/mp_utils/sequence_functions.hpp"
 #include "lin_alg/new_tensor/mp_utils/slice_mp_utils.hpp"
 
 #include <iostream>
 #include <cmath>
+#include <vector>
 
 using namespace yafel;
 using namespace std;
 
 
 
-int main()//(int argc, char **argv)
+int main()
 {
-    double lambda=1.0e9;
-    double mu=1.0e8;
 
-    auto Cijkl = make_TensorFunctor<3,4,double>([lambda,mu](int i, int j, int k, int l)
-                                                {return lambda*(i==j)*(k==l) + mu*((i==k)*(j==l) + (i==l)*(j==k));});
+    Tensor<3,1,int> x,y;
+    int count = 1;
+    auto yit = y.begin();
+    for(auto &xi : x) {
+        *yit = xi = count++;
+        ++yit;
+    }
 
+    auto A = otimes(x,y).eval();
 
-    Tensor<3,2> gradU(0); gradU(0,1) = .01;
-    auto strain = ((gradU + gradU.perm<1,0>())/2);
+    auto C=otimes(A,x).eval();
+    auto D = otimes(y,A).eval();
 
-    auto stress = contract<2>(Cijkl,strain).eval();
+    auto E = (C - D.perm<1,2,0>().eval()).eval();
 
-    int s = dot(stress,stress)>0;
-    for(auto s : stress)
-        cout << s << endl;
-    cout << endl;
-    cout << sqrt(dot(stress,stress)) << endl;
-    return s;
+    return dot(E,E);
 }
