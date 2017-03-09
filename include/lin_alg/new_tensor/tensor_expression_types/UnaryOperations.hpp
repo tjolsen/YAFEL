@@ -17,24 +17,8 @@
 
 YAFEL_NAMESPACE_OPEN
 
-/**
- * \class UnaryOperator
- * \brief Base type of all structs that implement the unary operator policy
- * Can only be instantiated with Yafel Scalar types.
- * This is given by an entry in yafel::ScalarTraits.
- * By default, all builtin arithmetic types (std::is_arithmetic<T>::value == true)
- * are Yafel Scalars.
- * Any other data types (such as DualNumber) must implement their own
- * ScalarTraits class.
- *
- * @tparam T
- */
 template<typename T>
-        //typename = typename std::enable_if<ScalarTraits<T>::isYafelScalar()>::type>
-struct UnaryOperator {};
-
-template<typename T>
-struct Negation : UnaryOperator<T>
+struct Negation
 {
     using result_type = decltype(-T());
 
@@ -43,7 +27,7 @@ struct Negation : UnaryOperator<T>
 
 
 template<typename T>
-struct Sqrt : UnaryOperator<T>
+struct Sqrt
 {
     using result_type = decltype(sqrt(std::declval<T>()));
 
@@ -52,7 +36,7 @@ struct Sqrt : UnaryOperator<T>
 
 
 template<typename T>
-struct Sign : UnaryOperator<T>
+struct Sign
 {
     //always return a signed int from this function.
     using result_type = int;

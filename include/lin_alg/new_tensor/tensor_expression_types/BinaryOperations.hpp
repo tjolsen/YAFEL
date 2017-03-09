@@ -32,13 +32,8 @@
 
 YAFEL_NAMESPACE_OPEN
 
-template<typename T, typename U,
-        typename = typename std::enable_if<ScalarTraits<T>::isYafelScalar()>::type,
-        typename = typename std::enable_if<ScalarTraits<U>::isYafelScalar()>::type>
-struct BinaryOperator {};
-
 template<typename T, typename U>
-struct Addition : BinaryOperator<T,U>
+struct Addition
 {
     using result_type = decltype(T() + U());
 
@@ -47,7 +42,7 @@ struct Addition : BinaryOperator<T,U>
 
 
 template<typename T, typename U>
-struct Subtraction : BinaryOperator<T,U>
+struct Subtraction
 {
     using result_type = decltype(T() - U());
 
@@ -56,7 +51,7 @@ struct Subtraction : BinaryOperator<T,U>
 
 
 template<typename T, typename U>
-struct Max : BinaryOperator<T,U>
+struct Max
 {
     using result_type = decltype(T() * U());
 
@@ -64,7 +59,7 @@ struct Max : BinaryOperator<T,U>
 };
 
 template<typename T, typename U>
-struct Min : BinaryOperator<T,U>
+struct Min
 {
     using result_type = decltype(T() * U());
 
