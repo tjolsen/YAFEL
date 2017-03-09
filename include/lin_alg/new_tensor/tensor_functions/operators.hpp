@@ -13,7 +13,9 @@
 
 #include "yafel_globals.hpp"
 #include "lin_alg/new_tensor/tensor_expression_types/BinaryOperations.hpp"
+#include "lin_alg/new_tensor/tensor_expression_types/UnaryOperations.hpp"
 #include "lin_alg/new_tensor/tensor_expression_types/TensorCwiseBinaryOp.hpp"
+#include "lin_alg/new_tensor/tensor_expression_types/TensorCwiseUnaryOp.hpp"
 #include "lin_alg/new_tensor/tensor_expression_types/TensorScaled.hpp"
 
 YAFEL_NAMESPACE_OPEN
@@ -67,6 +69,14 @@ auto operator/(const TensorExpression<T1,D,R,dt,b> &lhs, const U &rhs)
     return TensorScaled<T1,result_type,D,R,dt>(lhs,result_type(1)/rhs);
 }
 
+//-------------------------------------------------------------------
+//              Component-wise Unary Operations
+//-------------------------------------------------------------------
+template<typename T1, int D, int R, typename dt1, bool b1>
+auto operator-(const TensorExpression<T1, D, R, dt1, b1> &te)
+{
+    return TensorCwiseUnaryOp<T1, D, R, dt1, b1, Negation>(te);
+}
 
 
 YAFEL_NAMESPACE_CLOSE

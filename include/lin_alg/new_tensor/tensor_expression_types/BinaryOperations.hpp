@@ -27,22 +27,51 @@
 
 
 #include "yafel_globals.hpp"
+#include "utils/ScalarTraits.hpp"
+#include <type_traits>
 
 YAFEL_NAMESPACE_OPEN
 
+template<typename T, typename U,
+        typename = typename std::enable_if<ScalarTraits<T>::isYafelScalar()>::type,
+        typename = typename std::enable_if<ScalarTraits<U>::isYafelScalar()>::type>
+struct BinaryOperator {};
+
 template<typename T, typename U>
-struct Addition
+struct Addition : BinaryOperator<T,U>
 {
     using result_type = decltype(T() + U());
+
     static auto BinaryOp(T t, U u) { return t + u; }
 };
 
+
 template<typename T, typename U>
-struct Subtraction
+struct Subtraction : BinaryOperator<T,U>
 {
     using result_type = decltype(T() - U());
+
     static auto BinaryOp(T t, U u) { return t - u; }
 };
+
+
+template<typename T, typename U>
+struct Max : BinaryOperator<T,U>
+{
+    using result_type = decltype(T() * U());
+
+    static auto BinaryOp(T t, U u) { return (t > u) ? t : u; }
+};
+
+template<typename T, typename U>
+struct Min : BinaryOperator<T,U>
+{
+    using result_type = decltype(T() * U());
+
+    static auto BinaryOp(T t, U u) { return (t < u) ? t : u; }
+};
+
+
 
 YAFEL_NAMESPACE_CLOSE
 

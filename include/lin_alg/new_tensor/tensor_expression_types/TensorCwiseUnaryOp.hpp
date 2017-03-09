@@ -8,7 +8,19 @@
 #include "yafel_globals.hpp"
 #include "lin_alg/new_tensor/TensorExpression.hpp"
 
-template<typename TE, int D, int R, typename dt, bool b, template<template> UnaryOpType>
+YAFEL_NAMESPACE_OPEN
+
+/**
+ * \class TensorCwiseUnaryOp
+ *
+ * \brief Component-wise operation on a TensorExpression
+ * @tparam TE TensorExpression type
+ * @tparam D tensor Dimension
+ * @tparam R tensor Rank
+ * @tparam dt tensor dataType
+ * @tparam b "assignable" flag
+ */
+template<typename TE, int D, int R, typename dt, bool b, template<typename> class UnaryOpType>
 class TensorCwiseUnaryOp
         : public TensorExpression<TensorCwiseUnaryOp<TE, D, R, dt, b, UnaryOpType>, D, R, typename UnaryOpType<dt>::result_type, false>
 {
@@ -29,5 +41,7 @@ public:
     }
 };
 
+
+YAFEL_NAMESPACE_CLOSE
 
 #endif //YAFEL_TENWORCWISEUNARYOP_HPP

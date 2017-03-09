@@ -6,6 +6,7 @@
 #define YAFEL_TENSOREXPRESSION_HPP
 
 #include "yafel_globals.hpp"
+#include "utils/ScalarTraits.hpp"
 #include "mp_utils/sequences.hpp"
 #include "mp_utils/sequence_functions.hpp"
 #include "mp_utils/TypeList.hpp"
@@ -48,7 +49,7 @@ auto permute(const TE<T, D, R, dt, b> &te, sequence<IDX_PERM...>);
  * @tparam dataType data type of tensor entries
  * @tparam assignable flag to indicate whether underlying expression is assignable
  */
-template<typename TE, int D, int R, typename dataType, bool assignable>
+template<typename TE, int D, int R, typename dataType, bool assignable, typename=typename std::enable_if<ScalarTraits<dataType>::isYafelScalar()>::type>
 class TensorExpression
 {
 public:
@@ -81,22 +82,6 @@ public:
         return Tensor<D,R,dataType>(self());
     }
 
-    /*
-    template<bool dummy_bool=assignable, typename T, typename dt2, bool Tb,
-            typename=typename std::enable_if<dummy_bool>::type,
-            typename=typename std::enable_if<std::is_assignable<dataType, dt2>::value>::type
-            >
-    auto& operator=(const TensorExpression<T,D,R,dt2,Tb> &rhs) noexcept
-    {
-        if(this != &rhs) {
-            for (auto it = begin(), rit = rhs.begin(); it != end(); ++it, ++rit)
-                *it = *rit;
-        }
-
-        return self();
-    };
-
-     */
 
     // Compute linear index of a (i,j,k...) component
     template<int S, typename INT>

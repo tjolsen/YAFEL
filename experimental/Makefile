@@ -9,6 +9,7 @@ $(exefile): $(ofile)
 
 include $(YAFELDIR)/common.mk
 
+
 %.o: %.cpp
 	$(CXX) $< $(CXXFLAGS)
 

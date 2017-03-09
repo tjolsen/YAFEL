@@ -1,0 +1,11 @@
+//
+// Created by tyler on 3/9/17.
+//
+
+#ifndef YAFEL_BINARYFUNCTIONS_HPP
+#define YAFEL_BINARYFUNCTIONS_HPP
+
+
+
+
+#endif //YAFEL_BINARYFUNCTIONS_HPP
