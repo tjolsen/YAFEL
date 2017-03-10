@@ -45,6 +45,24 @@ struct Sign
 };
 
 
+template<typename T>
+struct Sin
+{
+    //always return a signed int from this function.
+    using result_type = decltype(sin(std::declval<T>()));
+
+    static auto UnaryOp(T t) { return sin(t); }
+};
+
+template<typename T>
+struct Cos
+{
+    //always return a signed int from this function.
+    using result_type = decltype(sin(std::declval<T>()));
+
+    static auto UnaryOp(T t) { return cos(t); }
+};
+
 YAFEL_NAMESPACE_CLOSE
 
 #endif //YAFEL_UNARYOPERATIONS_HPP

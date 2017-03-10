@@ -14,4 +14,4 @@ include $(YAFELDIR)/common.mk
 	$(CXX) $< $(CXXFLAGS)
 
 clean:
-	rm $(exefile) $(ofile)
+	rm $(exefile) $(ofile) .depend
