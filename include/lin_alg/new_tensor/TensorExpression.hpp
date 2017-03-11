@@ -235,12 +235,12 @@ public:
         }
     };
 
-    auto begin() const noexcept
+    ConstTensorExpressionIterator begin() const noexcept
     {
         return ConstTensorExpressionIterator(*this, 0);
     }
 
-    auto end() const noexcept
+    ConstTensorExpressionIterator end() const noexcept
     {
         return ConstTensorExpressionIterator(*this, tensor_storage(R));
     }

@@ -30,11 +30,13 @@ int main()
     x += y.perm<1,0>();
     x += y;
 
+
+    /*
     for(int i=0; i<x.dim(); ++i) {
         for (auto xi : x(i, colon()))
             std::cout << xi << " ";
         std::cout << std::endl;
-    }
+    }*/
 
 
     //for(auto xi : x(0,colon()))

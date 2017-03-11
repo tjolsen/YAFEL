@@ -7,6 +7,7 @@
 
 #include "yafel_globals.hpp"
 #include "lin_alg/new_tensor/TensorExpression.hpp"
+#include <iostream>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -44,11 +45,10 @@ decltype(dt1()*dt2()) dot(const TensorExpression<T1,D,R,dt1,b1> &lhs,
     auto rit=rhs.begin();
     decltype(dt1()*dt2()) retval(0);
 
-    for(; lit != lhs.end(); ++lit, ++rit)
+    auto l_end = lhs.end();
+    for(; lit != l_end ; ++lit, ++rit)
     {
         retval += (*lit)*(*rit);
-        ++lit;
-        ++rit;
     }
 
     return retval;

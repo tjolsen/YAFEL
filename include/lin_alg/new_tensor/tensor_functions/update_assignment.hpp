@@ -17,6 +17,7 @@ template<typename T1, typename T2, int D, int R, typename dt1, typename dt2,
 inline T1 &update_assign(TensorExpression<T1, D, R, dt1, true> &&lhs,
                          const TensorExpression<T2, D, R, dt2, b2> &rhs, BinaryOperator)
 {
+
     auto lit = lhs.begin();
 
     //automatically eval() the right-hand side for assignment.
@@ -42,7 +43,7 @@ inline T1 &update_assign(TensorExpression<T1, D, R, dt1, true> &lhs,
     //going to have to be done anyway. Hopefully, the compiler
     //can see that the resulting values aren't going to be used anywhere,
     //so it'll just evaluate it on the fly
-    for (auto r : rhs.eval()) {
+    for (auto r : rhs.self().eval()) {
         *lit = BinaryOperator::BinaryOp(*lit, r);
         ++lit;
     }
@@ -84,14 +85,14 @@ template<typename T1, typename T2, int D, int R, typename dt1, typename dt2, boo
 auto operator+=(TensorExpression<T1, D, R, dt1, true> &lhs,
                 const TensorExpression<T2, D, R, dt2, b2> &rhs)
 {
-    return update_assign(lhs, rhs, Addition<dt1, dt2>());
+    return update_assign(lhs, rhs.self(), Addition<dt1, dt2>());
 };
 
 template<typename T1, typename T2, int D, int R, typename dt1, typename dt2, bool b2>
 auto operator+=(TensorExpression<T1, D, R, dt1, true> &&lhs,
                 const TensorExpression<T2, D, R, dt2, b2> &rhs)
 {
-    return update_assign(std::forward<TensorExpression<T1, D, R, dt1, true>>(lhs), rhs, Addition<dt1, dt2>());
+    return update_assign(std::forward<TensorExpression<T1, D, R, dt1, true>>(lhs), rhs.self(), Addition<dt1, dt2>());
 };
 
 template<typename T1, int D, int R, typename dt1, typename dt2,
