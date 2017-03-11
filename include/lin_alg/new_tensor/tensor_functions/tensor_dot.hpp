@@ -7,7 +7,6 @@
 
 #include "yafel_globals.hpp"
 #include "lin_alg/new_tensor/TensorExpression.hpp"
-#include <iostream>
 
 YAFEL_NAMESPACE_OPEN
 

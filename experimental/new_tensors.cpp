@@ -24,11 +24,11 @@ int main()
 {
 
     Tensor<3,2,int> x(1),y(0);
-
+    Tensor<3,1,int> z(2);
     y(0,1) = 1;
 
     x += y.perm<1,0>();
-    x += y;
+    x(0,colon()) += z;
 
 
     /*
