@@ -2,19 +2,7 @@
 // Created by tyler on 2/21/17.
 //
 
-#include "lin_alg/new_tensor/tensor_expression_types/Tensor.hpp"
-#include "lin_alg/new_tensor/tensor_functions/operators.hpp"
-#include "lin_alg/new_tensor/tensor_expression_types/TensorSlice.hpp"
-#include "lin_alg/new_tensor/tensor_expression_types/TensorPermutation.hpp"
-#include "lin_alg/new_tensor/tensor_expression_types/TensorContraction.hpp"
-#include "lin_alg/new_tensor/tensor_expression_types/TensorFunctor.hpp"
-#include "lin_alg/new_tensor/tensor_expression_types/TensorMap.hpp"
-#include "lin_alg/new_tensor/tensor_expression_types/TensorDyadicProduct.hpp"
-#include "lin_alg/new_tensor/tensor_functions/tensor_dot.hpp"
-#include "lin_alg/new_tensor/tensor_functions/UnaryFunctions.hpp"
-#include "lin_alg/new_tensor/tensor_functions/update_assignment.hpp"
-#include "lin_alg/new_tensor/mp_utils/sequence_functions.hpp"
-#include "lin_alg/new_tensor/mp_utils/slice_mp_utils.hpp"
+#include "lin_alg/new_tensor/tensors.hpp"
 
 #include <iostream>
 
@@ -23,24 +11,20 @@ using namespace yafel;
 int main()
 {
 
-    Tensor<3,2,int> x(1),y(0);
-    Tensor<3,1,int> z(2);
-    y(0,1) = 1;
+    Tensor<3,2> Q = TensorEye<3>();
+    Q(1,0) = .1;
+    Tensor<3,2> A;
 
-    x += y.perm<1,0>();
-    x(0,colon()) += z;
+    double lam[3] = {1,2,3};
 
+    for(auto i : IRange(0,3))
+        A += otimes(lam[i]*Q(colon(),i), Q(colon(),i));
 
-    /*
-    for(int i=0; i<x.dim(); ++i) {
-        for (auto xi : x(i, colon()))
-            std::cout << xi << " ";
-        std::cout << std::endl;
-    }*/
+    Tensor<3,2> A0(A);
+    spectral_decomposition(A,Q); // warning, this modifies A, Q
 
+    // Compute ||A0 - QAQ^T|| --> Check accuracy of spectral decomposition
+    double err = norm((A0 - ((Q*A).eval()*Q.perm<1,0>().eval()).eval()));
 
-    //for(auto xi : x(0,colon()))
-    //std::cout << xi << "\n";
-
-    return dot(x,x);
+    return err < 1.0e-15;
 }

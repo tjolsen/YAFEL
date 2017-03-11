@@ -15,28 +15,28 @@ template<typename T, int D, int R, typename dt, bool b>
 auto sqrt(const TensorExpression<T,D,R,dt,b> &te) noexcept
 {
     return TensorCwiseUnaryOp<T,D,R,dt,b,Sqrt>(te);
-};
+}
 
 
 template<typename T, int D, int R, typename dt, bool b>
 auto sign(const TensorExpression<T,D,R,dt,b> &te) noexcept
 {
     return TensorCwiseUnaryOp<T,D,R,dt,b,Sign>(te);
-};
+}
 
 
 template<typename T, int D, int R, typename dt, bool b>
 auto sin(const TensorExpression<T,D,R,dt,b> &te) noexcept
 {
     return TensorCwiseUnaryOp<T,D,R,dt,b,Sin>(te);
-};
+}
 
 
 template<typename T, int D, int R, typename dt, bool b>
 auto cos(const TensorExpression<T,D,R,dt,b> &te) noexcept
 {
     return TensorCwiseUnaryOp<T,D,R,dt,b,Cos>(te);
-};
+}
 
 
 YAFEL_NAMESPACE_CLOSE

@@ -30,7 +30,7 @@ inline T1 &update_assign(TensorExpression<T1, D, R, dt1, true> &&lhs,
     }
 
     return lhs.self();
-};
+}
 
 template<typename T1, typename T2, int D, int R, typename dt1, typename dt2,
         bool b2, typename BinaryOperator>
@@ -49,7 +49,7 @@ inline T1 &update_assign(TensorExpression<T1, D, R, dt1, true> &lhs,
     }
 
     return lhs.self();
-};
+}
 
 
 template<typename T1, int D, int R, typename dt1, typename dt2, typename BinaryOperator,
@@ -62,7 +62,7 @@ inline T1 &update_assign(TensorExpression<T1, D, R, dt1, true> &lhs, dt2 rhs, Bi
     }
 
     return lhs.self();
-};
+}
 
 template<typename T1, int D, int R, typename dt1, typename dt2, typename BinaryOperator,
         typename=typename std::enable_if<ScalarTraits<dt2>::isYafelScalar()>::type>
@@ -74,7 +74,7 @@ inline T1 &update_assign(TensorExpression<T1, D, R, dt1, true> &&lhs, dt2 rhs, B
     }
 
     return lhs.self();
-};
+}
 
 
 //------------------------------------------------------------
@@ -86,28 +86,28 @@ auto operator+=(TensorExpression<T1, D, R, dt1, true> &lhs,
                 const TensorExpression<T2, D, R, dt2, b2> &rhs)
 {
     return update_assign(lhs, rhs.self(), Addition<dt1, dt2>());
-};
+}
 
 template<typename T1, typename T2, int D, int R, typename dt1, typename dt2, bool b2>
 auto operator+=(TensorExpression<T1, D, R, dt1, true> &&lhs,
                 const TensorExpression<T2, D, R, dt2, b2> &rhs)
 {
     return update_assign(std::forward<TensorExpression<T1, D, R, dt1, true>>(lhs), rhs.self(), Addition<dt1, dt2>());
-};
+}
 
 template<typename T1, int D, int R, typename dt1, typename dt2,
         typename=typename std::enable_if<ScalarTraits<dt2>::isYafelScalar()>::type>
 T1 &operator+=(TensorExpression<T1, D, R, dt1, true> &lhs, dt2 rhs)
 {
     return update_assign(lhs, rhs, Addition<dt1, dt2>());
-};
+}
 
 template<typename T1, int D, int R, typename dt1, typename dt2,
         typename=typename std::enable_if<ScalarTraits<dt2>::isYafelScalar()>::type>
 T1 &operator+=(TensorExpression<T1, D, R, dt1, true> &&lhs, dt2 rhs)
 {
     return update_assign(std::forward<TensorExpression<T1, D, R, dt1, true>>(lhs), rhs, Addition<dt1, dt2>());
-};
+}
 
 //-----------------------------------------------------------------
 template<typename T1, typename T2, int D, int R, typename dt1, typename dt2, bool b2>
@@ -116,7 +116,7 @@ auto operator-=(TensorExpression<T1, D, R, dt1, true> &&lhs,
 {
     return update_assign(std::forward<TensorExpression<T1, D, R, dt1, true>>(lhs),
                          rhs, Subtraction<dt1, dt2>());
-};
+}
 
 template<typename T1, int D, int R, typename dt1, typename dt2,
         typename=typename std::enable_if<ScalarTraits<dt2>::isYafelScalar()>::type>
@@ -124,7 +124,7 @@ T1 &operator-=(TensorExpression<T1, D, R, dt1, true> &&lhs, dt2 rhs)
 {
     return update_assign(std::forward<TensorExpression<T1, D, R, dt1, true>>(lhs),
                          rhs, Subtraction<dt1, dt2>());
-};
+}
 
 
 YAFEL_NAMESPACE_CLOSE

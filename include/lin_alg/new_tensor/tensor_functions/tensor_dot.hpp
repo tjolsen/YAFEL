@@ -7,6 +7,7 @@
 
 #include "yafel_globals.hpp"
 #include "lin_alg/new_tensor/TensorExpression.hpp"
+#include <cmath>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -52,6 +53,18 @@ decltype(dt1()*dt2()) dot(const TensorExpression<T1,D,R,dt1,b1> &lhs,
 
     return retval;
 }
+
+
+/**
+ * \brief Compute the norm of a tensor
+ *
+ * Compute the L2 norm of a tensor by calling sqrt(dot(x,x))
+ */
+template<typename TE, int D, int R, typename dt, bool b>
+auto norm(const TensorExpression<TE,D,R,dt,b> &x) {
+    using std::sqrt;
+    return sqrt(dot(x,x));
+};
 
 YAFEL_NAMESPACE_CLOSE
 

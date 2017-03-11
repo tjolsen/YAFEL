@@ -5,6 +5,7 @@
 #ifndef YAFEL_SEQUENCE_FUNCTIONS_HPP
 #define YAFEL_SEQUENCE_FUNCTIONS_HPP
 
+#include "yafel_globals.hpp"
 #include "sequences.hpp"
 #include <type_traits>
 

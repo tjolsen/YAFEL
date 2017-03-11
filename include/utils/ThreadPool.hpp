@@ -5,8 +5,6 @@
  * See website listed above for licensing and copying requirements.
  */
 
-
-
 #ifndef THREAD_POOL_H
 #define THREAD_POOL_H
 

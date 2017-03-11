@@ -52,7 +52,7 @@ private:
     inline int lhs_index(int idx, sequence<S, SS...>, sequence<P, PP...>) const noexcept
     {
         return P * (idx / S) + lhs_index(idx % S, sequence<SS...>(), sequence<PP...>());
-    };
+    }
 
 };
 
@@ -62,7 +62,7 @@ auto otimes(const TensorExpression<T1, D, R1, dt1, b1> &lhs,
             const TensorExpression<T2, D, R2, dt2, b2> &rhs)
 {
     return TensorDyadicProduct<T1, T2, D, R1, R2, dt1, dt2, b1, b2>(lhs, rhs);
-};
+}
 
 
 YAFEL_NAMESPACE_CLOSE
