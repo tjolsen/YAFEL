@@ -12,37 +12,33 @@
 #include "lin_alg/new_tensor/tensor_expression_types/TensorDyadicProduct.hpp"
 #include "lin_alg/new_tensor/tensor_functions/tensor_dot.hpp"
 #include "lin_alg/new_tensor/tensor_functions/UnaryFunctions.hpp"
+#include "lin_alg/new_tensor/tensor_functions/update_assignment.hpp"
 #include "lin_alg/new_tensor/mp_utils/sequence_functions.hpp"
 #include "lin_alg/new_tensor/mp_utils/slice_mp_utils.hpp"
-
 
 #include <iostream>
 
 using namespace yafel;
-//using namespace std;
-
 
 int main()
 {
 
-    Tensor<10,1,double> x,y;
-    int count = 1;
-    int sgn=1;
-    auto yit = y.begin();
-    for(auto &xi : x) {
-        *yit = xi = sgn*count++;
-        ++yit;
-        sgn *= -1;
+    Tensor<3,2,int> x(1),y(0);
+
+    y(0,1) = 1;
+
+    x += y.perm<1,0>();
+    x += y;
+
+    for(int i=0; i<x.dim(); ++i) {
+        for (auto xi : x(i, colon()))
+            std::cout << xi << " ";
+        std::cout << std::endl;
     }
 
-    auto z = sign(x).eval();
 
+    //for(auto xi : x(0,colon()))
+    //std::cout << xi << "\n";
 
-    for(auto zi : z) {
-        std::cout << zi << std::endl;
-    }
-
-    auto yy = dot(y,z);
-
-    return yy>0;
+    return dot(x,x);
 }

@@ -57,16 +57,16 @@ template<typename T1, int D, int R, typename dt, bool b, typename U,
         typename=typename std::enable_if<std::is_arithmetic<U>::value>::type>
 auto operator*(const U &lhs, const TensorExpression<T1, D, R, dt, b> &rhs)
 {
-    return TensorScaled<T1, U, D, R, dt>(lhs, rhs);
+    return TensorScaled<T1, U, D, R, dt>(rhs, lhs);
 }
 
 // Division (recast as multiplication by inverse, which is faster)
 template<typename T1, int D, int R, typename dt, bool b, typename U,
         typename=typename std::enable_if<std::is_arithmetic<U>::value>::type>
-auto operator/(const TensorExpression<T1,D,R,dt,b> &lhs, const U &rhs)
+auto operator/(const TensorExpression<T1, D, R, dt, b> &lhs, const U &rhs)
 {
-    using result_type = decltype(dt()/U());
-    return TensorScaled<T1,result_type,D,R,dt>(lhs,result_type(1)/rhs);
+    using result_type = decltype(dt() / U());
+    return TensorScaled<T1, result_type, D, R, dt>(lhs, result_type(1) / rhs);
 }
 
 //-------------------------------------------------------------------

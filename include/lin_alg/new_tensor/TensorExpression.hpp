@@ -30,14 +30,21 @@ template<typename TE, int D, int R, typename dt, bool b, int ...IDX_PERM>
 class TensorPermutation;
 
 
-template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R, typename dataType, bool assignable, int ...PARENT_STRIDES, typename ...Args>
+template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R,
+        typename dataType, bool assignable, int ...PARENT_STRIDES, typename ...Args>
 auto make_slice(const TE<T, D, R, dataType, assignable> &te, Args... args);
 
-template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R, typename dataType, bool assignable, int ...PARENT_STRIDES, typename ...Args>
+template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R,
+        typename dataType, bool assignable, int ...PARENT_STRIDES, typename ...Args>
 auto make_const_slice(const TE<T, D, R, dataType, assignable> &te, Args... args);
 
-template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R, typename dt, bool b, int ...IDX_PERM>
-auto permute(const TE<T, D, R, dt, b> &te, sequence<IDX_PERM...>);
+template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R,
+        typename dt, int ...IDX_PERM>
+auto permute(TE<T, D, R, dt, true> &te, sequence<IDX_PERM...>);
+
+template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R,
+        typename dt, bool b, int ...IDX_PERM>
+auto const_permute(const TE<T, D, R, dt, b> &te, sequence<IDX_PERM...>);
 
 
 /**
@@ -60,7 +67,7 @@ public:
     static constexpr int tensor_storage(int N)
     {
         int sz{1};
-        while(N>0){
+        while (N > 0) {
             sz *= D;
             --N;
         }
@@ -78,8 +85,9 @@ public:
     TE &self() { return static_cast<TE &>(*this); }
 
     // Evaluate the current expression into a Tensor<D,R,dataType>
-    auto eval() const noexcept {
-        return Tensor<D,R,dataType>(self());
+    auto eval() const noexcept
+    {
+        return Tensor<D, R, dataType>(self());
     }
 
 
@@ -148,7 +156,13 @@ public:
      * @return
      */
     template<int ...IDXS>
-    auto perm()
+    auto perm() const noexcept
+    {
+        return const_permute(*this, sequence<IDXS...>());
+    }
+
+    template<int ...IDXS>
+    auto perm() noexcept
     {
         return permute(*this, sequence<IDXS...>());
     }
@@ -244,9 +258,9 @@ public:
 };
 
 
-template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R,
-        typename dataType, bool assignable, int ...PARENT_STRIDES>
-auto make_slice(TE<T, D, R, dataType, assignable> &te, int offset, sequence<PARENT_STRIDES...>)
+template<template<typename, int, int, typename, bool, typename> class TE, typename T, int D, int R,
+        typename dataType, bool assignable, typename enabled, int ...PARENT_STRIDES>
+auto make_slice(TE<T, D, R, dataType, assignable, enabled> &te, int offset, sequence<PARENT_STRIDES...>)
 {
     return TensorSlice<T, D, sizeof...(PARENT_STRIDES), dataType,
             assignable, PARENT_STRIDES...>(te, offset, sequence<PARENT_STRIDES...>());
@@ -254,23 +268,28 @@ auto make_slice(TE<T, D, R, dataType, assignable> &te, int offset, sequence<PARE
 }
 
 
-template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R,
-        typename dataType, bool assignable, int ...PARENT_STRIDES>
-auto make_const_slice(const TE<T, D, R, dataType, assignable> &te, int offset, sequence<PARENT_STRIDES...>)
+template<template<typename, int, int, typename, bool, typename> class TE, typename T, int D, int R,
+        typename dataType, bool assignable, typename enabled, int ...PARENT_STRIDES>
+auto make_const_slice(const TE<T, D, R, dataType, assignable, enabled> &te, int offset, sequence<PARENT_STRIDES...>)
 {
     return ConstTensorSlice<T, D, sizeof...(PARENT_STRIDES), dataType,
             false, PARENT_STRIDES...>(te, offset, sequence<PARENT_STRIDES...>());
 
 }
 
-template<template<typename, int, int, typename, bool> class TE, typename T, int D, int R, typename dt, bool b, int ...IDX_PERM>
-auto permute(const TE<T, D, R, dt, b> &te, sequence<IDX_PERM...>)
+template<template<typename, int, int, typename, bool, typename> class TE, typename T, int D,
+        int R, typename dt, typename enabled, int ...IDX_PERM>
+auto permute(TE<T, D, R, dt, true, enabled> &te, sequence<IDX_PERM...>)
+{
+    return TensorPermutation<T, D, R, dt, true, IDX_PERM...>(te, sequence<IDX_PERM...>());
+}
+
+template<template<typename, int, int, typename, bool, typename> class TE, typename T, int D,
+        int R, typename dt, bool b, typename enabled, int ...IDX_PERM>
+auto const_permute(const TE<T, D, R, dt, b, enabled> &te, sequence<IDX_PERM...>)
 {
     return TensorPermutation<T, D, R, dt, b, IDX_PERM...>(te, sequence<IDX_PERM...>());
 }
-
-//template<typename TE, int D, int R, typename dt, bool b, int ...IDX_PERM>
-//auto permute(const TensorExpression<TE,D,R,dt,b>& te, sequence<IDX_PERM...>) {
 
 
 YAFEL_NAMESPACE_CLOSE

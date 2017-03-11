@@ -47,6 +47,8 @@ decltype(dt1()*dt2()) dot(const TensorExpression<T1,D,R,dt1,b1> &lhs,
     for(; lit != lhs.end(); ++lit, ++rit)
     {
         retval += (*lit)*(*rit);
+        ++lit;
+        ++rit;
     }
 
     return retval;

@@ -8,6 +8,7 @@
 #include "yafel_globals.hpp"
 #include "lin_alg/new_tensor/TensorExpression.hpp"
 #include "lin_alg/new_tensor/mp_utils/sequence_functions.hpp"
+#include "lin_alg/new_tensor/mp_utils/map_mp_utils.hpp"
 
 YAFEL_NAMESPACE_OPEN
 
@@ -27,17 +28,19 @@ YAFEL_NAMESPACE_OPEN
  * @tparam dt dataType
  * @tparam b bool flag indicating whether underlying TensorExpression is assignable
  */
-template<typename TE, int D, int R, typename dt, bool b, int ...IDX_PERM>
-class TensorPermutation : public TensorExpression<TensorPermutation<TE,D,R,dt,b,IDX_PERM...>,D,R,dt,false>
+template<typename TE, int D, int R, typename dt, bool assignable, int ...IDX_PERM>
+class TensorPermutation : public TensorExpression<TensorPermutation<TE,D,R,dt,assignable,IDX_PERM...>,D,R,dt,assignable>
 {
 public:
-    using super = TensorExpression<TensorPermutation<TE,D,R,dt,b,IDX_PERM...>,D,R,dt,false>;
+    using super = TensorExpression<TensorPermutation<TE,D,R,dt,assignable,IDX_PERM...>,D,R,dt,assignable>;
     using stride_sequence = typename super::stride_sequence;
     using idx_perm = sequence<IDX_PERM...>;
+    using TE_RefType = typename map_ref<TE, !assignable>::type;
+    using value_RefType = typename map_ref<dt, !assignable>::type;
 
-    const TE& te_ref;
+    TE_RefType te_ref;
 
-    TensorPermutation(const TensorExpression<TE,D,R,dt,b> &T, idx_perm)
+    TensorPermutation(TensorExpression<TE,D,R,dt,assignable> &T, idx_perm)
             : te_ref(T.self())
     {
         validate_idx_perm();
@@ -56,7 +59,7 @@ public:
         return 0;
     }
 
-    inline dt linearIndexing(int idx) const noexcept
+    inline value_RefType linearIndexing(int idx) const noexcept
     {
         return te_ref.linearIndexing(local_to_parent(idx,stride_sequence(), stride_sequence(), typename counting_sequence<R>::type()));
     }
