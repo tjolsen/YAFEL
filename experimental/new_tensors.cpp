@@ -25,6 +25,6 @@ int main()
 
     // Compute ||A0 - QAQ^T|| --> Check accuracy of spectral decomposition
     double err = norm((A0 - ((Q*A).eval()*Q.perm<1,0>().eval()).eval()));
-
+    std::cout << err << std::endl;
     return err < 1.0e-15;
 }

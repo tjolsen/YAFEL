@@ -51,7 +51,7 @@ void spectral_decomposition(Tensor<D, 2, dt> &A, Tensor<D, 2, dt> &Q)
     using std::abs;
 
     // Convergence tolerance
-    constexpr double TOL{1.0e-14};
+    constexpr double TOL{1.0e-15};
 
     //Initialize eigenvectors to identity
     Q = TensorEye<D,dt>();
@@ -108,7 +108,7 @@ Tensor<dim, 2, dt> jacobi_rotation(const Tensor<dim, 2, dt> &D, int row, int col
     // for which sqrt() and abs() have been overloaded
     using std::sqrt;
     using std::abs;
-    constexpr dt TOL = 1.0e-14; //Relative tolerance for something being "done"
+    constexpr dt TOL = 1.0e-15; //Relative tolerance for something being "done"
 
     auto Q = TensorEye<dim, dt>();
 

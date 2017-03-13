@@ -10,7 +10,7 @@
  *
  * Note, this header does not include the metaprogramming headers.
  * These are included as needed in individual files in order to
- * keep people from inadvertantly poking around and changing something.
+ * keep people from inadvertently poking around and changing something.
  */
 
 #include "yafel_globals.hpp"
