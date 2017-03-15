@@ -19,7 +19,8 @@ YAFEL_NAMESPACE_OPEN
  * Simplex --> {line/tri/tet}
  * None --> {} (used for template defaulting purposes)
  */
-enum class ElementClass {
+enum class ElementClass : int
+{
     TensorProduct,
     Simplex,
     None
@@ -30,19 +31,26 @@ enum class ElementClass {
  * \class ElementType
  *
  * Utility class to unambiguously define an element type.
- * Requires both the ElementClass (denoting topology)
+ * Requires both the ElementClass (denoting topology),
+ * a topological dimension "topoDim",
  * and a polynomial interpolation order "poly_order".
  *
  * An implementation of operator< is provided in order to
  * allow for use as a key in a std::map, if necessary.
  */
-struct ElementType {
-    ElementClass element_class;
-    int poly_order;
+struct ElementType
+{
+    inline ElementType(ElementClass ec, int td, int po) : elementClass(ec), topoDim(td), polyOrder(po)
+    {}
 
-    inline bool operator<(const ElementType &rhs) {
-        return std::make_tuple(element_class,poly_order)
-               < std::make_tuple(rhs.element_class, rhs.poly_order);
+    ElementClass elementClass;
+    int topoDim;
+    int polyOrder;
+
+    inline bool operator<(const ElementType &rhs)
+    {
+        return std::make_tuple(elementClass, topoDim, polyOrder)
+               < std::make_tuple(rhs.elementClass, rhs.topoDim, rhs.polyOrder);
     }
 };
 

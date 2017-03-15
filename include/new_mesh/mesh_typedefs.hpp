@@ -10,10 +10,42 @@
 
 YAFEL_NAMESPACE_OPEN
 
-//Unified coordinate<T> type across library.
-// No longer templated on the "NSD" parameter.
-template<typename T=double>
-using coordinate = Tensor<3, 1, T>;
+/**
+ * \class CellType
+ * \brief Enum denoting geometric type of a cell in a mesh
+ *
+ * This enum class defines the types of cells that can be
+ * represented in a mesh. Often, these will be linear tris, tets,
+ * quads, hexes, and lines. If necessary, higher-order
+ * versions will be added, if mesh generation of curved boundaries
+ * is desired.
+ *
+ * In addition there will be (already is?) a set of functions
+ * to convert from Gmsh element types (or other mesh generators)
+ * to CellTypes, and from CellTypes to VTK Element Types.
+ * This will be necessary when importing/exporting meshes
+ * from external utilities.
+ *
+ * The naming convention is: <CellTopology><NumberOfNodes>.
+ * More concretely, names will be of the form:
+ *
+ * - Line2
+ * - Line3
+ * - Tri3
+ * - Tri6
+ * - Quad4
+ * - Quad9
+ * - Hex8
+ * - Hex20
+ * - ...
+ */
+enum class CellType : int {
+    Line2,
+    Tri3,
+    Quad4,
+    Hex8,
+    Point1  // Useful for MPM
+};
 
 YAFEL_NAMESPACE_CLOSE
 

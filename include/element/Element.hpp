@@ -6,6 +6,9 @@
 #define YAFEL_ELEMENT_HPP
 
 #include "yafel_globals.hpp"
+#include "yafel_typedefs.hpp"
+#include "ElementType.hpp"
+#include "new_mesh/Mesh.hpp"
 #include "lin_alg/Matrix.hpp"
 #include "lin_alg/Vector.hpp"
 #include <vector>
@@ -18,19 +21,24 @@ YAFEL_NAMESPACE_OPEN
 class Element {
 
 public:
-    int poly_order; ///< spatial interpolation order
-    int spatialDims; ///< number of spatial dimensions of element/simulation
-    int topoDims; ///< topological dimension of element (line=1, quad=2, hex=3)
+    Element(ElementType={ElementClass::None, 0, 0});
 
-    //Vector of coordinates of local points
-    std::vector<coordinate<>> localPoints_xi;
+    ElementType elementType;
+
+    // Mesh of the local "Master" element
+    Mesh localMesh;
 
     //Quadrature rule (ie, points and weights)
-    std::vector<double> quadrature_weights;
-    std::vector<coordinate<>> quadrature_points;
+    //std::vector<double> quadrature_weights;
+    //std::vector<coordinate<>> quadrature_points;
 
-    std::vector<Vector<double>> shape_values;
-    std::vector<Matrix<double>> shape_gradients_xi;
+    //std::vector<Vector<double>> shape_values;
+    //std::vector<Matrix<double>> shape_gradients_xi;
+
+
+private:
+    void make_simplex();
+    void make_tensorProduct();
 };
 
 

@@ -88,9 +88,10 @@ set(SOURCE_FILES
         include/utils/ThreadPool.hpp
         include/yafel.hpp
         include/yafel_globals.hpp
-        src/element/LagrangeLine.cpp
-        src/element/LinLine.cpp
+        src/element/Element.cpp
         src/mesh/Face.cpp
+        src/new_mesh/LobattoPoints1D.cpp
+        src/new_mesh/Mesh.cpp
         src/output/VTKObject.cpp
         src/output/VTKOutput.cpp
         src/output/VTKScalarData.cpp
@@ -100,39 +101,43 @@ set(SOURCE_FILES
         src/utils/ElementVtkType.cpp
         src/utils/GaussLegendreQuadrature.cpp
         src/utils/GaussLobattoQuadrature.cpp
-        test/matmul_performance.cpp
-        test/test_bcsr_spmv.cpp
-        test/test_bicgstab_solve.cpp
-        test/test_cg_solve.cpp
-        test/test_csr_spmv.cpp
-        test/test_dg_dofmanager.cpp
-        test/test_DG_Quad.cpp
-        test/test_DualNumber.cpp
-        test/test_GaussLegQuadrature.cpp
-        test/test_GaussLobQuadrature.cpp
-        test/test_GmshMesh.cpp
-        test/test_ILU.cpp
-        test/test_LagrangeLine.cpp
-        test/test_LinQuadElement.cpp
-        test/test_LinTetElement.cpp
-        test/test_LinTriElement.cpp
-        test/test_LU.cpp
-        test/test_matmul.cpp
-        test/test_matrixTest.cpp
-        test/test_MatrixVisualization.cpp
-        test/test_mesh_faces.cpp
-        test/test_mesh_generate.cpp
-        test/test_mesh_minlength.cpp
-        test/test_mesh_reorder_rcm.cpp
-        test/test_MeshTopology.cpp
-        test/test_RectilinearMesh.cpp
-        test/test_sparse_bcsr.cpp
-        test/test_sparse_coo.cpp
-        test/test_sparse_csr.cpp
-        test/test_tensor.cpp
-        test/test_topoStructures.cpp
-        test/test_vectorTest.cpp
-        test/test_vtktimeoutput.cpp)
+        #test/matmul_performance.cpp
+        #test/test_bcsr_spmv.cpp
+        #test/test_bicgstab_solve.cpp
+        #test/test_cg_solve.cpp
+        #test/test_csr_spmv.cpp
+        #test/test_dg_dofmanager.cpp
+        #test/test_DG_Quad.cpp
+        #test/test_DualNumber.cpp
+        #test/test_GaussLegQuadrature.cpp
+        #test/test_GaussLobQuadrature.cpp
+        #test/test_GmshMesh.cpp
+        #test/test_ILU.cpp
+        #test/test_LagrangeLine.cpp
+        #test/test_LinQuadElement.cpp
+        #test/test_LinTetElement.cpp
+        #test/test_LinTriElement.cpp
+        #test/test_LU.cpp
+        #test/test_matmul.cpp
+        #test/test_matrixTest.cpp
+        #test/test_MatrixVisualization.cpp
+        #test/test_mesh_faces.cpp
+        #test/test_mesh_generate.cpp
+        #test/test_mesh_minlength.cpp
+        #test/test_mesh_reorder_rcm.cpp
+        #test/test_MeshTopology.cpp
+        #test/test_RectilinearMesh.cpp
+        #test/test_sparse_bcsr.cpp
+        #test/test_sparse_coo.cpp
+        #test/test_sparse_csr.cpp
+        #test/test_tensor.cpp
+        #test/test_topoStructures.cpp
+        #test/test_vectorTest.cpp
+        #test/test_vtktimeoutput.cpp
+        )
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 add_library(yafel ${SOURCE_FILES})
+
+add_executable(sandbox experimental/sandbox.cpp)
+target_link_libraries(sandbox yafel)

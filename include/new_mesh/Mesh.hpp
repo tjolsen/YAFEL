@@ -6,6 +6,7 @@
 #define YAFEL_MESH_HPP
 
 #include "yafel_globals.hpp"
+#include "yafel_typedefs.hpp"
 #include "mesh_typedefs.hpp"
 #include <vector>
 
@@ -37,32 +38,48 @@ public:
     /**
      * \brief Construct a mesh with a specified storage scheme
      * @param definitionScheme
+     * @param geometryNodes node coordinates
+     * @param cellNodes nodes comprising cells
+     * @param cellOffsets offset of each cell in cellNodes vector
+     * @param cellTypes Types of each cell
      */
-    Mesh(DefinitionScheme definitionScheme = DefinitionScheme::Explicit);
+    Mesh(DefinitionScheme definitionScheme,
+               std::vector<coordinate<>> geometryNodes = {},
+               std::vector<int> cellNodes = {},
+               std::vector<int> cellOffsets = {},
+               std::vector<CellType> cellTypes = {});
 
 
     /**
-     * \brief Build internal mesh faces
+     * \brief Build internal mesh faces. Implementation and storage TBD.
      */
     void buildInternalFaces();
 
+    /**
+     * Get node indices of a cell
+     * @param cellnum Cell index
+     * @param container vector to fill with node indices
+     *
+     * "container" is modified to hold cell nodes. No reallocation
+     * is done unless the container needs to grow. Will be resized
+     * to allow easy iteration over nodes for caller.
+     */
+    void getCellNodes(int cellnum, std::vector<int> &container) const noexcept;
 
-    inline void getElementNodes(int elem, std::vector<int> &container) const noexcept
-    {
-        if (definitionScheme_ == DefinitionScheme::Explicit) {
-            int n_elem_nodes = elementOffsets_[elem + 1] - elementOffsets_[elem];
-            container.clear();
-            container.reserve(n_elem_nodes);
 
-            for (int i = elementOffsets_[elem]; i < elementOffsets_[elem + 1]; ++i) {
-                conatiner.push_back(elementNodes[i]);
-            }
-            return;
-        } else {
-            getElementNodesImplicit(elem, container);
-            return;
-        }
-    }
+    /**
+     * Setters for internal structures
+     */
+    inline void setGeometryNodes(std::vector<coordinate<>> &&gn) { geometryNodes_ = gn; }
+    inline void setCellNodes(std::vector<int> && cn) { cellNodes_ = cn; }
+    inline void setOffsets(std::vector<int> && off) { cellOffsets_ = off; }
+    inline void setCellTypes(std::vector<CellType> &&ct) { cellTypes_ = ct; }
+
+
+    /**
+     * Getters for internal structures
+     */
+     const std::vector<coordinate<>> &getGeometryNodes() const { return geometryNodes_; }
 
 protected:
     DefinitionScheme definitionScheme_;
@@ -71,14 +88,14 @@ protected:
     // Stored in a "compressed" format, with element
     // "elem" comprising nodes from [elementOffsets_[elem], elementOffsets_[elem+1])
     // (note half-open interval).
-    // elementOffsets_ has length "num_elems+1", with the last element
-    // elementOffsets_[num_elems] = num_nodes. (Same as sparse matrix compressed storage)
+    // cellOffsets_ has length "num_elems+1", with the last element
+    // cellOffsets_[num_elems] = num_nodes. (Same as sparse matrix compressed storage)
     std::vector<coordinate<>> geometryNodes_;
-    std::vector<int> elementNodes;
-    std::vector<int> elementOffsets_;
+    std::vector<int> cellNodes_;
+    std::vector<int> cellOffsets_;
+    std::vector<CellType> cellTypes_;
 
-
-    virtual inline void getElementNodesImplicit(int element, std::vector<int> &container) {}
+    virtual inline void getCellNodesImplicit(int cell, std::vector<int> &container) const noexcept {}
 };
 
 
