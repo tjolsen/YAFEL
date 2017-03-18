@@ -20,7 +20,7 @@ Mesh::Mesh(DefinitionScheme definitionScheme,
 {}
 
 
-void Mesh::getCellNodes(int elem, std::vector<int> &container) const noexcept
+void Mesh::getCellNodes(int elem, std::vector<int> &container) const
 {
     if (definitionScheme_ == DefinitionScheme::Explicit) {
         int n_cell_nodes = cellOffsets_[elem + 1] - cellOffsets_[elem];

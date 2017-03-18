@@ -134,6 +134,7 @@ void Element::make_tensorProduct()
                 }
             }
         }
+        offsets[idx] = offset;
 
     } else {
         // unsupported topoDim
@@ -152,6 +153,45 @@ void Element::make_tensorProduct()
 
 
 void Element::make_simplex()
-{}
+{
+    auto lob_pts_1d = make_LobattoPoints_1D(elementType.polyOrder);
+    auto npts = static_cast<int>(lob_pts_1d.size());
+
+    std::vector<coordinate<>> localPoints_xi;
+    std::vector<int> cellNodes;
+    std::vector<int> offsets;
+    std::vector<CellType> cellTypes;
+
+
+    if (elementType.topoDim == 1) {
+        //1D simplex is a line, which is also a 1D tensor-product element
+        make_tensorProduct();
+        return;
+    } else if (elementType.topoDim == 2) {
+        // based on scheme be Blyth & Pozrikdis (JAM 2005)
+        localPoints_xi.resize((npts*(npts+1))/2);
+
+        int idx = 0;
+        for(int i=0; i<npts; ++i) {
+            for(int j=0; j < npts-i; ++j) {
+                int k = npts - i - j - 1;
+                double vi = (lob_pts_1d[i] + 1)/2;
+                double vj = (lob_pts_1d[j] + 1)/2;
+                double vk = (lob_pts_1d[k] + 1)/2;
+                localPoints_xi[idx](0) = (1 + 2*vj - vi - vk)/3;
+                localPoints_xi[idx](1) = (1 + 2*vi - vj - vk)/3;
+            }
+        }
+
+
+
+    } else if (elementType.topoDim == 3) {
+
+    } else {
+        //unsupported topoDim
+    }
+
+
+}
 
 YAFEL_NAMESPACE_CLOSE

@@ -44,10 +44,10 @@ public:
      * @param cellTypes Types of each cell
      */
     Mesh(DefinitionScheme definitionScheme,
-               std::vector<coordinate<>> geometryNodes = {},
-               std::vector<int> cellNodes = {},
-               std::vector<int> cellOffsets = {},
-               std::vector<CellType> cellTypes = {});
+         std::vector<coordinate<>> geometryNodes = {},
+         std::vector<int> cellNodes = {},
+         std::vector<int> cellOffsets = {},
+         std::vector<CellType> cellTypes = {});
 
 
     /**
@@ -64,22 +64,37 @@ public:
      * is done unless the container needs to grow. Will be resized
      * to allow easy iteration over nodes for caller.
      */
-    void getCellNodes(int cellnum, std::vector<int> &container) const noexcept;
+    void getCellNodes(int cellnum, std::vector<int> &container) const;
 
 
     /**
      * Setters for internal structures
      */
-    inline void setGeometryNodes(std::vector<coordinate<>> &&gn) { geometryNodes_ = gn; }
-    inline void setCellNodes(std::vector<int> && cn) { cellNodes_ = cn; }
-    inline void setOffsets(std::vector<int> && off) { cellOffsets_ = off; }
-    inline void setCellTypes(std::vector<CellType> &&ct) { cellTypes_ = ct; }
+    inline void setGeometryNodes(std::vector<coordinate<>> &&gn)
+    { geometryNodes_ = gn; }
+
+    inline void setCellNodes(std::vector<int> &&cn)
+    { cellNodes_ = cn; }
+
+    inline void setOffsets(std::vector<int> &&off)
+    { cellOffsets_ = off; }
+
+    inline void setCellTypes(std::vector<CellType> &&ct)
+    { cellTypes_ = ct; }
 
 
     /**
      * Getters for internal structures
      */
-     const std::vector<coordinate<>> &getGeometryNodes() const { return geometryNodes_; }
+    const std::vector<coordinate<>> &getGeometryNodes() const
+    { return geometryNodes_; }
+
+
+    //Get number of cells
+    inline virtual int nCells() const noexcept
+    {
+        return cellTypes_.size();
+    }
 
 protected:
     DefinitionScheme definitionScheme_;
@@ -95,7 +110,8 @@ protected:
     std::vector<int> cellOffsets_;
     std::vector<CellType> cellTypes_;
 
-    virtual inline void getCellNodesImplicit(int cell, std::vector<int> &container) const noexcept {}
+    virtual inline void getCellNodesImplicit(int cell, std::vector<int> &container) const noexcept
+    {}
 };
 
 
