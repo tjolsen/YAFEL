@@ -1,6 +1,15 @@
 #ifndef _YAFEL_GAUSSLOBATTOQUADRATURE_HPP
 #define _YAFEL_GAUSSLOBATTOQUADRATURE_HPP
 
+#include "yafel_globals.hpp"
+#include "utils/QuadratureRule.hpp"
+#include "lin_alg/tensor/Tensor.hpp"
+#include <vector>
+#include <cmath>
+
+YAFEL_NAMESPACE_OPEN
+
+
 /**
  * \class GaussLobattoQuadrature:
  *
@@ -10,15 +19,6 @@
  * The "Npoints" parameter refers to the number of points in a 1D rule.
  * The total number of quadrature points is Npoints^NSD.
  */
-
-#include "yafel_globals.hpp"
-#include "utils/QuadratureRule.hpp"
-#include "lin_alg/tensor/Tensor.hpp"
-#include <vector>
-#include <cmath>
-
-YAFEL_NAMESPACE_OPEN
-
 template<unsigned NSD>
 class GaussLobattoQuadrature : public QuadratureRule<NSD>
 {

@@ -11,7 +11,7 @@ using namespace yafel;
 int main() {
 
     // make a quad
-    Element e(ElementType(ElementClass::TensorProduct,3,3));
+    Element e(ElementType(ElementClass::Simplex,2,9));
 
 
     for(auto x : e.localMesh.getGeometryNodes())

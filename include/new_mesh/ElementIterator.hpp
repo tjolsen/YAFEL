@@ -40,7 +40,9 @@ public:
      * 1) Iterators point to same mesh
      * 2) Iterators point to same element
      */
-     bool valid_pair()
+     bool valid_pair();
+
+
 protected:
     const Mesh &mesh_;
 

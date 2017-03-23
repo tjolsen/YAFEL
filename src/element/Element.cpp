@@ -170,6 +170,10 @@ void Element::make_simplex()
     } else if (elementType.topoDim == 2) {
         // based on scheme be Blyth & Pozrikdis (JAM 2005)
         localPoints_xi.resize((npts*(npts+1))/2);
+        int nt_local = elementType.polyOrder*elementType.polyOrder;
+        cellNodes.resize(3*nt_local);
+        offsets.reserve(nt_local+1);
+        cellTypes.resize(nt_local, CellType::Tri3);
 
         int idx = 0;
         for(int i=0; i<npts; ++i) {
@@ -180,9 +184,33 @@ void Element::make_simplex()
                 double vk = (lob_pts_1d[k] + 1)/2;
                 localPoints_xi[idx](0) = (1 + 2*vj - vi - vk)/3;
                 localPoints_xi[idx](1) = (1 + 2*vi - vj - vk)/3;
+                ++idx;
             }
         }
 
+        //make local triangles
+        idx=0;
+        int offset = 0;
+        for(int layer=0; layer < elementType.polyOrder; ++layer) {
+            for(int i=0; i<elementType.polyOrder-layer; ++i) {
+
+                cellNodes[offset + 0] = idx+i;
+                cellNodes[offset + 1] = idx+i+1;
+                cellNodes[offset + 2] = idx+i+1+elementType.polyOrder-layer;
+                offsets.push_back(offset);
+                offset += 3;
+                if(i < elementType.polyOrder-layer-1) {
+                    cellNodes[offset + 0] = idx+i+1;
+                    cellNodes[offset + 1] = idx+i+2+elementType.polyOrder-layer;
+                    cellNodes[offset + 2] = idx+i+1+elementType.polyOrder-layer;
+                    offsets.push_back(offset);
+                    offset += 3;
+                }
+
+            }
+            idx += elementType.polyOrder+1-layer;
+        }
+        offsets.push_back(offset);
 
 
     } else if (elementType.topoDim == 3) {
@@ -191,7 +219,10 @@ void Element::make_simplex()
         //unsupported topoDim
     }
 
-
+    localMesh.setGeometryNodes(std::move(localPoints_xi));
+    localMesh.setCellNodes(std::move(cellNodes));
+    localMesh.setOffsets(std::move(offsets));
+    localMesh.setCellTypes(std::move(cellTypes));
 }
 
 YAFEL_NAMESPACE_CLOSE
