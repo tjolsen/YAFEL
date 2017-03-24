@@ -50,12 +50,14 @@ T poly_eval(const std::vector<double> &coeffs, T x)
 /**
  * \brief Create coefficients of n-th degree Jacobi polynomial
  *
+ * Recurrance relation given in http://lsec.cc.ac.cn/~hyu/teaching/shonm2013/STWchap3.2p.pdf
+ *
  * @param n Jacobi polynomial degree
  * @param alpha Jacobi alhpa
  * @param beta Jacobi beta
  * @return polynomial coefficients suitable for use in poly_eval
  */
-std::vector<double> jacobi(int n, int alpha, int beta);
+std::vector<double> jacobi(int n, double alpha, double beta);
 
 
 YAFEL_NAMESPACE_CLOSE

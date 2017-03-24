@@ -4,18 +4,22 @@ project(YAFEL)
 set(CMAKE_CXX_STANDARD 14)
 
 set(SOURCE_FILES
-        include/old_element/DG_Quad.hpp
-        include/old_element/Element.hpp
-        include/old_element/ElementFactory.hpp
-        include/old_element/ElementImpl.hpp
-        include/old_element/ElementTraits.hpp
-        include/old_element/LagrangeLine.hpp
-        include/old_element/LinHex.hpp
-        include/old_element/LinLine.hpp
-        include/old_element/LinQuad.hpp
-        include/old_element/LinTet.hpp
-        include/old_element/LinTri.hpp
-        include/old_element/NullElement.hpp
+        include/element/Element.hpp
+        include/element/ElementType.hpp
+        include/element/ShapeFunctionUtils.hpp
+
+        #include/old_element/DG_Quad.hpp
+        #include/old_element/Element.hpp
+        #include/old_element/ElementFactory.hpp
+        #include/old_element/ElementImpl.hpp
+        #include/old_element/ElementTraits.hpp
+        #include/old_element/LagrangeLine.hpp
+        #include/old_element/LinHex.hpp
+        #include/old_element/LinLine.hpp
+        #include/old_element/LinQuad.hpp
+        #include/old_element/LinTet.hpp
+        #include/old_element/LinTri.hpp
+        #include/old_element/NullElement.hpp
         include/lin_alg/solver/direct/LUDecomposition.hpp
         include/lin_alg/solver/iterative/bicgstab_solve.hpp
         include/lin_alg/solver/iterative/cg_solve.hpp
@@ -54,15 +58,21 @@ set(SOURCE_FILES
         include/lin_alg/sparsity_pattern.hpp
         include/lin_alg/Vector.hpp
         include/lin_alg/VectorExpression.hpp
-        include/mesh/Face.hpp
-        include/mesh/GenericMesh.hpp
-        include/mesh/GmshMesh.hpp
-        include/mesh/MeshIterator.hpp
-        include/mesh/MeshTopology.hpp
-        include/mesh/RectilinearMesh.hpp
-        include/mesh/TopoFace.hpp
-        include/mesh/TopoLine.hpp
-        include/mesh/TopoPoint.hpp
+        #include/mesh/Face.hpp
+        #include/mesh/GenericMesh.hpp
+        #include/mesh/GmshMesh.hpp
+        #include/mesh/MeshIterator.hpp
+        #include/mesh/MeshTopology.hpp
+        #include/mesh/RectilinearMesh.hpp
+        #include/mesh/TopoFace.hpp
+        #include/mesh/TopoLine.hpp
+        #include/mesh/TopoPoint.hpp
+
+        include/new_mesh/ElementIterator.hpp
+        include/new_mesh/LobattoPoints1D.hpp
+        include/new_mesh/Mesh.hpp
+        include/new_mesh/mesh_typedefs.hpp
+
         include/output/MatrixVisualization.hpp
         include/output/VTKDGMesh.hpp
         include/output/VTKMesh.hpp
@@ -83,12 +93,19 @@ set(SOURCE_FILES
         include/utils/GaussLegendreQuadrature.hpp
         include/utils/GaussLobattoQuadrature.hpp
         include/utils/QuadratureRule.hpp
+        include/utils/Range.hpp
+        include/utils/ScalarTraits.hpp
         include/utils/SpatialFunction.hpp
         include/utils/TaskScheduler.hpp
         include/utils/ThreadPool.hpp
         include/yafel.hpp
         include/yafel_globals.hpp
+        include/yafel_typedefs.hpp
+
+
+
         src/element/Element.cpp
+        src/element/ShapeFunctionUtils.cpp
         src/mesh/Face.cpp
         src/new_mesh/LobattoPoints1D.cpp
         src/new_mesh/Mesh.cpp

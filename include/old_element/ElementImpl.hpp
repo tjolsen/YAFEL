@@ -9,8 +9,8 @@
 #include "lin_alg/tensor/Tensor.hpp"
 #include "lin_alg/tensor/tensor_specializations.hpp"
 
-#include "element/Element.hpp"
-#include "element/ElementTraits.hpp"
+#include "old_element/Element.hpp"
+#include "old_element/ElementTraits.hpp"
 
 #include "mesh/GenericMesh.hpp"
 #include "utils/DoFManager.hpp"
