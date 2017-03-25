@@ -54,11 +54,8 @@ std::vector<double> jacobi(int n, double alpha, double beta)
             *rit -= c*(*rit_2);
         }
 
-
-        coeffs_2 = coeffs_1;
-        coeffs_1 = coeffs;
-        //coeffs_2.swap(coeffs_1);
-        //coeffs_1.assign(coeffs.begin(), coeffs.end());
+        coeffs_2.swap(coeffs_1);
+        coeffs_1.assign(coeffs.begin(), coeffs.end());
     }
 
     return coeffs;

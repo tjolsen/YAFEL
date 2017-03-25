@@ -3,6 +3,7 @@
 //
 
 #include "element/ShapeFunctionUtils.hpp"
+#include "utils/Range.hpp"
 #include <iostream>
 
 using namespace yafel;
@@ -10,10 +11,14 @@ using namespace yafel;
 
 int main() {
 
-    auto coeffs = jacobi(5,1,0);
+    auto coeffs = jacobi(8,0,0);
 
     for(auto c : coeffs)
         std::cout << c << std::endl;
+
+    //for(auto x : Range<double>(-1.0,1.01,.01))
+    //std::cout << x << "  " << poly_eval(coeffs, x) << std::endl;
+
 
     return 0;
 }

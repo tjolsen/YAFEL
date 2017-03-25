@@ -39,7 +39,7 @@ YAFEL_NAMESPACE_OPEN
 template<typename T>
 T poly_eval(const std::vector<double> &coeffs, T x)
 {
-    T retval;
+    T retval{0};
     for(int i=0; i<coeffs.size(); ++i) {
         retval *= x;
         retval += coeffs[i];

@@ -10,7 +10,8 @@ template<typename T>
 class Range
 {
 public:
-    Range(T first, T last, T inc = 1) : first(first), last(last), inc(inc)
+    template<typename U, typename = typename std::enable_if<std::is_convertible<U,T>::value>::type>
+    Range(U first, U last, U inc = 1) : first(first), last(last), inc(inc)
     {}
 
 
@@ -30,7 +31,7 @@ private:
 };
 
 
-template<typename T, typename=typename std::enable_if<std::is_integral<T>::value>::type>
+template<typename T>//, typename=typename std::enable_if<std::is_integral<T>::value>::type>
 class RangeIterator
 {
 public:
