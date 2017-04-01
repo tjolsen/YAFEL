@@ -2,7 +2,7 @@
 #define _YAFEL_GAUSSLOBATTOQUADRATURE_HPP
 
 #include "yafel_globals.hpp"
-#include "utils/QuadratureRule.hpp"
+#include "quadrature/QuadratureRule.hpp"
 #include "lin_alg/tensor/Tensor.hpp"
 #include <vector>
 #include <cmath>

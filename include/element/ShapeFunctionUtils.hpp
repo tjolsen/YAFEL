@@ -17,6 +17,9 @@
 
 
 #include "yafel_globals.hpp"
+#include "yafel_typedefs.hpp"
+#include "utils/Range.hpp"
+#include <eigen3/Eigen/Core>
 #include <vector>
 
 YAFEL_NAMESPACE_OPEN
@@ -59,6 +62,30 @@ T poly_eval(const std::vector<double> &coeffs, T x)
  */
 std::vector<double> jacobi(int n, double alpha, double beta);
 
+
+
+void tensor_product_shape_functions(const std::vector<coordinate<>> &localPoints,
+                                    const std::vector<coordinate<>> &quadPoints,
+                                    int topoDim,
+                                    std::vector<std::vector<double>> &shapeValue,
+                                    std::vector<std::vector<Tensor<3, 1, double>>> &shapeGrad);
+
+
+template<typename FUNC>
+Eigen::MatrixXd make_vandermonde(const std::vector<coordinate<>> &localPoints, FUNC & func)
+{
+
+    int N = localPoints.size();
+    Eigen::MatrixXd V(N,N);
+
+    for(auto i : IRange(0,N)) {
+        for(auto j : IRange(0,N)) {
+            V(i,j) = func(j,localPoints[i]);
+        }
+    }
+
+    return V;
+}
 
 YAFEL_NAMESPACE_CLOSE
 

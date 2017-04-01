@@ -9,6 +9,7 @@
 #include "yafel_typedefs.hpp"
 #include "ElementType.hpp"
 #include "new_mesh/Mesh.hpp"
+#include "quadrature/QuadratureRule.hpp"
 #include "lin_alg/Matrix.hpp"
 #include "lin_alg/Vector.hpp"
 #include <vector>
@@ -29,12 +30,11 @@ public:
     Mesh localMesh;
 
     //Quadrature rule (ie, points and weights)
-    //std::vector<double> quadrature_weights;
-    //std::vector<coordinate<>> quadrature_points;
+    QuadratureRule quadratureRule;
 
-    //std::vector<Vector<double>> shape_values;
-    //std::vector<Matrix<double>> shape_gradients_xi;
 
+    std::vector<std::vector<double>> shapeValues;
+    std::vector<std::vector<Tensor<3,1,double>>> shapeGradXi;
 
 private:
     void make_simplex();

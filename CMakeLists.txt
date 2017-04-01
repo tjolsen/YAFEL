@@ -3,6 +3,10 @@ project(YAFEL)
 
 set(CMAKE_CXX_STANDARD 14)
 
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ffast-math -march=native -flto")
+set(CMAKE_AR "gcc-ar")
+set(CMAKE_RANLIB "gcc-ranlib")
+
 set(SOURCE_FILES
         include/element/Element.hpp
         include/element/ElementType.hpp
@@ -69,7 +73,7 @@ set(SOURCE_FILES
         #include/mesh/TopoPoint.hpp
 
         include/new_mesh/ElementIterator.hpp
-        include/new_mesh/LobattoPoints1D.hpp
+        include/quadrature/LobattoPoints1D.hpp
         include/new_mesh/Mesh.hpp
         include/new_mesh/mesh_typedefs.hpp
 
@@ -92,7 +96,7 @@ set(SOURCE_FILES
         include/utils/ElementVtkType.hpp
         include/utils/GaussLegendreQuadrature.hpp
         include/utils/GaussLobattoQuadrature.hpp
-        include/utils/QuadratureRule.hpp
+        include/quadrature/QuadratureRule.hpp
         include/utils/Range.hpp
         include/utils/ScalarTraits.hpp
         include/utils/SpatialFunction.hpp
@@ -106,18 +110,19 @@ set(SOURCE_FILES
 
         src/element/Element.cpp
         src/element/ShapeFunctionUtils.cpp
-        src/mesh/Face.cpp
-        src/new_mesh/LobattoPoints1D.cpp
+        #src/mesh/Face.cpp
+        src/quadrature/LobattoPoints1D.cpp
         src/new_mesh/Mesh.cpp
         src/output/VTKObject.cpp
         src/output/VTKOutput.cpp
         src/output/VTKScalarData.cpp
         src/output/VTKTimeOutput.cpp
+        src/quadrature/QuadratureRule.cpp
         src/utils/DirBC.cpp
         src/utils/ElementType.cpp
         src/utils/ElementVtkType.cpp
-        src/utils/GaussLegendreQuadrature.cpp
-        src/utils/GaussLobattoQuadrature.cpp
+        #src/utils/GaussLegendreQuadrature.cpp
+        #src/utils/GaussLobattoQuadrature.cpp
         #test/matmul_performance.cpp
         #test/test_bcsr_spmv.cpp
         #test/test_bicgstab_solve.cpp

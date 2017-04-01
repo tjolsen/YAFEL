@@ -23,7 +23,7 @@
 #include "utils/ElementType.hpp"
 #include "utils/DG_DoFManager.hpp"
 #include "utils/DualNumber.hpp"
-#include "utils/QuadratureRule.hpp"
+#include "quadrature/QuadratureRule.hpp"
 #include "utils/GaussLobattoQuadrature.hpp"
 
 #include <vector>

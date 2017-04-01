@@ -12,7 +12,7 @@
 
 
 #include "yafel_globals.hpp"
-#include "utils/QuadratureRule.hpp"
+#include "quadrature/QuadratureRule.hpp"
 #include <vector>
 #include <cmath>
 
@@ -53,26 +53,26 @@ void GaussLegendreQuadrature<NSD>::compute_1d_points(std::vector<value_type> & _
 
   // Newton-Raphson solve for xi-th root of Legendre polynomial
   for(size_type xi=0; xi<polyOrder; ++xi) {
-    
+
     double x = -std::cos(PI*(1+xi-0.25)/(polyOrder+0.5));
     double Pold, Pn, Pnew, dP;
-    
+
     do {
       //compute legendre polynomial
       Pold = 1; Pn = x;
       for(size_type n=2; n<=polyOrder; ++n) {
-	Pnew = ( (2*n - 1)*x*Pn - (n-1)*Pold )/n;
-	
-	Pold = Pn;
-	Pn = Pnew;
+        Pnew = ( (2*n - 1)*x*Pn - (n-1)*Pold )/n;
+
+        Pold = Pn;
+        Pn = Pnew;
       }
-      
+
       //legendre polynomial derivative
       dP = (polyOrder/(x*x - 1))*(x*Pn - Pold);
-      
+
       x -= Pn/dP;
     } while(std::abs(Pn) > TOL);
-    
+
     _nodes[xi] = x;
     //compute weight
     double w = 2.0/( (1 - x*x)*(dP*dP) );

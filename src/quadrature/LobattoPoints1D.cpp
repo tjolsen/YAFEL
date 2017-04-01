@@ -3,7 +3,7 @@
 //
 
 
-#include "new_mesh/LobattoPoints1D.hpp"
+#include "quadrature/LobattoPoints1D.hpp"
 #include <cmath>
 #include <cassert>
 

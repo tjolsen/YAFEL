@@ -10,19 +10,16 @@ template<typename T>
 class Range
 {
 public:
-    template<typename U, typename = typename std::enable_if<std::is_convertible<U,T>::value>::type>
-    Range(U first, U last, U inc = 1) : first(first), last(last), inc(inc)
+    template<typename U, typename = typename std::enable_if<std::is_convertible<U, T>::value>::type>
+    Range(U first, U last, U inc = 1, bool inclusive = false)
+            : first(first), last(last+inclusive*inc), inc(inc)
     {}
 
+    inline T getFirst() const { return first; }
 
-    inline T getFirst() const
-    { return first; }
+    inline T getLast() const { return last; }
 
-    inline T getLast() const
-    { return last; }
-
-    inline T getInc() const
-    { return inc; }
+    inline T getInc() const { return inc; }
 
 private:
     T first;
@@ -37,8 +34,7 @@ class RangeIterator
 public:
     RangeIterator() = delete;
 
-    RangeIterator(T val, T inc) : val(val), inc(inc)
-    {}
+    RangeIterator(T val, T inc) : val(val), inc(inc) {}
 
     RangeIterator<T> operator++()
     {

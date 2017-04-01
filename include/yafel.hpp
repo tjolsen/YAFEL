@@ -17,7 +17,7 @@
 #include "utils/DG_DoFManager.hpp"
 #include "utils/DualNumber.hpp"
 #include "utils/ElementType.hpp"
-#include "utils/QuadratureRule.hpp"
+#include "quadrature/QuadratureRule.hpp"
 #include "utils/GaussLegendreQuadrature.hpp"
 #include "utils/GaussLobattoQuadrature.hpp"
 #include "utils/SpatialFunction.hpp"

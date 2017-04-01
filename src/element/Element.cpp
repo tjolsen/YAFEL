@@ -2,8 +2,8 @@
 // Created by tyler on 3/14/17.
 //
 
-#include <new_mesh/LobattoPoints1D.hpp>
 #include "element/Element.hpp"
+#include "element/ShapeFunctionUtils.hpp"
 
 YAFEL_NAMESPACE_OPEN
 
@@ -28,7 +28,13 @@ Element::Element(ElementType et)
 void Element::make_tensorProduct()
 {
 
-    auto lob_pts_1d = make_LobattoPoints_1D(elementType.polyOrder);
+    //auto lob_pts_1d = make_LobattoPoints_1D(elementType.polyOrder);
+    auto qr = QuadratureRule(elementType.polyOrder + 1,
+                             QuadratureRule::QuadratureType::GAUSS_LOBATTO);
+    std::vector<double> lob_pts_1d;
+    for (auto x : qr.nodes)
+        lob_pts_1d.push_back(x(0));
+
     auto npts = static_cast<int>(lob_pts_1d.size());
 
     std::vector<coordinate<>> localPoints_xi;
@@ -141,20 +147,30 @@ void Element::make_tensorProduct()
 
     }
 
-
-
     // Set local mesh members from created containers
     localMesh.setGeometryNodes(std::move(localPoints_xi));
     localMesh.setCellNodes(std::move(cellNodes));
     localMesh.setOffsets(std::move(offsets));
     localMesh.setCellTypes(std::move(cellTypes));
 
+    quadratureRule = QuadratureRule::make_tensor_product(QuadratureRule::QuadratureType::GAUSS_LEGENDRE,
+                                                         elementType.topoDim, 2*elementType.polyOrder);
+
+    tensor_product_shape_functions(localMesh.getGeometryNodes(),
+                                   quadratureRule.nodes,
+                                   elementType.topoDim,
+                                   shapeValues,
+                                   shapeGradXi);
 }
 
 
 void Element::make_simplex()
 {
-    auto lob_pts_1d = make_LobattoPoints_1D(elementType.polyOrder);
+    auto qr = QuadratureRule(elementType.polyOrder + 1,
+                             QuadratureRule::QuadratureType::GAUSS_LOBATTO);
+    std::vector<double> lob_pts_1d;
+    for (auto x : qr.nodes)
+        lob_pts_1d.push_back(x(0));
     auto npts = static_cast<int>(lob_pts_1d.size());
 
     std::vector<coordinate<>> localPoints_xi;
@@ -169,46 +185,46 @@ void Element::make_simplex()
         return;
     } else if (elementType.topoDim == 2) {
         // based on scheme be Blyth & Pozrikdis (JAM 2005)
-        localPoints_xi.resize((npts*(npts+1))/2);
-        int nt_local = elementType.polyOrder*elementType.polyOrder;
-        cellNodes.resize(3*nt_local);
-        offsets.reserve(nt_local+1);
+        localPoints_xi.resize((npts * (npts + 1)) / 2);
+        int nt_local = elementType.polyOrder * elementType.polyOrder;
+        cellNodes.resize(3 * nt_local);
+        offsets.reserve(nt_local + 1);
         cellTypes.resize(nt_local, CellType::Tri3);
 
         int idx = 0;
-        for(int i=0; i<npts; ++i) {
-            for(int j=0; j < npts-i; ++j) {
+        for (int i = 0; i < npts; ++i) {
+            for (int j = 0; j < npts - i; ++j) {
                 int k = npts - i - j - 1;
-                double vi = (lob_pts_1d[i] + 1)/2;
-                double vj = (lob_pts_1d[j] + 1)/2;
-                double vk = (lob_pts_1d[k] + 1)/2;
-                localPoints_xi[idx](0) = (1 + 2*vj - vi - vk)/3;
-                localPoints_xi[idx](1) = (1 + 2*vi - vj - vk)/3;
+                double vi = (lob_pts_1d[i] + 1) / 2;
+                double vj = (lob_pts_1d[j] + 1) / 2;
+                double vk = (lob_pts_1d[k] + 1) / 2;
+                localPoints_xi[idx](0) = (1 + 2 * vj - vi - vk) / 3;
+                localPoints_xi[idx](1) = (1 + 2 * vi - vj - vk) / 3;
                 ++idx;
             }
         }
 
         //make local triangles
-        idx=0;
+        idx = 0;
         int offset = 0;
-        for(int layer=0; layer < elementType.polyOrder; ++layer) {
-            for(int i=0; i<elementType.polyOrder-layer; ++i) {
+        for (int layer = 0; layer < elementType.polyOrder; ++layer) {
+            for (int i = 0; i < elementType.polyOrder - layer; ++i) {
 
-                cellNodes[offset + 0] = idx+i;
-                cellNodes[offset + 1] = idx+i+1;
-                cellNodes[offset + 2] = idx+i+1+elementType.polyOrder-layer;
+                cellNodes[offset + 0] = idx + i;
+                cellNodes[offset + 1] = idx + i + 1;
+                cellNodes[offset + 2] = idx + i + 1 + elementType.polyOrder - layer;
                 offsets.push_back(offset);
                 offset += 3;
-                if(i < elementType.polyOrder-layer-1) {
-                    cellNodes[offset + 0] = idx+i+1;
-                    cellNodes[offset + 1] = idx+i+2+elementType.polyOrder-layer;
-                    cellNodes[offset + 2] = idx+i+1+elementType.polyOrder-layer;
+                if (i < elementType.polyOrder - layer - 1) {
+                    cellNodes[offset + 0] = idx + i + 1;
+                    cellNodes[offset + 1] = idx + i + 2 + elementType.polyOrder - layer;
+                    cellNodes[offset + 2] = idx + i + 1 + elementType.polyOrder - layer;
                     offsets.push_back(offset);
                     offset += 3;
                 }
 
             }
-            idx += elementType.polyOrder+1-layer;
+            idx += elementType.polyOrder + 1 - layer;
         }
         offsets.push_back(offset);
 

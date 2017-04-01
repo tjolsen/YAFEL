@@ -5,19 +5,24 @@
 #include "element/ShapeFunctionUtils.hpp"
 #include "utils/Range.hpp"
 #include <iostream>
+#include <element/Element.hpp>
 
 using namespace yafel;
 
 
-int main() {
+int main()
+{
 
-    auto coeffs = jacobi(8,0,0);
+    Element e({ElementClass::TensorProduct, 1, 3});
 
-    for(auto c : coeffs)
-        std::cout << c << std::endl;
+    std::vector<std::vector<double>> shapeVals;
+    std::vector<std::vector<coordinate<>>> shapeGrads;
 
-    //for(auto x : Range<double>(-1.0,1.01,.01))
-    //std::cout << x << "  " << poly_eval(coeffs, x) << std::endl;
+    tensor_product_shape_functions(e.localMesh.getGeometryNodes(),
+                                   e.quadratureRule.nodes,
+                                   e.elementType.topoDim,
+                                   shapeVals,
+                                   shapeGrads);
 
 
     return 0;
