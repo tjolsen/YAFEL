@@ -4,6 +4,7 @@
 
 #include "element/Element.hpp"
 #include "element/ShapeFunctionUtils.hpp"
+#include "utils/DoFManager.hpp"
 
 YAFEL_NAMESPACE_OPEN
 
@@ -242,5 +243,6 @@ void Element::make_simplex()
     localMesh.setOffsets(std::move(offsets));
     localMesh.setCellTypes(std::move(cellTypes));
 }
+
 
 YAFEL_NAMESPACE_CLOSE

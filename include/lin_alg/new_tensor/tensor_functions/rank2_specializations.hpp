@@ -104,6 +104,37 @@ Tensor<3, 2, dt> TensorEye()
 }
 
 
+//===================================================================
+// Tensor inverse
+//===================================================================
+template<typename dt=double>
+Tensor<2,2,dt> inverse(const Tensor<2,2,dt> &A) {
+    dt detA = A(0,0)*A(1,1) - A(1,0)*A(0,1);
+    Tensor<2,2,dt> Ainv;
+    Ainv(0,0) = A(1,1)/detA;
+    Ainv(1,1) = A(0,0)/detA;
+    Ainv(0,1) = -A(0,1)/detA;
+    Ainv(1,0) = -A(1,0)/detA;
+    return Ainv;
+};
+
+
+//===================================================================
+// Tensor determinant
+//===================================================================
+template<typename dt=double>
+dt determinant(const Tensor<2,2,dt> &A) {
+    return A(0,0)*A(1,1) - A(0,1)*A(1,0);
+}
+
+template<typename dt=double>
+dt determinant(const Tensor<3,2,dt> &A) {
+    return A(0,0)*(A(1,1)*A(2,2) - A(1,2)*A(2,1))
+            - A(0,1)*(A(1,0)*A(2,2) - A(2,0)*A(0,2))
+            + A(0,2)*(A(1,0)*A(2,1) - A(2,0)*A(1,1));
+}
+
+
 YAFEL_NAMESPACE_CLOSE
 
 #endif //YAFEL_RANK2_SPECIALIZATIONS_HPP

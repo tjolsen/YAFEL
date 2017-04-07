@@ -10,14 +10,12 @@
 #include "ElementType.hpp"
 #include "new_mesh/Mesh.hpp"
 #include "quadrature/QuadratureRule.hpp"
+#include "utils/DoFManager.hpp"
 
 #include <eigen3/Eigen/Core>
 #include <vector>
 
 YAFEL_NAMESPACE_OPEN
-
-//Forward declaration
-class DoFManager;
 
 /**
  * \class Element
@@ -42,7 +40,8 @@ public:
     std::vector<Eigen::MatrixXd> shapeGradXi;
 
     // update element values at a quadrature point
-    void update(int qpi, const DoFManager &dofm);
+    template<int NSD>
+    void update(int elnum, int qpi, const DoFManager &dofm);
 
     //Element data at a quadrature point
     Eigen::MatrixXd shapeGrad;
@@ -66,6 +65,29 @@ private:
 
     int dof_per_node;
 };
+
+
+template<int NSD>
+void Element::update(int elnum, int qpi, const DoFManager &dofm)
+{
+
+    std::vector<int> nodes;
+    dofm.getGlobalNodes(elnum, nodes);
+
+    Tensor<NSD,2> Jacobian(0);
+
+    if(NSD == elementType.topoDim) {
+        for (auto A : IRange(0, static_cast<int>(nodes.size()))) {
+            for (auto j : IRange(0, elementType.topoDim)) {
+                for (auto i : IRange(0, NSD)) {
+                    Jacobian(i, j) += dofm.dof_nodes[nodes[A]](i)*shapeGradXi[qpi](A,j);
+                }
+            }
+        }
+    }
+
+    //Tensor<NSD,2> Jinv =
+}
 
 
 YAFEL_NAMESPACE_CLOSE

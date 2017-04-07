@@ -28,7 +28,7 @@ DoFManager::DoFManager(const Mesh &M,
 }
 
 
-void DoFManager::getGlobalDofs(int elnum, std::vector<int> &container)
+void DoFManager::getGlobalDofs(int elnum, std::vector<int> &container) const
 {
     int n_dofs = dof_per_node * (element_offsets[elnum + 1] - element_offsets[elnum]);
 
@@ -40,6 +40,19 @@ void DoFManager::getGlobalDofs(int elnum, std::vector<int> &container)
         for (auto dof : IRange(0, dof_per_node)) {
             container.push_back(node * dof_per_node + dof);
         }
+    }
+}
+
+void DoFManager::getGlobalNodes(int elnum, std::vector<int> &container) const
+{
+    int n_dofs = element_offsets[elnum + 1] - element_offsets[elnum];
+
+    container.clear();
+    container.reserve(n_dofs);
+
+    for (auto idx : IRange(element_offsets[elnum], element_offsets[elnum + 1])) {
+        int node = elements[idx];
+        container.push_back(node);
     }
 }
 
