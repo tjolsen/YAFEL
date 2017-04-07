@@ -12,6 +12,7 @@ using namespace yafel;
 
 int main()
 {
+    /*
     //---------------------------------------------------
     std::vector<coordinate<>> X;
     int N = 3;
@@ -46,10 +47,19 @@ int main()
 
     Mesh M(Mesh::DefinitionScheme::Explicit,
            X,cells,cell_offsets,celltypes);
-    int p=1;
+    */
+    Mesh M("minsquare.msh");
+    int p=2;
     DoFManager dofm(M,DoFManager::ManagerType::CG, p, 1);
-    DoFManager dofm2(M,DoFManager::ManagerType::CG, p, 2);
 
+    std::vector<int> container;
+    for(auto c : IRange(0,M.nCells())) {
+        dofm.getGlobalDofs(c,container);
+        for(auto i : container) {
+            std::cout << i << "  ";
+        }
+        std::cout << std::endl;
+    }
 
     return 0;
 }
