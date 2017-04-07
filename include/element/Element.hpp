@@ -10,8 +10,8 @@
 #include "ElementType.hpp"
 #include "new_mesh/Mesh.hpp"
 #include "quadrature/QuadratureRule.hpp"
-#include "lin_alg/Matrix.hpp"
-#include "lin_alg/Vector.hpp"
+
+#include <eigen3/Eigen/Core>
 #include <vector>
 
 YAFEL_NAMESPACE_OPEN
@@ -19,11 +19,13 @@ YAFEL_NAMESPACE_OPEN
 /**
  * \class Element
  */
-class Element {
+class Element
+{
 
 public:
-    Element(ElementType={ElementClass::None, 0, 0});
+    Element(ElementType= {ElementTopology::None, 0, 0}, int dofPerNode=1);
 
+    // Struct that holds element type
     ElementType elementType;
 
     // Mesh of the local "Master" element
@@ -32,15 +34,34 @@ public:
     //Quadrature rule (ie, points and weights)
     QuadratureRule quadratureRule;
 
+    // Shape function values and gradients (in parameter space)
+    std::vector<Eigen::VectorXd> shapeValues;
+    std::vector<Eigen::MatrixXd> shapeGradXi;
 
-    std::vector<std::vector<double>> shapeValues;
-    std::vector<std::vector<Tensor<3,1,double>>> shapeGradXi;
+    // update element values at a quadrature point
+    //void update_element(int qpi, const DoFManager &dofm);
+
+    //Element data at a quadrature point
+    Eigen::MatrixXd shapeGrad;
+    double detJ;
+    std::vector<int> globalDofs;
+
+
+    // useful getters for an element
+    inline int dofPerNode() const { return dof_per_node; }
+
+    inline int getNode(int dof) const { return dof / dof_per_node; }
+
+    inline int getComp(int dof) const { return dof % dof_per_node; }
+
 
 private:
     void make_simplex();
-    void make_tensorProduct();
-};
 
+    void make_tensorProduct();
+
+    int dof_per_node;
+};
 
 
 YAFEL_NAMESPACE_CLOSE

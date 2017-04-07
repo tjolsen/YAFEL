@@ -67,8 +67,8 @@ std::vector<double> jacobi(int n, double alpha, double beta);
 void tensor_product_shape_functions(const std::vector<coordinate<>> &localPoints,
                                     const std::vector<coordinate<>> &quadPoints,
                                     int topoDim,
-                                    std::vector<std::vector<double>> &shapeValue,
-                                    std::vector<std::vector<Tensor<3, 1, double>>> &shapeGrad);
+                                    std::vector<Eigen::VectorXd> &shapeValue,
+                                    std::vector<Eigen::MatrixXd> &shapeGrad);
 
 
 template<typename FUNC>

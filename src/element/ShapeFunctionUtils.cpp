@@ -65,14 +65,13 @@ std::vector<double> jacobi(int n, double alpha, double beta)
 void tensor_product_shape_functions(const std::vector<coordinate<>> &localPoints,
                                     const std::vector<coordinate<>> &quadPoints,
                                     int topoDim,
-                                    std::vector<std::vector<double>> &shapeValue,
-                                    std::vector<std::vector<Tensor<3, 1, double>>> &shapeGrad)
+                                    std::vector<Eigen::VectorXd> &shapeValue,
+                                    std::vector<Eigen::MatrixXd> &shapeGrad)
 {
     shapeValue.resize(quadPoints.size());
     shapeGrad.resize(quadPoints.size());
     std::vector<std::vector<double>> jacobi_coeffs;
     int p = static_cast<int>(std::round(pow(localPoints.size(), 1.0 / topoDim)));
-    std::cout << "p = " << p << std::endl;
     for (auto n : IRange(0, p)) {
         jacobi_coeffs.push_back(jacobi(n, 0, 0));
     }
@@ -114,7 +113,6 @@ void tensor_product_shape_functions(const std::vector<coordinate<>> &localPoints
 
 
     V = make_vandermonde(localPoints, shape_func);
-    std::cout << V << std::endl;
     rhs.resize(V.rows());
     gradRhs.resize(V.rows(), topoDim);
     auto VTLU = V.transpose().lu();
@@ -133,16 +131,8 @@ void tensor_product_shape_functions(const std::vector<coordinate<>> &localPoints
             }
         }
 
-        auto vals = VTLU.solve(rhs);
-        auto grads = VTLU.solve(gradRhs);
-        shapeValue[i].resize(vals.rows(), 0);
-        shapeGrad[i].resize(vals.rows());
-        for (auto j : IRange(0, (int) vals.rows())) {
-            shapeValue[i][j] = vals(j);
-            for (auto d : IRange(0, topoDim)) {
-                shapeGrad[i][j](d) = grads(j, d);
-            }
-        }
+        shapeValue[i] = VTLU.solve(rhs);
+        shapeGrad[i] = VTLU.solve(gradRhs);
     }
 
 }

@@ -8,6 +8,7 @@
 #include "yafel_globals.hpp"
 #include "yafel_typedefs.hpp"
 #include "mesh_typedefs.hpp"
+#include "new_mesh/CellFace.hpp"
 #include <vector>
 
 YAFEL_NAMESPACE_OPEN
@@ -44,10 +45,10 @@ public:
      * @param cellTypes Types of each cell
      */
     Mesh(DefinitionScheme definitionScheme,
-         std::vector<coordinate<>> geometryNodes = {},
-         std::vector<int> cellNodes = {},
-         std::vector<int> cellOffsets = {},
-         std::vector<CellType> cellTypes = {});
+         const std::vector<coordinate<>> &geometryNodes = {},
+         const std::vector<int> &cellNodes = {},
+         const std::vector<int> &cellOffsets = {},
+         const std::vector<CellType> &cellTypes = {});
 
 
     /**
@@ -70,30 +71,29 @@ public:
     /**
      * Setters for internal structures
      */
-    inline void setGeometryNodes(std::vector<coordinate<>> &&gn)
-    { geometryNodes_ = gn; }
+    inline void setGeometryNodes(std::vector<coordinate<>> &&gn) { geometryNodes_ = gn; }
 
-    inline void setCellNodes(std::vector<int> &&cn)
-    { cellNodes_ = cn; }
+    inline void setCellNodes(std::vector<int> &&cn) { cellNodes_ = cn; }
 
-    inline void setOffsets(std::vector<int> &&off)
-    { cellOffsets_ = off; }
+    inline void setOffsets(std::vector<int> &&off) { cellOffsets_ = off; }
 
-    inline void setCellTypes(std::vector<CellType> &&ct)
-    { cellTypes_ = ct; }
+    inline void setCellTypes(std::vector<CellType> &&ct) { cellTypes_ = ct; }
 
 
     /**
      * Getters for internal structures
      */
-    const std::vector<coordinate<>> &getGeometryNodes() const
-    { return geometryNodes_; }
+    const std::vector<coordinate<>> &getGeometryNodes() const { return geometryNodes_; }
 
+    const std::vector<CellFace> &getInternalFaces() const { return internal_faces_; }
+
+
+    inline const CellType getCellType(int cell) const noexcept { return cellTypes_[cell]; }
 
     //Get number of cells
     inline virtual int nCells() const noexcept
     {
-        return cellTypes_.size();
+        return static_cast<int>(cellTypes_.size());
     }
 
 protected:
@@ -109,9 +109,9 @@ protected:
     std::vector<int> cellNodes_;
     std::vector<int> cellOffsets_;
     std::vector<CellType> cellTypes_;
+    std::vector<CellFace> internal_faces_;
 
-    virtual inline void getCellNodesImplicit(int cell, std::vector<int> &container) const noexcept
-    {}
+    virtual inline void getCellNodesImplicit(int cell, std::vector<int> &container) const noexcept {}
 };
 
 

@@ -8,16 +8,16 @@ YAFEL_NAMESPACE_OPEN
 
 
 Mesh::Mesh(DefinitionScheme definitionScheme,
-           std::vector<coordinate<>> geometryNodes,
-           std::vector<int> cellNodes,
-           std::vector<int> cellOffsets,
-           std::vector<CellType> cellTypes)
-        : definitionScheme_(std::move(definitionScheme)),
-          geometryNodes_(std::move(geometryNodes)),
-          cellNodes_(std::move(cellNodes)),
-          cellOffsets_(std::move(cellOffsets)),
-          cellTypes_(std::move(cellTypes))
-{}
+           const std::vector<coordinate<>> &geometryNodes,
+           const std::vector<int> &cellNodes,
+           const std::vector<int> &cellOffsets,
+           const std::vector<CellType> &cellTypes)
+        : definitionScheme_(definitionScheme),
+          geometryNodes_(geometryNodes),
+          cellNodes_(cellNodes),
+          cellOffsets_(cellOffsets),
+          cellTypes_(cellTypes),
+          internal_faces_(0) {}
 
 
 void Mesh::getCellNodes(int elem, std::vector<int> &container) const

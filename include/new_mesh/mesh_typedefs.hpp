@@ -42,9 +42,10 @@ YAFEL_NAMESPACE_OPEN
 enum class CellType : int {
     Line2,
     Tri3,
+    Tet4,
     Quad4,
     Hex8,
-    Point1  // Useful for MPM
+    Point1  // Useful for MPM?
 };
 
 YAFEL_NAMESPACE_CLOSE

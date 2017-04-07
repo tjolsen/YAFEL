@@ -7,19 +7,21 @@
 
 YAFEL_NAMESPACE_OPEN
 
-Element::Element(ElementType et)
-        : elementType(et), localMesh(Mesh::DefinitionScheme::Explicit)
+Element::Element(ElementType et, int dofpn)
+        : elementType(et),
+          localMesh(Mesh::DefinitionScheme::Explicit),
+          dof_per_node(dofpn)
 {
 
-    switch (et.elementClass) {
-        case ElementClass::TensorProduct:
+    switch (et.elementTopology) {
+        case ElementTopology::TensorProduct:
             make_tensorProduct();
             break;
-        case ElementClass::Simplex:
+        case ElementTopology::Simplex:
             make_simplex();
             break;
-        case ElementClass::None:
-            //null element likely used for
+        case ElementTopology::None:
+            //null element. used for points/unsupported types
             break;
     }
 }
@@ -144,7 +146,6 @@ void Element::make_tensorProduct()
 
     } else {
         // unsupported topoDim
-
     }
 
     // Set local mesh members from created containers
@@ -161,6 +162,7 @@ void Element::make_tensorProduct()
                                    elementType.topoDim,
                                    shapeValues,
                                    shapeGradXi);
+
 }
 
 

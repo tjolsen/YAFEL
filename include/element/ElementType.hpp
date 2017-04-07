@@ -19,13 +19,12 @@ YAFEL_NAMESPACE_OPEN
  * Simplex --> {line/tri/tet}
  * None --> {} (used for template defaulting purposes)
  */
-enum class ElementClass : int
+enum class ElementTopology : int8_t
 {
     TensorProduct,
     Simplex,
     None
 };
-
 
 /**
  * \class ElementType
@@ -40,17 +39,17 @@ enum class ElementClass : int
  */
 struct ElementType
 {
-    inline ElementType(ElementClass ec, int td, int po) : elementClass(ec), topoDim(td), polyOrder(po)
+    inline ElementType(ElementTopology ec, int td, int po) : elementTopology(ec), topoDim(td), polyOrder(po)
     {}
 
-    ElementClass elementClass;
-    int topoDim;
-    int polyOrder;
+    ElementTopology elementTopology;
+    int8_t topoDim;
+    int8_t polyOrder;
 
-    inline bool operator<(const ElementType &rhs)
+    inline bool operator<(const ElementType &rhs) const
     {
-        return std::make_tuple(elementClass, topoDim, polyOrder)
-               < std::make_tuple(rhs.elementClass, rhs.topoDim, rhs.polyOrder);
+        return std::make_tuple(elementTopology, topoDim, polyOrder)
+               < std::make_tuple(rhs.elementTopology, rhs.topoDim, rhs.polyOrder);
     }
 };
 

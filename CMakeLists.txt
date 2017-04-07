@@ -9,6 +9,7 @@ set(CMAKE_RANLIB "gcc-ranlib")
 
 set(SOURCE_FILES
         include/element/Element.hpp
+        include/element/ElementFactory.hpp
         include/element/ElementType.hpp
         include/element/ShapeFunctionUtils.hpp
 
@@ -109,10 +110,12 @@ set(SOURCE_FILES
 
 
         src/element/Element.cpp
+        src/element/ElementFactory.cpp
         src/element/ShapeFunctionUtils.cpp
         #src/mesh/Face.cpp
         src/quadrature/LobattoPoints1D.cpp
         src/new_mesh/Mesh.cpp
+        src/new_mesh/build_faces.cpp
         src/output/VTKObject.cpp
         src/output/VTKOutput.cpp
         src/output/VTKScalarData.cpp
