@@ -16,6 +16,9 @@
 
 YAFEL_NAMESPACE_OPEN
 
+//Forward declaration
+class DoFManager;
+
 /**
  * \class Element
  */
@@ -23,7 +26,7 @@ class Element
 {
 
 public:
-    Element(ElementType= {ElementTopology::None, 0, 0}, int dofPerNode=1);
+    Element(ElementType= {ElementTopology::None, 0, 0}, int dofPerNode = 1);
 
     // Struct that holds element type
     ElementType elementType;
@@ -39,7 +42,7 @@ public:
     std::vector<Eigen::MatrixXd> shapeGradXi;
 
     // update element values at a quadrature point
-    //void update_element(int qpi, const DoFManager &dofm);
+    void update(int qpi, const DoFManager &dofm);
 
     //Element data at a quadrature point
     Eigen::MatrixXd shapeGrad;
@@ -54,6 +57,7 @@ public:
 
     inline int getComp(int dof) const { return dof % dof_per_node; }
 
+    inline int nQP() const { return static_cast<int>(quadratureRule.weights.size()); }
 
 private:
     void make_simplex();

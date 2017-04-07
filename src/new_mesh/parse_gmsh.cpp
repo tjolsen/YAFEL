@@ -129,6 +129,8 @@ static CellType gmsh_to_CellType(int id)
             return CellType::Tet4;
         case 5:
             return CellType::Hex8;
+        case 15:
+            return CellType::Point1;
         default:
             std::cerr << "Unknown gmsh type. (" << id << ")" << std::endl;
             return CellType::None;

@@ -6,6 +6,7 @@
 #include "utils/Range.hpp"
 #include <iostream>
 #include <element/Element.hpp>
+#include <element/ElementFactory.hpp>
 #include "utils/DoFManager.hpp"
 
 using namespace yafel;
@@ -49,17 +50,24 @@ int main()
            X,cells,cell_offsets,celltypes);
     */
     Mesh M("minsquare.msh");
-    int p=2;
+    int p=1;
     DoFManager dofm(M,DoFManager::ManagerType::CG, p, 1);
 
-    std::vector<int> container;
+    double area{0};
+    ElementFactory EF(1);
+
     for(auto c : IRange(0,M.nCells())) {
-        dofm.getGlobalDofs(c,container);
-        for(auto i : container) {
-            std::cout << i << "  ";
+        auto et = dofm.CellType_to_ElementType(M.getCellType(c),p);
+        auto &E = EF.getElement(et);
+
+        for(auto qpi : IRange(0,E.nQP())) {
+            E.update(qpi, dofm);
+
+            auto w = E.quadratureRule.weights[qpi];
+            area += w*E.detJ;
         }
-        std::cout << std::endl;
     }
+
 
     return 0;
 }

@@ -51,6 +51,10 @@ ElementType DoFManager::CellType_to_ElementType(CellType ct, int polyOrder) cons
     int topodim{0};
 
     switch (ct) {
+        case CellType::Line2:
+            topodim = 1;
+            topology = ElementTopology::TensorProduct;
+            break;
         case CellType::Tri3:
             topodim = 2;
             topology = ElementTopology::Simplex;
