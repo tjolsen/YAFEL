@@ -116,14 +116,15 @@ set(SOURCE_FILES
         src/quadrature/LobattoPoints1D.cpp
         src/new_mesh/Mesh.cpp
         src/new_mesh/build_faces.cpp
-        src/output/VTKObject.cpp
-        src/output/VTKOutput.cpp
-        src/output/VTKScalarData.cpp
-        src/output/VTKTimeOutput.cpp
+        #src/output/VTKObject.cpp
+        #src/output/VTKOutput.cpp
+        #src/output/VTKScalarData.cpp
+        #src/output/VTKTimeOutput.cpp
         src/quadrature/QuadratureRule.cpp
-        src/utils/DirBC.cpp
-        src/utils/ElementType.cpp
-        src/utils/ElementVtkType.cpp
+        src/utils/DoFManager.cpp
+        #src/utils/DirBC.cpp
+        #src/utils/ElementType.cpp
+        #src/utils/ElementVtkType.cpp
         #src/utils/GaussLegendreQuadrature.cpp
         #src/utils/GaussLobattoQuadrature.cpp
         #test/matmul_performance.cpp

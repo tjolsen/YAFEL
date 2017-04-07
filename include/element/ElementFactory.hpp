@@ -15,12 +15,15 @@ YAFEL_NAMESPACE_OPEN
 /**
  * \class ElementFactory
  */
-class ElementFactory {
+class ElementFactory
+{
 
 public:
     ElementFactory(int dof_per_node = 1);
 
-    Element& getElement(ElementType elementType);
+    Element &getElement(ElementType elementType);
+
+    inline int getDofPerNode() const { return dof_per_node; }
 
 private:
     int dof_per_node;

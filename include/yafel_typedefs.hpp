@@ -6,7 +6,7 @@
 #define YAFEL_YAFEL_TYPEDEFS_HPP
 
 #include "yafel_globals.hpp"
-#include "lin_alg/new_tensor/tensor_expression_types/Tensor.hpp"
+#include "lin_alg/new_tensor/tensors.hpp"
 
 YAFEL_NAMESPACE_OPEN
 

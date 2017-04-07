@@ -6,6 +6,7 @@
 #include "utils/Range.hpp"
 #include <iostream>
 #include <element/Element.hpp>
+#include "utils/DoFManager.hpp"
 
 using namespace yafel;
 
@@ -46,13 +47,22 @@ int main()
     Mesh M(Mesh::DefinitionScheme::Explicit,
            X,cells,cell_offsets,celltypes);
 
+    DoFManager dofm(M,DoFManager::ManagerType::CG, 1, 1);
 
-    M.buildInternalFaces();
-    std::cout << M.getInternalFaces().size() << std::endl;
-    auto &faces = M.getInternalFaces();
-    for(int i=0; i<faces.size(); ++i) {
-        std::cout << faces[i] << std::endl;
+    //for(auto x : dofm.dof_nodes)
+        //printf("(%f, %f, %f)\n", x(0), x(1), x(2));
+
+    std::cout << std::endl;
+    std::vector<int> container;
+
+    for(auto c : IRange(0,M.nCells())) {
+        dofm.getGlobalDofs(c,container);
+        for(auto i : container) {
+            std::cout << i << "  ";
+        }
+        std::cout << std::endl;
     }
+
 
     return 0;
 }

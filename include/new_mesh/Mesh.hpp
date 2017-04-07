@@ -96,6 +96,13 @@ public:
         return static_cast<int>(cellTypes_.size());
     }
 
+    //get number of nodes
+    inline virtual int nNodes() const noexcept
+    {
+        return static_cast<int>(geometryNodes_.size());
+    }
+
+
 protected:
     DefinitionScheme definitionScheme_;
 
