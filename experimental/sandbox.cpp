@@ -14,7 +14,7 @@ int main()
 {
     //---------------------------------------------------
     std::vector<coordinate<>> X;
-    int N = 300;
+    int N = 3;
     double dx = 1.0;
     for(auto i : IRange(0,N)) {
         for(auto j : IRange(0,N)) {
@@ -46,22 +46,9 @@ int main()
 
     Mesh M(Mesh::DefinitionScheme::Explicit,
            X,cells,cell_offsets,celltypes);
-
-    DoFManager dofm(M,DoFManager::ManagerType::CG, 1, 1);
-
-    //for(auto x : dofm.dof_nodes)
-        //printf("(%f, %f, %f)\n", x(0), x(1), x(2));
-
-    std::cout << std::endl;
-    std::vector<int> container;
-
-    for(auto c : IRange(0,M.nCells())) {
-        dofm.getGlobalDofs(c,container);
-        for(auto i : container) {
-            std::cout << i << "  ";
-        }
-        std::cout << std::endl;
-    }
+    int p=1;
+    DoFManager dofm(M,DoFManager::ManagerType::CG, p, 1);
+    DoFManager dofm2(M,DoFManager::ManagerType::CG, p, 2);
 
 
     return 0;

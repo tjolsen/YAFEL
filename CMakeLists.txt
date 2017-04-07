@@ -116,6 +116,7 @@ set(SOURCE_FILES
         src/quadrature/LobattoPoints1D.cpp
         src/new_mesh/Mesh.cpp
         src/new_mesh/build_faces.cpp
+        src/new_mesh/parse_gmsh.cpp
         #src/output/VTKObject.cpp
         #src/output/VTKOutput.cpp
         #src/output/VTKScalarData.cpp
@@ -125,8 +126,6 @@ set(SOURCE_FILES
         #src/utils/DirBC.cpp
         #src/utils/ElementType.cpp
         #src/utils/ElementVtkType.cpp
-        #src/utils/GaussLegendreQuadrature.cpp
-        #src/utils/GaussLobattoQuadrature.cpp
         #test/matmul_performance.cpp
         #test/test_bcsr_spmv.cpp
         #test/test_bicgstab_solve.cpp

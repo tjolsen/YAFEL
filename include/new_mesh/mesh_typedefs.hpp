@@ -45,7 +45,8 @@ enum class CellType : int {
     Tet4,
     Quad4,
     Hex8,
-    Point1  // Useful for MPM?
+    Point1,  // Useful for MPM?
+    None
 };
 
 YAFEL_NAMESPACE_CLOSE

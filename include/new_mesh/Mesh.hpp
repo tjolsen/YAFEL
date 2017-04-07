@@ -10,6 +10,7 @@
 #include "mesh_typedefs.hpp"
 #include "new_mesh/CellFace.hpp"
 #include <vector>
+#include <string>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -48,7 +49,14 @@ public:
          const std::vector<coordinate<>> &geometryNodes = {},
          const std::vector<int> &cellNodes = {},
          const std::vector<int> &cellOffsets = {},
-         const std::vector<CellType> &cellTypes = {});
+         const std::vector<CellType> &cellTypes = {},
+         const std::vector<std::vector<int>> &cellTags = {});
+
+
+    /**
+     * \brief Construct a mesh from Gmsh
+     */
+    Mesh(const std::string &fname);
 
 
     /**
@@ -116,9 +124,11 @@ protected:
     std::vector<int> cellNodes_;
     std::vector<int> cellOffsets_;
     std::vector<CellType> cellTypes_;
+    std::vector<std::vector<int>> cellTags_;
     std::vector<CellFace> internal_faces_;
 
     virtual inline void getCellNodesImplicit(int cell, std::vector<int> &container) const noexcept {}
+    void parse_gmsh(const std::string &fname);
 };
 
 

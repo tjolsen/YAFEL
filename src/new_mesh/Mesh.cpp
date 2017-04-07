@@ -3,6 +3,7 @@
 //
 
 #include "new_mesh/Mesh.hpp"
+#include <fstream>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -11,14 +12,22 @@ Mesh::Mesh(DefinitionScheme definitionScheme,
            const std::vector<coordinate<>> &geometryNodes,
            const std::vector<int> &cellNodes,
            const std::vector<int> &cellOffsets,
-           const std::vector<CellType> &cellTypes)
+           const std::vector<CellType> &cellTypes,
+           const std::vector<std::vector<int>> &cellTags)
         : definitionScheme_(definitionScheme),
           geometryNodes_(geometryNodes),
           cellNodes_(cellNodes),
           cellOffsets_(cellOffsets),
           cellTypes_(cellTypes),
+          cellTags_(cellTags),
           internal_faces_(0) {}
 
+
+Mesh::Mesh(const std::string &fname)
+        : definitionScheme_(DefinitionScheme::Explicit)
+{
+    parse_gmsh(fname);
+}
 
 void Mesh::getCellNodes(int elem, std::vector<int> &container) const
 {
