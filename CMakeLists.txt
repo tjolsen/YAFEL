@@ -1,30 +1,17 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.5)
 project(YAFEL)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ffast-math -march=native -flto")
-set(CMAKE_AR "gcc-ar")
-set(CMAKE_RANLIB "gcc-ranlib")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG -ffast-math -march=native")
+
+set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -Og")
 
 set(SOURCE_FILES
         include/element/Element.hpp
         include/element/ElementFactory.hpp
         include/element/ElementType.hpp
         include/element/ShapeFunctionUtils.hpp
-
-        #include/old_element/DG_Quad.hpp
-        #include/old_element/Element.hpp
-        #include/old_element/ElementFactory.hpp
-        #include/old_element/ElementImpl.hpp
-        #include/old_element/ElementTraits.hpp
-        #include/old_element/LagrangeLine.hpp
-        #include/old_element/LinHex.hpp
-        #include/old_element/LinLine.hpp
-        #include/old_element/LinQuad.hpp
-        #include/old_element/LinTet.hpp
-        #include/old_element/LinTri.hpp
-        #include/old_element/NullElement.hpp
         include/lin_alg/solver/direct/LUDecomposition.hpp
         include/lin_alg/solver/iterative/bicgstab_solve.hpp
         include/lin_alg/solver/iterative/cg_solve.hpp
@@ -112,7 +99,6 @@ set(SOURCE_FILES
         src/element/Element.cpp
         src/element/ElementFactory.cpp
         src/element/ShapeFunctionUtils.cpp
-        #src/mesh/Face.cpp
         src/quadrature/LobattoPoints1D.cpp
         src/new_mesh/Mesh.cpp
         src/new_mesh/build_faces.cpp
@@ -126,39 +112,6 @@ set(SOURCE_FILES
         #src/utils/DirBC.cpp
         #src/utils/ElementType.cpp
         #src/utils/ElementVtkType.cpp
-        #test/matmul_performance.cpp
-        #test/test_bcsr_spmv.cpp
-        #test/test_bicgstab_solve.cpp
-        #test/test_cg_solve.cpp
-        #test/test_csr_spmv.cpp
-        #test/test_dg_dofmanager.cpp
-        #test/test_DG_Quad.cpp
-        #test/test_DualNumber.cpp
-        #test/test_GaussLegQuadrature.cpp
-        #test/test_GaussLobQuadrature.cpp
-        #test/test_GmshMesh.cpp
-        #test/test_ILU.cpp
-        #test/test_LagrangeLine.cpp
-        #test/test_LinQuadElement.cpp
-        #test/test_LinTetElement.cpp
-        #test/test_LinTriElement.cpp
-        #test/test_LU.cpp
-        #test/test_matmul.cpp
-        #test/test_matrixTest.cpp
-        #test/test_MatrixVisualization.cpp
-        #test/test_mesh_faces.cpp
-        #test/test_mesh_generate.cpp
-        #test/test_mesh_minlength.cpp
-        #test/test_mesh_reorder_rcm.cpp
-        #test/test_MeshTopology.cpp
-        #test/test_RectilinearMesh.cpp
-        #test/test_sparse_bcsr.cpp
-        #test/test_sparse_coo.cpp
-        #test/test_sparse_csr.cpp
-        #test/test_tensor.cpp
-        #test/test_topoStructures.cpp
-        #test/test_vectorTest.cpp
-        #test/test_vtktimeoutput.cpp
         )
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

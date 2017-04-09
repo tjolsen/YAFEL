@@ -99,7 +99,6 @@ void Mesh::parse_gmsh(const std::string &fname)
                     tag[i - 3] = atoi(words[i].c_str());
                 }
                 cellTags_[id - 1] = tag;
-                //element_container el(nodes_in_el, 0); //init to 0. gonna fail hard somewhere, if it does.
                 for (size_type i = 3 + ntags; i < words.size(); ++i) {
                     cellNodes_.push_back(atoi(words[i].c_str()) - 1); //using 0-based node numbering from gmsh 1-based
                 }

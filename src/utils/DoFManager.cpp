@@ -99,7 +99,7 @@ void DoFManager::make_cg_dofs(const Mesh &M)
     int max_topodim = make_raw_dofs(M);
 
     //recombine duplicate nodes and update triangulation
-    recombine_all_duplicates();
+    //recombine_all_duplicates();
 
 }
 
@@ -120,8 +120,9 @@ int DoFManager::make_raw_dofs(const Mesh &M)
     ElementFactory EF(1);
     int offset{0};
 
-    std::vector<coordinate<>> corner_coords;
+    std::vector<coordinate<>> corner_coords(8);
     std::vector<int> corner_idxs;
+    auto const& geom_nodes = M.getGeometryNodes();
 
     element_offsets.resize(ncells + 1);
     int next_node{0};
@@ -137,11 +138,14 @@ int DoFManager::make_raw_dofs(const Mesh &M)
         // corner nodes
         M.getCellNodes(c, corner_idxs);
         corner_coords.clear();
+        corner_coords.reserve(corner_idxs.size());
+
         for (auto i : corner_idxs) {
-            corner_coords.push_back(M.getGeometryNodes()[i]);
+            corner_coords.push_back(geom_nodes[i]);
         }
 
         auto &E = EF.getElement(et);
+
         int nLocalNodes = E.localMesh.nNodes();
 
         for (auto n : E.localMesh.getGeometryNodes()) {

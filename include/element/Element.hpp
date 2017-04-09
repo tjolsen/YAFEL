@@ -44,10 +44,9 @@ public:
     void update(int elnum, int qpi, const DoFManager &dofm);
 
     //Element data at a quadrature point
-    Eigen::MatrixXd shapeGrad;
+    Eigen::Matrix<double, Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> shapeGrad;
     double detJ;
     std::vector<int> globalDofs;
-
 
     // useful getters for an element
     inline int dofPerNode() const { return dof_per_node; }
@@ -78,7 +77,7 @@ void Element::update(int elnum, int qpi, const DoFManager &dofm)
 
     if(NSD == elementType.topoDim) {
         for (auto A : IRange(0, static_cast<int>(nodes.size()))) {
-            for (auto j : IRange(0, elementType.topoDim)) {
+            for (auto j : IRange(0, static_cast<int>(elementType.topoDim))) {
                 for (auto i : IRange(0, NSD)) {
                     Jacobian(i, j) += dofm.dof_nodes[nodes[A]](i)*shapeGradXi[qpi](A,j);
                 }
@@ -86,7 +85,23 @@ void Element::update(int elnum, int qpi, const DoFManager &dofm)
         }
     }
 
-    //Tensor<NSD,2> Jinv =
+    detJ = determinant(Jacobian);
+    Tensor<NSD,2> Jinv = inverse(Jacobian);
+    Tensor<NSD,2> JinvT = Jinv.template perm<1,0>();
+    shapeGrad = Eigen::MatrixXd::Constant(nodes.size(),NSD,0);
+
+    for(auto A : IRange(0,static_cast<int>(nodes.size()))) {
+        for(auto d : IRange(0,NSD)) {
+            shapeGrad(A,d) = 0;
+            double s = dot(make_TensorMap<NSD,1>(&shapeGradXi[qpi](A,0)), JinvT(d,colon()));
+            //for(auto i : IRange(0,NSD)) {
+            //s += shapeGradXi[qpi](A,i)*JinvT(d,i);
+            //}
+            shapeGrad(A,d) = s;
+        }
+    }
+
+
 }
 
 
