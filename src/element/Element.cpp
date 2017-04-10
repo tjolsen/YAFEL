@@ -156,7 +156,7 @@ void Element::make_tensorProduct()
     localMesh.setCellTypes(std::move(cellTypes));
 
     quadratureRule = QuadratureRule::make_tensor_product(QuadratureRule::QuadratureType::GAUSS_LEGENDRE,
-                                                         elementType.topoDim, 2*elementType.polyOrder);
+                                                         elementType.topoDim, 2 * elementType.polyOrder);
 
     tensor_product_shape_functions(localMesh.getGeometryNodes(),
                                    quadratureRule.nodes,
@@ -238,10 +238,26 @@ void Element::make_simplex()
         //unsupported topoDim
     }
 
+
+    if (elementType.topoDim == 2) {
+        quadratureRule.get_triangle_quadrature(2 * elementType.polyOrder);
+    } else if (elementType.topoDim == 3) {
+
+    }
     localMesh.setGeometryNodes(std::move(localPoints_xi));
     localMesh.setCellNodes(std::move(cellNodes));
     localMesh.setOffsets(std::move(offsets));
     localMesh.setCellTypes(std::move(cellTypes));
+
+    if (elementType.topoDim == 2) {
+        triangle_shape_functions(localMesh.getGeometryNodes(),
+                                 quadratureRule.nodes,
+                                 elementType.polyOrder,
+                                 shapeValues,
+                                 shapeGradXi);
+    } else if (elementType.topoDim == 3) {
+
+    }
 }
 
 

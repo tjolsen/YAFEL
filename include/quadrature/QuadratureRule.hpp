@@ -38,13 +38,15 @@ public:
 
 
     /**
-     *
+     * Construct a quadrature rule for a tensor-product element
      * @param qt Quadrature Type
      * @param topoDim Dimension of tensor product rule {1,2,3}
      * @param polyOrder Polynomial order to integrate exactly (often useful to use 2x element polynomial interpolation)
      * @return
      */
     static QuadratureRule make_tensor_product(QuadratureType qt, int topoDim, int polyOrder);
+
+    void get_triangle_quadrature(int porder);
 
     std::vector<coordinate<>> nodes;
     std::vector<double> weights;

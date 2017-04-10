@@ -74,6 +74,7 @@ int main()
 
     std::cout << "A = " << area << std::endl;
 
+
     return 0;
 }
 

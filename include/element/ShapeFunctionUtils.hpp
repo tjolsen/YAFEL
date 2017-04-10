@@ -43,7 +43,7 @@ template<typename T>
 T poly_eval(const std::vector<double> &coeffs, T x)
 {
     T retval{0};
-    for(int i=0; i<coeffs.size(); ++i) {
+    for (int i = 0; i < coeffs.size(); ++i) {
         retval *= x;
         retval += coeffs[i];
     }
@@ -63,24 +63,36 @@ T poly_eval(const std::vector<double> &coeffs, T x)
 std::vector<double> jacobi(int n, double alpha, double beta);
 
 
-
 void tensor_product_shape_functions(const std::vector<coordinate<>> &localPoints,
                                     const std::vector<coordinate<>> &quadPoints,
                                     int topoDim,
                                     std::vector<Eigen::VectorXd> &shapeValue,
-                                    std::vector<Eigen::MatrixXd> &shapeGrad);
+                                    std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> &shapeGrad);
+
+
+void triangle_shape_functions(const std::vector<coordinate<>> &localPoints,
+                              const std::vector<coordinate<>> &quadPoints,
+                              int polyOrder,
+                              std::vector<Eigen::VectorXd> &shapeValue,
+                              std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> &shapeGrad);
+
+void tetrahedron_shape_functions(const std::vector<coordinate<>> &localPoints,
+                                 const std::vector<coordinate<>> &quadPoints,
+                                 int polyOrder,
+                                 std::vector<Eigen::VectorXd> &shapeValue,
+                                 std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> &shapeGrad);
 
 
 template<typename FUNC>
-Eigen::MatrixXd make_vandermonde(const std::vector<coordinate<>> &localPoints, FUNC & func)
+Eigen::MatrixXd make_vandermonde(const std::vector<coordinate<>> &localPoints, FUNC &func)
 {
 
     int N = localPoints.size();
-    Eigen::MatrixXd V(N,N);
+    Eigen::MatrixXd V(N, N);
 
-    for(auto i : IRange(0,N)) {
-        for(auto j : IRange(0,N)) {
-            V(i,j) = func(j,localPoints[i]);
+    for (auto i : IRange(0, N)) {
+        for (auto j : IRange(0, N)) {
+            V(i, j) = func(j, localPoints[i]);
         }
     }
 

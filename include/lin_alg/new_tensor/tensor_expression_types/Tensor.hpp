@@ -31,9 +31,14 @@ public:
     // Initialize an empty tensor with all zeros
     Tensor() : Tensor(dataType(0)) {}
 
+    template<typename ...DT,
+            typename=typename std::enable_if<2 <= sizeof...(DT)>::type>
+    Tensor(DT ...args) : data{std::forward<dataType>(args)...} {}
+
+
     // Construct from a TensorExpression
-    template<typename TE, typename dt2, bool b, typename=typename std::enable_if<std::is_convertible<dataType,dt2>::value>::type>
-    Tensor(const TensorExpression<TE, D, R, dt2, b> &rhs)
+    template<typename TE, typename dt2, bool b, typename=typename std::enable_if<std::is_convertible<dataType, dt2>::value>::type>
+    Tensor(const TensorExpression <TE, D, R, dt2, b> &rhs)
     {
         auto rit = rhs.begin();
         for (int i = 0; i < super::tensor_storage(R); ++i, ++rit) {

@@ -37,7 +37,7 @@ public:
 
     // Shape function values and gradients (in parameter space)
     std::vector<Eigen::VectorXd> shapeValues;
-    std::vector<Eigen::MatrixXd> shapeGradXi;
+    std::vector<Eigen::Matrix<double,Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> shapeGradXi;
 
     // update element values at a quadrature point
     template<int NSD>
@@ -94,9 +94,6 @@ void Element::update(int elnum, int qpi, const DoFManager &dofm)
         for(auto d : IRange(0,NSD)) {
             shapeGrad(A,d) = 0;
             double s = dot(make_TensorMap<NSD,1>(&shapeGradXi[qpi](A,0)), JinvT(d,colon()));
-            //for(auto i : IRange(0,NSD)) {
-            //s += shapeGradXi[qpi](A,i)*JinvT(d,i);
-            //}
             shapeGrad(A,d) = s;
         }
     }

@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG -ffast-math -march=native")
 
-set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -Og")
+set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG}")
 
 set(SOURCE_FILES
         include/element/Element.hpp
@@ -108,6 +108,7 @@ set(SOURCE_FILES
         #src/output/VTKScalarData.cpp
         #src/output/VTKTimeOutput.cpp
         src/quadrature/QuadratureRule.cpp
+        src/quadrature/TriangleQuadratureRules.cpp
         src/utils/DoFManager.cpp
         #src/utils/DirBC.cpp
         #src/utils/ElementType.cpp

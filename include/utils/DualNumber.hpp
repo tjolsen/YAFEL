@@ -161,6 +161,12 @@ DualNumber<T> sqrt(DualNumber<T> x)
     return DualNumber<T>(sqrt(x.first), .5 * x.second / sqrt(x.first));
 }
 
+template<typename T, typename U>
+DualNumber<T> pow(DualNumber<T> x, U exponent)
+{
+    using std::pow;
+    return DualNumber<T>(pow(x.first, exponent), x.second*exponent*pow(x.first,exponent-1));
+};
 
 template<typename T>
 std::ostream & operator<<(std::ostream & out, DualNumber<T> x)
