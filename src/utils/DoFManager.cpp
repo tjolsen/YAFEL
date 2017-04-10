@@ -99,7 +99,7 @@ void DoFManager::make_cg_dofs(const Mesh &M)
     int max_topodim = make_raw_dofs(M);
 
     //recombine duplicate nodes and update triangulation
-    //recombine_all_duplicates();
+    recombine_all_duplicates();
 
 }
 

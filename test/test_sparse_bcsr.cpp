@@ -1,6 +1,6 @@
 #include "yafel_globals.hpp"
-#include "lin_alg/sparse_bcsr.hpp"
-#include "lin_alg/sparse_coo.hpp"
+#include "old_handmade_linalg/sparse_bcsr.hpp"
+#include "old_handmade_linalg/sparse_coo.hpp"
 
 #include <iostream>
 #include <tuple>

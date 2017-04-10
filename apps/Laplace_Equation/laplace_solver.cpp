@@ -6,11 +6,11 @@
 #include "mesh/RectilinearMesh.hpp"
 
 //include linear algebra
-#include "lin_alg/Vector.hpp"
-#include "lin_alg/Matrix.hpp"
-#include "lin_alg/sparse_csr.hpp"
-#include "lin_alg/sparse_coo.hpp"
-#include "lin_alg/operators.hpp"
+#include "old_handmade_linalg/Vector.hpp"
+#include "old_handmade_linalg/Matrix.hpp"
+#include "old_handmade_linalg/sparse_csr.hpp"
+#include "old_handmade_linalg/sparse_coo.hpp"
+#include "old_handmade_linalg/operators.hpp"
 #include "lin_alg/solver/solvers.hpp"
 #include "lin_alg/tensor/Tensor.hpp"
 

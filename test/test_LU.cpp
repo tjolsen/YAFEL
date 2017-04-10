@@ -1,7 +1,7 @@
 #include "yafel_globals.hpp"
-#include "lin_alg/Matrix.hpp"
-#include "lin_alg/Vector.hpp"
-#include "lin_alg/operators.hpp"
+#include "old_handmade_linalg/Matrix.hpp"
+#include "old_handmade_linalg/Vector.hpp"
+#include "old_handmade_linalg/operators.hpp"
 #include "lin_alg/solver/direct/LUDecomposition.hpp"
 #include <iostream>
 #include <random>

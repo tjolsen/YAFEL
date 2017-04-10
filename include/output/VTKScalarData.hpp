@@ -3,7 +3,7 @@
 
 #include "yafel_globals.hpp"
 #include "output/VTKObject.hpp"
-#include "lin_alg/Vector.hpp"
+#include "old_handmade_linalg/Vector.hpp"
 #include <vector>
 #include <string>
 

@@ -1,9 +1,9 @@
 #include "yafel_globals.hpp"
-#include "lin_alg/sparse_bcsr.hpp"
-#include "lin_alg/sparse_coo.hpp"
-#include "lin_alg/Vector.hpp"
-#include "lin_alg/bcsr_spmv.hpp"
-#include "lin_alg/operators.hpp"
+#include "old_handmade_linalg/sparse_bcsr.hpp"
+#include "old_handmade_linalg/sparse_coo.hpp"
+#include "old_handmade_linalg/Vector.hpp"
+#include "old_handmade_linalg/bcsr_spmv.hpp"
+#include "old_handmade_linalg/operators.hpp"
 
 #include <iostream>
 

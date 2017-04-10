@@ -1,8 +1,8 @@
 #include "yafel_globals.hpp"
-#include "lin_alg/Matrix.hpp"
-#include "lin_alg/MatrixExpression.hpp"
-#include "lin_alg/matmul.hpp"
-#include "lin_alg/operators.hpp"
+#include "old_handmade_linalg/Matrix.hpp"
+#include "old_handmade_linalg/MatrixExpression.hpp"
+#include "old_handmade_linalg/matmul.hpp"
+#include "old_handmade_linalg/operators.hpp"
 #include "output/MatrixVisualization.hpp"
 
 #include <chrono>

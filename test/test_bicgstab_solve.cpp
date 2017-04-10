@@ -1,7 +1,7 @@
 #include "yafel_globals.hpp"
-#include "lin_alg/Vector.hpp"
-#include "lin_alg/sparse_csr.hpp"
-#include "lin_alg/sparse_coo.hpp"
+#include "old_handmade_linalg/Vector.hpp"
+#include "old_handmade_linalg/sparse_csr.hpp"
+#include "old_handmade_linalg/sparse_coo.hpp"
 #include "lin_alg/solver/iterative/bicgstab_solve.hpp"
 #include <cstdlib>
 #include <iostream>

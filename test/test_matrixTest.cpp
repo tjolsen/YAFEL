@@ -1,5 +1,5 @@
-#include "lin_alg/Matrix.hpp"
-#include "lin_alg/operators.hpp"
+#include "old_handmade_linalg/Matrix.hpp"
+#include "old_handmade_linalg/operators.hpp"
 #include <cassert>
 #include <cmath>
 #include <cstdlib>

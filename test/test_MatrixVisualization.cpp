@@ -1,8 +1,8 @@
 #include "yafel_globals.hpp"
 #include "output/MatrixVisualization.hpp"
-#include "lin_alg/sparse_coo.hpp"
-#include "lin_alg/sparse_csr.hpp"
-#include "lin_alg/sparse_bcsr.hpp"
+#include "old_handmade_linalg/sparse_coo.hpp"
+#include "old_handmade_linalg/sparse_csr.hpp"
+#include "old_handmade_linalg/sparse_bcsr.hpp"
 #include "mesh/GmshMesh.hpp"
 
 #include <iostream>

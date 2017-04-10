@@ -1,5 +1,5 @@
-#include "lin_alg/Vector.hpp"
-#include "lin_alg/operators.hpp"
+#include "old_handmade_linalg/Vector.hpp"
+#include "old_handmade_linalg/operators.hpp"
 #include <cassert>
 #include <cmath>
 #include <cstdlib>

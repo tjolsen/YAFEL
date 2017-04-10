@@ -8,7 +8,7 @@
 #include "yafel_globals.hpp"
 #include "yafel_typedefs.hpp"
 #include "ElementType.hpp"
-#include "new_mesh/Mesh.hpp"
+#include "mesh/Mesh.hpp"
 #include "quadrature/QuadratureRule.hpp"
 #include "utils/DoFManager.hpp"
 

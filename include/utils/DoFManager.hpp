@@ -3,26 +3,31 @@
 
 #include "yafel_globals.hpp"
 #include "yafel_typedefs.hpp"
-#include "new_mesh/Mesh.hpp"
+#include "mesh/Mesh.hpp"
 #include "element/ElementType.hpp"
 #include <vector>
 
 
 YAFEL_NAMESPACE_OPEN
 
-class DoFManager {
+class DoFManager
+{
 
 public:
-    enum class ManagerType {
+    //Denote DoF layout: CG, DG, (HDG, EDG?), (HDG_Skeleton, EDG_Skeleton?), (Composite?)
+    enum class ManagerType
+    {
         CG,
         DG
     };
 
 
-    DoFManager(const Mesh &M, ManagerType m_type, int polyOrder, int dof_per_node=1);
+    DoFManager(const Mesh &M, ManagerType m_type, int polyOrder, int dof_per_node = 1);
 
     void getGlobalDofs(int elnum, std::vector<int> &container) const;
+
     void getGlobalNodes(int elnum, std::vector<int> &container) const;
+
     ElementType CellType_to_ElementType(CellType ct, int polyOrder) const;
 
     int dof_per_node;
@@ -34,11 +39,15 @@ public:
 
 private:
     void make_cg_dofs(const Mesh &M);
+
     void make_dg_dofs(const Mesh &M);
+
     int make_raw_dofs(const Mesh &M);
+
     coordinate<> interpolate_from_corners(coordinate<> xlocal,
                                           const std::vector<coordinate<>> &corners,
                                           CellType ct) const noexcept;
+
     void recombine_all_duplicates();
 
 

@@ -2,7 +2,7 @@
 // Created by tyler on 3/14/17.
 //
 
-#include "new_mesh/Mesh.hpp"
+#include "mesh/Mesh.hpp"
 #include "utils/Range.hpp"
 #include <iostream>
 #include <element/Element.hpp>

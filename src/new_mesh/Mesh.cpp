@@ -2,7 +2,7 @@
 // Created by tyler on 3/15/17.
 //
 
-#include "new_mesh/Mesh.hpp"
+#include "mesh/Mesh.hpp"
 #include <fstream>
 
 YAFEL_NAMESPACE_OPEN

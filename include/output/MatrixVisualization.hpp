@@ -12,7 +12,7 @@
  */ 
 
 #include "yafel_globals.hpp"
-#include "lin_alg/sparse_matrix.hpp"
+#include "old_handmade_linalg/sparse_matrix.hpp"
 #include <vector>
 #include <sstream>
 #include <tuple>

@@ -1,5 +1,5 @@
 #include "yafel_globals.hpp"
-#include "lin_alg/sparse_coo.hpp"
+#include "old_handmade_linalg/sparse_coo.hpp"
 
 #include <cassert>
 #include <cstdlib>
