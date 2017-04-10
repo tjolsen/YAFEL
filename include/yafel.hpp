@@ -5,10 +5,16 @@
   This file serves as the simplest interface to YAFEL by including everything.
   If desired, this file may be ignored in favor of more fine-grained control
   over the parts of the library that are included.
+  It deliberately includes headers that are not meant to be user-facing
+  as a convenience to library developers (aka me!).
  */
 
 // Library-wide global declarations
 #include "yafel_globals.hpp"
+
+// Linear Algebra structures
+#include "lin_alg/tensor/tensors.hpp" // <-- already a convenience header
+
 
 // Utils
 #include "utils/DirBC.hpp"
@@ -22,34 +28,16 @@
 #include "utils/GaussLobattoQuadrature.hpp"
 #include "utils/SpatialFunction.hpp"
 
-
-// Linear Algebra
-#include "old_handmade_linalg/Vector.hpp"
-#include "old_handmade_linalg/Matrix.hpp"
-#include "old_handmade_linalg/sparse_coo.hpp"
-#include "old_handmade_linalg/sparse_csr.hpp"
-#include "old_handmade_linalg/sparse_bcsr.hpp"
-#include "lin_alg/solver/iterative/cg_solve.hpp"
-#include "lin_alg/solver/iterative/bicgstab_solve.hpp"
-#include "lin_alg/solver/iterative/Preconditioner.hpp"
-#include "lin_alg/solver/iterative/ILUPreconditioner.hpp"
-#include "lin_alg/solver/iterative/JacobiPreconditioner.hpp"
-#include "lin_alg/solver/direct/LUDecomposition.hpp"
-
 // Mesh
-#include "mesh/GenericMesh.hpp"
-#include "mesh/RectilinearMesh.hpp"
-#include "mesh/GmshMesh.hpp"
-#include "mesh/Face.hpp"
+#include "mesh/mesh_typedefs.hpp"
+#include "mesh/Mesh.hpp"
+#include "mesh/CellFace.hpp"
 
 // Elements
 #include "element/Element.hpp"
-#include "element/LinQuad.hpp"
-#include "element/LinTri.hpp"
-#include "element/LinHex.hpp"
-//#include "element/LinTet.hpp"
 #include "element/ElementFactory.hpp"
-#include "element/DG_Quad.hpp"
+#include "element/ElementType.hpp"
+#include "element/ShapeFunctionUtils.hpp"
 
 // Output
 #include "output/VTKObject.hpp"

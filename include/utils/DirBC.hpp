@@ -7,9 +7,6 @@
 
 
 #include "yafel_globals.hpp"
-#include "mesh/GenericMesh.hpp"
-#include "mesh/GmshMesh.hpp"
-#include "mesh/RectilinearMesh.hpp"
 #include "old_handmade_linalg/access_sparse_matrix.hpp"
 #include "old_handmade_linalg/sparse_csr.hpp"
 #include "old_handmade_linalg/Vector.hpp"

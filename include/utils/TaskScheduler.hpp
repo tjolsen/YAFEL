@@ -1,5 +1,5 @@
-#ifndef _YAFEL_TASK_SCHEDULER
-#define  _YAFEL_TASK_SCHEDULER
+#ifndef YAFEL_TASK_SCHEDULER
+#define YAFEL_TASK_SCHEDULER
 
 /**
  * \file
@@ -30,11 +30,12 @@
  * implementation (see ThreadPool in this project) from github by returning
  * a std::future<T()> from the TaskScheduler::enqueue() method.
  */
-class TaskScheduler {
+class TaskScheduler
+{
 public:
     using lock_t = std::unique_lock<std::mutex>;
 
-    constexpr static unsigned spin_count{32};
+    constexpr static int spin_count{32};
     const unsigned count;
 
     std::vector<std::thread> workers;
@@ -45,21 +46,22 @@ public:
     std::atomic<unsigned> _index;
 
     inline TaskScheduler(unsigned nthreads = std::thread::hardware_concurrency())
-        : count(nthreads), 
-          workers(nthreads), 
-          tq(nthreads), 
-          mtxs(nthreads), 
-          cvs(nthreads),
-          done(nthreads,false),
-          _index(0)
+            : count(nthreads),
+              workers(nthreads),
+              tq(nthreads),
+              mtxs(nthreads),
+              cvs(nthreads),
+              done(nthreads, false),
+              _index(0)
     {
-        for(unsigned i=0; i<nthreads; ++i) {
-            workers[i] = std::thread( [i, this](){ run(i); } );
+        for (unsigned i = 0; i < nthreads; ++i) {
+            workers[i] = std::thread([i, this]() { run(i); });
         }
     }
 
-    inline ~TaskScheduler() {
-        for(unsigned i=0; i<count; ++i) {
+    inline ~TaskScheduler()
+    {
+        for (unsigned i = 0; i < count; ++i) {
             {
                 std::unique_lock<std::mutex> lock{mtxs[i]};
                 done[i] = true;
@@ -67,79 +69,80 @@ public:
             cvs[i].notify_all();
         }
 
-        for(auto &w : workers)
+        for (auto &w : workers)
             w.join();
     }
 
     template<typename F, typename ...Args>
-    auto enqueue(F&& f, Args&& ...args)
-        -> std::future<typename std::result_of<F(Args...)>::type>
+    auto enqueue(F &&f, Args &&...args)
+    -> std::future<typename std::result_of<F(Args...)>::type>
     {
-        
+
         using ret_type = typename std::result_of<F(Args...)>::type;
 
         auto task = std::make_shared<std::packaged_task<ret_type()> >
-            (std::bind(std::forward<F>(f), std::forward<Args>(args)...));
-        
+                (std::bind(std::forward<F>(f), std::forward<Args>(args)...));
+
         auto ret = task->get_future();
         auto i = _index++;
 
         //try to push without blocking
-        for(unsigned n=0; n != count*spin_count; ++n) {
-            auto idx = (i+n)%count;
+        for (unsigned n = 0; n != count * spin_count; ++n) {
+            auto idx = (i + n) % count;
             {
                 lock_t lock{mtxs[idx], std::try_to_lock};
-                if(!lock) continue;
+                if (!lock) continue;
 
-                tq[idx].emplace_back([task](){(*task)();});
+                tq[idx].emplace_back([task]() { (*task)(); });
             }
             cvs[idx].notify_one();
             return ret;
         }
         {
             lock_t lock{mtxs[i]};
-            tq[i].emplace_back([task](){(*task)();});
+            tq[i].emplace_back([task]() { (*task)(); });
         }
         cvs[i].notify_one();
         return ret;
     }
-    
+
 private:
 
-    
-    void run(unsigned i) {
 
-        while(true) {
+    void run(unsigned i)
+    {
+
+        while (true) {
             std::function<void()> f;
             bool try_failure = true;
-            for(unsigned n=0; n != count*spin_count; ++n) {
-                auto idx = (i+n)%count;
+            for (unsigned n = 0; n != count * spin_count; ++n) {
+                auto idx = (i + n) % count;
                 lock_t lock{mtxs[idx], std::try_to_lock};
-                
-                if(!lock || tq[idx].empty()) continue;
-                
+
+                if (!lock || tq[idx].empty()) continue;
+
                 f = std::move(tq[idx].front());
                 tq[idx].pop_front();
                 try_failure = false;
                 break;
             }
-            if(try_failure) {
+            if (try_failure) {
                 lock_t lock{mtxs[i]};
-                while(tq[i].empty() && !done[i])
+                while (tq[i].empty() && !done[i])
                     cvs[i].wait(lock);
-                if(tq[i].empty())
+                if (tq[i].empty())
                     break;
                 f = std::move(tq[i].front());
                 tq[i].pop_front();
             }
-            if(!f) break;
-            
+            if (!f) break;
+
             f();
         } //end while
 
     }//end run
 
-    
+
 };
 
 

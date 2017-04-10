@@ -42,11 +42,13 @@ set(SOURCE_FILES
         include/lin_alg/tensor/tensor_functions/UnaryFunctions.hpp
         include/lin_alg/tensor/tensor_functions/update_assignment.hpp
 
-        include/mesh/ElementIterator.hpp
-        include/quadrature/LobattoPoints1D.hpp
-        include/mesh/Mesh.hpp
-        include/mesh/mesh_typedefs.hpp
 
+        include/mesh/ElementIterator.hpp
+        include/mesh/mesh_typedefs.hpp
+        include/mesh/Mesh.hpp
+        include/mesh/CellFace.hpp
+
+        include/output/OutputBackend.hpp
         #include/output/MatrixVisualization.hpp
         #include/output/VTKDGMesh.hpp
         #include/output/VTKMesh.hpp
@@ -56,15 +58,15 @@ set(SOURCE_FILES
         #include/output/VTKTensorData.hpp
         #include/output/VTKTimeOutput.hpp
         #include/output/VTKVectorData.hpp
+
+        include/quadrature/LobattoPoints1D.hpp
+        include/quadrature/QuadratureRule.hpp
+
         include/utils/ConcurrentQueue.hpp
         include/utils/DirBC.hpp
         include/utils/DoFManager.hpp
         include/utils/DualNumber.hpp
-        include/utils/ElementType.hpp
         include/utils/ElementVtkType.hpp
-        include/utils/GaussLegendreQuadrature.hpp
-        include/utils/GaussLobattoQuadrature.hpp
-        include/quadrature/QuadratureRule.hpp
         include/utils/Range.hpp
         include/utils/ScalarTraits.hpp
         include/utils/SpatialFunction.hpp
@@ -73,7 +75,6 @@ set(SOURCE_FILES
         include/yafel.hpp
         include/yafel_globals.hpp
         include/yafel_typedefs.hpp
-
 
 
         src/element/Element.cpp
@@ -91,7 +92,6 @@ set(SOURCE_FILES
         src/quadrature/TriangleQuadratureRules.cpp
         src/utils/DoFManager.cpp
         #src/utils/DirBC.cpp
-        #src/utils/ElementType.cpp
         #src/utils/ElementVtkType.cpp
         )
 
@@ -100,3 +100,7 @@ add_library(yafel ${SOURCE_FILES})
 
 add_executable(sandbox experimental/sandbox.cpp)
 target_link_libraries(sandbox yafel)
+
+
+# Add any subdirectories to the project
+add_subdirectory(apps)
