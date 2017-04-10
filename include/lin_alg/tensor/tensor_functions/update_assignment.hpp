@@ -6,8 +6,8 @@
 #define YAFEL_UPDATE_ASSIGNMENT_HPP_HPP
 
 #include "yafel_globals.hpp"
-#include "lin_alg/new_tensor/TensorExpression.hpp"
-#include "lin_alg/new_tensor/tensor_expression_types/BinaryOperations.hpp"
+#include "lin_alg/tensor/TensorExpression.hpp"
+#include "lin_alg/tensor/tensor_expression_types/BinaryOperations.hpp"
 
 YAFEL_NAMESPACE_OPEN
 

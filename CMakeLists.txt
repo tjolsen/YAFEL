@@ -13,6 +13,35 @@ set(SOURCE_FILES
         include/element/ElementType.hpp
         include/element/ShapeFunctionUtils.hpp
 
+        include/lin_alg/tensor/tensors.hpp
+        include/lin_alg/tensor/TensorExpression.hpp
+        include/lin_alg/tensor/mp_utils/contraction_mp_utils.hpp
+        include/lin_alg/tensor/mp_utils/map_mp_utils.hpp
+        include/lin_alg/tensor/mp_utils/mp_tuple_utils.hpp
+        include/lin_alg/tensor/mp_utils/sequence_functions.hpp
+        include/lin_alg/tensor/mp_utils/sequences.hpp
+        include/lin_alg/tensor/mp_utils/slice_mp_utils.hpp
+        include/lin_alg/tensor/mp_utils/TypeList.hpp
+        include/lin_alg/tensor/tensor_expression_types/BinaryOperations.hpp
+        include/lin_alg/tensor/tensor_expression_types/Tensor.hpp
+        include/lin_alg/tensor/tensor_expression_types/TensorContraction.hpp
+        include/lin_alg/tensor/tensor_expression_types/TensorCwiseBinaryOp.hpp
+        include/lin_alg/tensor/tensor_expression_types/TensorCwiseUnaryOp.hpp
+        include/lin_alg/tensor/tensor_expression_types/TensorDyadicProduct.hpp
+        include/lin_alg/tensor/tensor_expression_types/TensorFunctor.hpp
+        include/lin_alg/tensor/tensor_expression_types/TensorMap.hpp
+        include/lin_alg/tensor/tensor_expression_types/TensorPermutation.hpp
+        include/lin_alg/tensor/tensor_expression_types/TensorScaled.hpp
+        include/lin_alg/tensor/tensor_expression_types/TensorSlice.hpp
+        include/lin_alg/tensor/tensor_expression_types/UnaryOperations.hpp
+        include/lin_alg/tensor/tensor_functions/BinaryFunctions.hpp
+        include/lin_alg/tensor/tensor_functions/operators.hpp
+        include/lin_alg/tensor/tensor_functions/rank2_specializations.hpp
+        include/lin_alg/tensor/tensor_functions/spectral_decomposition.hpp
+        include/lin_alg/tensor/tensor_functions/tensor_dot.hpp
+        include/lin_alg/tensor/tensor_functions/UnaryFunctions.hpp
+        include/lin_alg/tensor/tensor_functions/update_assignment.hpp
+
         include/mesh/ElementIterator.hpp
         include/quadrature/LobattoPoints1D.hpp
         include/mesh/Mesh.hpp

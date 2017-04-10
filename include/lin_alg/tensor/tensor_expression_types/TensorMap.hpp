@@ -6,8 +6,8 @@
 #define YAFEL_TENSORMAP_HPP
 
 #include "yafel_globals.hpp"
-#include "lin_alg/new_tensor/TensorExpression.hpp"
-#include "lin_alg/new_tensor/mp_utils/map_mp_utils.hpp"
+#include "lin_alg/tensor/TensorExpression.hpp"
+#include "lin_alg/tensor/mp_utils/map_mp_utils.hpp"
 #include <type_traits>
 
 YAFEL_NAMESPACE_OPEN

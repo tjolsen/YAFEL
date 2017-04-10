@@ -18,10 +18,10 @@
  */
 
 #include "yafel_globals.hpp"
-#include "lin_alg/new_tensor/TensorExpression.hpp"
-#include "lin_alg/new_tensor/tensor_expression_types/TensorPermutation.hpp"
-#include "lin_alg/new_tensor/tensor_expression_types/TensorScaled.hpp"
-#include "lin_alg/new_tensor/tensor_functions/operators.hpp"
+#include "lin_alg/tensor/TensorExpression.hpp"
+#include "lin_alg/tensor/tensor_expression_types/TensorPermutation.hpp"
+#include "lin_alg/tensor/tensor_expression_types/TensorScaled.hpp"
+#include "lin_alg/tensor/tensor_functions/operators.hpp"
 #include "utils/Range.hpp"
 
 YAFEL_NAMESPACE_OPEN

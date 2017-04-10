@@ -5,7 +5,7 @@
 #ifndef YAFEL_TENSORSCALED_HPP
 #define YAFEL_TENSORSCALED_HPP
 
-#include "lin_alg/new_tensor/TensorExpression.hpp"
+#include "lin_alg/tensor/TensorExpression.hpp"
 
 YAFEL_NAMESPACE_OPEN
 

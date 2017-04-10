@@ -6,10 +6,10 @@
 #define YAFEL_SPECTRAL_DECOMPOSITION_HPP
 
 #include "yafel_globals.hpp"
-#include "lin_alg/new_tensor/TensorExpression.hpp"
-#include "lin_alg/new_tensor/tensor_expression_types/Tensor.hpp"
-#include "lin_alg/new_tensor/tensor_expression_types/TensorPermutation.hpp"
-#include "lin_alg/new_tensor/tensor_functions/rank2_specializations.hpp"
+#include "lin_alg/tensor/TensorExpression.hpp"
+#include "lin_alg/tensor/tensor_expression_types/Tensor.hpp"
+#include "lin_alg/tensor/tensor_expression_types/TensorPermutation.hpp"
+#include "lin_alg/tensor/tensor_functions/rank2_specializations.hpp"
 #include "utils/Range.hpp"
 #include <cmath>
 

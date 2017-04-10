@@ -6,8 +6,8 @@
 #define YAFEL_UNARYFUNCTIONS_HPP
 
 #include "yafel_globals.hpp"
-#include "lin_alg/new_tensor/tensor_expression_types/TensorCwiseUnaryOp.hpp"
-#include "lin_alg/new_tensor/tensor_expression_types/UnaryOperations.hpp"
+#include "lin_alg/tensor/tensor_expression_types/TensorCwiseUnaryOp.hpp"
+#include "lin_alg/tensor/tensor_expression_types/UnaryOperations.hpp"
 
 YAFEL_NAMESPACE_OPEN
 

@@ -6,9 +6,9 @@
 #define YAFEL_TENSORFUNCTOR_HPP
 
 #include "yafel_globals.hpp"
-#include "lin_alg/new_tensor/TensorExpression.hpp"
-#include "lin_alg/new_tensor/mp_utils/sequences.hpp"
-#include "lin_alg/new_tensor/mp_utils/mp_tuple_utils.hpp"
+#include "lin_alg/tensor/TensorExpression.hpp"
+#include "lin_alg/tensor/mp_utils/sequences.hpp"
+#include "lin_alg/tensor/mp_utils/mp_tuple_utils.hpp"
 #include <utility>
 
 YAFEL_NAMESPACE_OPEN

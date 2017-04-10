@@ -6,7 +6,7 @@
 #define YAFEL_TENSOR_DOT_HPP
 
 #include "yafel_globals.hpp"
-#include "lin_alg/new_tensor/TensorExpression.hpp"
+#include "lin_alg/tensor/TensorExpression.hpp"
 #include <cmath>
 
 YAFEL_NAMESPACE_OPEN

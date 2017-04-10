@@ -11,8 +11,8 @@
  */
 
 #include "yafel_globals.hpp"
-#include "lin_alg/new_tensor/tensor_expression_types/BinaryOperations.hpp"
-#include "lin_alg/new_tensor/tensor_expression_types/TensorCwiseBinaryOp.hpp"
+#include "lin_alg/tensor/tensor_expression_types/BinaryOperations.hpp"
+#include "lin_alg/tensor/tensor_expression_types/TensorCwiseBinaryOp.hpp"
 
 
 YAFEL_NAMESPACE_OPEN
