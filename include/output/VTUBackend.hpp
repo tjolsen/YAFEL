@@ -35,9 +35,9 @@ public:
     virtual void finalize() override;
     virtual void finalize_frame() override;
 
-    virtual void write_frame(const OutputFrame &frame) override;
+    virtual void write_frame(OutputFrame &frame) override;
     virtual void write_data(const OutputData &data) override;
-    virtual void write_mesh(const OutputMesh *outputMesh) override;
+    virtual void write_mesh(OutputMesh *outputMesh) override;
 
 private:
     std::ofstream outfile;

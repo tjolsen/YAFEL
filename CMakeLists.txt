@@ -51,6 +51,7 @@ set(SOURCE_FILES
         include/output/OutputBackend.hpp
         include/output/OutputData.hpp
         include/output/OutputFrame.hpp
+        include/output/OutputMesh.hpp
         include/output/VTUBackend.hpp
         #include/output/MatrixVisualization.hpp
         #include/output/VTKDGMesh.hpp

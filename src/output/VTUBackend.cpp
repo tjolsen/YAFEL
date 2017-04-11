@@ -17,7 +17,6 @@ YAFEL_NAMESPACE_OPEN
 static int ElementType_to_VTKType(const ElementType &et);
 
 
-
 void VTUBackend::initialize(const std::string &fname_base, double time)
 {
     if (is_initialized) {
@@ -51,7 +50,8 @@ void VTUBackend::finalize()
     }
 }
 
-void VTUBackend::finalize_frame(){
+void VTUBackend::finalize_frame()
+{
     while (frame_stack.size() > 0) {
         auto &&f = frame_stack.back();
         f();
@@ -60,13 +60,13 @@ void VTUBackend::finalize_frame(){
 }
 
 
-void VTUBackend::write_frame(const OutputFrame &frame)
+void VTUBackend::write_frame(OutputFrame &frame)
 {
     //write mesh
     write_mesh(frame.outputMesh);
 
     //write point data
-    if(frame.point_data.size() > 0) {
+    if (frame.point_data.size() > 0) {
         outfile << "<PointData>\n";
         for (auto &pd : frame.point_data) {
             write_data(*pd);
@@ -75,10 +75,24 @@ void VTUBackend::write_frame(const OutputFrame &frame)
     }
 
     //write cell data
-    if(frame.cell_data.size() > 0) {
+    int n_local_cells{0};
+    for(auto n : frame.outputMesh->local_cells_per_cell) {
+        n_local_cells += n;
+    }
+
+    if (frame.cell_data.size() > 0) {
         outfile << "<CellData>\n";
         for (auto &pd : frame.cell_data) {
-            write_data(*pd);
+            Eigen::VectorXd tmp(n_local_cells);
+            int idx{0};
+            for(int c : IRange(0,static_cast<int>(frame.outputMesh->local_cells_per_cell.size()))) {
+                for(auto i : IRange(0,frame.outputMesh->local_cells_per_cell[c])) {
+                    tmp(idx++) = (*(pd->data))(c);
+                }
+            }
+            OutputData tmp_data(*pd);
+            tmp_data.data = &tmp;
+            write_data(tmp_data);
         }
         outfile << "</CellData>\n";
     }
@@ -175,7 +189,7 @@ void VTUBackend::write_data(const OutputData &data)
 }
 
 
-void VTUBackend::write_mesh(const OutputMesh *outputMesh)
+void VTUBackend::write_mesh(OutputMesh *outputMesh)
 {
     cleanup_stack.push_back([this]() {
         outfile << "</Piece>\n";
@@ -184,7 +198,7 @@ void VTUBackend::write_mesh(const OutputMesh *outputMesh)
 
     auto &dofm = *outputMesh->dofm;
     int n_points = outputMesh->dofm->dof_nodes.size();
-    int n_parent_cells = outputMesh->dofm->element_offsets.size()-1;
+    int n_parent_cells = outputMesh->dofm->element_offsets.size() - 1;
 
     //Need an element factory to build visualization topology
     ElementFactory EF(1);
@@ -192,29 +206,32 @@ void VTUBackend::write_mesh(const OutputMesh *outputMesh)
     std::vector<int> expanded_cells;
     std::vector<int> expanded_cell_offsets;
     std::vector<int> expanded_cell_vtk_type;
+    outputMesh->local_cells_per_cell.resize(n_parent_cells);
 
     int offset{0};
     std::vector<int> local_cell;
     std::vector<int> global_nodes;
-    for(auto e : IRange(0,n_parent_cells)) {
+    for (auto e : IRange(0, n_parent_cells)) {
         auto et = dofm.element_types[e];
-        if(et.elementTopology == ElementTopology::None) {
+        if (et.elementTopology == ElementTopology::None) {
             continue;
         }
         auto &E = EF.getElement(et);
-        dofm.getGlobalNodes(e,global_nodes);
+        dofm.getGlobalNodes(e, global_nodes);
+
+        outputMesh->local_cells_per_cell[e] = E.localMesh.nCells();
 
         //all "local" meshes are of same type. get ElementType of first element and run
-        int vtk_type = ElementType_to_VTKType(dofm.CellType_to_ElementType(E.localMesh.getCellType(0),1));
+        int vtk_type = ElementType_to_VTKType(dofm.CellType_to_ElementType(E.localMesh.getCellType(0), 1));
 
-        for(auto lc : IRange(0,E.localMesh.nCells())) {
+        for (auto lc : IRange(0, E.localMesh.nCells())) {
             E.localMesh.getCellNodes(lc, local_cell);
             expanded_cell_offsets.push_back(offset);
             offset += local_cell.size();
 
             expanded_cell_vtk_type.push_back(vtk_type);
 
-            for(auto n : local_cell) {
+            for (auto n : local_cell) {
                 expanded_cells.push_back(global_nodes[n]);
             }
         }
@@ -225,16 +242,16 @@ void VTUBackend::write_mesh(const OutputMesh *outputMesh)
 
     //Begin writing
     outfile << "<UnstructuredGrid>\n"
-            <<"<Piece NumberOfPoints=\""
+            << "<Piece NumberOfPoints=\""
                + std::to_string(n_points)
                + "\" NumberOfCells=\""
                + std::to_string(n_cells)
-               +"\">\n";
+               + "\">\n";
 
     //write points
-    outfile <<"<Points>\n"
+    outfile << "<Points>\n"
             << "<DataArray type=\"Float32\" NumberOfComponents=\"3\" format=\"ascii\">\n";
-    for(auto &x : dofm.dof_nodes) {
+    for (auto &x : dofm.dof_nodes) {
         outfile << x(0) << ' ' << x(1) << ' ' << x(2) << '\n';
     }
     outfile << "</DataArray>\n"
@@ -245,38 +262,39 @@ void VTUBackend::write_mesh(const OutputMesh *outputMesh)
             << "<DataArray type=\"UInt32\" Name=\"connectivity\" format=\"ascii\">\n";
 
     //write cell connectivity. each cell written on a separate line only for human-readability. not important for format.
-    for(auto c : IRange(0,n_cells)) {
+    for (auto c : IRange(0, n_cells)) {
         auto start = expanded_cell_offsets[c];
-        auto end = expanded_cell_offsets[c+1];
-        for(auto idx : IRange(start, end-1)) {
+        auto end = expanded_cell_offsets[c + 1];
+        for (auto idx : IRange(start, end - 1)) {
             outfile << expanded_cells[idx] << ' ';
         }
-        outfile << expanded_cells[end-1] << '\n';
+        outfile << expanded_cells[end - 1] << '\n';
     }
     outfile << "</DataArray>\n";
 
     //write cell offsets
     outfile << "<DataArray type=\"UInt32\" Name=\"offsets\" format=\"ascii\">\n";
-    for(auto c : IRange(1,n_cells+1)) {
+    for (auto c : IRange(1, n_cells + 1)) {
         outfile << expanded_cell_offsets[c] << '\n';
     }
     outfile << "</DataArray>\n";
 
     //write cell types
     outfile << "<DataArray type=\"UInt8\" Name=\"types\" format=\"ascii\">\n";
-    for(auto vtktype : expanded_cell_vtk_type) {
+    for (auto vtktype : expanded_cell_vtk_type) {
         outfile << vtktype << '\n';
     }
     outfile << "</DataArray>\n";
     outfile << "</Cells>\n";
 }
 
-static int ElementType_to_VTKType(const ElementType &et) {
-    switch(et.elementTopology) {
+static int ElementType_to_VTKType(const ElementType &et)
+{
+    switch (et.elementTopology) {
         case ElementTopology::Simplex:
-            return 5*(et.topoDim==2) + 10*(et.topoDim==3); //tri or tet
+            return 5 * (et.topoDim == 2) + 10 * (et.topoDim == 3); //tri or tet
         case ElementTopology::TensorProduct:
-            return 3*(et.topoDim==1) + 9*(et.topoDim==2) + 12*(et.topoDim==3); //quad or hex
+            return 3 * (et.topoDim == 1) + 9 * (et.topoDim == 2) + 12 * (et.topoDim == 3); //quad or hex
         case ElementTopology::None:
             return 2; //poly-vertex, draw it as dots and see how it goes
     }

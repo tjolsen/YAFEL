@@ -7,6 +7,7 @@
 
 #include "yafel_globals.hpp"
 #include "utils/DoFManager.hpp"
+#include <vector>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -16,6 +17,8 @@ public:
     inline OutputMesh(const DoFManager &dm) : dofm(&dm) {}
 
     const DoFManager *dofm;
+
+    std::vector<int> local_cells_per_cell;
 };
 
 

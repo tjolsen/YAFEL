@@ -40,7 +40,11 @@ public:
 
     OutputData(const Eigen::VectorXd &d, const std::string &name);
 
-    OutputData(const Eigen::VectorXd &d, const std::string &name, const std::vector<int> &mask);
+    OutputData(const Eigen::VectorXd &d,
+               const std::string &name,
+               DataLocation dL,
+               DataType dT,
+               const std::vector<int> &mask);
 
 
     const Eigen::VectorXd *data;

@@ -54,15 +54,41 @@ int main()
            X,cells,cell_offsets,celltypes);
     */
     Mesh M("minsquare.msh");
-    int p=5;
-    DoFManager dofm(M,DoFManager::ManagerType::CG, p, 1);
+    int p = 2;
+    DoFManager dofm(M, DoFManager::ManagerType::CG, p, 1);
 
 
     VTUBackend VTU;
     OutputMesh outputMesh(dofm);
     OutputFrame outputFrame(outputMesh);
 
-    VTU.initialize("test_output",0);
+    Eigen::VectorXd x_coord(dofm.dof_nodes.size());
+    Eigen::VectorXd y_coord(dofm.dof_nodes.size());
+    Eigen::VectorXd xy_coord(2 * dofm.dof_nodes.size());
+    for (auto i : IRange(0, static_cast<int>(dofm.dof_nodes.size()))) {
+        x_coord(i) = dofm.dof_nodes[i](0);
+        y_coord(i) = dofm.dof_nodes[i](1);
+        xy_coord(2 * i) = dofm.dof_nodes[i](0);
+        xy_coord(2 * i + 1) = dofm.dof_nodes[i](1);
+    }
+
+    Eigen::VectorXd cell_id(dofm.element_types.size());
+    double id{0};
+    for(auto i : IRange(0,static_cast<int>(cell_id.rows()))) {
+        cell_id(i) = id;
+        id += 1;
+    }
+
+    OutputData Xdata(x_coord, "X");
+    OutputData Ydata(y_coord, "Y");
+    OutputData XYdata(xy_coord, "XY", OutputData::DataLocation::Point, OutputData::DataType::Vector, {1, 1});
+    OutputData cellid_data(cell_id,"ID",OutputData::DataLocation::Cell,OutputData::DataType::Scalar, {1});
+    outputFrame.point_data.push_back(&Xdata);
+    outputFrame.point_data.push_back(&Ydata);
+    outputFrame.point_data.push_back(&XYdata);
+    outputFrame.cell_data.push_back(&cellid_data);
+
+    VTU.initialize("test_output", 0);
     VTU.write_frame(outputFrame);
     VTU.finalize();
 

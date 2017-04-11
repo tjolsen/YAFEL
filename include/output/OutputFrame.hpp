@@ -14,9 +14,9 @@ YAFEL_NAMESPACE_OPEN
 class OutputFrame
 {
 public:
-    inline OutputFrame(const OutputMesh &om) : outputMesh(&om) {}
+    inline OutputFrame(OutputMesh &om) : outputMesh(&om) {}
 
-    const OutputMesh *outputMesh;
+    OutputMesh *outputMesh;
     std::vector<OutputData*> point_data;
     std::vector<OutputData*> cell_data;
     double time{0};
