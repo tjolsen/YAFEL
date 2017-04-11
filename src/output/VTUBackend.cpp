@@ -24,7 +24,7 @@ void VTUBackend::initialize(const std::string &fname_base, double time)
         return;
     }
 
-    std::string fname = fname_base + std::to_string(time) + ".vtu";
+    std::string fname = fname_base + "_" + std::to_string(time) + ".vtu";
     outfile.open(fname);
 
     if (outfile.good()) {
@@ -48,6 +48,14 @@ void VTUBackend::finalize()
         auto &&f = cleanup_stack.back();
         f();
         cleanup_stack.pop_back();
+    }
+}
+
+void VTUBackend::finalize_frame(){
+    while (frame_stack.size() > 0) {
+        auto &&f = frame_stack.back();
+        f();
+        frame_stack.pop_back();
     }
 }
 
@@ -75,7 +83,7 @@ void VTUBackend::write_frame(const OutputFrame &frame)
         outfile << "</CellData>\n";
     }
 
-    finalize();
+    finalize_frame();
 }
 
 void VTUBackend::write_data(const OutputData &data)
@@ -189,7 +197,11 @@ void VTUBackend::write_mesh(const OutputMesh *outputMesh)
     std::vector<int> local_cell;
     std::vector<int> global_nodes;
     for(auto e : IRange(0,n_parent_cells)) {
-        auto &E = EF.getElement(dofm.element_types[e]);
+        auto et = dofm.element_types[e];
+        if(et.elementTopology == ElementTopology::None) {
+            continue;
+        }
+        auto &E = EF.getElement(et);
         dofm.getGlobalNodes(e,global_nodes);
 
         //all "local" meshes are of same type. get ElementType of first element and run
@@ -212,7 +224,8 @@ void VTUBackend::write_mesh(const OutputMesh *outputMesh)
 
 
     //Begin writing
-    outfile << "<Piece NumberOfPoints=\""
+    outfile << "<UnstructuredGrid>\n"
+            <<"<Piece NumberOfPoints=\""
                + std::to_string(n_points)
                + "\" NumberOfCells=\""
                + std::to_string(n_cells)

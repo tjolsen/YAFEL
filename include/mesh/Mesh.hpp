@@ -79,13 +79,13 @@ public:
     /**
      * Setters for internal structures
      */
-    inline void setGeometryNodes(std::vector<coordinate<>> &&gn) { geometryNodes_ = gn; }
+    inline void setGeometryNodes(const std::vector<coordinate<>> &gn) { geometryNodes_ = gn; }
 
-    inline void setCellNodes(std::vector<int> &&cn) { cellNodes_ = cn; }
+    inline void setCellNodes(const std::vector<int> &cn) { cellNodes_ = cn; }
 
-    inline void setOffsets(std::vector<int> &&off) { cellOffsets_ = off; }
+    inline void setOffsets(const std::vector<int> &off) { cellOffsets_ = off; }
 
-    inline void setCellTypes(std::vector<CellType> &&ct) { cellTypes_ = ct; }
+    inline void setCellTypes(const std::vector<CellType> &ct) { cellTypes_ = ct; }
 
 
     /**

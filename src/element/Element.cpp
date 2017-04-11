@@ -150,10 +150,10 @@ void Element::make_tensorProduct()
     }
 
     // Set local mesh members from created containers
-    localMesh.setGeometryNodes(std::move(localPoints_xi));
-    localMesh.setCellNodes(std::move(cellNodes));
-    localMesh.setOffsets(std::move(offsets));
-    localMesh.setCellTypes(std::move(cellTypes));
+    localMesh.setGeometryNodes(localPoints_xi);
+    localMesh.setCellNodes(cellNodes);
+    localMesh.setOffsets(offsets);
+    localMesh.setCellTypes(cellTypes);
 
     quadratureRule = QuadratureRule::make_tensor_product(QuadratureRule::QuadratureType::GAUSS_LEGENDRE,
                                                          elementType.topoDim, 2 * elementType.polyOrder);

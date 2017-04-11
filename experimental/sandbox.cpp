@@ -9,6 +9,10 @@
 #include <element/ElementFactory.hpp>
 #include "utils/DoFManager.hpp"
 
+#include "output/VTUBackend.hpp"
+#include "output/OutputMesh.hpp"
+#include "output/OutputFrame.hpp"
+
 using namespace yafel;
 
 int main()
@@ -50,26 +54,17 @@ int main()
            X,cells,cell_offsets,celltypes);
     */
     Mesh M("minsquare.msh");
-    int p=2;
+    int p=5;
     DoFManager dofm(M,DoFManager::ManagerType::CG, p, 1);
-    double area{0};
 
 
-    ElementFactory EF(1);
+    VTUBackend VTU;
+    OutputMesh outputMesh(dofm);
+    OutputFrame outputFrame(outputMesh);
 
-    for(auto c : IRange(0,M.nCells())) {
-        auto et = dofm.CellType_to_ElementType(M.getCellType(c),p);
-        auto &E = EF.getElement(et);
-        for(auto qpi : IRange(0,E.nQP())) {
-            E.update<2>(c, qpi, dofm);
-            auto w = E.quadratureRule.weights[qpi];
-            area += w*E.detJ;
-        }
-    }
-
-
-    std::cout << "A = " << area << std::endl;
-
+    VTU.initialize("test_output",0);
+    VTU.write_frame(outputFrame);
+    VTU.finalize();
 
     return 0;
 }

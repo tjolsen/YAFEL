@@ -13,9 +13,9 @@ YAFEL_NAMESPACE_OPEN
 class OutputMesh
 {
 public:
-    OutputMesh(const DoFManager &dofm);
+    inline OutputMesh(const DoFManager &dm) : dofm(&dm) {}
 
-    DoFManager *dofm;
+    const DoFManager *dofm;
 };
 
 
