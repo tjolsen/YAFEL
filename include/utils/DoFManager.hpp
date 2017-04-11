@@ -36,6 +36,7 @@ public:
     std::vector<coordinate<>> dof_nodes;
     std::vector<int> element_offsets;
     std::vector<int> elements;
+    std::vector<ElementType> element_types;
 
 private:
     void make_cg_dofs(const Mesh &M);

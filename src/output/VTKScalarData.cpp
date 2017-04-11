@@ -18,7 +18,7 @@ VTKScalarData::VTKScalarData(const Vector<double> &d, VTKObject::VTKObjectType o
 
 void VTKScalarData::write(FILE *fp) {
 
-  fprintf(fp, "<DataArray type=\"Float32\" format=\"ascii\" Name=\"%s\" NumberOfComponents=\"1\">\n",
+  fprintf(fp, "<DataArray type=\\\"Float32\\\" format=\\\"ascii\\\" Name=\\\"%s\\\" NumberOfComponents=\\\"1\\\">\\n",
 	  getName().c_str());
   
   for(std::size_t i=0; i<data.size(); ++i) {

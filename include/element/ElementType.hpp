@@ -39,7 +39,7 @@ enum class ElementTopology : int8_t
  */
 struct ElementType
 {
-    inline ElementType(ElementTopology ec, int td, int po) : elementTopology(ec), topoDim(td), polyOrder(po)
+    inline ElementType(ElementTopology ec=ElementTopology::None, int td=0, int po=0) : elementTopology(ec), topoDim(td), polyOrder(po)
     {}
 
     ElementTopology elementTopology;

@@ -45,7 +45,7 @@ void VTKOutput::write(const std::string &fname) {
         std::runtime_error("VTKOutput::write() : no mesh assigned.");
     }
   
-    fprintf(fp, "<?xml version=\"1.0\"?>\n");
+    fprintf(fp, "<?xml version=\\\"1.0\\\"?>\\n");
     fprintf(fp, "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\">\n");
     vtkmesh->write(fp);
   

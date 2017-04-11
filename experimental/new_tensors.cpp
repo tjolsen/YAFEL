@@ -2,7 +2,7 @@
 // Created by tyler on 2/21/17.
 //
 
-#include "lin_alg/new_tensor/tensors.hpp"
+#include "lin_alg/tensor/tensors.hpp"
 
 #include <iostream>
 

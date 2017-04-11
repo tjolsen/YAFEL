@@ -49,6 +49,9 @@ set(SOURCE_FILES
         include/mesh/CellFace.hpp
 
         include/output/OutputBackend.hpp
+        include/output/OutputData.hpp
+        include/output/OutputFrame.hpp
+        include/output/VTUBackend.hpp
         #include/output/MatrixVisualization.hpp
         #include/output/VTKDGMesh.hpp
         #include/output/VTKMesh.hpp
@@ -81,15 +84,22 @@ set(SOURCE_FILES
         src/element/ElementFactory.cpp
         src/element/ShapeFunctionUtils.cpp
         src/quadrature/LobattoPoints1D.cpp
-        src/new_mesh/Mesh.cpp
-        src/new_mesh/build_faces.cpp
-        src/new_mesh/parse_gmsh.cpp
+        src/mesh/Mesh.cpp
+        src/mesh/build_faces.cpp
+        src/mesh/parse_gmsh.cpp
+
+        src/output/OutputBackend.cpp
+        src/output/OutputData.cpp
+        src/output/VTUBackend.cpp
+
         #src/output/VTKObject.cpp
         #src/output/VTKOutput.cpp
         #src/output/VTKScalarData.cpp
         #src/output/VTKTimeOutput.cpp
+
         src/quadrature/QuadratureRule.cpp
         src/quadrature/TriangleQuadratureRules.cpp
+
         src/utils/DoFManager.cpp
         #src/utils/DirBC.cpp
         #src/utils/ElementVtkType.cpp

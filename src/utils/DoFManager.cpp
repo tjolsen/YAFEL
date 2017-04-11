@@ -125,13 +125,17 @@ int DoFManager::make_raw_dofs(const Mesh &M)
     auto const& geom_nodes = M.getGeometryNodes();
 
     element_offsets.resize(ncells + 1);
+    element_types.resize(ncells);
+
     int next_node{0};
     for (auto c : IRange(0, ncells)) {
 
         auto et = CellType_to_ElementType(M.getCellType(c), polyOrder);
+        element_types[c] = et;
         if (et.elementTopology == ElementTopology::None) {
             continue;
         }
+
         max_td = std::max(max_td, et.topoDim);
 
 
