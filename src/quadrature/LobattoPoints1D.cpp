@@ -20,7 +20,7 @@ std::vector<double> make_LobattoPoints_1D(int polyOrder)
     double PI = std::atan2(1., 1.) * 4;
     double TOL = 1.0e-15;
     //newton-raphson solve for quadrature points
-    for (unsigned xi = 0; xi < Npoints; ++xi) {
+    for (int xi = 0; xi < Npoints; ++xi) {
         double x = -std::cos((PI * xi) / polyOrder);
         double xold = x;
         double Pold, Pn, Pnew;
@@ -31,7 +31,7 @@ std::vector<double> make_LobattoPoints_1D(int polyOrder)
             Pn = x;
 
             //compute legendre polynomial value at current x
-            for (unsigned n = 2; n < Npoints; ++n) {
+            for (int n = 2; n < Npoints; ++n) {
                 Pnew = ((2 * n - 1) * x * Pn - (n - 1) * Pold) / n;
                 Pold = Pn;
                 Pn = Pnew;

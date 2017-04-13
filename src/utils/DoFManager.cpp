@@ -96,7 +96,7 @@ ElementType DoFManager::CellType_to_ElementType(CellType ct, int polyOrder) cons
 void DoFManager::make_cg_dofs(const Mesh &M)
 {
     //make a raw mesh
-    int max_topodim = make_raw_dofs(M);
+    make_raw_dofs(M);
 
     //recombine duplicate nodes and update triangulation
     recombine_all_duplicates();
@@ -106,7 +106,7 @@ void DoFManager::make_cg_dofs(const Mesh &M)
 void DoFManager::make_dg_dofs(const Mesh &M)
 {
     //make a raw mesh
-    int max_topodim = make_raw_dofs(M);
+    make_raw_dofs(M);
 
 }
 

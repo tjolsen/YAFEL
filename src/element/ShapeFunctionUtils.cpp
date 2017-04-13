@@ -152,7 +152,7 @@ void triangle_shape_functions(const std::vector<coordinate<>> &localPoints,
         jacobi_coeffs_00.push_back(jacobi(n, 0, 0));
     }
 
-    int Nfuncs = (polyOrder + 1) * (polyOrder + 2) / 2;
+    //int Nfuncs = (polyOrder + 1) * (polyOrder + 2) / 2;
 
     std::vector<Tensor<2, 1, int>> mn_coeffs;
     for (auto i : IRange(0, polyOrder + 1)) {

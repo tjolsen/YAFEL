@@ -75,8 +75,8 @@ struct CellFace {
                 nodes[i] = tmp_nodes[(min_i+i)%n_nodes];
             }
 
-            if(nodes[2] < nodes[1]) {
-                std::swap(nodes[1], nodes[2]);
+            if(nodes[n_nodes-1] < nodes[1]) {
+                std::swap(nodes[1], nodes[n_nodes-1]);
                 std::swap(left,right);
                 std::swap(left_flocal,right_flocal);
             }

@@ -43,7 +43,7 @@ template<typename T>
 T poly_eval(const std::vector<double> &coeffs, T x)
 {
     T retval{0};
-    for (int i = 0; i < coeffs.size(); ++i) {
+    for (int i = 0; i < static_cast<int>(coeffs.size()); ++i) {
         retval *= x;
         retval += coeffs[i];
     }

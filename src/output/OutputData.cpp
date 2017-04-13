@@ -13,7 +13,7 @@ OutputData::OutputData(const Eigen::VectorXd &d,
                        DataLocation dL,
                        DataType dT,
                        const std::vector<int> &mask)
-        : data(&d), name(name), dataLocation(dL), dataType(dT),dof_mask(mask) {}
+        : data(&d), dof_mask(mask), name(name), dataType(dT), dataLocation(dL) {}
 
 OutputData::OutputData(const Eigen::VectorXd &d, const std::string &name)
         : OutputData(d, name, DataLocation::Point, DataType::Scalar, {1}) {}

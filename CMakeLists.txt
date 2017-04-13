@@ -3,9 +3,9 @@ project(YAFEL)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG -ffast-math -march=native")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ffast-math -Wall -Wextra -DNDEBUG -march=native")
 
-#set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG}")
+set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -fno-omit-frame-pointer -fsanitize=address")
 
 set(SOURCE_FILES
         include/element/Element.hpp
@@ -67,7 +67,7 @@ set(SOURCE_FILES
         include/quadrature/QuadratureRule.hpp
 
         include/utils/ConcurrentQueue.hpp
-        include/utils/DirBC.hpp
+        include/utils/old_DirBC.hpp
         include/utils/DoFManager.hpp
         include/utils/DualNumber.hpp
         include/utils/ElementVtkType.hpp
@@ -102,7 +102,7 @@ set(SOURCE_FILES
         src/quadrature/TriangleQuadratureRules.cpp
 
         src/utils/DoFManager.cpp
-        #src/utils/DirBC.cpp
+        #src/utils/old_DirBC.cpp
         #src/utils/ElementVtkType.cpp
         )
 

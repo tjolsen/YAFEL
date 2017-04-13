@@ -23,7 +23,7 @@
 #include "utils/DoFManager.hpp"
 #include "utils/CG_DoFManager.hpp"
 #include "utils/ElementType.hpp"
-#include "utils/DirBC.hpp"
+#include "utils/old_DirBC.hpp"
 
 //include output tools
 #include "output/MatrixVisualization.hpp"

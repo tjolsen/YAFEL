@@ -31,7 +31,7 @@ void QuadratureRule::make_gauss_lobatto_1D(int Npoints)
     double PI = std::atan2(1., 1.) * 4;
     double TOL = 1.0e-15;
     //newton-raphson solve for quadrature points
-    for (unsigned xi = 0; xi < Npoints; ++xi) {
+    for (int xi = 0; xi < Npoints; ++xi) {
         double x = -std::cos((PI * xi) / (Npoints - 1));
         double xold = x;
         double Pold, Pn, Pnew;
@@ -42,7 +42,7 @@ void QuadratureRule::make_gauss_lobatto_1D(int Npoints)
             Pn = x;
 
             //compute legendre polynomial value at current x
-            for (unsigned n = 2; n < Npoints; ++n) {
+            for (int n = 2; n < Npoints; ++n) {
                 Pnew = ((2 * n - 1) * x * Pn - (n - 1) * Pold) / n;
 
                 Pold = Pn;
@@ -74,7 +74,7 @@ void QuadratureRule::make_gauss_legendre_1D(int Npoints)
     weights.resize(polyOrder);
 
     // Newton-Raphson solve for xi-th root of Legendre polynomial
-    for (size_type xi = 0; xi < polyOrder; ++xi) {
+    for (int xi = 0; xi < polyOrder; ++xi) {
 
         double x = -std::cos(PI * (1 + xi - 0.25) / (polyOrder + 0.5));
         double Pold, Pn, Pnew, dP;
@@ -83,7 +83,7 @@ void QuadratureRule::make_gauss_legendre_1D(int Npoints)
             //compute legendre polynomial
             Pold = 1;
             Pn = x;
-            for (size_type n = 2; n <= polyOrder; ++n) {
+            for (int n = 2; n <= polyOrder; ++n) {
                 Pnew = ((2 * n - 1) * x * Pn - (n - 1) * Pold) / n;
 
                 Pold = Pn;

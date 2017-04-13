@@ -33,7 +33,7 @@ public:
 
     template<typename ...DT,
             typename=typename std::enable_if<2 <= sizeof...(DT)>::type>
-    Tensor(DT ...args) : data{std::forward<dataType>(args)...} {}
+    Tensor(DT ...args) : data{{std::forward<dataType>(args)...}} {}
 
 
     // Construct from a TensorExpression

@@ -95,8 +95,9 @@ public:
 
     const std::vector<CellFace> &getInternalFaces() const { return internal_faces_; }
 
+    const std::vector<int> &getBoundaryFaceIdxs() const {return boundary_face_idxs_; }
 
-    inline const CellType getCellType(int cell) const noexcept { return cellTypes_[cell]; }
+    inline CellType getCellType(int cell) const noexcept { return cellTypes_[cell]; }
 
     //Get number of cells
     inline virtual int nCells() const noexcept
@@ -126,8 +127,9 @@ protected:
     std::vector<CellType> cellTypes_;
     std::vector<std::vector<int>> cellTags_;
     std::vector<CellFace> internal_faces_;
+    std::vector<int> boundary_face_idxs_;
 
-    virtual inline void getCellNodesImplicit(int cell, std::vector<int> &container) const noexcept {}
+    virtual inline void getCellNodesImplicit(int /*cell*/, std::vector<int> &/*container*/) const noexcept {}
     void parse_gmsh(const std::string &fname);
 };
 

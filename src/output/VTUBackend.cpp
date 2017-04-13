@@ -86,7 +86,7 @@ void VTUBackend::write_frame(OutputFrame &frame)
             Eigen::VectorXd tmp(n_local_cells);
             int idx{0};
             for(int c : IRange(0,static_cast<int>(frame.outputMesh->local_cells_per_cell.size()))) {
-                for(auto i : IRange(0,frame.outputMesh->local_cells_per_cell[c])) {
+                for(int i : IRange(0,frame.outputMesh->local_cells_per_cell[c])) {
                     tmp(idx++) = (*(pd->data))(c);
                 }
             }

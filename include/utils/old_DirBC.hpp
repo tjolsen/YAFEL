@@ -18,7 +18,7 @@
 
 YAFEL_NAMESPACE_OPEN
 
-class DirBC {
+class old_DirBC {
 
 public:
     using size_type = std::size_t;
@@ -29,10 +29,10 @@ public:
     Vector<double> ubc;
   
     template<unsigned NSD>
-    DirBC(const GmshMesh<NSD> &m, const DoFManager &dofm, size_type tagID, 
+    old_DirBC(const GmshMesh<NSD> &m, const DoFManager &dofm, size_type tagID,
 	  size_type comp, const SpatialFunction<NSD,double> &sfunc);
 
-    DirBC(const std::vector<size_type> bcdofs_,
+    old_DirBC(const std::vector<size_type> bcdofs_,
 	  const std::vector<double> bcvals_,
 	  const std::vector<bool> bcmask_)
 	: bcdofs(bcdofs_), bcvals(bcvals_), bcmask(bcmask_), ubc(bcmask_.size(),0)
@@ -49,7 +49,7 @@ public:
  */
 
 template<unsigned NSD>
-DirBC::DirBC(const GmshMesh<NSD> &M, const DoFManager &dofm, size_type tagID, 
+old_DirBC::old_DirBC(const GmshMesh<NSD> &M, const DoFManager &dofm, size_type tagID,
              size_type comp, const SpatialFunction<NSD,double> &sfunc) 
     : bcdofs(), 
       bcvals(), 

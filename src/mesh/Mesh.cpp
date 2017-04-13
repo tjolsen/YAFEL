@@ -20,7 +20,8 @@ Mesh::Mesh(DefinitionScheme definitionScheme,
           cellOffsets_(cellOffsets),
           cellTypes_(cellTypes),
           cellTags_(cellTags),
-          internal_faces_(0) {}
+          internal_faces_(),
+          boundary_face_idxs_() {}
 
 
 Mesh::Mesh(const std::string &fname)
