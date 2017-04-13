@@ -234,7 +234,7 @@ void Element::make_simplex()
 
     } else if (elementType.topoDim == 3) {
         // based on scheme be Blyth & Pozrikdis (JAM 2005)
-        localPoints_xi.resize((npts * (npts + 1)*(npts+2)) / 6);
+        localPoints_xi.resize((npts * (npts + 1) * (npts + 2)) / 6);
         int nt_local = 0;//elementType.polyOrder * elementType.polyOrder;
         //cellNodes.resize(3 * nt_local);
         //offsets.reserve(nt_local + 1);
@@ -242,19 +242,99 @@ void Element::make_simplex()
 
 
         int idx{0};
+        //xi-eta plane
+        for (auto i : IRange(1, npts + 1)) {
+            for (auto j : IRange(1, npts + 2 - i)) {
+                int k = npts + 2 - i - j;
+                double vi = (lob_pts_1d[i - 1] + 1) / 2;
+                double vj = (lob_pts_1d[j - 1] + 1) / 2;
+                double vk = (lob_pts_1d[k - 1] + 1) / 2;
+                localPoints_xi[idx](0) = (1 + 2 * vj - vi - vk) / 3;
+                localPoints_xi[idx](1) = (1 + 2 * vi - vj - vk) / 3;
+                localPoints_xi[idx](2) = 0;
+                ++idx;
+            }
+        }
 
+        //eta-zeta plane
+        for (auto j : IRange(1, npts)) {
+            for (auto k : IRange(2, npts + 2 - j)) {
+                int l = npts + 2 - j - k;
+                double vj = (lob_pts_1d[j - 1] + 1) / 2;
+                double vk = (lob_pts_1d[k - 1] + 1) / 2;
+                double vl = (lob_pts_1d[l - 1] + 1) / 2;
+                localPoints_xi[idx](0) = 0;
+                localPoints_xi[idx](1) = (1 + 2 * vj - vk - vl) / 3;
+                localPoints_xi[idx](2) = (1 + 2 * vk - vj - vl) / 3;
+                ++idx;
+            }
+        }
+
+        //xi-zeta plane
+        for (auto i : IRange(2, npts)) {
+            for (auto k : IRange(2, npts + 2 - i)) {
+                int l = npts + 2 - i - k;
+                double vi = (lob_pts_1d[i-1] + 1)/2;
+                double vk = (lob_pts_1d[k-1] + 1)/2;
+                double vl = (lob_pts_1d[l-1] + 1)/2;
+
+                localPoints_xi[idx](0) = (1 + 2*vi - vk - vl)/3;
+                localPoints_xi[idx](1) = 0;
+                localPoints_xi[idx](2) = (1 + 2*vk - vi - vl)/3;
+
+                ++idx;
+            }
+        }
+
+        //slanted face
+        for(auto i : IRange(2,npts)) {
+            for(auto j : IRange(2,npts+1-i)) {
+                int l = npts + 2 - i - j;
+                double vi = (lob_pts_1d[i-1] + 1)/2;
+                double vj = (lob_pts_1d[j-1] + 1)/2;
+                double vl = (lob_pts_1d[l-1] + 1)/2;
+
+                localPoints_xi[idx](0) = (1 + 2*vi - vj - vl)/3;
+                localPoints_xi[idx](1) = (1 + 2*vj - vi - vl)/3;
+                localPoints_xi[idx](2) = 1 - localPoints_xi[idx](0) - localPoints_xi[idx](1);
+
+                ++idx;
+            }
+        }
+
+
+        //interior points
+        for (auto i : IRange(2, npts)) {
+            for (auto j : IRange(2, npts + 1 - i)) {
+                std::cerr << npts << "   " << npts + 2 - i - j << std::endl;
+                for (auto k : IRange(2, npts + 2 - i - j)) {
+                    int l = npts + 3 - i - j - k;
+                    double vi = (lob_pts_1d[i - 1] + 1) / 2;
+                    double vj = (lob_pts_1d[j - 1] + 1) / 2;
+                    double vk = (lob_pts_1d[k - 1] + 1) / 2;
+                    double vl = (lob_pts_1d[l - 1] + 1) / 2;
+
+
+                    localPoints_xi[idx](0) = (1 + 3 * vk - vi - vj - vl) / 4;
+                    localPoints_xi[idx](1) = (1 + 3 * vj - vi - vk - vl) / 4;
+                    localPoints_xi[idx](2) = (1 + 3 * vi - vj - vk - vl) / 4;
+
+                    ++idx;
+                }
+            }
+        }
 
 
     } else {
         //unsupported topoDim
-        std::cerr << "Topological Dimension " << elementType.topoDim << 
+        std::cerr << "Topological Dimension " << elementType.topoDim << std::endl;
     }
 
 
     if (elementType.topoDim == 2) {
-        quadratureRule.get_triangle_quadrature(std::max(1,2 * elementType.polyOrder));
+        quadratureRule.get_triangle_quadrature(std::max(1, 2 * elementType.polyOrder));
     } else if (elementType.topoDim == 3) {
-        quadratureRule.get_tetrahedron_quadrature(std::max(1,2*elementType.polyOrder));
+        quadratureRule.get_tetrahedron_quadrature(std::max(1, 2 * elementType.polyOrder));
     }
     localMesh.setGeometryNodes(std::move(localPoints_xi));
     localMesh.setCellNodes(std::move(cellNodes));

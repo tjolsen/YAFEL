@@ -17,26 +17,16 @@ using namespace yafel;
 
 int main()
 {
-    Mesh M("minsquare.msh");
-    int p = 1;
+    Mesh M("singleTet.msh");
+    int p = 4;
     DoFManager dofm(M, DoFManager::ManagerType::CG, p, 1);
+    ElementFactory EF(1);
+    auto &E = EF.getElement(dofm.element_types[0]);
 
-    M.buildInternalFaces();
 
-    for(auto i : M.getInternalFaces()) {
-        std::cout << i << std::endl;
+    for(auto x : E.localMesh.getGeometryNodes()) {
+        std::cout << x(0) << "  " << x(1) << "  " << x(2) << std::endl;
     }
-
-
-    std::cout << std::endl << std::endl;
-    for(auto i : M.getBoundaryFaceIdxs()) {
-        std::cout << i << "  "
-                  << M.getInternalFaces()[i]
-                  << std::endl;
-    }
-
-
-
 
     return 0;
 }

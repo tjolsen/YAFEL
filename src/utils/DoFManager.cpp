@@ -141,11 +141,6 @@ int DoFManager::make_raw_dofs(const Mesh &M)
 
         // corner nodes
         M.getCellNodes(c, corner_idxs);
-        std::cout << c << ": ";
-        for(auto i : corner_idxs) {
-            std::cout << i << " ";
-        }
-        std::cout << std::endl;
         corner_coords.clear();
         corner_coords.reserve(corner_idxs.size());
 
