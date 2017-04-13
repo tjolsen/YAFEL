@@ -68,7 +68,7 @@ void QuadratureRule::make_gauss_legendre_1D(int Npoints)
 
     int polyOrder = Npoints;
     double PI = std::atan2(1., 1.) * 4;
-    double TOL = 1.0e-14;
+    double TOL = 1.0e-15;
 
     nodes.resize(polyOrder);
     weights.resize(polyOrder);

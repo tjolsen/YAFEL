@@ -274,28 +274,28 @@ void Element::make_simplex()
         for (auto i : IRange(2, npts)) {
             for (auto k : IRange(2, npts + 2 - i)) {
                 int l = npts + 2 - i - k;
-                double vi = (lob_pts_1d[i-1] + 1)/2;
-                double vk = (lob_pts_1d[k-1] + 1)/2;
-                double vl = (lob_pts_1d[l-1] + 1)/2;
+                double vi = (lob_pts_1d[i - 1] + 1) / 2;
+                double vk = (lob_pts_1d[k - 1] + 1) / 2;
+                double vl = (lob_pts_1d[l - 1] + 1) / 2;
 
-                localPoints_xi[idx](0) = (1 + 2*vi - vk - vl)/3;
+                localPoints_xi[idx](0) = (1 + 2 * vi - vk - vl) / 3;
                 localPoints_xi[idx](1) = 0;
-                localPoints_xi[idx](2) = (1 + 2*vk - vi - vl)/3;
+                localPoints_xi[idx](2) = (1 + 2 * vk - vi - vl) / 3;
 
                 ++idx;
             }
         }
 
         //slanted face
-        for(auto i : IRange(2,npts)) {
-            for(auto j : IRange(2,npts+1-i)) {
+        for (auto i : IRange(2, npts)) {
+            for (auto j : IRange(2, npts + 1 - i)) {
                 int l = npts + 2 - i - j;
-                double vi = (lob_pts_1d[i-1] + 1)/2;
-                double vj = (lob_pts_1d[j-1] + 1)/2;
-                double vl = (lob_pts_1d[l-1] + 1)/2;
+                double vi = (lob_pts_1d[i - 1] + 1) / 2;
+                double vj = (lob_pts_1d[j - 1] + 1) / 2;
+                double vl = (lob_pts_1d[l - 1] + 1) / 2;
 
-                localPoints_xi[idx](0) = (1 + 2*vi - vj - vl)/3;
-                localPoints_xi[idx](1) = (1 + 2*vj - vi - vl)/3;
+                localPoints_xi[idx](0) = (1 + 2 * vi - vj - vl) / 3;
+                localPoints_xi[idx](1) = (1 + 2 * vj - vi - vl) / 3;
                 localPoints_xi[idx](2) = 1 - localPoints_xi[idx](0) - localPoints_xi[idx](1);
 
                 ++idx;
@@ -306,7 +306,6 @@ void Element::make_simplex()
         //interior points
         for (auto i : IRange(2, npts)) {
             for (auto j : IRange(2, npts + 1 - i)) {
-                std::cerr << npts << "   " << npts + 2 - i - j << std::endl;
                 for (auto k : IRange(2, npts + 2 - i - j)) {
                     int l = npts + 3 - i - j - k;
                     double vi = (lob_pts_1d[i - 1] + 1) / 2;
@@ -323,7 +322,9 @@ void Element::make_simplex()
                 }
             }
         }
-
+        std::sort(localPoints_xi.begin(), localPoints_xi.end(),
+                  [](auto const &l, auto const &r) { return std::lexicographical_compare(l.data.rbegin(),l.data.rend(),
+                                                                                         r.data.rbegin(),r.data.rend()); });
 
     } else {
         //unsupported topoDim

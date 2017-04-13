@@ -18,7 +18,7 @@ using namespace yafel;
 int main()
 {
     Mesh M("singleTet.msh");
-    int p = 4;
+    int p = 5;
     DoFManager dofm(M, DoFManager::ManagerType::CG, p, 1);
     ElementFactory EF(1);
     auto &E = EF.getElement(dofm.element_types[0]);
