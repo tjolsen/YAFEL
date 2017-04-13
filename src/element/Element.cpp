@@ -233,9 +233,21 @@ void Element::make_simplex()
 
 
     } else if (elementType.topoDim == 3) {
+        // based on scheme be Blyth & Pozrikdis (JAM 2005)
+        localPoints_xi.resize((npts * (npts + 1)*(npts+2)) / 6);
+        int nt_local = 0;//elementType.polyOrder * elementType.polyOrder;
+        //cellNodes.resize(3 * nt_local);
+        //offsets.reserve(nt_local + 1);
+        //cellTypes.resize(nt_local, CellType::Tet4);
+
+
+        int idx{0};
+
+
 
     } else {
         //unsupported topoDim
+        std::cerr << "Topological Dimension " << elementType.topoDim << 
     }
 
 
