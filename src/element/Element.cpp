@@ -240,9 +240,9 @@ void Element::make_simplex()
 
 
     if (elementType.topoDim == 2) {
-        quadratureRule.get_triangle_quadrature(2 * elementType.polyOrder);
+        quadratureRule.get_triangle_quadrature(std::max(1,2 * elementType.polyOrder));
     } else if (elementType.topoDim == 3) {
-
+        quadratureRule.get_tetrahedron_quadrature(std::max(1,2*elementType.polyOrder));
     }
     localMesh.setGeometryNodes(std::move(localPoints_xi));
     localMesh.setCellNodes(std::move(cellNodes));
@@ -256,7 +256,11 @@ void Element::make_simplex()
                                  shapeValues,
                                  shapeGradXi);
     } else if (elementType.topoDim == 3) {
-
+        tetrahedron_shape_functions(localMesh.getGeometryNodes(),
+                                    quadratureRule.nodes,
+                                    elementType.polyOrder,
+                                    shapeValues,
+                                    shapeGradXi);
     }
 }
 

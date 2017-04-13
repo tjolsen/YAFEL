@@ -111,7 +111,6 @@ void tensor_product_shape_functions(const std::vector<coordinate<>> &localPoints
         shape_grad_func = shape_func_lambda;
     }
 
-
     V = make_vandermonde(localPoints, shape_func);
     rhs.resize(V.rows());
     gradRhs.resize(V.rows(), topoDim);
@@ -152,8 +151,6 @@ void triangle_shape_functions(const std::vector<coordinate<>> &localPoints,
         jacobi_coeffs_00.push_back(jacobi(n, 0, 0));
     }
 
-    //int Nfuncs = (polyOrder + 1) * (polyOrder + 2) / 2;
-
     std::vector<Tensor<2, 1, int>> mn_coeffs;
     for (auto i : IRange(0, polyOrder + 1)) {
         for (auto j : IRange(0, polyOrder + 1)) {
@@ -183,6 +180,89 @@ void triangle_shape_functions(const std::vector<coordinate<>> &localPoints,
         auto s = xi(1);
 
         return poly_eval(jacobi_coeffs_00[m], r) * poly_eval(jac_coef_2, s) * pow((1 - s) / 2, m);
+    };
+    std::function<double(int, coordinate<>)> shape_func = shape_func_lambda;
+    std::function<DualNumber<double>(int, coordinate<DualNumber<double>>)> shape_grad_func = shape_func_lambda;
+
+    V = make_vandermonde(localPoints_bumped, shape_func);
+    rhs.resize(V.rows());
+    gradRhs.resize(V.rows(), 2);
+    auto VTLU = V.transpose().lu();
+
+    for (auto i : IRange(0, static_cast<int>(quadPoints.size()))) {
+
+        for (auto j : IRange(0, (int) V.rows())) {
+            rhs(j) = shape_func(j, quadPoints[i]);
+            for (auto d : IRange(0, 2)) {
+                coordinate<DualNumber<double>> xi;
+                for (auto di : IRange(0, xi.dim())) {
+                    xi(di) = make_dual(quadPoints[i](di));
+                }
+                xi(d).second = 1;
+
+                gradRhs(j, d) = shape_grad_func(j, xi).second;
+
+            }
+
+            shapeValue[i] = VTLU.solve(rhs);
+            shapeGrad[i] = VTLU.solve(gradRhs);
+        }
+    }
+}
+
+
+void tetrahedron_shape_functions(const std::vector<coordinate<>> &localPoints,
+                                 const std::vector<coordinate<>> &quadPoints,
+                                 int polyOrder,
+                                 std::vector<Eigen::VectorXd> &shapeValue,
+                                 std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> &shapeGrad)
+{
+
+    shapeValue.resize(quadPoints.size());
+    shapeGrad.resize(quadPoints.size());
+    std::vector<std::vector<double>> jacobi_coeffs_00;
+    for (auto n : IRange(0, polyOrder + 1)) {
+        jacobi_coeffs_00.push_back(jacobi(n, 0, 0));
+    }
+
+    std::vector<Tensor<3, 1, int>> mnl_coeffs;
+    for (auto i : IRange(0, polyOrder + 1)) {
+        for (auto j : IRange(0, polyOrder + 1)) {
+            for (auto k : IRange(0, polyOrder + 1)) {
+                if (i + j + k <= polyOrder) {
+                    mnl_coeffs.push_back({i, j, k});
+                }
+            }
+        }
+    }
+
+    std::vector<coordinate<>> localPoints_bumped(localPoints);
+    for (auto &x : localPoints_bumped) {
+        x(2) = std::min(.999999999, x(1));
+    }
+
+    Eigen::MatrixXd V;
+    Eigen::VectorXd rhs;
+    Eigen::MatrixXd gradRhs;
+
+    auto shape_func_lambda = [&mnl_coeffs, &jacobi_coeffs_00](int k, auto xi) {
+        using std::pow;
+        auto m = mnl_coeffs[k](0);
+        auto n = mnl_coeffs[k](1);
+        auto l = mnl_coeffs[k](2);
+
+        auto jac_coef_2 = jacobi(n, 2 * m + 1, 0);
+        auto jac_coef_3 = jacobi(l, 2 * m + 2 * n + 2, 0);
+
+        auto r = -2 * (1 + xi(0)) / (xi(1) + xi(2)) - 1;
+        auto s = 2 * (1 + xi(1)) / (1 - xi(2)) - 1;
+        auto t = xi(2);
+
+        return poly_eval(jacobi_coeffs_00[m], r)
+               * poly_eval(jac_coef_2, s)
+               * poly_eval(jac_coef_3, t)
+               * pow((1 - s) / 2, m)
+               * pow((1 - t) / 2, m + n);
     };
     std::function<double(int, coordinate<>)> shape_func = shape_func_lambda;
     std::function<DualNumber<double>(int, coordinate<DualNumber<double>>)> shape_grad_func = shape_func_lambda;

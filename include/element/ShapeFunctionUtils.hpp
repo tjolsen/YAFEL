@@ -7,12 +7,11 @@
 
 /**
  * \file
- * This file contains utilities for computing shape functions
- * on tensor product and simplex elements. Functions included
- * are:
+ * This file contains functions for computing shape functions
+ * on tensor product and simplex elements.
  *
- * - Jacobi polynomials
- * - Koornwinder polynomials
+ * - Jacobi polynomials (Legendre polynomials for tensor product elements)
+ * - Koornwinder polynomials (for 2d/3d simplices)
  */
 
 

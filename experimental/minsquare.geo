@@ -1,4 +1,4 @@
-lc = .1;
+lc = 1;
 L = 2;
 
 Point(1) = {0,0,0,lc};
@@ -11,18 +11,18 @@ Line(3) = {3,4};
 Line(4) = {4,1};
 Line Loop(1) = {1,2,3,4};
 Plane Surface(10) = {1};
-Transfinite Surface(10);
-Recombine Surface(10);
+//Transfinite Surface(10);
+//Recombine Surface(10);
 //Physical Surface(1) = {10};
 
 out[] = Extrude{0,0,L}{Surface{10};};
-Transfinite Surface{out[0],out[2],out[3],out[4],out[5]};
-Recombine Surface(out[0]);
-Recombine Surface(out[2]);
-Recombine Surface(out[3]);
-Recombine Surface(out[4]);
-Recombine Surface(out[5]);
+//Transfinite Surface{out[0],out[2],out[3],out[4],out[5]};
+//Recombine Surface(out[0]);
+//Recombine Surface(out[2]);
+//Recombine Surface(out[3]);
+//Recombine Surface(out[4]);
+//Recombine Surface(out[5]);
 
-Transfinite Volume(out[1]);
-Recombine Volume(out[1]);
+//Transfinite Volume(out[1]);
+//Recombine Volume(out[1]);
 Physical Volume(1) = {out[1]};

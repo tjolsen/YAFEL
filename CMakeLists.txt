@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ffast-math -Wall -Wextra -DNDEBUG -march=native")
 
-set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -fno-omit-frame-pointer -fsanitize=address")
+set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra")
 
 set(SOURCE_FILES
         include/element/Element.hpp
@@ -84,6 +84,7 @@ set(SOURCE_FILES
         src/element/Element.cpp
         src/element/ElementFactory.cpp
         src/element/ShapeFunctionUtils.cpp
+
         src/quadrature/LobattoPoints1D.cpp
         src/mesh/Mesh.cpp
         src/mesh/build_faces.cpp
@@ -100,6 +101,7 @@ set(SOURCE_FILES
 
         src/quadrature/QuadratureRule.cpp
         src/quadrature/TriangleQuadratureRules.cpp
+        src/quadrature/TetrahedronQuadratureRules.cpp
 
         src/utils/DoFManager.cpp
         #src/utils/old_DirBC.cpp

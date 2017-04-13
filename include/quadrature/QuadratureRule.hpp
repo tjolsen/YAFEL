@@ -47,6 +47,7 @@ public:
     static QuadratureRule make_tensor_product(QuadratureType qt, int topoDim, int polyOrder);
 
     void get_triangle_quadrature(int porder);
+    void get_tetrahedron_quadrature(int porder);
 
     std::vector<coordinate<>> nodes;
     std::vector<double> weights;
