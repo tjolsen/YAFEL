@@ -323,8 +323,33 @@ void Element::make_simplex()
             }
         }
         std::sort(localPoints_xi.begin(), localPoints_xi.end(),
-                  [](auto const &l, auto const &r) { return std::lexicographical_compare(l.data.rbegin(),l.data.rend(),
-                                                                                         r.data.rbegin(),r.data.rend()); });
+                  [](auto const &l, auto const &r) {
+                      return std::lexicographical_compare(l.data.rbegin(), l.data.rend(),
+                                                          r.data.rbegin(), r.data.rend());
+                  });
+
+        for (auto layer : IRange(0, npts)) {
+            for (auto row : IRange(0, npts - layer)) {
+                for (auto i : IRange(0, npts - layer - row)) {
+                    //get index of current node
+                    idx = 0;
+
+                    //make cell
+                    if (layer < npts - 2
+                        && row < npts - layer - 2
+                        && i < npts - layer - row - 2) {
+                        //hex cell
+                        int xi_stride = 1;
+                        int row_stride = npts-layer-row;
+                        int layer_stride = (npts-layer)*(npts+1-layer)/2 - row;
+
+
+                    }
+
+
+                }
+            }
+        }
 
     } else {
         //unsupported topoDim
