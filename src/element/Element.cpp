@@ -107,7 +107,7 @@ void Element::make_tensorProduct()
         localPoints_xi.resize(npts * npts * npts);
         cellNodes.resize(8 * (npts - 1) * (npts - 1) * (npts - 1));
         offsets.resize((npts - 1) * (npts - 1) * (npts - 1) + 1);
-        cellTypes.resize((npts - 1) * (npts - 1) * (npts - 1), CellType::Quad4);
+        cellTypes.resize((npts - 1) * (npts - 1) * (npts - 1), CellType::Hex8);
 
         int idx = 0;
         for (int i = 0; i < npts; ++i) {
@@ -123,18 +123,21 @@ void Element::make_tensorProduct()
 
         int offset = 0;
         idx = 0;
+        int j_stride = npts;
+        int i_stride = npts * npts;
         for (int i = 0; i < npts - 1; ++i) {
             for (int j = 0; j < npts - 1; ++j) {
                 for (int k = 0; k < npts - 1; ++k) {
+                    int corner = i * i_stride + j * j_stride + k;
 
-                    cellNodes[offset + 0] = (i * npts + j) * npts + k;
-                    cellNodes[offset + 1] = (i * npts + j) * npts + k + 1;
-                    cellNodes[offset + 2] = (i * npts + j + 1) * npts + k + 1;
-                    cellNodes[offset + 3] = (i * npts + j + 1) * npts + k;
-                    cellNodes[offset + 4] = ((i + 1) * npts + j) * npts + k;
-                    cellNodes[offset + 5] = ((i + 1) * npts + j) * npts + k + 1;
-                    cellNodes[offset + 6] = ((i + 1) * npts + j + 1) * npts + k + 1;
-                    cellNodes[offset + 7] = ((i + 1) * npts + j + 1) * npts + k;
+                    cellNodes[offset + 0] = corner;
+                    cellNodes[offset + 1] = corner + 1;
+                    cellNodes[offset + 2] = corner + 1 + j_stride;
+                    cellNodes[offset + 3] = corner + j_stride;
+                    cellNodes[offset + 4] = corner + i_stride;
+                    cellNodes[offset + 5] = corner + i_stride + 1;
+                    cellNodes[offset + 6] = corner + i_stride + 1 + j_stride;
+                    cellNodes[offset + 7] = corner + i_stride + j_stride;
 
                     offsets[idx++] = offset;
                     offset += 8;
@@ -233,13 +236,8 @@ void Element::make_simplex()
 
 
     } else if (elementType.topoDim == 3) {
-        // based on scheme be Blyth & Pozrikdis (JAM 2005)
+        // based on scheme in Blyth & Pozrikdis (JAM 2005)
         localPoints_xi.resize((npts * (npts + 1) * (npts + 2)) / 6);
-        int nt_local = 0;//elementType.polyOrder * elementType.polyOrder;
-        //cellNodes.resize(3 * nt_local);
-        //offsets.reserve(nt_local + 1);
-        //cellTypes.resize(nt_local, CellType::Tet4);
-
 
         int idx{0};
         //xi-eta plane
@@ -328,28 +326,138 @@ void Element::make_simplex()
                                                           r.data.rbegin(), r.data.rend());
                   });
 
+
+        int offset = 0;
+        cellNodes.reserve(localPoints_xi.size());
+        cellTypes.resize(localPoints_xi.size(), CellType::Point1);
+        offsets.reserve(localPoints_xi.size() + 1);
+        for (auto i : IRange(0, static_cast<int>(localPoints_xi.size()))) {
+            cellNodes.push_back(i);
+            offsets.push_back(offset++);
+        }
+        offsets.push_back(offset);
+
+
+
+        /*
+        int offset = 0;
+        idx = 0;
         for (auto layer : IRange(0, npts)) {
             for (auto row : IRange(0, npts - layer)) {
                 for (auto i : IRange(0, npts - layer - row)) {
-                    //get index of current node
-                    idx = 0;
 
                     //make cell
-                    if (layer < npts - 2
-                        && row < npts - layer - 2
-                        && i < npts - layer - row - 2) {
+                    if (layer < npts - 3
+                        && row < npts - layer - 3
+                        && i < npts - layer - row - 3) {
                         //hex cell
-                        int xi_stride = 1;
-                        int row_stride = npts-layer-row;
-                        int layer_stride = (npts-layer)*(npts+1-layer)/2 - row;
+                        int row_stride = npts - layer - row;
+                        int layer_stride = (npts - layer) * (npts + 1 - layer) / 2 - row;
 
+                        int idx0 = idx;
+                        int idx1 = idx + 1;
+                        int idx2 = idx1 + row_stride;
+                        int idx3 = idx2 - 1;
+                        int idx4 = idx + layer_stride;
+                        int idx5 = idx4 + 1;
+                        int idx6 = idx5 + row_stride - 1;
+                        int idx7 = idx6 - 1;
 
+                        cellNodes.reserve(cellNodes.size() + 8);
+                        cellNodes.push_back(idx0);
+                        cellNodes.push_back(idx1);
+                        cellNodes.push_back(idx2);
+                        cellNodes.push_back(idx3);
+                        cellNodes.push_back(idx4);
+                        cellNodes.push_back(idx5);
+                        cellNodes.push_back(idx6);
+                        cellNodes.push_back(idx7);
+
+                        cellTypes.push_back(CellType::Hex8);
+                        offsets.push_back(offset);
+                        offset += 8;
+                    } else if (layer < npts - 2
+                               && row < npts - layer - 2
+                               && i < npts - layer - row - 2) {
+                        //make square-base,triangle top tets
+                        int row_stride = npts - layer - row;
+                        int layer_stride = (npts - layer) * (npts + 1 - layer) / 2 - row;
+
+                        int idx0 = idx;
+                        int idx1 = idx + 1;
+                        int idx2 = idx1 + row_stride;
+                        int idx3 = idx2 - 1;
+                        int idx4 = idx + layer_stride;
+                        int idx5 = idx4 + 1;
+                        int idx6 = idx4 + row_stride - 1;
+
+                        cellNodes.reserve(cellNodes.size() + 4 * 4);
+
+                        cellNodes.push_back(idx1);
+                        cellNodes.push_back(idx2);
+                        cellNodes.push_back(idx0);
+                        cellNodes.push_back(idx5);
+
+                        cellNodes.push_back(idx5);
+                        cellNodes.push_back(idx2);
+                        cellNodes.push_back(idx0);
+                        cellNodes.push_back(idx6);
+
+                        cellNodes.push_back(idx4);
+                        cellNodes.push_back(idx6);
+                        cellNodes.push_back(idx5);
+                        cellNodes.push_back(idx0);
+
+                        cellNodes.push_back(idx3);
+                        cellNodes.push_back(idx0);
+                        cellNodes.push_back(idx2);
+                        cellNodes.push_back(idx6);
+
+                        offsets.push_back(offset);
+                        offset += 4;
+                        offsets.push_back(offset);
+                        offset += 4;
+                        offsets.push_back(offset);
+                        offset += 4;
+                        offsets.push_back(offset);
+                        offset += 4;
+
+                        cellTypes.push_back(CellType::Tet4);
+                        cellTypes.push_back(CellType::Tet4);
+                        cellTypes.push_back(CellType::Tet4);
+                        cellTypes.push_back(CellType::Tet4);
+                    }
+                    else if(layer < npts - 1
+                            && row < npts - layer - 1
+                            && i < npts - layer - row - 1) {
+                        int row_stride = npts - layer - row;
+                        int layer_stride = (npts - layer) * (npts + 1 - layer) / 2 - row;
+
+                        int idx0 = idx;
+                        int idx1 = idx + 1;
+                        int idx2 = idx + row_stride;
+                        int idx3 = idx + layer_stride;
+
+                        cellNodes.reserve(cellNodes.size() + 4);
+                        cellNodes.push_back(idx0);
+                        cellNodes.push_back(idx1);
+                        cellNodes.push_back(idx2);
+                        cellNodes.push_back(idx3);
+                        cellTypes.push_back(CellType::Tet4);
+                        offsets.push_back(offset);
+                        offset += 4;
                     }
 
 
+                    //increment idx
+                    ++idx;
                 }
+
             }
         }
+        offsets.push_back(offset);
+        */
+
 
     } else {
         //unsupported topoDim

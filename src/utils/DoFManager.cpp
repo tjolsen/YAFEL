@@ -17,6 +17,11 @@ DoFManager::DoFManager(const Mesh &M,
           managerType(m_type)
 {
 
+    cell_region_idx.resize(M.nCells());
+    for (auto c : IRange(0, M.nCells())) {
+        cell_region_idx[c] = M.getCellTags(c)[1];
+    }
+
     switch (m_type) {
         case ManagerType::CG:
             make_cg_dofs(M);
@@ -122,7 +127,7 @@ int DoFManager::make_raw_dofs(const Mesh &M)
 
     std::vector<coordinate<>> corner_coords(8);
     std::vector<int> corner_idxs;
-    auto const& geom_nodes = M.getGeometryNodes();
+    auto const &geom_nodes = M.getGeometryNodes();
 
     element_offsets.resize(ncells + 1);
     element_types.resize(ncells);
@@ -216,25 +221,27 @@ void DoFManager::recombine_all_duplicates()
     for (auto &i : idxs)
         i = idx++;
 
-    auto sort_func = [this](int L, int R) { return this->dof_nodes[L].data < this->dof_nodes[R].data; };
+    auto sort_func = [this](int L, int R) {
+        return std::lexicographical_compare(dof_nodes[L].data.rbegin(), dof_nodes[L].data.rend(),
+                                            dof_nodes[R].data.rbegin(), dof_nodes[R].data.rend());
+    };
     auto uniq_func = [this](int L, int R) { return norm(this->dof_nodes[L] - this->dof_nodes[R]) < 1.0e-10; };
 
 
     //lexicographical sort of nodes
     std::sort(idxs.begin(), idxs.end(), sort_func);
     std::vector<int> reverse_idx(idxs.size());
-    for(auto i : IRange(0,static_cast<int>(idxs.size()))) {
+    for (auto i : IRange(0, static_cast<int>(idxs.size()))) {
         reverse_idx[idxs[i]] = i;
     }
 
     std::vector<int> uniq_idx(idxs.size());
     uniq_idx[0] = idxs[0];
-    for(auto i : IRange(1,static_cast<int>(idxs.size()))) {
+    for (auto i : IRange(1, static_cast<int>(idxs.size()))) {
 
-        if(uniq_func(idxs[i], idxs[i-1])) {
-            uniq_idx[i] = uniq_idx[i-1];
-        }
-        else {
+        if (uniq_func(idxs[i], idxs[i - 1])) {
+            uniq_idx[i] = uniq_idx[i - 1];
+        } else {
             uniq_idx[i] = idxs[i];
         }
     }
@@ -242,19 +249,19 @@ void DoFManager::recombine_all_duplicates()
     std::vector<int> unique_uniq_idx(uniq_idx);
     auto uuend = std::unique(unique_uniq_idx.begin(), unique_uniq_idx.end());
     unique_uniq_idx.resize(std::distance(unique_uniq_idx.begin(), uuend));
-    std::vector<int> reverse_map(uniq_idx.size(),0);
-    for(auto i : IRange(0,static_cast<int>(unique_uniq_idx.size()))) {
+    std::vector<int> reverse_map(uniq_idx.size(), 0);
+    for (auto i : IRange(0, static_cast<int>(unique_uniq_idx.size()))) {
         reverse_map[unique_uniq_idx[i]] = i;
     }
 
-    for(auto &n : elements) {
+    for (auto &n : elements) {
         n = reverse_map[uniq_idx[reverse_idx[n]]];
     }
 
     std::vector<coordinate<>> dof_nodes_unique;
     dof_nodes_unique.reserve(unique_uniq_idx.size());
 
-    for(auto i : unique_uniq_idx) {
+    for (auto i : unique_uniq_idx) {
         dof_nodes_unique.push_back(dof_nodes[i]);
     }
 

@@ -94,10 +94,6 @@ set(SOURCE_FILES
         src/output/OutputData.cpp
         src/output/VTUBackend.cpp
 
-        #src/output/VTKObject.cpp
-        #src/output/VTKOutput.cpp
-        #src/output/VTKScalarData.cpp
-        #src/output/VTKTimeOutput.cpp
 
         src/quadrature/QuadratureRule.cpp
         src/quadrature/TriangleQuadratureRules.cpp

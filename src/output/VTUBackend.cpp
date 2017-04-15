@@ -221,10 +221,10 @@ void VTUBackend::write_mesh(OutputMesh *outputMesh)
 
         outputMesh->local_cells_per_cell[e] = E.localMesh.nCells();
 
-        //all "local" meshes are of same type. get ElementType of first element and run
-        int vtk_type = ElementType_to_VTKType(dofm.CellType_to_ElementType(E.localMesh.getCellType(0), 1));
+
 
         for (auto lc : IRange(0, E.localMesh.nCells())) {
+            int vtk_type = ElementType_to_VTKType(dofm.CellType_to_ElementType(E.localMesh.getCellType(lc), 1));
             E.localMesh.getCellNodes(lc, local_cell);
             expanded_cell_offsets.push_back(offset);
             offset += local_cell.size();

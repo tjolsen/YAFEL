@@ -37,6 +37,7 @@ public:
     std::vector<int> element_offsets;
     std::vector<int> elements;
     std::vector<ElementType> element_types;
+    std::vector<int> cell_region_idx;
 
 private:
     void make_cg_dofs(const Mesh &M);
