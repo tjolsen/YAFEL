@@ -8,12 +8,16 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -Wextra -DNDEBUG -
 set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra")
 
 set(SOURCE_FILES
+        include/assembly/CGAssembly.hpp
+
         include/boundary_conditions/DirichletBC.hpp
 
         include/element/Element.hpp
         include/element/ElementFactory.hpp
         include/element/ElementType.hpp
         include/element/ShapeFunctionUtils.hpp
+
+        include/fe_system/FESystem.hpp
 
         include/lin_alg/tensor/tensors.hpp
         include/lin_alg/tensor/TensorExpression.hpp

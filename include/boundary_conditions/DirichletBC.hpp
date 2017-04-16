@@ -25,22 +25,21 @@ class DirichletBC
 public:
 
     template<typename T,
-            typename=typename std::enable_if<std::is_fundamental<T>::value>::type>
-    DirichletBC(const DoFManager &dofm, T bcval);
+            typename = typename std::enable_if<std::is_fundamental<T>::value>::type>
+    DirichletBC(const DoFManager &dofm, T bcval, int comp=0);
 
     template<typename T,
-            typename=typename std::enable_if<std::is_constructible<std::function<double(const coordinate<> &, double)>, T>::value>::type>
-
-    DirichletBC(const DoFManager &dofm, T &&bcval);
+            typename = typename std::enable_if<std::is_constructible<std::function<double(const coordinate<> &, double)>, T>::value>::type>
+    DirichletBC(const DoFManager &dofm, T &&bcval, int comp=0);
 
     template<int RCMajor,
             typename=typename std::enable_if<RCMajor == Eigen::ColMajor || RCMajor == Eigen::RowMajor>::type>
-    void apply(Eigen::SparseMatrix<double, RCMajor> &A, Eigen::VectorXd &rhs);
+    void apply(Eigen::SparseMatrix<double, RCMajor> &A, Eigen::VectorXd &rhs, double time=0.0);
 
-    void selectByRegionID(int region_id, int component);
+    void selectByRegionID(int region_id);
 
     template<typename Lambda>
-    void selectByFunction(Lambda &&func, int component);
+    void selectByFunction(Lambda &&func);
 
     // for debugging purposes
     inline double test_value(const coordinate<> &x = coordinate<>(), double t = 0) const { return value_func(x, t); }
@@ -51,8 +50,7 @@ private:
     const DoFManager &dofm;
     int component;
     std::vector<int> bc_nodes;
-    std::function<double(const coordinate<> &, double)>
-    value_func;
+    std::function<double(const coordinate<> &, double)> value_func;
 };
 
 
@@ -80,10 +78,9 @@ DirichletBC::DirichletBC(const DoFManager &dofm, T &&bcval, int comp)
 
 
 template<typename Lambda>
-void DirichletBC::selectByFunction(Lambda &&func, int comp)
+void DirichletBC::selectByFunction(Lambda &&func)
 {
     int N = dofm.dof_nodes.size();
-    component = comp;
     for (auto i : IRange(0, N)) {
         if (func(dofm.dof_nodes[i])) {
             bc_nodes.push_back(i);

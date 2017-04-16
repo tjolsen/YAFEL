@@ -7,7 +7,7 @@
 
 YAFEL_NAMESPACE_OPEN
 
-void DirichletBC::selectByRegionID(int region_id, int component)
+void DirichletBC::selectByRegionID(int region_id)
 {
     int N = dofm.nCells();
     std::vector<int> cellNodes;
@@ -25,32 +25,65 @@ void DirichletBC::selectByRegionID(int region_id, int component)
 
 
 template<>
-void DirichletBC::apply(Eigen::SparseMatrix<double, Eigen::RowMajor> &A, Eigen::VectorXd &rhs)
+void DirichletBC::apply(Eigen::SparseMatrix<double, Eigen::RowMajor> &A, Eigen::VectorXd &rhs, double time)
 {
 
     int *row_ptr = A.outerIndexPtr();
     int *col_ptr = A.innerIndexPtr();
     double *value_ptr = A.valuePtr();
-
-    std::vector<bool> bc_mask(dofm.dof_nodes.size()*dofm.dof_per_node,false);
-    for(auto n : bc_nodes) {
-        
+    Eigen::VectorXd bc_values = Eigen::VectorXd::Constant(dofm.dof_per_node * dofm.dof_nodes.size(), 0.0);
+    std::vector<bool> bc_mask(dofm.dof_nodes.size() * dofm.dof_per_node, false);
+    for (auto n : bc_nodes) {
+        bc_mask[n * dofm.dof_per_node + component] = true;
+        bc_values(n * dofm.dof_per_node + component) = value_func(dofm.dof_nodes[n], time);
     }
 
+    rhs -= A * bc_values;
 
-    for(auto r : IRange(0,A.rows())) {
-        for(auto idx : IRange(row_ptr[r], row_ptr[r+1])) {
+    for (auto r : IRange(0, static_cast<int>(A.rows()))) {
+        for (auto idx : IRange(row_ptr[r], row_ptr[r + 1])) {
             int c = col_ptr[idx];
-            if(bc_mask[r]) {
 
+            if (bc_mask[r] || bc_mask[c]) {
+                value_ptr[idx] = 0;
+                if (r == c) {
+                    rhs(r) = bc_values(c);
+                    value_ptr[idx] = 1;
+                }
             }
         }
     }
 }
 
 template<>
-void DirichletBC::apply(Eigen::SparseMatrix<double, Eigen::ColMajor>, Eigen::VectorXd &rhs)
+void DirichletBC::apply(Eigen::SparseMatrix<double, Eigen::ColMajor> &A, Eigen::VectorXd &rhs, double time)
 {
+
+    int *col_ptr = A.outerIndexPtr();
+    int *row_ptr = A.innerIndexPtr();
+    double *value_ptr = A.valuePtr();
+    Eigen::VectorXd bc_values = Eigen::VectorXd::Constant(dofm.dof_per_node * dofm.dof_nodes.size(), 0.0);
+    std::vector<bool> bc_mask(dofm.dof_nodes.size() * dofm.dof_per_node, false);
+    for (auto n : bc_nodes) {
+        bc_mask[n * dofm.dof_per_node + component] = true;
+        bc_values(n * dofm.dof_per_node + component) = value_func(dofm.dof_nodes[n], time);
+    }
+
+    rhs -= A * bc_values;
+
+    for (auto c : IRange(0, static_cast<int>(A.cols()))) {
+        for (auto idx : IRange(col_ptr[c], col_ptr[c + 1])) {
+            int r = row_ptr[idx];
+
+            if (bc_mask[c] || bc_mask[r]) {
+                value_ptr[idx] = 0;
+                if (r == c) {
+                    rhs(r) = bc_values(c);
+                    value_ptr[idx] = 1;
+                }
+            }
+        }
+    }
 
 
 }

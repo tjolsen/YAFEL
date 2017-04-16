@@ -19,13 +19,9 @@
 // Utils
 #include "utils/old_DirBC.hpp"
 #include "utils/DoFManager.hpp"
-#include "utils/CG_DoFManager.hpp"
-#include "utils/DG_DoFManager.hpp"
 #include "utils/DualNumber.hpp"
 #include "utils/ElementType.hpp"
 #include "quadrature/QuadratureRule.hpp"
-#include "utils/GaussLegendreQuadrature.hpp"
-#include "utils/GaussLobattoQuadrature.hpp"
 #include "utils/SpatialFunction.hpp"
 
 // Mesh
