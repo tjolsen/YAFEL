@@ -19,7 +19,7 @@ DoFManager::DoFManager(const Mesh &M,
 
     cell_region_idx.resize(M.nCells());
     for (auto c : IRange(0, M.nCells())) {
-        cell_region_idx[c] = M.getCellTags(c)[1];
+        cell_region_idx[c] = M.getCellTags(c)[0];
     }
 
     switch (m_type) {

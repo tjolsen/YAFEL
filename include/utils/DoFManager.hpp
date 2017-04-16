@@ -30,6 +30,8 @@ public:
 
     ElementType CellType_to_ElementType(CellType ct, int polyOrder) const;
 
+    inline int nCells() const { return static_cast<int>(element_types.size()); }
+
     int dof_per_node;
     int polyOrder;
     ManagerType managerType;

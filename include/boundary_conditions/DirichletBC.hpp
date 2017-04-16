@@ -35,22 +35,22 @@ public:
 
     template<int RCMajor,
             typename=typename std::enable_if<RCMajor == Eigen::ColMajor || RCMajor == Eigen::RowMajor>::type>
-    void apply(Eigen::SparseMatrix<double, RCMajor>, Eigen::VectorXd &rhs);
+    void apply(Eigen::SparseMatrix<double, RCMajor> &A, Eigen::VectorXd &rhs);
 
     void selectByRegionID(int region_id, int component);
 
     template<typename Lambda>
-
     void selectByFunction(Lambda &&func, int component);
 
     // for debugging purposes
     inline double test_value(const coordinate<> &x = coordinate<>(), double t = 0) const { return value_func(x, t); }
 
-    inline auto &getMask() { return bc_mask; }
+    inline auto &getNodes() { return bc_nodes; }
 
 private:
     const DoFManager &dofm;
-    std::vector<bool> bc_mask;
+    int component;
+    std::vector<int> bc_nodes;
     std::function<double(const coordinate<> &, double)>
     value_func;
 };
@@ -60,9 +60,10 @@ private:
 // Constructor implementation for fundamental types
 //-------------------------------------------------
 template<typename T, typename>
-DirichletBC::DirichletBC(const DoFManager &dofm, T bcval)
+DirichletBC::DirichletBC(const DoFManager &dofm, T bcval, int comp)
         : dofm(dofm),
-          bc_mask(dofm.dof_nodes.size() * dofm.dof_per_node, false)
+          component(comp),
+          bc_nodes()
 {
     value_func = [val = double(bcval)](const coordinate<> &, double) { return val; };
 }
@@ -71,17 +72,21 @@ DirichletBC::DirichletBC(const DoFManager &dofm, T bcval)
 // Constructor implementation for function types
 //----------------------------------------------
 template<typename T, typename>
-DirichletBC::DirichletBC(const DoFManager &dofm, T &&bcval)
-        :dofm(dofm), bc_mask(dofm.dof_nodes.size() * dofm.dof_per_node, false), value_func(bcval) {}
+DirichletBC::DirichletBC(const DoFManager &dofm, T &&bcval, int comp)
+        :dofm(dofm),
+         component(comp),
+         bc_nodes(),
+         value_func(bcval) {}
 
 
 template<typename Lambda>
-void DirichletBC::selectByFunction(Lambda &&func, int component)
+void DirichletBC::selectByFunction(Lambda &&func, int comp)
 {
     int N = dofm.dof_nodes.size();
+    component = comp;
     for (auto i : IRange(0, N)) {
         if (func(dofm.dof_nodes[i])) {
-            bc_mask[dofm.dof_per_node * i + component] = true;
+            bc_nodes.push_back(i);
         }
     }
 }

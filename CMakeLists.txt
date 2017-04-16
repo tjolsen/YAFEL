@@ -8,6 +8,8 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -Wextra -DNDEBUG -
 set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra")
 
 set(SOURCE_FILES
+        include/boundary_conditions/DirichletBC.hpp
+
         include/element/Element.hpp
         include/element/ElementFactory.hpp
         include/element/ElementType.hpp
@@ -80,6 +82,7 @@ set(SOURCE_FILES
         include/yafel_globals.hpp
         include/yafel_typedefs.hpp
 
+        src/boundary_conditions/DirichletBC.cpp
 
         src/element/Element.cpp
         src/element/ElementFactory.cpp
