@@ -21,7 +21,12 @@ Mesh::Mesh(DefinitionScheme definitionScheme,
           cellTypes_(cellTypes),
           cellTags_(cellTags),
           internal_faces_(),
-          boundary_face_idxs_() {}
+          boundary_face_idxs_()
+{
+    if(cellTags_.size() == 0) {
+        cellTags_.resize(nCells(), {0});
+    }
+}
 
 
 Mesh::Mesh(const std::string &fname)

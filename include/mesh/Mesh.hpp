@@ -75,6 +75,9 @@ public:
      */
     void getCellNodes(int cellnum, std::vector<int> &container) const;
 
+    auto const &getCellVector() const { return cellNodes_; }
+
+    auto const &getOffsetVector() const { return cellOffsets_; }
 
     /**
      * Setters for internal structures

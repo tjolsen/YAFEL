@@ -14,7 +14,9 @@ DoFManager::DoFManager(const Mesh &M,
                        int dof_per_node)
         : dof_per_node(dof_per_node),
           polyOrder(polyOrder),
-          managerType(m_type)
+          managerType(m_type),
+          mesh_corner_idxs(M.getCellVector()),
+          mesh_corner_offsets(M.getOffsetVector())
 {
 
     cell_region_idx.resize(M.nCells());

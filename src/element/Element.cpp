@@ -337,8 +337,6 @@ void Element::make_simplex()
         }
         offsets.push_back(offset);
 
-
-
         /*
         int offset = 0;
         idx = 0;
@@ -457,7 +455,6 @@ void Element::make_simplex()
         }
         offsets.push_back(offset);
         */
-
 
     } else {
         //unsupported topoDim

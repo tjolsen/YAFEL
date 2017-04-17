@@ -41,6 +41,8 @@ public:
     std::vector<ElementType> element_types;
     std::vector<int> cell_region_idx;
 
+    std::vector<int> mesh_corner_idxs;
+    std::vector<int> mesh_corner_offsets;
 private:
     void make_cg_dofs(const Mesh &M);
 

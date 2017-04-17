@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.5)
 project(YAFEL)
 
+find_package(OpenMP)
+
 set(CMAKE_CXX_STANDARD 14)
 
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -Wextra -DNDEBUG -Ofast -ffast-math -march=native")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 ${OpenMP_CXX_FLAGS} -Wall -Wextra -DNDEBUG -march=native")
 
 set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra")
 
@@ -16,6 +18,7 @@ set(SOURCE_FILES
         include/element/ElementFactory.hpp
         include/element/ElementType.hpp
         include/element/ShapeFunctionUtils.hpp
+        include/element/element_boundary_nodes.hpp
 
         include/fe_system/FESystem.hpp
 
@@ -43,6 +46,7 @@ set(SOURCE_FILES
         include/lin_alg/tensor/tensor_functions/BinaryFunctions.hpp
         include/lin_alg/tensor/tensor_functions/operators.hpp
         include/lin_alg/tensor/tensor_functions/rank2_specializations.hpp
+        include/lin_alg/tensor/tensor_functions/rank1_specializations.hpp
         include/lin_alg/tensor/tensor_functions/spectral_decomposition.hpp
         include/lin_alg/tensor/tensor_functions/tensor_dot.hpp
         include/lin_alg/tensor/tensor_functions/UnaryFunctions.hpp
