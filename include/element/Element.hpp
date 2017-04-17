@@ -45,7 +45,7 @@ public:
 
     //Element data at a quadrature point
     Eigen::Matrix<double, Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> shapeGrad;
-    double detJ;
+    double jxw;
     std::vector<int> globalDofs;
 
     // useful getters for an element
@@ -85,7 +85,8 @@ void Element::update(int elnum, int qpi, const DoFManager &dofm)
         }
     }
 
-    detJ = determinant(Jacobian);
+    double detJ = determinant(Jacobian);
+    jxw = detJ*quadratureRule.weights[qpi];
     Tensor<NSD,2> Jinv = inverse(Jacobian);
     Tensor<NSD,2> JinvT = Jinv.template perm<1,0>();
     shapeGrad = Eigen::MatrixXd::Constant(nodes.size(),NSD,0);
