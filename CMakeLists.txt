@@ -95,8 +95,9 @@ set(SOURCE_FILES
         src/element/Element.cpp
         src/element/ElementFactory.cpp
         src/element/ShapeFunctionUtils.cpp
+        src/element/build_tet_faces.cpp
 
-        src/quadrature/LobattoPoints1D.cpp
+        src/mesh/CellFace.cpp
         src/mesh/Mesh.cpp
         src/mesh/build_faces.cpp
         src/mesh/parse_gmsh.cpp
@@ -105,7 +106,7 @@ set(SOURCE_FILES
         src/output/OutputData.cpp
         src/output/VTUBackend.cpp
 
-
+        src/quadrature/LobattoPoints1D.cpp
         src/quadrature/QuadratureRule.cpp
         src/quadrature/TriangleQuadratureRules.cpp
         src/quadrature/TetrahedronQuadratureRules.cpp

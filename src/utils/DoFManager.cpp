@@ -106,7 +106,7 @@ void DoFManager::make_cg_dofs(const Mesh &M)
     make_raw_dofs(M);
 
     //recombine duplicate nodes and update triangulation
-    recombine_all_duplicates();
+    recombine_all_duplicates2();
 
 }
 
@@ -227,8 +227,7 @@ void DoFManager::recombine_all_duplicates()
         return std::lexicographical_compare(dof_nodes[L].data.rbegin(), dof_nodes[L].data.rend(),
                                             dof_nodes[R].data.rbegin(), dof_nodes[R].data.rend());
     };
-    auto uniq_func = [this](int L, int R) { return norm(this->dof_nodes[L] - this->dof_nodes[R]) < 1.0e-10; };
-
+    auto uniq_func = [this](int L, int R) { return norm(this->dof_nodes[L] - this->dof_nodes[R]) < 1.0e-6; };
 
     //lexicographical sort of nodes
     std::sort(idxs.begin(), idxs.end(), sort_func);
@@ -267,7 +266,73 @@ void DoFManager::recombine_all_duplicates()
         dof_nodes_unique.push_back(dof_nodes[i]);
     }
 
+
     dof_nodes.swap(dof_nodes_unique);
+}
+
+
+void DoFManager::recombine_all_duplicates2()
+{
+
+    int N = dof_nodes.size();
+    std::vector<int> idxs(N);
+    for (auto i : IRange(0, N)) {
+        idxs[i] = i;
+    }
+
+    auto sort_func = [this](int L, int R) {
+        return std::lexicographical_compare(dof_nodes[L].data.rbegin(), dof_nodes[L].data.rend(),
+                                            dof_nodes[R].data.rbegin(), dof_nodes[R].data.rend());
+    };
+    auto uniq_func_idx = [this](int L, int R) { return norm(this->dof_nodes[L] - this->dof_nodes[R]) < 1.0e-6; };
+    auto uniq_func_x = [](auto x, auto y) { return norm(x - y) < 1.0e-6; };
+
+    //lexicographical sort of nodes
+    std::sort(idxs.begin(), idxs.end(), sort_func);
+
+    std::vector<coordinate<>> sorted_nodes(N);
+    std::vector<int> reverse_idxs(N);
+    for (auto i : IRange(0, N)) {
+        sorted_nodes[i] = dof_nodes[idxs[i]];
+        reverse_idxs[idxs[i]] = i;
+    }
+
+    std::vector<int> uniq_idx(N);
+    std::vector<int> uniq_uniq_idx(1,0);
+    uniq_idx[0] = 0;
+    for(auto i : IRange(1,N)) {
+        if(uniq_func_x(sorted_nodes[i], sorted_nodes[i-1])) {
+            uniq_idx[i] = uniq_idx[i-1];
+        }
+        else {
+            uniq_uniq_idx.push_back(i);
+            uniq_idx[i] = i;
+        }
+    }
+
+    std::vector<int> reverse_u_idx(uniq_idx.size());
+    int current{0};
+    reverse_u_idx[0] = current;
+    for(auto i : IRange(1,static_cast<int>(uniq_idx.size()))) {
+        if(uniq_idx[i] == uniq_idx[i-1]) {
+            reverse_u_idx[i] = current;
+        }
+        else {
+            reverse_u_idx[i] = ++current;
+        }
+    }
+
+
+    std::vector<coordinate<>> unique_nodes(uniq_uniq_idx.size());
+    for(auto i : IRange(0,static_cast<int>(uniq_uniq_idx.size()))) {
+        unique_nodes[i] = sorted_nodes[uniq_uniq_idx[i]];
+    }
+
+    for(auto &n : elements) {
+        n = reverse_u_idx[uniq_idx[reverse_idxs[n]]];
+    }
+
+    dof_nodes.swap(unique_nodes);
 }
 
 YAFEL_NAMESPACE_CLOSE

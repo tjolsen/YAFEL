@@ -6,7 +6,7 @@
 #define YAFEL_CELLFACE_HPP
 
 #include "yafel_globals.hpp"
-#include "utils/Range.hpp"
+#include "mesh/mesh_typedefs.hpp"
 #include <array>
 #include <iostream>
 
@@ -34,17 +34,19 @@ YAFEL_NAMESPACE_OPEN
  * This uniquely defines the face orientation regardless
  * of how it occurs in the original mesh.
  */
-struct CellFace {
+struct CellFace
+{
 
     inline CellFace()
             : nodes(), left(-1), right(-1), n_nodes(0),
-              left_flocal(-1), right_flocal(-1)
+              left_flocal(-1), right_flocal(-1),
+              left_rot(0), right_rot(0)
     {
         this->nodes.fill(0);
     }
 
     //node idx container
-    std::array<int,4> nodes;
+    std::array<int, 4> nodes;
 
     //Indices of left/right cells
     int left;
@@ -55,46 +57,29 @@ struct CellFace {
     int left_flocal;
     int right_flocal;
 
-    inline void orient() {
-        if(n_nodes == 2) {
-            if(nodes[1] < nodes[0]) {
-                std::swap(nodes[0], nodes[1]);
-                std::swap(left,right);
-                std::swap(left_flocal,right_flocal);
-            }
-        }
-        else {
-            //n_nodes==3 or n_nodes==4
-            int min_i=0;
-            for(auto i : IRange(1,n_nodes)) {
-                min_i = (nodes[min_i] < nodes[i]) ? min_i : i;
-            }
+    //Local face rotation
+    int left_rot;
+    int right_rot;
 
-            std::array<int,4> tmp_nodes(nodes);
-            for(auto i : IRange(0,n_nodes)) {
-                nodes[i] = tmp_nodes[(min_i+i)%n_nodes];
-            }
 
-            if(nodes[n_nodes-1] < nodes[1]) {
-                std::swap(nodes[1], nodes[n_nodes-1]);
-                std::swap(left,right);
-                std::swap(left_flocal,right_flocal);
-            }
-        }
-    };
+    static CellFace canonicalCellFace(CellType ct, int flocal);
+
+    void orient();
 };
 
-inline std::ostream& operator<<(std::ostream& out, const CellFace& F)
+inline std::ostream &operator<<(std::ostream &out, const CellFace &F)
 {
     out << "F{ {";
-    for(int i=0; i<F.n_nodes-1; ++i) {
+    for (int i = 0; i < F.n_nodes - 1; ++i) {
         out << F.nodes[i] << ", ";
     }
-    out << F.nodes[F.n_nodes-1]
+    out << F.nodes[F.n_nodes - 1]
         << "}, L(" << F.left
         << "), R(" << F.right
         << "), Lf(" << F.left_flocal
         << "), Rf(" << F.right_flocal
+        << "), Lr(" << F.left_rot
+        << "), Rr(" << F.right_rot
         << ") }";
 
     return out;

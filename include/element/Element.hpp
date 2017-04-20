@@ -39,6 +39,9 @@ public:
     std::vector<Eigen::VectorXd> shapeValues;
     std::vector<Eigen::Matrix<double,Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> shapeGradXi;
 
+    // Permutation arrays for face nodes
+    std::vector<std::vector<std::vector<std::vector<int>>>> face_perm;
+
     // update element values at a quadrature point
     template<int NSD>
     void update(int elnum, int qpi, const DoFManager &dofm);
@@ -59,6 +62,7 @@ public:
 
 private:
     void make_simplex();
+    void build_tet_faces();
 
     void make_tensorProduct();
 
