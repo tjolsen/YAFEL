@@ -100,7 +100,7 @@ void CGAssembly(FESystem &feSystem,
 
         //Create an ElementFactory
         ElementFactory EF;
-#pragma omp for schedule(static, 128);
+#pragma omp for schedule(static, 128)
         for (int elnum=0; elnum<dofm.nCells(); ++elnum) {
 
             auto et = dofm.element_types[elnum];

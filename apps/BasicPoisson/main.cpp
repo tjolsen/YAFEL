@@ -55,8 +55,8 @@ Eigen::VectorXd solveSystem(const Eigen::SparseMatrix<double> &A, const Eigen::V
 
 int main()
 {
-    Mesh M("minsquare.msh");
-    int p = 10;
+    Mesh M("mesh.msh");
+    int p = 5;
     int dofpn = 1;
     DoFManager dofm(M, DoFManager::ManagerType::CG, p, dofpn);
     FESystem feSystem(dofm);
