@@ -42,5 +42,7 @@
 #include "lin_alg/tensor/tensor_functions/rank2_specializations.hpp"
 #include "lin_alg/tensor/tensor_functions/spectral_decomposition.hpp"
 #include "lin_alg/tensor/tensor_functions/rank1_specializations.hpp"
+#include "lin_alg/tensor/tensor_functions/Reductions.hpp"
+
 
 #endif //YAFEL_TENSORS_HPP

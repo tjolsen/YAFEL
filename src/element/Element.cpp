@@ -167,6 +167,9 @@ void Element::make_tensorProduct()
                                    shapeValues,
                                    shapeGradXi);
 
+    if(elementType.topoDim == 2) {
+        build_quad_faces();
+    }
 }
 
 
@@ -174,6 +177,9 @@ void Element::make_simplex()
 {
     auto qr = QuadratureRule(elementType.polyOrder + 1,
                              QuadratureRule::QuadratureType::GAUSS_LOBATTO);
+    double snap_value = 1.0/(2<<20);
+    auto snap = [snap_value](auto x)->coordinate<> { return round(x / snap_value) * snap_value; };
+
     std::vector<double> lob_pts_1d;
     for (auto x : qr.nodes)
         lob_pts_1d.push_back(x(0));
@@ -247,8 +253,8 @@ void Element::make_simplex()
                 double vi = (lob_pts_1d[i - 1] + 1) / 2;
                 double vj = (lob_pts_1d[j - 1] + 1) / 2;
                 double vk = (lob_pts_1d[k - 1] + 1) / 2;
-                localPoints_xi[idx](0) = std::max(0.0,(1 + 2 * vj - vi - vk) / 3);
-                localPoints_xi[idx](1) = std::max(0.0,(1 + 2 * vi - vj - vk) / 3);
+                localPoints_xi[idx](0) = std::max(0.0, (1 + 2 * vj - vi - vk) / 3);
+                localPoints_xi[idx](1) = std::max(0.0, (1 + 2 * vi - vj - vk) / 3);
                 localPoints_xi[idx](2) = 0;
                 ++idx;
             }
@@ -262,8 +268,8 @@ void Element::make_simplex()
                 double vk = (lob_pts_1d[k - 1] + 1) / 2;
                 double vl = (lob_pts_1d[l - 1] + 1) / 2;
                 localPoints_xi[idx](0) = 0;
-                localPoints_xi[idx](1) = std::max(0.0,(1 + 2 * vj - vk - vl) / 3);
-                localPoints_xi[idx](2) = std::max(0.0,(1 + 2 * vk - vj - vl) / 3);
+                localPoints_xi[idx](1) = std::max(0.0, (1 + 2 * vj - vk - vl) / 3);
+                localPoints_xi[idx](2) = std::max(0.0, (1 + 2 * vk - vj - vl) / 3);
                 ++idx;
             }
         }
@@ -276,9 +282,9 @@ void Element::make_simplex()
                 double vk = (lob_pts_1d[k - 1] + 1) / 2;
                 double vl = (lob_pts_1d[l - 1] + 1) / 2;
 
-                localPoints_xi[idx](0) = std::max(0.0,(1 + 2 * vi - vk - vl) / 3);
+                localPoints_xi[idx](0) = std::max(0.0, (1 + 2 * vi - vk - vl) / 3);
                 localPoints_xi[idx](1) = 0;
-                localPoints_xi[idx](2) = std::max(0.0,(1 + 2 * vk - vi - vl) / 3);
+                localPoints_xi[idx](2) = std::max(0.0, (1 + 2 * vk - vi - vl) / 3);
 
                 ++idx;
             }
@@ -292,8 +298,8 @@ void Element::make_simplex()
                 double vj = (lob_pts_1d[j - 1] + 1) / 2;
                 double vl = (lob_pts_1d[l - 1] + 1) / 2;
 
-                localPoints_xi[idx](0) = std::max(0.0,(1 + 2 * vi - vj - vl) / 3);
-                localPoints_xi[idx](1) = std::max(0.0,(1 + 2 * vj - vi - vl) / 3);
+                localPoints_xi[idx](0) = std::max(0.0, (1 + 2 * vi - vj - vl) / 3);
+                localPoints_xi[idx](1) = std::max(0.0, (1 + 2 * vj - vi - vl) / 3);
                 localPoints_xi[idx](2) = 1 - localPoints_xi[idx](0) - localPoints_xi[idx](1);
 
                 ++idx;
@@ -312,9 +318,9 @@ void Element::make_simplex()
                     double vl = (lob_pts_1d[l - 1] + 1) / 2;
 
 
-                    localPoints_xi[idx](0) = std::max(0.0,(1 + 3 * vk - vi - vj - vl) / 4);
-                    localPoints_xi[idx](1) = std::max(0.0,(1 + 3 * vj - vi - vk - vl) / 4);
-                    localPoints_xi[idx](2) = std::max(0.0,(1 + 3 * vi - vj - vk - vl) / 4);
+                    localPoints_xi[idx](0) = std::max(0.0, (1 + 3 * vk - vi - vj - vl) / 4);
+                    localPoints_xi[idx](1) = std::max(0.0, (1 + 3 * vj - vi - vk - vl) / 4);
+                    localPoints_xi[idx](2) = std::max(0.0, (1 + 3 * vi - vj - vk - vl) / 4);
 
                     ++idx;
                 }
@@ -462,6 +468,11 @@ void Element::make_simplex()
     }
 
 
+    //snap points to help with sorting
+    for(auto &x : localPoints_xi) {
+        x = snap(x);
+    }
+
     if (elementType.topoDim == 2) {
         quadratureRule.get_triangle_quadrature(std::max(1, 2 * elementType.polyOrder));
     } else if (elementType.topoDim == 3) {
@@ -478,13 +489,15 @@ void Element::make_simplex()
                                  elementType.polyOrder,
                                  shapeValues,
                                  shapeGradXi);
+
+        build_tri_faces();
     } else if (elementType.topoDim == 3) {
         tetrahedron_shape_functions(localMesh.getGeometryNodes(),
                                     quadratureRule.nodes,
                                     elementType.polyOrder,
                                     shapeValues,
                                     shapeGradXi);
-        build_tet_faces();
+        //build_tet_faces();
     }
 }
 

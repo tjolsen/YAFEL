@@ -276,13 +276,27 @@ void DoFManager::recombine_all_duplicates2()
 
     int N = dof_nodes.size();
     std::vector<int> idxs(N);
+    coordinate<> boundingBox_min{dof_nodes[0]};
+    coordinate<> boundingBox_max{dof_nodes[0]};
     for (auto i : IRange(0, N)) {
         idxs[i] = i;
+        boundingBox_min = min(boundingBox_min, dof_nodes[i]);
+        boundingBox_max = max(boundingBox_max, dof_nodes[i]);
     }
 
-    auto sort_func = [this](int L, int R) {
-        return std::lexicographical_compare(dof_nodes[L].data.rbegin(), dof_nodes[L].data.rend(),
-                                            dof_nodes[R].data.rbegin(), dof_nodes[R].data.rend());
+    double max_dim = max(boundingBox_max - boundingBox_min);
+    double snap_value = max_dim * 1.0e-6;
+
+    auto snap = [snap_value](auto x)->coordinate<> { return round(x / snap_value) * snap_value; };
+    for(auto &x : dof_nodes) {
+        //x = snap(x);
+    }
+
+    auto sort_func = [this,snap](int L, int R) {
+        auto xL = snap(dof_nodes[L]);
+        auto xR = snap(dof_nodes[R]);
+        return std::lexicographical_compare(xL.data.rbegin(), xL.data.rend(),
+                                            xR.data.rbegin(), xR.data.rend());
     };
     auto uniq_func_idx = [this](int L, int R) { return norm(this->dof_nodes[L] - this->dof_nodes[R]) < 1.0e-6; };
     auto uniq_func_x = [](auto x, auto y) { return norm(x - y) < 1.0e-6; };
@@ -298,13 +312,12 @@ void DoFManager::recombine_all_duplicates2()
     }
 
     std::vector<int> uniq_idx(N);
-    std::vector<int> uniq_uniq_idx(1,0);
+    std::vector<int> uniq_uniq_idx(1, 0);
     uniq_idx[0] = 0;
-    for(auto i : IRange(1,N)) {
-        if(uniq_func_x(sorted_nodes[i], sorted_nodes[i-1])) {
-            uniq_idx[i] = uniq_idx[i-1];
-        }
-        else {
+    for (auto i : IRange(1, N)) {
+        if (uniq_func_x(sorted_nodes[i], sorted_nodes[i - 1])) {
+            uniq_idx[i] = uniq_idx[i - 1];
+        } else {
             uniq_uniq_idx.push_back(i);
             uniq_idx[i] = i;
         }
@@ -313,22 +326,21 @@ void DoFManager::recombine_all_duplicates2()
     std::vector<int> reverse_u_idx(uniq_idx.size());
     int current{0};
     reverse_u_idx[0] = current;
-    for(auto i : IRange(1,static_cast<int>(uniq_idx.size()))) {
-        if(uniq_idx[i] == uniq_idx[i-1]) {
+    for (auto i : IRange(1, static_cast<int>(uniq_idx.size()))) {
+        if (uniq_idx[i] == uniq_idx[i - 1]) {
             reverse_u_idx[i] = current;
-        }
-        else {
+        } else {
             reverse_u_idx[i] = ++current;
         }
     }
 
 
     std::vector<coordinate<>> unique_nodes(uniq_uniq_idx.size());
-    for(auto i : IRange(0,static_cast<int>(uniq_uniq_idx.size()))) {
+    for (auto i : IRange(0, static_cast<int>(uniq_uniq_idx.size()))) {
         unique_nodes[i] = sorted_nodes[uniq_uniq_idx[i]];
     }
 
-    for(auto &n : elements) {
+    for (auto &n : elements) {
         n = reverse_u_idx[uniq_idx[reverse_idxs[n]]];
     }
 

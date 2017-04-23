@@ -63,6 +63,8 @@ public:
 private:
     void make_simplex();
     void build_tet_faces();
+    void build_tri_faces();
+    void build_quad_faces();
 
     void make_tensorProduct();
 

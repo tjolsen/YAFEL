@@ -38,6 +38,11 @@ auto cos(const TensorExpression<T,D,R,dt,b> &te) noexcept
     return TensorCwiseUnaryOp<T,D,R,dt,b,Cos>(te);
 }
 
+template<typename T, int D, int R, typename dt, bool b>
+auto round(const TensorExpression<T,D,R,dt,b> &te) noexcept
+{
+    return TensorCwiseUnaryOp<T,D,R,dt,b,Round>(te);
+}
 
 YAFEL_NAMESPACE_CLOSE
 

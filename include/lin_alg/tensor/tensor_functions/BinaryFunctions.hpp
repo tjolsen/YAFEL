@@ -22,7 +22,7 @@ YAFEL_NAMESPACE_OPEN
  */
 template<typename T1, typename T2, int D, int R, typename dt1, typename dt2, bool b1, bool b2>
 auto max(const TensorExpression<T1,D,R,dt1,b1> &lhs,
-         const TensorExpression<T1,D,R,dt2,b2> &rhs)
+         const TensorExpression<T2,D,R,dt2,b2> &rhs)
 {
     return TensorCwiseBinaryOp<T1,T2,D,R,dt1,dt2,b1,b2,Max>(lhs,rhs);
 }
@@ -32,7 +32,7 @@ auto max(const TensorExpression<T1,D,R,dt1,b1> &lhs,
  */
 template<typename T1, typename T2, int D, int R, typename dt1, typename dt2, bool b1, bool b2>
 auto min(const TensorExpression<T1,D,R,dt1,b1> &lhs,
-         const TensorExpression<T1,D,R,dt2,b2> &rhs)
+         const TensorExpression<T2,D,R,dt2,b2> &rhs)
 {
     return TensorCwiseBinaryOp<T1,T2,D,R,dt1,dt2,b1,b2,Min>(lhs,rhs);
 }

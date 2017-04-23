@@ -16,7 +16,8 @@ template<typename Lambda>
 std::vector<int> make_element_boundary_nodes(
         const std::vector<coordinate<>> &xi_all,
         Tensor<3, 1, double> boundary_normal,
-        Tensor<3, 1, double> edge_direction,
+        Tensor<3, 1, double> edge_direction_1,
+        Tensor<3, 1, double> edge_direction_2,
         Lambda &&boundary_mark)
 {
     int npts = static_cast<int>(xi_all.size());
@@ -34,16 +35,17 @@ std::vector<int> make_element_boundary_nodes(
 
 
     //generate new basis
-    auto e2 = cross(boundary_normal, edge_direction);
     Tensor<3, 2> basis;
-    basis(colon(), 0) = edge_direction;
-    basis(colon(), 1) = e2;
+    basis(colon(), 0) = edge_direction_1;
+    basis(colon(), 1) = edge_direction_2;
     basis(colon(), 2) = boundary_normal;
+
 
     Tensor<3, 2> Ainv = inverse(basis);
 
     for (auto &x : xi_boundary) {
-        x = Ainv * x;
+        x = (Ainv * x);
+        x(2) = 0;
     }
 
     std::sort(idx_perm.begin(), idx_perm.end(),

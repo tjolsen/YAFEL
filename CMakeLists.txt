@@ -47,6 +47,7 @@ set(SOURCE_FILES
         include/lin_alg/tensor/tensor_functions/operators.hpp
         include/lin_alg/tensor/tensor_functions/rank2_specializations.hpp
         include/lin_alg/tensor/tensor_functions/rank1_specializations.hpp
+        include/lin_alg/tensor/tensor_functions/Reductions.hpp
         include/lin_alg/tensor/tensor_functions/spectral_decomposition.hpp
         include/lin_alg/tensor/tensor_functions/tensor_dot.hpp
         include/lin_alg/tensor/tensor_functions/UnaryFunctions.hpp
@@ -96,6 +97,7 @@ set(SOURCE_FILES
         src/element/ElementFactory.cpp
         src/element/ShapeFunctionUtils.cpp
         src/element/build_tet_faces.cpp
+        src/element/build_topodim2_faces.cpp
 
         src/mesh/CellFace.cpp
         src/mesh/Mesh.cpp

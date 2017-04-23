@@ -34,10 +34,10 @@ int main()
     M.buildInternalFaces();*/
 
 
-    Mesh M("twoTets.msh");
+    Mesh M("twoQuads.msh");
     M.buildInternalFaces();
 
-    int p = 4;
+    int p = 5;
 
     DoFManager dofm(M, DoFManager::ManagerType::CG, p);
 
@@ -49,12 +49,6 @@ int main()
     vtu.finalize();
 
     ElementFactory EF(1);
-
-    std::cout << dofm.dof_nodes[36](0) << "  " << dofm.dof_nodes[36](1) << "  " << dofm.dof_nodes[36](2) << std::endl;
-    std::cout << dofm.dof_nodes[39](0) << "  " << dofm.dof_nodes[39](1) << "  " << dofm.dof_nodes[39](2) << std::endl;
-    std::cout << dofm.dof_nodes[50](0) << "  " << dofm.dof_nodes[50](1) << "  " << dofm.dof_nodes[50](2) << std::endl;
-    std::cout << dofm.dof_nodes[32](0) << "  " << dofm.dof_nodes[32](1) << "  " << dofm.dof_nodes[32](2) << std::endl;
-    std::cout << dofm.dof_nodes[37](0) << "  " << dofm.dof_nodes[37](1) << "  " << dofm.dof_nodes[37](2) << std::endl;
 
     for (auto f : M.getInternalFaces()) {
         if (!(f.left < 0 || f.right < 0)) {
@@ -76,48 +70,19 @@ int main()
             std::vector<int> container;
             dofm.getGlobalNodes(L, container);
             for (auto n : EL.face_perm[fL][rL][0]) {
-                std::cout << container[n] << "  ";
+                auto x = dofm.dof_nodes[container[n]];
+                std::cout << container[n] << ":  " << x(0) << "  " << x(1) << "  " << x(2) << std::endl;
             }
-            std::cout << std::endl;
+            std::cout << std::endl << std::endl;
             dofm.getGlobalNodes(R, container);
             for (auto n : ER.face_perm[fR][rR][1]) {
-                std::cout << container[n] << "  ";
+                auto x = dofm.dof_nodes[container[n]];
+                std::cout << container[n] << ":  " << x(0) << "  " << x(1) << "  " << x(2) << std::endl;
             }
             std::cout << std::endl << std::endl;
         }
     }
 
-    /*
-    ElementType et{ElementTopology::TensorProduct, 2, p};
-    Element E(et);
-
-    auto idxs_l = make_element_boundary_nodes(E.localMesh.getGeometryNodes(), {1,0,0}, {0,1,0},
-                                              [](auto xi) { return std::abs(xi(0) - 1) < 1.0e-6; });
-
-
-    auto idxs_r = make_element_boundary_nodes(E.localMesh.getGeometryNodes(), {-1,0,0}, {0,1,0},
-            [](auto xi) { return std::abs(xi(0) + 1) < 1.0e-6; });
-
-
-    std::vector<int> left_nodes, right_nodes;
-    dofm.getGlobalNodes(0,left_nodes);
-    dofm.getGlobalNodes(1, right_nodes);
-
-    for(auto il : idxs_l) {
-        std::cout << left_nodes[il] << "  ";
-    }
-    std::cout << "\n";
-    for(auto ir : idxs_r) {
-        std::cout << right_nodes[ir] << "  ";
-    }
-    std::cout << std::endl;
-    for(auto l : left_nodes) {
-        std::cout << l << "  ";
-    }
-    std::cout << std::endl;
-    for(auto r : right_nodes) {
-        std::cout << r << "  ";
-    }*/
 
     std::cout << std::endl;
     return 0;

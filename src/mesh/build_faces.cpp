@@ -66,7 +66,8 @@ void Mesh::buildInternalFaces()
             Fprev.right = std::max(Fprev.right, F.right);
             Fprev.left_flocal = std::max(Fprev.left_flocal, F.left_flocal);
             Fprev.right_flocal = std::max(Fprev.right_flocal, F.right_flocal);
-
+            Fprev.left_rot = std::max(Fprev.left_rot, F.left_rot);
+            Fprev.right_rot = std::max(Fprev.right_rot, F.right_rot);
         }
 
     }
