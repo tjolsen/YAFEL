@@ -17,7 +17,6 @@ static std::vector<std::vector<int>> build_topodim2_faces(const std::vector<coor
 {
     using std::cos;
     using std::sin;
-    int N = xi_all.size();
     double pi = std::atan(1.0) * 4;
     auto Theta = [pi](coordinate<> xi) { return std::atan2(xi(1), xi(0)); };
 

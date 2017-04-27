@@ -98,6 +98,8 @@ set(SOURCE_FILES
         src/element/ShapeFunctionUtils.cpp
         src/element/build_tet_faces.cpp
         src/element/build_topodim2_faces.cpp
+        src/element/make_tensorproduct_element.cpp
+        src/element/make_simplex_element.cpp
 
         src/mesh/CellFace.cpp
         src/mesh/Mesh.cpp
