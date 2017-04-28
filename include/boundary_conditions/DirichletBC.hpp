@@ -26,15 +26,15 @@ public:
 
     template<typename T,
             typename = typename std::enable_if<std::is_fundamental<T>::value>::type>
-    DirichletBC(const DoFManager &dofm, T bcval, int comp=0);
+    DirichletBC(const DoFManager &dofm, T bcval, int comp = 0);
 
     template<typename T,
             typename = typename std::enable_if<std::is_constructible<std::function<double(const coordinate<> &, double)>, T>::value>::type>
-    DirichletBC(const DoFManager &dofm, T &&bcval, int comp=0);
+    DirichletBC(const DoFManager &dofm, T &&bcval, int comp = 0);
 
     template<int RCMajor,
             typename=typename std::enable_if<RCMajor == Eigen::ColMajor || RCMajor == Eigen::RowMajor>::type>
-    void apply(Eigen::SparseMatrix<double, RCMajor> &A, Eigen::VectorXd &rhs, double time=0.0);
+    void apply(Eigen::SparseMatrix<double, RCMajor> &A, Eigen::VectorXd &rhs, double time = 0.0);
 
     void selectByRegionID(int region_id);
 
@@ -50,7 +50,8 @@ private:
     const DoFManager &dofm;
     int component;
     std::vector<int> bc_nodes;
-    std::function<double(const coordinate<> &, double)> value_func;
+    std::function<double(const coordinate<> &, double)>
+    value_func;
 };
 
 

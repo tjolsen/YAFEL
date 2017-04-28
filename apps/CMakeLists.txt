@@ -3,3 +3,6 @@ target_link_libraries(meshArea yafel)
 
 add_executable(basicPoisson BasicPoisson/main.cpp)
 target_link_libraries(basicPoisson yafel)
+
+add_executable(basicElasticity BasicLinearElasticity/main.cpp)
+target_link_libraries(basicElasticity yafel)

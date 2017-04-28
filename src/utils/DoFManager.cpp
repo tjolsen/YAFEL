@@ -106,7 +106,7 @@ void DoFManager::make_cg_dofs(const Mesh &M)
     make_raw_dofs(M);
 
     //recombine duplicate nodes and update triangulation
-    recombine_all_duplicates2();
+    recombine_all_duplicates();
 
 }
 
@@ -215,63 +215,7 @@ coordinate<> DoFManager::interpolate_from_corners(coordinate<> xlocal,
 
 }
 
-
 void DoFManager::recombine_all_duplicates()
-{
-    std::vector<int> idxs(dof_nodes.size(), 0);
-    int idx = 0;
-    for (auto &i : idxs)
-        i = idx++;
-
-    auto sort_func = [this](int L, int R) {
-        return std::lexicographical_compare(dof_nodes[L].data.rbegin(), dof_nodes[L].data.rend(),
-                                            dof_nodes[R].data.rbegin(), dof_nodes[R].data.rend());
-    };
-    auto uniq_func = [this](int L, int R) { return norm(this->dof_nodes[L] - this->dof_nodes[R]) < 1.0e-6; };
-
-    //lexicographical sort of nodes
-    std::sort(idxs.begin(), idxs.end(), sort_func);
-    std::vector<int> reverse_idx(idxs.size());
-    for (auto i : IRange(0, static_cast<int>(idxs.size()))) {
-        reverse_idx[idxs[i]] = i;
-    }
-
-    std::vector<int> uniq_idx(idxs.size());
-    uniq_idx[0] = idxs[0];
-    for (auto i : IRange(1, static_cast<int>(idxs.size()))) {
-
-        if (uniq_func(idxs[i], idxs[i - 1])) {
-            uniq_idx[i] = uniq_idx[i - 1];
-        } else {
-            uniq_idx[i] = idxs[i];
-        }
-    }
-
-    std::vector<int> unique_uniq_idx(uniq_idx);
-    auto uuend = std::unique(unique_uniq_idx.begin(), unique_uniq_idx.end());
-    unique_uniq_idx.resize(std::distance(unique_uniq_idx.begin(), uuend));
-    std::vector<int> reverse_map(uniq_idx.size(), 0);
-    for (auto i : IRange(0, static_cast<int>(unique_uniq_idx.size()))) {
-        reverse_map[unique_uniq_idx[i]] = i;
-    }
-
-    for (auto &n : elements) {
-        n = reverse_map[uniq_idx[reverse_idx[n]]];
-    }
-
-    std::vector<coordinate<>> dof_nodes_unique;
-    dof_nodes_unique.reserve(unique_uniq_idx.size());
-
-    for (auto i : unique_uniq_idx) {
-        dof_nodes_unique.push_back(dof_nodes[i]);
-    }
-
-
-    dof_nodes.swap(dof_nodes_unique);
-}
-
-
-void DoFManager::recombine_all_duplicates2()
 {
 
     int N = dof_nodes.size();
@@ -288,9 +232,7 @@ void DoFManager::recombine_all_duplicates2()
     double snap_value = max_dim * 1.0e-6;
 
     auto snap = [snap_value](auto x)->coordinate<> { return round(x / snap_value) * snap_value; };
-    for(auto &x : dof_nodes) {
-        //x = snap(x);
-    }
+
 
     auto sort_func = [this,snap](int L, int R) {
         auto xL = snap(dof_nodes[L]);

@@ -26,7 +26,7 @@ struct PoissonEquation
     LocalResidual(const Element &E, int qpi, double, Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &R_el)
     {
         for (auto A : IRange(0, static_cast<int>(R_el.rows()))) {
-            R_el(A) += 0 * E.shapeValues[qpi](A) * E.jxw;
+            R_el(A) += 10*E.shapeValues[qpi](A) * E.jxw;
         }
     }
 
@@ -56,17 +56,17 @@ Eigen::VectorXd solveSystem(const Eigen::SparseMatrix<double> &A, const Eigen::V
 int main()
 {
     Mesh M("mesh.msh");
-    int p = 1;
+    int p = 5;
     int dofpn = 1;
     DoFManager dofm(M, DoFManager::ManagerType::CG, p, dofpn);
     FESystem feSystem(dofm);
     CGAssembly<PoissonEquation<2>>(feSystem);
 
-    DirichletBC bc0(dofm, 0.0);
-    bc0.selectByFunction([](const coordinate<> &x) { return std::abs(x(0)) < 1.0e-6; });
+    DirichletBC bc0(dofm, [](const coordinate<> &x,double){return x(0)*x(0)/4;});
+    bc0.selectByFunction([](const coordinate<> &x) { return std::abs(x(0)) < 1.0e-6 || std::abs(x(1)) < 1.0e-6; });
 
     DirichletBC bc1(dofm, 1.0);
-    bc1.selectByFunction([](const coordinate<> & x) { return std::abs(x(0) - 2) < 1.0e-6; });
+    bc1.selectByFunction([](const coordinate<> &x) { return std::abs(x(0) - 2) < 1.0e-6; });
 
     bc0.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
     bc1.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());

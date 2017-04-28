@@ -52,7 +52,7 @@ class TensorMap : public TensorExpression<TensorMap<D, R, dataType, assignable>,
 public:
     using PtrType = typename map_ptr<dataType, true, !assignable>::type;
     using RefType = typename map_ref<dataType, !assignable>::type;
-
+    using super = TensorExpression<TensorMap<D, R, dataType, assignable>, D, R, dataType, assignable>;
 
     TensorMap(PtrType ptr) : dataPtr(ptr) {}
 

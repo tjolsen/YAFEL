@@ -55,7 +55,6 @@ private:
                                           CellType ct) const noexcept;
 
     void recombine_all_duplicates();
-    void recombine_all_duplicates2();
 
 };
 

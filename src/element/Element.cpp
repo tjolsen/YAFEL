@@ -28,5 +28,4 @@ Element::Element(ElementType et, int dofpn)
 }
 
 
-
 YAFEL_NAMESPACE_CLOSE

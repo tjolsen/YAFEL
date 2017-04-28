@@ -8,6 +8,12 @@
 YAFEL_NAMESPACE_OPEN
 
 
+static std::vector<coordinate<>> make_1d_points(const std::vector<double> &lob_pts_1d);
+
+static std::vector<coordinate<>> make_2d_points(const std::vector<double> &lob_pts_1d);
+
+static std::vector<coordinate<>> make_3d_points(const std::vector<double> &lob_pts_1d);
+
 void Element::make_tensorProduct()
 {
 
@@ -27,15 +33,12 @@ void Element::make_tensorProduct()
 
     if (elementType.topoDim == 1) {
         //make a line element
-        localPoints_xi.resize(npts);
         cellNodes.resize(2 * (npts - 1));
         offsets.resize(npts);
         cellTypes.resize(npts - 1, CellType::Line2);
 
-
-        for (int i = 0; i < npts; ++i) {
-            localPoints_xi[i](0) = lob_pts_1d[i];
-        }
+        localPoints_xi = make_1d_points(lob_pts_1d);
+        boundaryNodes = {{-1,0,0}, {1,0,0}};
 
         int offset = 0;
         for (int i = 0; i < npts - 1; ++i) {
@@ -49,23 +52,15 @@ void Element::make_tensorProduct()
 
     } else if (elementType.topoDim == 2) {
         // make a quad element
-
-        localPoints_xi.resize(npts * npts);
         cellNodes.resize(4 * (npts - 1) * (npts - 1));
         offsets.resize((npts - 1) * (npts - 1) + 1);
         cellTypes.resize((npts - 1) * (npts - 1), CellType::Quad4);
 
-        int idx = 0;
-        for (int i = 0; i < npts; ++i) {
-            for (int j = 0; j < npts; ++j) {
-                localPoints_xi[idx](1) = lob_pts_1d[i];
-                localPoints_xi[idx](0) = lob_pts_1d[j];
-                ++idx;
-            }
-        }
+        localPoints_xi = make_2d_points(lob_pts_1d);
+        boundaryNodes = make_1d_points(lob_pts_1d);
 
         int offset = 0;
-        idx = 0;
+        int idx = 0;
         for (int i = 0; i < npts - 1; ++i) {
             for (int j = 0; j < npts - 1; ++j) {
 
@@ -84,25 +79,15 @@ void Element::make_tensorProduct()
     } else if (elementType.topoDim == 3) {
         // make a hex element
 
-        localPoints_xi.resize(npts * npts * npts);
         cellNodes.resize(8 * (npts - 1) * (npts - 1) * (npts - 1));
         offsets.resize((npts - 1) * (npts - 1) * (npts - 1) + 1);
         cellTypes.resize((npts - 1) * (npts - 1) * (npts - 1), CellType::Hex8);
 
-        int idx = 0;
-        for (int i = 0; i < npts; ++i) {
-            for (int j = 0; j < npts; ++j) {
-                for (int k = 0; k < npts; ++k) {
-                    localPoints_xi[idx](2) = lob_pts_1d[i];
-                    localPoints_xi[idx](1) = lob_pts_1d[j];
-                    localPoints_xi[idx](0) = lob_pts_1d[k];
-                    ++idx;
-                }
-            }
-        }
+        localPoints_xi = make_3d_points(lob_pts_1d);
+        boundaryNodes = make_2d_points(lob_pts_1d);
 
         int offset = 0;
-        idx = 0;
+        int idx = 0;
         int j_stride = npts;
         int i_stride = npts * npts;
         for (int i = 0; i < npts - 1; ++i) {
@@ -130,6 +115,7 @@ void Element::make_tensorProduct()
     } else {
         throw "Unsupported topoDim";
         // unsupported topoDim
+
     }
 
     // Set local mesh members from created containers
@@ -141,17 +127,77 @@ void Element::make_tensorProduct()
     quadratureRule = QuadratureRule::make_tensor_product(QuadratureRule::QuadratureType::GAUSS_LEGENDRE,
                                                          elementType.topoDim, 2 * elementType.polyOrder);
 
+    boundaryQuadratureRule = QuadratureRule::make_tensor_product(QuadratureRule::QuadratureType::GAUSS_LEGENDRE,
+                                                         elementType.topoDim-1, 2 * elementType.polyOrder);
+
     tensor_product_shape_functions(localMesh.getGeometryNodes(),
                                    quadratureRule.nodes,
                                    elementType.topoDim,
                                    shapeValues,
                                    shapeGradXi);
 
-    if(elementType.topoDim == 2) {
+    tensor_product_shape_functions(boundaryNodes,
+                                   boundaryQuadratureRule.nodes,
+                                   elementType.topoDim-1,
+                                   boundaryShapeValues,
+                                   boundaryShapeGradXi);
+
+    if (elementType.topoDim == 2) {
         build_quad_faces();
+
+    }
+    if (elementType.topoDim == 3) {
+        //build_hex_faces();
     }
 }
 
+
+static std::vector<coordinate<>> make_1d_points(const std::vector<double> &lob_pts_1d)
+{
+    int npts = static_cast<int>(lob_pts_1d.size());
+    std::vector<coordinate<>> localPoints_xi(npts);
+    for (int i = 0; i < npts; ++i) {
+        localPoints_xi[i](0) = lob_pts_1d[i];
+    }
+    return localPoints_xi;
+}
+
+static std::vector<coordinate<>> make_2d_points(const std::vector<double> &lob_pts_1d)
+{
+    int npts = static_cast<int>(lob_pts_1d.size());
+    std::vector<coordinate<>> localPoints_xi(npts * npts);
+
+    int idx = 0;
+    for (int i = 0; i < npts; ++i) {
+        for (int j = 0; j < npts; ++j) {
+            localPoints_xi[idx](1) = lob_pts_1d[i];
+            localPoints_xi[idx](0) = lob_pts_1d[j];
+            ++idx;
+        }
+    }
+
+    return localPoints_xi;
+}
+
+static std::vector<coordinate<>> make_3d_points(const std::vector<double> &lob_pts_1d)
+{
+    int npts = static_cast<int>(lob_pts_1d.size());
+    std::vector<coordinate<>> localPoints_xi(npts * npts * npts);
+
+    int idx = 0;
+    for (int i = 0; i < npts; ++i) {
+        for (int j = 0; j < npts; ++j) {
+            for (int k = 0; k < npts; ++k) {
+                localPoints_xi[idx](2) = lob_pts_1d[i];
+                localPoints_xi[idx](1) = lob_pts_1d[j];
+                localPoints_xi[idx](0) = lob_pts_1d[k];
+                ++idx;
+            }
+        }
+    }
+
+    return localPoints_xi;
+}
 
 
 YAFEL_NAMESPACE_CLOSE
