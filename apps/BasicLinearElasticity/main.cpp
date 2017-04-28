@@ -141,15 +141,18 @@ Eigen::VectorXd solveSystem(const Eigen::SparseMatrix<double, Eigen::RowMajor> &
 
 int main()
 {
+
+    constexpr int NSD = 3;
+
     Mesh M("mesh.msh");
-    int p = 5;
-    int dofpn = 2;
+    int p = 3;
+    int dofpn = NSD;
     DoFManager dofm(M, DoFManager::ManagerType::CG, p, dofpn);
     FESystem feSystem(dofm);
     BasicTimer timer;
 
     timer.tic();
-    CGAssembly<LinearElasticity<2>>(feSystem);
+    CGAssembly<LinearElasticity<NSD>>(feSystem);
     timer.toc();
 
     std::cout << "Assembly time: " << timer.duration<>() << " ms" << std::endl;
@@ -158,6 +161,8 @@ int main()
     bc00.selectByFunction([](const coordinate<> &x) { return std::abs(x(0)) < 1.0e-6; });
     DirichletBC bc01(dofm, 0.0, 1);
     bc01.selectByFunction([](const coordinate<> &x) { return std::abs(x(0)) < 1.0e-6; });
+    DirichletBC bc02(dofm, 0.0, 2);
+    bc01.selectByFunction([](const coordinate<> &x) { return std::abs(x(0)) < 1.0e-6; });
 
 
     DirichletBC bc10(dofm, 0.001, 0);
@@ -165,6 +170,7 @@ int main()
 
     bc00.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
     bc01.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
+    bc02.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
     bc10.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
 
     Eigen::VectorXd U(feSystem.getGlobalResidual().rows());
@@ -176,7 +182,7 @@ int main()
             "Solution",
             OutputData::DataLocation::Point,
             OutputData::DataType::Vector,
-            {1, 1}
+            std::vector<int>(NSD,1)
     );
     OutputFrame frame(outputMesh);
     frame.point_data.push_back(&data);
