@@ -38,7 +38,7 @@ public:
     inline auto &getTime() {return time; }
 protected:
     DoFManager &dofm;
-    Eigen::SparseMatrix<double, Eigen::ColMajor> global_tangent;
+    Eigen::SparseMatrix<double, Eigen::RowMajor> global_tangent;
     Eigen::VectorXd global_residual;
 
     int simulation_dimension;

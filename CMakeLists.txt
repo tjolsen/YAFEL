@@ -1,11 +1,17 @@
 cmake_minimum_required(VERSION 3.5)
 project(YAFEL)
 
-find_package(OpenMP)
+find_package(OpenMP REQUIRED)
+find_package(OpenCL REQUIRED)
+find_package (Eigen3 REQUIRED)
 
+include_directories(${EIGEN3_INCLUDE_DIR})
+include_directories(${ViennaCL_INCLUDE_DIRS})
+
+
+set(VIENNACL_CXX_FLAGS "-DVIENNACL_WITH_OPENCL")
 set(CMAKE_CXX_STANDARD 14)
-
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 ${OpenMP_CXX_FLAGS} -Wall -Wextra -DNDEBUG -march=native")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${OpenMP_CXX_FLAGS} ${VIENNACL_CXX_FLAGS} -O3 -Wall -Wextra -DNDEBUG -march=native")
 
 set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra")
 
@@ -77,6 +83,7 @@ set(SOURCE_FILES
         include/quadrature/LobattoPoints1D.hpp
         include/quadrature/QuadratureRule.hpp
 
+        include/utils/BasicTimer.hpp
         include/utils/ConcurrentQueue.hpp
         include/utils/old_DirBC.hpp
         include/utils/DoFManager.hpp
@@ -116,9 +123,9 @@ set(SOURCE_FILES
         src/quadrature/TetrahedronQuadratureRules.cpp
 
         src/utils/DoFManager.cpp
-        #src/utils/old_DirBC.cpp
-        #src/utils/ElementVtkType.cpp
         )
+
+link_libraries("OpenCL")
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 add_library(yafel ${SOURCE_FILES})

@@ -32,8 +32,7 @@ int main()
         auto &E = EF.getElement(et);
         for (auto qpi : IRange(0, E.nQP())) {
             E.update<2>(c, qpi, dofm);
-            auto w = E.quadratureRule.weights[qpi];
-            area += w * E.detJ;
+            area += E.jxw;
         }
     }
 
