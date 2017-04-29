@@ -231,16 +231,18 @@ void DoFManager::recombine_all_duplicates()
     double max_dim = max(boundingBox_max - boundingBox_min);
     double snap_value = max_dim * 1.0e-6;
 
-    auto snap = [snap_value](auto x)->coordinate<> { return round(x / snap_value) * snap_value; };
+    auto snap = [snap_value](auto x) -> coordinate<> { return round(x / snap_value) * snap_value; };
 
 
-    auto sort_func = [this,snap](int L, int R) {
-        auto xL = snap(dof_nodes[L]);
-        auto xR = snap(dof_nodes[R]);
-        return std::lexicographical_compare(xL.data.rbegin(), xL.data.rend(),
-                                            xR.data.rbegin(), xR.data.rend());
+    auto sort_func = [this, snap](int L, int R) {
+        const auto xL = snap(dof_nodes[L]);
+        const auto xR = snap(dof_nodes[R]);
+        return std::lexicographical_compare(
+                xL.data.rbegin(), xL.data.rend(),
+                xR.data.rbegin(), xR.data.rend()
+        );
     };
-    auto uniq_func_idx = [this](int L, int R) { return norm(this->dof_nodes[L] - this->dof_nodes[R]) < 1.0e-6; };
+    //auto uniq_func_idx = [this](int L, int R) { return norm(this->dof_nodes[L] - this->dof_nodes[R]) < 1.0e-6; };
     auto uniq_func_x = [](auto x, auto y) { return norm(x - y) < 1.0e-6; };
 
     //lexicographical sort of nodes

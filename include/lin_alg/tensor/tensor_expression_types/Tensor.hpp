@@ -23,7 +23,7 @@ public:
             typename=typename std::enable_if<std::is_convertible<dataType, dt>::value>::type>
     Tensor(dt d = dt(0))
     {
-        for (int i = 0; i < super::tensor_storage(R); ++i) {
+        for (int i = 0; i < static_cast<int>(data.size()); ++i) {
             data[i] = d;
         }
     }
@@ -40,10 +40,12 @@ public:
     template<typename TE, typename dt2, bool b, typename=typename std::enable_if<std::is_convertible<dataType, dt2>::value>::type>
     Tensor(const TensorExpression <TE, D, R, dt2, b> &rhs)
     {
+
         auto rit = rhs.begin();
         for (int i = 0; i < super::tensor_storage(R); ++i, ++rit) {
             data[i] = dataType(*rit);
         }
+
     }
 
     //implement indexing operations

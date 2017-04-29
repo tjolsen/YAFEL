@@ -55,7 +55,7 @@ void Mesh::parse_gmsh(const std::string &fname)
         if (words[0]=="$Nodes") {
             currentAction = PARSE_NODES;
             std::getline(in, line);
-            int nNodes = atoi(line.c_str());
+            int nNodes = std::stoi(line);
             geometryNodes_.resize(nNodes);
             continue;
         } else if (words[0] == "$EndNodes") {
@@ -64,7 +64,7 @@ void Mesh::parse_gmsh(const std::string &fname)
         } else if (words[0] == "$Elements") {
             currentAction = PARSE_ELEMENTS;
             std::getline(in, line);
-            int nElems = atoi(line.c_str());
+            int nElems = std::stoi(line);
             cellNodes_.reserve(4 * nElems); //decent guess?
             cellOffsets_.resize(nElems + 1);
             cellTags_.resize(nElems);
@@ -81,26 +81,26 @@ void Mesh::parse_gmsh(const std::string &fname)
                 break;
 
             case PARSE_NODES: {
-                id = atoi(words[0].c_str());
+                id = std::stoi(words[0]);
                 coordinate<> node;
                 for (auto i : IRange(0,3)) {
-                    node(i) = atof(words[i + 1].c_str());
+                    node(i) = std::stof(words[i + 1]);
                 }
                 geometryNodes_[id - 1] = node;
                 break;
             }
             case PARSE_ELEMENTS: {
-                id = atoi(words[0].c_str());
-                cellTypes_[id - 1] = gmsh_to_CellType(atoi(words[1].c_str()));
-                int ntags = atoi(words[2].c_str());
+                id = std::stoi(words[0]);
+                cellTypes_[id - 1] = gmsh_to_CellType(std::stoi(words[1]));
+                int ntags = std::stoi(words[2]);
                 int nodes_in_el = words.size() - ntags - 3;
                 std::vector<size_type> tag(ntags, 0);
                 for (int i = 3; i < 3 + ntags; ++i) {
-                    tag[i - 3] = atoi(words[i].c_str());
+                    tag[i - 3] = std::stoi(words[i]);
                 }
                 cellTags_[id - 1] = tag;
                 for (size_type i = 3 + ntags; i < static_cast<int>(words.size()); ++i) {
-                    cellNodes_.push_back(atoi(words[i].c_str()) - 1); //using 0-based node numbering from gmsh 1-based
+                    cellNodes_.push_back(std::stoi(words[i]) - 1); //using 0-based node numbering from gmsh 1-based
                 }
                 cellOffsets_[id - 1] = offset;
                 offset += nodes_in_el;

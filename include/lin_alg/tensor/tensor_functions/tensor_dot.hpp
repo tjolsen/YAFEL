@@ -37,21 +37,27 @@ YAFEL_NAMESPACE_OPEN
  * @return Full Contraction (scalar product) of lhs and rhs.
  */
 template<typename T1, typename T2, int D, int R, typename dt1, typename dt2, bool b1, bool b2>
-decltype(dt1()*dt2()) dot(const TensorExpression<T1,D,R,dt1,b1> &lhs,
-         const TensorExpression<T2,D,R,dt2,b2> &rhs)
+decltype(dt1() * dt2()) dot(const TensorExpression <T1, D, R, dt1, b1> &lhs,
+                            const TensorExpression <T2, D, R, dt2, b2> &rhs)
 {
 
-    auto lit=lhs.begin();
-    auto rit=rhs.begin();
-    decltype(dt1()*dt2()) retval(0);
+    decltype(dt1() * dt2()) s0(0), s1(0), s2(0), s3(0);
+    constexpr auto N = T1::tensor_storage(R);
+    constexpr int blk_size = 4;
+    constexpr int Nblocks = N / blk_size;
 
-    auto l_end = lhs.end();
-    for(; lit != l_end ; ++lit, ++rit)
-    {
-        retval += (*lit)*(*rit);
+    for (int i = 0; i < blk_size * Nblocks; i += blk_size) {
+        s0 += lhs.linearIndexing(i) * rhs.linearIndexing(i);
+        s1 += lhs.linearIndexing(i + 1) * rhs.linearIndexing(i + 1);
+        s2 += lhs.linearIndexing(i + 2) * rhs.linearIndexing(i + 2);
+        s3 += lhs.linearIndexing(i + 3) * rhs.linearIndexing(i + 3);
+    }
+    for (int i = blk_size * Nblocks; i < N; ++i) {
+        s0 += lhs.linearIndexing(i) * rhs.linearIndexing(i);
     }
 
-    return retval;
+    return s0 + s1 + s2 + s3;
+
 }
 
 
@@ -61,9 +67,10 @@ decltype(dt1()*dt2()) dot(const TensorExpression<T1,D,R,dt1,b1> &lhs,
  * Compute the L2 norm of a tensor by calling sqrt(dot(x,x))
  */
 template<typename TE, int D, int R, typename dt, bool b>
-auto norm(const TensorExpression<TE,D,R,dt,b> &x) {
+auto norm(const TensorExpression <TE, D, R, dt, b> &x)
+{
     using std::sqrt;
-    return sqrt(dot(x,x));
+    return sqrt(dot(x, x));
 };
 
 YAFEL_NAMESPACE_CLOSE

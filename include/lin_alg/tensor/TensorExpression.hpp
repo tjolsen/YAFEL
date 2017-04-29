@@ -13,6 +13,7 @@
 #include "mp_utils/slice_mp_utils.hpp"
 
 #include <type_traits>
+#include <iterator>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -171,6 +172,9 @@ public:
     class TensorExpressionIterator
     {
     public:
+        using value_type = dataType;
+        using reference = dataType&;
+
         TE &te_ref;
         int offset;
 
@@ -180,6 +184,11 @@ public:
         inline bool operator!=(const TensorExpressionIterator &other)
         {
             return offset != other.offset;
+        }
+
+        inline bool operator==(const TensorExpressionIterator &other)
+        {
+            return offset == other.offset;
         }
 
         inline auto operator++()
@@ -201,10 +210,15 @@ public:
         }
     };
 
-
     class ConstTensorExpressionIterator
     {
     public:
+        using value_type = dataType;
+        using reference = const dataType&;
+        using iterator_category = std::forward_iterator_tag;
+        using pointer = const dataType*;
+        using difference_type = int;
+
         const TE &te_ref;
         int offset;
 
@@ -215,13 +229,16 @@ public:
         {
             return offset != other.offset;
         }
+        inline bool operator==(const ConstTensorExpressionIterator &other) const noexcept
+        {
+            return offset == other.offset;
+        }
 
         inline auto operator++()
         {
             ++offset;
             return *this;
         }
-
 
         dataType operator*() const noexcept
         {
@@ -291,7 +308,18 @@ auto const_permute(const TE<T, D, R, dt, b, enabled> &te, sequence<IDX_PERM...>)
     return TensorPermutation<T, D, R, dt, b, IDX_PERM...>(te, sequence<IDX_PERM...>());
 }
 
-
 YAFEL_NAMESPACE_CLOSE
 
+/*
+template<typename TETYPE>
+struct std::iterator_traits<typename TETYPE::ConstTensorExpressionIterator>
+{
+    using iterType = typename TETYPE::ConstTensorExpressionIterator;
+    using value_type = typename iterType::value_type;
+    using reference = typename iterType::reference;
+    using difference_type = int;
+
+    using iterator_category = std::forward_iterator_tag;
+};
+*/
 #endif //YAFEL_TENSOREXPRESSION_HPP

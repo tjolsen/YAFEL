@@ -62,7 +62,7 @@ struct LinearElasticity
         }
     }
 
-    static void LocalTangent(const Element &E, int qpi, double,
+    static void LocalTangent(const Element &E, int, double,
                              Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> &K_el)
     {
 
@@ -80,25 +80,26 @@ struct LinearElasticity
         const int nNodes = K_el.rows() / NSD;
         //loops attempting strength reduction by inserting more loops!
         int A{0};
-        for (auto Anode : IRange(0, nNodes)) {
+        for(int Anode=0; Anode < nNodes; ++Anode) {
             auto grad_Aj = make_TensorMap<NSD, 1>(&E.shapeGrad(Anode, 0));
 
-            for (auto i : IRange(0, NSD)) {
+            for(int i=0; i<NSD; ++i) {
                 int B{Anode * NSD};
 
                 //Diagonal block
                 auto tmp = otimes(grad_Aj, grad_Aj).eval();
-                for (auto k : IRange(0, NSD)) {
-                    K_el(A, B) -= dot(Cikjl(i, k, colon(), colon()), tmp) * E.jxw;
+                for(int k=0; k<NSD; ++k){
+                    K_el(A, B) -= dot(Cikjl(i, k, colon(), colon()).eval(), tmp) * E.jxw;
                     ++B;
                 }
 
                 //Off-diagonal blocks
-                for (auto Bnode : IRange(Anode + 1, nNodes)) {
+                for(int Bnode = Anode+1; Bnode<nNodes; ++Bnode) {
                     auto grad_Bl = make_TensorMap<NSD, 1>(&E.shapeGrad(Bnode, 0));
                     auto tmp = otimes(grad_Aj, grad_Bl).eval();
-                    for (auto k : IRange(0, NSD)) {
-                        K_el(A, B) -= dot(Cikjl(i, k, colon(), colon()), tmp) * E.jxw;
+                    //for (auto k : IRange(0, NSD)) {
+                    for(int k=0; k<NSD; ++k) {
+                        K_el(A, B) -= dot(Cikjl(i, k, colon(), colon()).eval(), tmp) * E.jxw;
                         K_el(B, A) = K_el(A, B);
 
                         ++B;
@@ -143,13 +144,23 @@ int main()
 {
 
     constexpr int NSD = 3;
-
-    Mesh M("mesh.msh");
-    int p = 2;
-    int dofpn = NSD;
-    DoFManager dofm(M, DoFManager::ManagerType::CG, p, dofpn);
-    FESystem feSystem(dofm);
     BasicTimer timer;
+
+    timer.tic();
+    Mesh M("mesh.msh");
+    timer.toc();
+
+    std::cout <<"Mesh import time: " << timer.duration<>() << " ms" << std::endl;
+    int p = 1;
+    int dofpn = NSD;
+
+    timer.tic();
+    DoFManager dofm(M, DoFManager::ManagerType::CG, p, dofpn);
+    timer.toc();
+    std::cout <<"dofm creation time: " << timer.duration<>() << " ms" << std::endl;
+
+    FESystem feSystem(dofm);
+
 
     timer.tic();
     CGAssembly<LinearElasticity<NSD>>(feSystem);
@@ -157,24 +168,43 @@ int main()
 
     std::cout << "Assembly time: " << timer.duration<>() << " ms" << std::endl;
 
+
     DirichletBC bc00(dofm, 0.0, 0);
     bc00.selectByFunction([](const coordinate<> &x) { return std::abs(x(0)) < 1.0e-6; });
     DirichletBC bc01(dofm, 0.0, 1);
     bc01.selectByFunction([](const coordinate<> &x) { return std::abs(x(0)) < 1.0e-6; });
     DirichletBC bc02(dofm, 0.0, 2);
-    bc01.selectByFunction([](const coordinate<> &x) { return std::abs(x(0)) < 1.0e-6; });
+    bc02.selectByFunction([](const coordinate<> &x) { return std::abs(x(0)) < 1.0e-6; });
 
+    double twist_angle = 0.1; // angle in radians
+    auto twist = [twist_angle](auto x) {
+        x(0) = 0;
+        Tensor<3,1> dx = x - Tensor<3,1>{0,1,1};
+        auto r = norm(dx);
+        auto theta = std::atan2(dx(2), dx(1));
 
-    DirichletBC bc10(dofm, 0.001, 0);
+        return (twist_angle*Tensor<3,1>(0, -r*std::sin(theta), r*std::cos(theta))).eval();
+    };
+
+    DirichletBC bc10(dofm, 0.0, 0);
+    DirichletBC bc11(dofm, [twist](auto x, double){return twist(x)(1);}, 1);
+    DirichletBC bc12(dofm, [twist](auto x, double){return twist(x)(1);}, 2);
     bc10.selectByFunction([](const coordinate<> &x) { return std::abs(x(0) - 2) < 1.0e-6; });
+    bc11.selectByFunction([](const coordinate<> &x) { return std::abs(x(0) - 2) < 1.0e-6; });
+    bc12.selectByFunction([](const coordinate<> &x) { return std::abs(x(0) - 2) < 1.0e-6; });
 
     bc00.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
     bc01.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
     bc02.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
     bc10.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
+    bc11.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
+    bc12.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
 
+    timer.tic();
     Eigen::VectorXd U(feSystem.getGlobalResidual().rows());
     U = solveSystem(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
+    timer.toc();
+    std::cout <<"Solution time: " << timer.duration<>() << " ms" << std::endl;
 
     OutputMesh outputMesh(dofm);
     OutputData data(

@@ -29,7 +29,7 @@ public:
     DirichletBC(const DoFManager &dofm, T bcval, int comp = 0);
 
     template<typename T,
-            typename = typename std::enable_if<std::is_constructible<std::function<double(const coordinate<> &, double)>, T>::value>::type>
+            typename = typename std::enable_if<std::is_constructible<std::function<double(coordinate<>, double)>, T>::value>::type>
     DirichletBC(const DoFManager &dofm, T &&bcval, int comp = 0);
 
     template<int RCMajor,

@@ -10,7 +10,6 @@
 #include "element/ElementFactory.hpp"
 #include "fe_system/FESystem.hpp"
 
-
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Sparse>
@@ -32,7 +31,7 @@ constexpr bool hasLocalResidual()
     using namespace Eigen;
     return std::is_same<void,
             typename std::result_of<decltype(&Physics::LocalResidual)(Element const &, int, double,
-            Map<Matrix<double,Dynamic,1>> &)>::type > ::value;
+            Map<Matrix<double, Dynamic, 1>> &)>::type > ::value;
 
 }
 
@@ -41,7 +40,7 @@ constexpr bool hasLocalTangent()
 {
     using namespace Eigen;
     return std::is_same<void, typename std::result_of<decltype(&Physics::LocalTangent)(Element const &, int, double,
-            Map<Matrix<double,Dynamic,Dynamic,RowMajor>> &)>::type > ::value;
+            Map<Matrix<double, Dynamic, Dynamic, RowMajor>> &)>::type > ::value;
 }
 
 
@@ -54,7 +53,7 @@ constexpr bool hasLocalTangent()
 template<typename Physics>
 void CGAssembly(FESystem &feSystem,
                 std::vector<AssemblyRequirement> requirements = {AssemblyRequirement::Residual,
-                                                                        AssemblyRequirement::Tangent})
+                                                                 AssemblyRequirement::Tangent})
 {
     static_assert(hasLocalResidual<Physics>(), "Must Implement static void method 'LocalResidual' in Physics class");
     static_assert(hasLocalTangent<Physics>(), "Must Implement static void method 'LocalTangent' in Physics class");
@@ -73,21 +72,26 @@ void CGAssembly(FESystem &feSystem,
     bool assemble_residual{false};
     bool assemble_dt_mass{false};
     bool assemble_dtdt_mass{false};
-    for(auto req : requirements) {
-        switch(req) {
+    for (auto req : requirements) {
+        switch (req) {
             case AssemblyRequirement::Residual:
-                assemble_residual = true; break;
+                assemble_residual = true;
+                break;
             case AssemblyRequirement::Tangent:
-                assemble_tangent = true; break;
+                assemble_tangent = true;
+                break;
             case AssemblyRequirement::DtMass:
-                assemble_dt_mass = true; break;
+                assemble_dt_mass = true;
+                break;
             case AssemblyRequirement::DtDtMass:
-                assemble_dtdt_mass = true; break;
+                assemble_dtdt_mass = true;
+                break;
         }
     }
 
     //shared objects
     std::vector<Eigen::Triplet<double>> tangent_triplets;
+    int total_triplets{0};
 
 #pragma omp parallel shared(tangent_triplets, GlobalResidual)
     {// open parallel block
@@ -95,13 +99,13 @@ void CGAssembly(FESystem &feSystem,
         std::vector<double> local_tangent_buffer;
         std::vector<double> local_residual_buffer;
         std::vector<int> global_dof_buffer;
-
-
+        Eigen::VectorXd private_residual = Eigen::VectorXd::Constant(GlobalResidual.rows(), 0.0);
+        std::vector<Eigen::Triplet<double>> local_triplets;
 
         //Create an ElementFactory
         ElementFactory EF;
-#pragma omp for schedule(static, 128)
-        for (int elnum=0; elnum<dofm.nCells(); ++elnum) {
+#pragma omp for
+        for (int elnum = 0; elnum < dofm.nCells(); ++elnum) {
 
             auto et = dofm.element_types[elnum];
             if (et.topoDim != simulation_dimension) {
@@ -113,10 +117,10 @@ void CGAssembly(FESystem &feSystem,
 
 
             auto local_dofs = E.localMesh.nNodes() * dof_per_node;
-            if (local_tangent_buffer.size() < local_dofs * local_dofs) {
+            if (static_cast<int>(local_tangent_buffer.size()) < local_dofs * local_dofs) {
                 local_tangent_buffer.resize(local_dofs * local_dofs, 0.0);
             }
-            if (local_residual_buffer.size() < local_dofs) {
+            if (static_cast<int>(local_residual_buffer.size()) < local_dofs) {
                 local_residual_buffer.resize(local_dofs, 0.0);
             }
 
@@ -147,22 +151,41 @@ void CGAssembly(FESystem &feSystem,
 
 
             //Assemble into global
-#pragma omp critical
             for (auto A : IRange(0, local_dofs)) {
                 auto GA = global_dof_buffer[A];
                 if (assemble_tangent || assemble_dt_mass || assemble_dtdt_mass) {
                     for (auto B : IRange(0, local_dofs)) {
                         auto GB = global_dof_buffer[B];
-                        tangent_triplets.emplace_back(GA, GB, local_tangent(A, B));
+                        local_triplets.emplace_back(GA, GB, local_tangent(A, B));
                     }
                 }
                 if (assemble_residual) {
-                    GlobalResidual(GA) = local_residual(A);
+                    private_residual(GA) = local_residual(A);
                 }
             }
 
         }// end element loop
+
+
+#pragma omp critical
+        {
+            total_triplets += static_cast<int>(local_triplets.size());
+        }//end critical block
+#pragma omp barrier
+#pragma omp single
+        {
+            tangent_triplets.reserve(total_triplets);
+        }
+#pragma omp critical
+        {
+            for (auto &trip : local_triplets) {
+                tangent_triplets.push_back(trip);
+            }
+
+            GlobalResidual += private_residual;
+        }
     }//end parallel block
+
     GlobalTangent.setFromTriplets(tangent_triplets.begin(), tangent_triplets.end());
 }
 

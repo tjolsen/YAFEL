@@ -11,6 +11,8 @@
 #include "output/OutputFrame.hpp"
 #include "output/VTUBackend.hpp"
 
+#include "utils/BasicTimer.hpp"
+
 #include <eigen3/Eigen/IterativeLinearSolvers>
 #include <iostream>
 
@@ -30,15 +32,14 @@ struct PoissonEquation
         }
     }
 
-    static void LocalTangent(const Element &E, int qpi, double,
+    static void LocalTangent(const Element &E, int, double,
                              Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> &K_el)
     {
         for (auto A: IRange(0, static_cast<int>(K_el.rows()))) {
+            auto grad_Ai = make_TensorMap<NSD,1>(&E.shapeGrad(A,0));
             for (auto B: IRange(A, static_cast<int>(K_el.rows()))) {
-                for (auto i : IRange(0, NSD)) {
-                    K_el(A, B) -= E.shapeGrad(A, i) * E.shapeGrad(B, i) * E.jxw;
-                }
-
+                auto grad_Bi = make_TensorMap<NSD,1>(&E.shapeGrad(A,0));
+                K_el(A, B) -=  dot(grad_Ai, grad_Bi)* E.jxw;
                 K_el(B, A) = K_el(A, B);
             }
 
@@ -56,11 +57,16 @@ Eigen::VectorXd solveSystem(const Eigen::SparseMatrix<double> &A, const Eigen::V
 int main()
 {
     Mesh M("mesh.msh");
-    int p = 5;
+    int p = 2;
     int dofpn = 1;
     DoFManager dofm(M, DoFManager::ManagerType::CG, p, dofpn);
     FESystem feSystem(dofm);
+    BasicTimer timer;
+    timer.tic();
     CGAssembly<PoissonEquation<2>>(feSystem);
+    timer.toc();
+
+    std::cout << "Assembly time: " << timer.duration<std::chrono::microseconds>() << " us" << std::endl;
 
     DirichletBC bc0(dofm, [](const coordinate<> &x,double){return x(0)*x(0)/4;});
     bc0.selectByFunction([](const coordinate<> &x) { return std::abs(x(0)) < 1.0e-6 || std::abs(x(1)) < 1.0e-6; });
