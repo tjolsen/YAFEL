@@ -145,7 +145,7 @@ int main()
     constexpr int NSD = 3;
 
     Mesh M("mesh.msh");
-    int p = 3;
+    int p = 2;
     int dofpn = NSD;
     DoFManager dofm(M, DoFManager::ManagerType::CG, p, dofpn);
     FESystem feSystem(dofm);
