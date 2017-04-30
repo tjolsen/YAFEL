@@ -25,6 +25,11 @@ static int numCellFaces(CellType ct) {
 
 void Mesh::buildInternalFaces()
 {
+    if(faces_built) {
+        return;
+    }
+    faces_built = true;
+
 
     //build naive list of faces
     int num_naive_faces{0};

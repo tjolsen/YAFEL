@@ -173,7 +173,6 @@ int DoFManager::make_raw_dofs(const Mesh &M)
     return max_td;
 }
 
-
 coordinate<> DoFManager::interpolate_from_corners(coordinate<> xlocal,
                                                   const std::vector<coordinate<>> &corners,
                                                   CellType ct) const noexcept

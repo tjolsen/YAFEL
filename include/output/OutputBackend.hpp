@@ -25,9 +25,9 @@ class OutputMesh;
 class OutputBackend
 {
 public:
-    virtual void initialize(const std::string & fname_base, double time=0) = 0;
+    virtual void initialize(const std::string & fname_base) = 0;
     virtual void finalize() = 0;
-    virtual void finalize_frame() = 0;
+    //virtual void finalize_frame() = 0;
 
     /// Write an entire frame
     virtual void write_frame(OutputFrame &frame) = 0;

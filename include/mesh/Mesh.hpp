@@ -134,6 +134,8 @@ protected:
     std::vector<CellFace> internal_faces_;
     std::vector<int> boundary_face_idxs_;
 
+    bool faces_built{false};
+
     virtual inline void getCellNodesImplicit(int /*cell*/, std::vector<int> &/*container*/) const noexcept {}
 
     void parse_gmsh(const std::string &fname);

@@ -6,7 +6,7 @@ find_package(OpenCL REQUIRED)
 find_package (Eigen3 REQUIRED)
 
 include_directories(${EIGEN3_INCLUDE_DIR})
-include_directories(${ViennaCL_INCLUDE_DIRS})
+#include_directories(${ViennaCL_INCLUDE_DIRS})
 
 set(OPT_FLAGS
         "-march=native -mtune=native -ffast-math -funroll-loops -fopenmp -ftree-coalesce-vars -fvariable-expansion-in-unroller -finline-limit=1000000 ")
@@ -71,16 +71,8 @@ set(SOURCE_FILES
         include/output/OutputData.hpp
         include/output/OutputFrame.hpp
         include/output/OutputMesh.hpp
+        include/output/SimulationOutput.hpp
         include/output/VTUBackend.hpp
-        #include/output/MatrixVisualization.hpp
-        #include/output/VTKDGMesh.hpp
-        #include/output/VTKMesh.hpp
-        #include/output/VTKObject.hpp
-        #include/output/VTKOutput.hpp
-        #include/output/VTKScalarData.hpp
-        #include/output/VTKTensorData.hpp
-        #include/output/VTKTimeOutput.hpp
-        #include/output/VTKVectorData.hpp
 
         include/quadrature/LobattoPoints1D.hpp
         include/quadrature/QuadratureRule.hpp
@@ -117,6 +109,7 @@ set(SOURCE_FILES
 
         src/output/OutputBackend.cpp
         src/output/OutputData.cpp
+        src/output/SimulationOutput.cpp
         src/output/VTUBackend.cpp
 
         src/quadrature/LobattoPoints1D.cpp

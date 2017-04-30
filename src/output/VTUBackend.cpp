@@ -17,21 +17,18 @@ YAFEL_NAMESPACE_OPEN
 static int ElementType_to_VTKType(const ElementType &et);
 
 
-void VTUBackend::initialize(const std::string &fname_base, double time)
+void VTUBackend::initialize(const std::string &fname_base)
 {
     if (is_initialized) {
         return;
     }
 
-    std::string fname = fname_base + "_" + std::to_string(time) + ".vtu";
+    std::string fname = fname_base + ".vtu";
     outfile.open(fname);
 
     if (outfile.good()) {
         is_initialized = true;
     }
-
-    outfile << "<?xml version=\"1.0\"?>\n";
-    outfile << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\">\n";
 
     cleanup_stack.push_back([this]() {
         outfile << "</VTKFile>";
@@ -53,7 +50,7 @@ void VTUBackend::finalize()
 void VTUBackend::finalize_frame()
 {
     while (frame_stack.size() > 0) {
-        auto &&f = frame_stack.back();
+        auto &f = frame_stack.back();
         f();
         frame_stack.pop_back();
     }
@@ -62,6 +59,9 @@ void VTUBackend::finalize_frame()
 
 void VTUBackend::write_frame(OutputFrame &frame)
 {
+    outfile << "<?xml version=\"1.0\"?>\n";
+    outfile << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\">\n";
+
     //write mesh
     write_mesh(frame.outputMesh);
 
@@ -76,7 +76,7 @@ void VTUBackend::write_frame(OutputFrame &frame)
 
     //write cell data
     int n_local_cells{0};
-    for(auto n : frame.outputMesh->local_cells_per_cell) {
+    for (auto n : frame.outputMesh->local_cells_per_cell) {
         n_local_cells += n;
     }
 
@@ -85,8 +85,8 @@ void VTUBackend::write_frame(OutputFrame &frame)
         for (auto &pd : frame.cell_data) {
             Eigen::VectorXd tmp(n_local_cells);
             int idx{0};
-            for(int c : IRange(0,static_cast<int>(frame.outputMesh->local_cells_per_cell.size()))) {
-                for(int i : IRange(0,frame.outputMesh->local_cells_per_cell[c])) {
+            for (int c : IRange(0, static_cast<int>(frame.outputMesh->local_cells_per_cell.size()))) {
+                for (int i : IRange(0, frame.outputMesh->local_cells_per_cell[c])) {
                     tmp(idx++) = (*(pd->data))(c);
                 }
             }
@@ -222,7 +222,6 @@ void VTUBackend::write_mesh(OutputMesh *outputMesh)
         outputMesh->local_cells_per_cell[e] = E.localMesh.nCells();
 
 
-
         for (auto lc : IRange(0, E.localMesh.nCells())) {
             int vtk_type = ElementType_to_VTKType(dofm.CellType_to_ElementType(E.localMesh.getCellType(lc), 1));
             E.localMesh.getCellNodes(lc, local_cell);
@@ -298,6 +297,10 @@ static int ElementType_to_VTKType(const ElementType &et)
         case ElementTopology::None:
             return 2; //poly-vertex, draw it as dots and see how it goes
     }
+
+    // gcc can't tell that this is unreachable code, for some reason,
+    // so it issues a warning without this line.
+    return -1;
 }
 
 

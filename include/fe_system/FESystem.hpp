@@ -20,10 +20,11 @@ class FESystem
 
 public:
     inline FESystem(DoFManager &dofm, int dim = 0)
-            : dofm(dofm), simulation_dimension(dim)
+            : dofm(dofm), simulation_dimension(dim), time(0)
     {
         int ndofs = dofm.dof_nodes.size() * dofm.dof_per_node;
         global_residual.resize(ndofs);
+        solution_vector.resize(ndofs);
         global_tangent.resize(ndofs, ndofs);
     }
 
@@ -31,15 +32,21 @@ public:
 
     inline auto &getGlobalResidual() { return global_residual; }
 
+    inline auto &getSolution() { return solution_vector; }
+
     inline auto &getDoFManager() { return dofm; }
 
     inline auto &getDimension() { return simulation_dimension; }
 
-    inline auto &getTime() {return time; }
+    inline auto &getTime() { return time; }
+
+    inline auto const &getTime() const noexcept { return time; }
+
 protected:
     DoFManager &dofm;
     Eigen::SparseMatrix<double, Eigen::RowMajor> global_tangent;
     Eigen::VectorXd global_residual;
+    Eigen::VectorXd solution_vector;
 
     int simulation_dimension;
     double time;
