@@ -108,7 +108,15 @@ void QuadratureRule::make_gauss_legendre_1D(int Npoints)
 
 QuadratureRule QuadratureRule::make_tensor_product(QuadratureType qt, int topoDim, int polyOrder)
 {
+
     QuadratureRule Q1d;
+
+    if(topoDim == 0) {
+        Q1d.nodes = {{0,0,0}};
+        Q1d.weights = {1};
+        return Q1d;
+    }
+
     if (qt == QuadratureType::GAUSS_LEGENDRE) {
         int npts_1d = (polyOrder + 1) / 2 + (polyOrder + 1) % 2;
         Q1d.make_gauss_legendre_1D(npts_1d);

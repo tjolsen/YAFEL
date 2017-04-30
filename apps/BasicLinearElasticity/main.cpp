@@ -188,7 +188,7 @@ int main()
 
     DirichletBC bc10(dofm, 0.0, 0);
     DirichletBC bc11(dofm, [twist](auto x, double){return twist(x)(1);}, 1);
-    DirichletBC bc12(dofm, [twist](auto x, double){return twist(x)(1);}, 2);
+    DirichletBC bc12(dofm, [twist](auto x, double){return twist(x)(2);}, 2);
     bc10.selectByFunction([](const coordinate<> &x) { return std::abs(x(0) - 2) < 1.0e-6; });
     bc11.selectByFunction([](const coordinate<> &x) { return std::abs(x(0) - 2) < 1.0e-6; });
     bc12.selectByFunction([](const coordinate<> &x) { return std::abs(x(0) - 2) < 1.0e-6; });

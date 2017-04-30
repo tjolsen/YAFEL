@@ -68,8 +68,15 @@ void tensor_product_shape_functions(const std::vector<coordinate<>> &localPoints
                                     std::vector<Eigen::VectorXd> &shapeValue,
                                     std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> &shapeGrad)
 {
+
     shapeValue.resize(quadPoints.size());
     shapeGrad.resize(quadPoints.size());
+
+    if(topoDim == 0) {
+        shapeValue[0] = Eigen::VectorXd::Constant(1,1.0);
+        return;
+    }
+
     std::vector<std::vector<double>> jacobi_coeffs;
     int p = static_cast<int>(std::round(std::pow(1.0 * localPoints.size(), 1.0 / topoDim)));
     for (auto n : IRange(0, p)) {
