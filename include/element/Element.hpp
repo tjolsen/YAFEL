@@ -24,7 +24,7 @@ class Element
 {
 
 public:
-    Element(ElementType= {ElementTopology::None, 0, 0}, int dofPerNode = 1);
+    Element(ElementType et = {ElementTopology::None, 0, 0}, int dofPerNode = 1);
 
     // Struct that holds element type
     ElementType elementType;
@@ -89,13 +89,14 @@ private:
 
     void make_tensorProduct();
 
-    inline Tensor<3,1> getUnscaledNormal(Tensor<3,2> Jacobian)
+    inline Tensor<3, 1> getUnscaledNormal(Tensor<3, 2> Jacobian)
     {
-        return cross(Jacobian(colon(),0), Jacobian(colon(),1));
+        return cross(Jacobian(colon(), 0), Jacobian(colon(), 1));
     };
-    inline Tensor<2,1> getUnscaledNormal(Tensor<2,2> Jacobian)
+
+    inline Tensor<2, 1> getUnscaledNormal(Tensor<2, 2> Jacobian)
     {
-        return Tensor<2,1>{Jacobian(1,0), -Jacobian(0,0)};
+        return Tensor<2, 1>{Jacobian(1, 0), -Jacobian(0, 0)};
     };
 
     int dof_per_node;
@@ -196,14 +197,14 @@ Tensor<NSD, 1> Element::face_update(int elnum, int fqpi, const CellFace &F, cons
 
     Tensor<NSD, 1> normal = getUnscaledNormal(Jacobian);
     double detJ = norm(normal);
-    normal = normal/detJ;
+    normal = normal / detJ;
     jxw = detJ * boundaryQuadratureRule.weights[fqpi];
 
     return normal;
 }
 
 template<int NSD>
-Tensor<NSD,1> getUnscaledNormal(Tensor<NSD,2> Jacobian);
+Tensor<NSD, 1> getUnscaledNormal(Tensor<NSD, 2> Jacobian);
 
 YAFEL_NAMESPACE_CLOSE
 #endif //YAFEL_ELEMENT_HPP

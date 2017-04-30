@@ -20,12 +20,12 @@ static std::vector<std::vector<int>> build_topodim2_faces(const std::vector<coor
     double pi = std::atan(1.0) * 4;
     auto Theta = [pi](coordinate<> xi) { return std::atan2(xi(1), xi(0)); };
 
-    Tensor<3,2> R;
-    R(0,0) = cos(theta0);
-    R(0,1) = -sin(theta0);
-    R(1,0) = sin(theta0);
-    R(1,1) = cos(theta0);
-    R(2,2) = 1;
+    Tensor<3, 2> R;
+    R(0, 0) = cos(theta0);
+    R(0, 1) = -sin(theta0);
+    R(1, 0) = sin(theta0);
+    R(1, 1) = cos(theta0);
+    R(2, 2) = 1;
     coordinate<> xi0{0.25, 0.25, 0};
 
     std::vector<double> thetaVec;
@@ -34,7 +34,7 @@ static std::vector<std::vector<int>> build_topodim2_faces(const std::vector<coor
     for (auto xi : xi_all) {
         if (isBoundary(xi)) {
             bnd_idxs.push_back(idx);
-            double th = Theta(R*(xi-xi0));
+            double th = Theta(R * (xi - xi0));
             thetaVec.push_back(th);
         }
         ++idx;
@@ -71,17 +71,20 @@ void Element::build_quad_faces()
     double pi = std::atan(1.0) * 4;
 
     face_perm.push_back({build_topodim2_faces(localMesh.getGeometryNodes(),
-                                              [](auto xi) { return std::abs(xi(1) + 1) < 1.0e-6; }, pi / 2)});
+                                              [](auto xi) { return std::abs(xi(1) + 1) < 1.0e-6; },
+                                              pi / 2)});
 
     face_perm.push_back({build_topodim2_faces(localMesh.getGeometryNodes(),
-                                              [](auto xi) { return std::abs(xi(0) - 1) < 1.0e-6; }, 0)});
+                                              [](auto xi) { return std::abs(xi(0) - 1) < 1.0e-6; },
+                                              0)});
 
     face_perm.push_back({build_topodim2_faces(localMesh.getGeometryNodes(),
                                               [](auto xi) { return std::abs(xi(1) - 1) < 1.0e-6; },
                                               -pi / 2)});
 
     face_perm.push_back({build_topodim2_faces(localMesh.getGeometryNodes(),
-                                              [](auto xi) { return std::abs(xi(0) + 1) < 1.0e-6; }, pi)});
+                                              [](auto xi) { return std::abs(xi(0) + 1) < 1.0e-6; },
+                                              pi)});
 }
 
 
@@ -91,21 +94,17 @@ void Element::build_tri_faces()
     face_perm.push_back({build_topodim2_faces(
             localMesh.getGeometryNodes(),
             [](auto xi) { return std::abs(xi(1)) < 1.0e-6; },
-            -pi / 2
-    )});
+            pi / 2)});
 
     face_perm.push_back({build_topodim2_faces(
             localMesh.getGeometryNodes(),
             [](auto xi) { return std::abs(1 - sum(xi)) < 1.0e-6; },
-            pi / 4
-    )});
+            -pi / 4)});
 
     face_perm.push_back({build_topodim2_faces(
             localMesh.getGeometryNodes(),
             [](auto xi) { return std::abs(xi(0)) < 1.0e-6; },
-            -pi
-
-    )});
+            pi)});
 
 }
 YAFEL_NAMESPACE_CLOSE

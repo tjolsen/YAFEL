@@ -128,7 +128,7 @@ void Element::make_tensorProduct()
                                                          elementType.topoDim, 2 * elementType.polyOrder);
 
     boundaryQuadratureRule = QuadratureRule::make_tensor_product(QuadratureRule::QuadratureType::GAUSS_LEGENDRE,
-                                                         elementType.topoDim-1, 2 * elementType.polyOrder);
+                                                                 elementType.topoDim-1, 2 * elementType.polyOrder);
 
     tensor_product_shape_functions(localMesh.getGeometryNodes(),
                                    quadratureRule.nodes,

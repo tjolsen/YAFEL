@@ -8,9 +8,11 @@
 
 YAFEL_NAMESPACE_OPEN
 
+static std::vector<coordinate<>> make_1d_points(const std::vector<double> &lob_pts_1d);
 static std::vector<coordinate<>> make_2d_points(const std::vector<double> &lob_points_1d);
-
 static std::vector<coordinate<>> make_3d_points(const std::vector<double> &lob_points_1d);
+
+
 
 void Element::make_simplex()
 {
@@ -36,6 +38,7 @@ void Element::make_simplex()
     } else if (elementType.topoDim == 2) {
 
         localPoints_xi = make_2d_points(lob_pts_1d);
+        boundaryNodes = make_1d_points(lob_pts_1d);
 
         //make local triangles
         int nt_local = elementType.polyOrder * elementType.polyOrder;
@@ -70,6 +73,8 @@ void Element::make_simplex()
     } else if (elementType.topoDim == 3) {
 
         localPoints_xi = make_3d_points(lob_pts_1d);
+        boundaryNodes = make_2d_points(lob_pts_1d);
+
         int offset = 0;
         cellNodes.reserve(localPoints_xi.size());
         cellTypes.resize(localPoints_xi.size(), CellType::Point1);
@@ -93,8 +98,14 @@ void Element::make_simplex()
 
     if (elementType.topoDim == 2) {
         quadratureRule.get_triangle_quadrature(std::max(1, 2 * elementType.polyOrder));
+        boundaryQuadratureRule = QuadratureRule::make_tensor_product(
+                QuadratureRule::QuadratureType::GAUSS_LEGENDRE,
+                elementType.topoDim-1,
+                2 * elementType.polyOrder);
+
     } else if (elementType.topoDim == 3) {
         quadratureRule.get_tetrahedron_quadrature(std::max(1, 2 * elementType.polyOrder));
+        boundaryQuadratureRule.get_triangle_quadrature(std::max(1, 2 * elementType.polyOrder));
     }
     localMesh.setGeometryNodes(std::move(localPoints_xi));
     localMesh.setCellNodes(std::move(cellNodes));
@@ -108,6 +119,12 @@ void Element::make_simplex()
                                  shapeValues,
                                  shapeGradXi);
 
+        tensor_product_shape_functions(boundaryNodes,
+                                       boundaryQuadratureRule.nodes,
+                                       elementType.topoDim - 1,
+                                       boundaryShapeValues,
+                                       boundaryShapeGradXi);
+
         build_tri_faces();
     } else if (elementType.topoDim == 3) {
         tetrahedron_shape_functions(localMesh.getGeometryNodes(),
@@ -115,10 +132,28 @@ void Element::make_simplex()
                                     elementType.polyOrder,
                                     shapeValues,
                                     shapeGradXi);
+
+        triangle_shape_functions(localMesh.getGeometryNodes(),
+                                 boundaryQuadratureRule.nodes,
+                                 elementType.polyOrder,
+                                 boundaryShapeValues,
+                                 boundaryShapeGradXi);
+
         //build_tet_faces();
     }
 }
 
+
+std::vector<coordinate<>> make_1d_points(const std::vector<double> &lob_pts_1d)
+{
+
+    std::vector<coordinate<>> localPoints_xi;
+    localPoints_xi.reserve(lob_pts_1d.size());
+    for(auto x : lob_pts_1d) {
+        localPoints_xi.push_back({x,0,0});
+    }
+    return localPoints_xi;
+}
 
 std::vector<coordinate<>> make_2d_points(const std::vector<double> &lob_pts_1d)
 {

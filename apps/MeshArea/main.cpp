@@ -23,7 +23,7 @@ int main()
     Mesh M("2x2square.msh");
     M.buildInternalFaces();
 
-    int p = 3; // set polynomial interpolation order ( p <= 5 for now if using triangle elements )
+    int p = 5; // set polynomial interpolation order ( p <= 5 for now if using triangle elements )
     DoFManager dofm(M, DoFManager::ManagerType::CG, p);
     double area{0};
 

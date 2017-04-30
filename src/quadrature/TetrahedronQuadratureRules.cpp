@@ -10,8 +10,8 @@ void QuadratureRule::get_tetrahedron_quadrature(int porder)
 {
 
     switch(porder) {
-        default:
         case 1:
+        default:
             nodes = {{1./4., 1./4., 1./4.}};
             weights = {1./6.};
             return;
