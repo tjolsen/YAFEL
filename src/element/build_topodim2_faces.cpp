@@ -71,17 +71,17 @@ void Element::build_quad_faces()
     double pi = std::atan(1.0) * 4;
 
     face_perm.push_back({build_topodim2_faces(localMesh.getGeometryNodes(),
-                                              [](auto xi) { return std::abs(xi(1) + 1) < 1.0e-6; }, -pi / 2)});
+                                              [](auto xi) { return std::abs(xi(1) + 1) < 1.0e-6; }, pi / 2)});
 
     face_perm.push_back({build_topodim2_faces(localMesh.getGeometryNodes(),
                                               [](auto xi) { return std::abs(xi(0) - 1) < 1.0e-6; }, 0)});
 
     face_perm.push_back({build_topodim2_faces(localMesh.getGeometryNodes(),
                                               [](auto xi) { return std::abs(xi(1) - 1) < 1.0e-6; },
-                                              pi / 2)});
+                                              -pi / 2)});
 
     face_perm.push_back({build_topodim2_faces(localMesh.getGeometryNodes(),
-                                              [](auto xi) { return std::abs(xi(0) + 1) < 1.0e-6; }, -pi)});
+                                              [](auto xi) { return std::abs(xi(0) + 1) < 1.0e-6; }, pi)});
 }
 
 
