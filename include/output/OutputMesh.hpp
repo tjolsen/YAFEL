@@ -14,11 +14,15 @@ YAFEL_NAMESPACE_OPEN
 class OutputMesh
 {
 public:
-    inline OutputMesh(const DoFManager &dm) : dofm(&dm) {}
+    OutputMesh(const DoFManager &dm);
 
     const DoFManager *dofm;
 
+
     std::vector<int> local_cells_per_cell;
+    std::vector<int> expanded_cells;
+    std::vector<int> expanded_cell_offsets;
+    std::vector<ElementType> expanded_cell_element_type;
 };
 
 

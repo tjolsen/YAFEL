@@ -67,6 +67,7 @@ set(SOURCE_FILES
         include/mesh/Mesh.hpp
         include/mesh/CellFace.hpp
 
+        include/output/HDFBackend.hpp
         include/output/OutputBackend.hpp
         include/output/OutputData.hpp
         include/output/OutputFrame.hpp
@@ -107,8 +108,10 @@ set(SOURCE_FILES
         src/mesh/build_faces.cpp
         src/mesh/parse_gmsh.cpp
 
+        src/output/HDFBackend.cpp
         src/output/OutputBackend.cpp
         src/output/OutputData.cpp
+        src/output/OutputMesh.cpp
         src/output/SimulationOutput.cpp
         src/output/VTUBackend.cpp
 

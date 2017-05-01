@@ -197,47 +197,9 @@ void VTUBackend::write_mesh(OutputMesh *outputMesh)
     });
 
     auto &dofm = *outputMesh->dofm;
+
+    int n_cells = outputMesh->expanded_cell_offsets.size() - 1;
     int n_points = outputMesh->dofm->dof_nodes.size();
-    int n_parent_cells = outputMesh->dofm->element_offsets.size() - 1;
-
-    //Need an element factory to build visualization topology
-    ElementFactory EF(1);
-
-    std::vector<int> expanded_cells;
-    std::vector<int> expanded_cell_offsets;
-    std::vector<int> expanded_cell_vtk_type;
-    outputMesh->local_cells_per_cell.resize(n_parent_cells);
-
-    int offset{0};
-    std::vector<int> local_cell;
-    std::vector<int> global_nodes;
-    for (auto e : IRange(0, n_parent_cells)) {
-        auto et = dofm.element_types[e];
-        if (et.elementTopology == ElementTopology::None) {
-            continue;
-        }
-        auto &E = EF.getElement(et);
-        dofm.getGlobalNodes(e, global_nodes);
-
-        outputMesh->local_cells_per_cell[e] = E.localMesh.nCells();
-
-
-        for (auto lc : IRange(0, E.localMesh.nCells())) {
-            int vtk_type = ElementType_to_VTKType(dofm.CellType_to_ElementType(E.localMesh.getCellType(lc), 1));
-            E.localMesh.getCellNodes(lc, local_cell);
-            expanded_cell_offsets.push_back(offset);
-            offset += local_cell.size();
-
-            expanded_cell_vtk_type.push_back(vtk_type);
-
-            for (auto n : local_cell) {
-                expanded_cells.push_back(global_nodes[n]);
-            }
-        }
-    }
-    expanded_cell_offsets.push_back(offset);
-    int n_cells = expanded_cell_offsets.size() - 1;
-
 
     //Begin writing
     outfile << "<UnstructuredGrid>\n"
@@ -262,25 +224,26 @@ void VTUBackend::write_mesh(OutputMesh *outputMesh)
 
     //write cell connectivity. each cell written on a separate line only for human-readability. not important for format.
     for (auto c : IRange(0, n_cells)) {
-        auto start = expanded_cell_offsets[c];
-        auto end = expanded_cell_offsets[c + 1];
+        auto start = outputMesh->expanded_cell_offsets[c];
+        auto end = outputMesh->expanded_cell_offsets[c + 1];
         for (auto idx : IRange(start, end - 1)) {
-            outfile << expanded_cells[idx] << ' ';
+            outfile << outputMesh->expanded_cells[idx] << ' ';
         }
-        outfile << expanded_cells[end - 1] << '\n';
+        outfile << outputMesh->expanded_cells[end - 1] << '\n';
     }
     outfile << "</DataArray>\n";
 
     //write cell offsets
     outfile << "<DataArray type=\"UInt32\" Name=\"offsets\" format=\"ascii\">\n";
     for (auto c : IRange(1, n_cells + 1)) {
-        outfile << expanded_cell_offsets[c] << '\n';
+        outfile << outputMesh->expanded_cell_offsets[c] << '\n';
     }
     outfile << "</DataArray>\n";
 
     //write cell types
     outfile << "<DataArray type=\"UInt8\" Name=\"types\" format=\"ascii\">\n";
-    for (auto vtktype : expanded_cell_vtk_type) {
+    for (auto et : outputMesh->expanded_cell_element_type) {
+        int vtktype = ElementType_to_VTKType(et);
         outfile << vtktype << '\n';
     }
     outfile << "</DataArray>\n";
