@@ -47,7 +47,6 @@ int main()
         }
 
         simulationOutput.captureFrame(feSystem);
-        int a = 1;
     }
 
 

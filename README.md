@@ -13,16 +13,17 @@ contact with me to discuss them.
 
 A quick and dirty list of features that I currently (or plan to) support:
 - Eigen3 for linear algebra data structures
+- ViennaCL for GPU-accelerated iterative linear system solvers
 - Mixed element topologies (eg: triangles + quads)
 - Arbitrary-order interpolation
 - Multiple dofs per node
 - Continuous-galerkin DoFManager
 - (in progress) Discontinuous-galerkin DoFManager
-- (in progress) ASCII Output to XML-based VTU files (most simply supports single-frame data)
-- (in progress) HDF5 + XDMF Output for paraview (supports time-dependent data)
+- ASCII Output to XML-based VTU files (most simply supports single-frame data)
+- HDF5 + XDMF Output for paraview (supports time-dependent data) (feature-poor, but working)
 - Mesh Import from Gmsh
 - (future) Mesh creation for rectilinear meshes
-- (future) Mesh creation for transfinite interpolation meshes, with boundary specification with C++11 Lambda
+- (future) Mesh creation for transfinite interpolation meshes, with boundary specification with Lambda
 
 
 I'd like to give credit where it's due: this library was originally inspired by the Deal.II
@@ -37,22 +38,16 @@ Compilation and installation
 
 (Currently in flux. Requires some reasonably recent version of cmake.)
 
-I recommend using the Clang compiler rather than GCC because Clang seems
-to do a better job handling template-heavy code.
-This library contains an implementation of arbitrary-order tensors that
-makes extensive use of variadic templates and relies on compile-time computation
-to generate efficient code.
-Clang (3.8, 4.0) seems to do a better job than GCC (5.4, 6.0) at the time of writing
-at fully inlining and simplifying the code.
+The library and applications should be compiled using CMake. The easiest
+way to incorporate new applications is to create them in a subdirectory
+inside the "apps" folder. Add your directory/executable to the apps/CMakeLists.txt
+file, and link against the "yafel" target.
+Other libraries requiring linking (HDF5) are added automatically by CMake, if available.
 
+Compilation is periodically tested using GCC (5.4, 6.1) and Clang (3.8, 3.9, 4.0).
 
 At the time of writing, the library is under rapid-enough development that it is not
 worth installing into a system-wide directory (eg, /usr/local/).
-
-Using the library
-=================
-
-(Currently in flux. Link against libyafel. See Compilation section above.)
 
 Warning
 =======

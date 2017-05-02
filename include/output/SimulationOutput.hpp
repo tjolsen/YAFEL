@@ -108,8 +108,6 @@ template<typename T>
 void SimulationOutput::captureFrame(T &feSystem, std::function<void(T&,OutputFrame&)> captureFunction)
 {
 
-    auto time = feSystem.currentTime();
-
     OutputMesh outputMesh(feSystem.getDoFManager());
     OutputFrame frame(outputMesh);
 

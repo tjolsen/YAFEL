@@ -5,22 +5,14 @@
 #include "yafel_globals.hpp"
 #include "assembly/CGAssembly.hpp"
 #include "boundary_conditions/DirichletBC.hpp"
-
-#include "output/OutputData.hpp"
-#include "output/OutputMesh.hpp"
-#include "output/OutputFrame.hpp"
-#include "output/VTUBackend.hpp"
-
+#include "output/SimulationOutput.hpp"
 #include "utils/BasicTimer.hpp"
-
 
 #ifndef VIENNACL_WITH_EIGEN
 #define VIENNACL_WITH_EIGEN 1
 #endif
 
 #include <viennacl/linalg/cg.hpp>
-
-#include <eigen3/Eigen/IterativeLinearSolvers>
 #include <iostream>
 
 
@@ -34,14 +26,20 @@ struct PoissonEquation
     static void
     LocalResidual(const Element &E, int qpi, double, Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &R_el)
     {
+
+        R_el += 10*E.shapeValues[qpi]*E.jxw;
+        /*
         for (auto A : IRange(0, static_cast<int>(R_el.rows()))) {
             R_el(A) += 10*E.shapeValues[qpi](A) * E.jxw;
-        }
+        }*/
+
     }
 
     static void LocalTangent(const Element &E, int, double,
                              Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> &K_el)
     {
+        K_el -= E.shapeGrad*E.shapeGrad.transpose()*E.jxw;
+        /*
         for (auto A: IRange(0, static_cast<int>(K_el.rows()))) {
             auto grad_Ai = make_TensorMap<NSD,1>(&E.shapeGrad(A,0));
             for (auto B: IRange(A, static_cast<int>(K_el.rows()))) {
@@ -50,7 +48,7 @@ struct PoissonEquation
                 K_el(B, A) = K_el(A, B);
             }
 
-        }
+        }*/
     }
 };
 
@@ -74,10 +72,6 @@ Eigen::VectorXd solveSystem(const Eigen::SparseMatrix<double> &A, const Eigen::V
     viennacl::copy(vcl_result, result);
 
     return result;
-
-    //Eigen::ConjugateGradient<Eigen::SparseMatrix<double>, Eigen::Upper | Eigen::Lower> solver;
-    //solver.compute(A);
-    //return solver.solve(rhs);
 }
 
 int main()
@@ -103,18 +97,12 @@ int main()
     bc0.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
     bc1.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
 
-    Eigen::VectorXd U(feSystem.getGlobalResidual().rows());
+    auto &U = feSystem.getSolution();
     U = solveSystem(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
 
-    OutputMesh outputMesh(dofm);
-    OutputData data(U, "Solution");
-    OutputFrame frame(outputMesh);
-    frame.point_data.push_back(&data);
 
-    VTUBackend vtuBackend;
-    vtuBackend.initialize("basic_poisson");
-    vtuBackend.write_frame(frame);
-    vtuBackend.finalize();
+    SimulationOutput simulationOutput("output",BackendType::HDF5);
+    simulationOutput.captureFrame(feSystem);
 
     return 0;
 }
