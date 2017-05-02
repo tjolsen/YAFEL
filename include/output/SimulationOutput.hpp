@@ -64,6 +64,7 @@ private:
     static auto default_capture() //std::function<void(T&,OutputFrame&)>
     {
         return [](T &feSys, OutputFrame &frame) -> void {
+            frame.time = feSys.currentTime();
             auto &dofm = feSys.getDoFManager();
             int dofpn = dofm.dof_per_node;
             auto &solution = feSys.getSolution();
@@ -77,7 +78,7 @@ private:
                 dataLocation = OutputData::DataLocation::Cell;
             }
 
-            std::string name_base("Solution ");
+            std::string name_base("Solution_");
             OutputData::DataType dt = OutputData::DataType::Scalar;
             for (auto i : IRange(0, dofpn)) {
                 dof_mask[i] = 1;
@@ -107,7 +108,7 @@ template<typename T>
 void SimulationOutput::captureFrame(T &feSystem, std::function<void(T&,OutputFrame&)> captureFunction)
 {
 
-    auto time = feSystem.getTime();
+    auto time = feSystem.currentTime();
 
     OutputMesh outputMesh(feSystem.getDoFManager());
     OutputFrame frame(outputMesh);

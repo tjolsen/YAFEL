@@ -217,6 +217,9 @@ void HDFBackend::write_mesh(OutputMesh *outputMesh)
                  << "</DataItem>\n"
                  << "</Geometry>\n";
 
+    // Do not re-write mesh to HDF5 file
+    if(mesh_is_written)
+        return;
 
     std::vector<int> cell_data(cell_vec_len, 0);
     int idx{0};
@@ -242,6 +245,8 @@ void HDFBackend::write_mesh(OutputMesh *outputMesh)
 
     tmp_size = 3 * nNodes;
     H5LTmake_dataset(h5_file, "/XYZ", 1, &tmp_size, H5T_NATIVE_DOUBLE, xyz_data.data());
+
+    mesh_is_written = true;
 }
 
 

@@ -65,7 +65,7 @@ void CGAssembly(FESystem &feSystem,
     auto &dofm = feSystem.getDoFManager();
     auto dof_per_node = dofm.dof_per_node;
     constexpr int simulation_dimension = Physics::nsd();
-    auto time = feSystem.getTime();
+    auto time = feSystem.currentTime();
 
 
     bool assemble_tangent{false};

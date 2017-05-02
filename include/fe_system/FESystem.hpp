@@ -38,9 +38,9 @@ public:
 
     inline auto &getDimension() { return simulation_dimension; }
 
-    inline auto &getTime() { return time; }
+    inline auto &currentTime() { return time; }
 
-    inline auto const &getTime() const noexcept { return time; }
+    inline auto const &currentTime() const noexcept { return time; }
 
 protected:
     DoFManager &dofm;
