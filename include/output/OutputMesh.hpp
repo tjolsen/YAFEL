@@ -18,7 +18,6 @@ public:
 
     const DoFManager *dofm;
 
-
     std::vector<int> local_cells_per_cell;
     std::vector<int> expanded_cells;
     std::vector<int> expanded_cell_offsets;

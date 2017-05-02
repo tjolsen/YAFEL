@@ -4,8 +4,11 @@ project(YAFEL)
 find_package(OpenMP REQUIRED)
 find_package(OpenCL REQUIRED)
 find_package (Eigen3 REQUIRED)
+find_package(HDF5 COMPONENTS C HL REQUIRED)
 
 include_directories(${EIGEN3_INCLUDE_DIR})
+include_directories(${HDF5_INCLUDE_DIRS})
+
 #include_directories(${ViennaCL_INCLUDE_DIRS})
 
 set(OPT_FLAGS
@@ -124,6 +127,8 @@ set(SOURCE_FILES
         )
 
 link_libraries("OpenCL")
+link_libraries(${HDF5_C_LIBRARIES})
+link_libraries(${HDF5_C_HL_LIBRARIES})
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 add_library(yafel ${SOURCE_FILES})

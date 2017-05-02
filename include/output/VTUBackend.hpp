@@ -33,7 +33,7 @@ public:
     virtual void initialize(const std::string &fname_base) override;
     virtual void finalize() override;
     virtual void write_frame(OutputFrame &frame) override;
-    virtual void write_data(const OutputData &data) override;
+    virtual void write_data(const OutputData &data, double time=0) override;
     virtual void write_mesh(OutputMesh *outputMesh) override;
 
 private:

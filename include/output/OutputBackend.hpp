@@ -33,7 +33,7 @@ public:
     virtual void write_frame(OutputFrame &frame) = 0;
 
     /// Write a data vector associated with a dof manager.
-    virtual void write_data(const OutputData &data) = 0;
+    virtual void write_data(const OutputData &data, double time) = 0;
 
     /// Write a mesh via a DoFManager (constructs an ElementFactory under the hood for topology)
     virtual void write_mesh(OutputMesh *outputMesh) = 0;

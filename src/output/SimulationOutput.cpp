@@ -4,6 +4,7 @@
 
 #include "output/SimulationOutput.hpp"
 #include "output/VTUBackend.hpp"
+#include "output/HDFBackend.hpp"
 
 YAFEL_NAMESPACE_OPEN
 
@@ -16,6 +17,7 @@ SimulationOutput::SimulationOutput(std::string fname_base, BackendType backendTy
             backend = std::make_unique<VTUBackend>();
             break;
         case BackendType::HDF5:
+            backend = std::make_unique<HDFBackend>();
             break;
     }
 

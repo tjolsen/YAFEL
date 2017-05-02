@@ -2,8 +2,8 @@
 // Created by tyler on 4/11/17.
 //
 
-#include "output/OutputFrame.hpp"
 #include "output/VTUBackend.hpp"
+#include "output/OutputFrame.hpp"
 #include "output/OutputData.hpp"
 #include "output/OutputMesh.hpp"
 #include "element/ElementFactory.hpp"
@@ -82,15 +82,15 @@ void VTUBackend::write_frame(OutputFrame &frame)
 
     if (frame.cell_data.size() > 0) {
         outfile << "<CellData>\n";
-        for (auto &pd : frame.cell_data) {
+        for (auto &cd : frame.cell_data) {
             Eigen::VectorXd tmp(n_local_cells);
             int idx{0};
             for (int c : IRange(0, static_cast<int>(frame.outputMesh->local_cells_per_cell.size()))) {
                 for (int i : IRange(0, frame.outputMesh->local_cells_per_cell[c])) {
-                    tmp(idx++) = (*(pd->data))(c);
+                    tmp(idx++) = (*(cd->data))(c);
                 }
             }
-            OutputData tmp_data(*pd);
+            OutputData tmp_data(*cd);
             tmp_data.data = &tmp;
             write_data(tmp_data);
         }
@@ -100,7 +100,7 @@ void VTUBackend::write_frame(OutputFrame &frame)
     finalize_frame();
 }
 
-void VTUBackend::write_data(const OutputData &data)
+void VTUBackend::write_data(const OutputData &data,double)
 {
 
     std::vector<int> comps;

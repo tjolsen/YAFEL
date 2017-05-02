@@ -20,13 +20,13 @@ YAFEL_NAMESPACE_OPEN
  * displacements accounted for in a data field).
  *
  */
-class HDFBackend : OutputBackend
+class HDFBackend : public OutputBackend
 {
 public:
     virtual void initialize(const std::string &fname_base) override;
     virtual void finalize() override;
     virtual void write_frame(OutputFrame &frame) override;
-    virtual void write_data(const OutputData &data) override;
+    virtual void write_data(const OutputData &data, double time) override;
     virtual void write_mesh(OutputMesh *outputMesh) override;
 
 private:

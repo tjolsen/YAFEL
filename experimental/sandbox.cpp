@@ -25,7 +25,7 @@ int main()
     Mesh M("minsquare.msh");
     M.buildInternalFaces();
 
-    int p = 1;
+    int p = 4;
 
     DoFManager dofm(M, DoFManager::ManagerType::DG, p);
     FESystem feSystem(dofm);
@@ -38,7 +38,7 @@ int main()
         }
     }
 
-    SimulationOutput simulationOutput;
+    SimulationOutput simulationOutput("output", BackendType::HDF5);
 
     simulationOutput.captureFrame(feSystem);
 
