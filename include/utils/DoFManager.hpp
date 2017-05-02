@@ -40,6 +40,7 @@ public:
     std::vector<int> elements;
     std::vector<ElementType> element_types;
     std::vector<int> cell_region_idx;
+    std::vector<CellFace> interior_faces;
 
     std::vector<int> mesh_corner_idxs;
     std::vector<int> mesh_corner_offsets;

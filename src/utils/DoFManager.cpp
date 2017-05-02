@@ -29,6 +29,7 @@ DoFManager::DoFManager(const Mesh &M,
             make_cg_dofs(M);
             break;
         case ManagerType::DG:
+            interior_faces = M.getInternalFaces();
             make_dg_dofs(M);
             break;
     }
