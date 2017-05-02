@@ -6,3 +6,6 @@ target_link_libraries(basicPoisson yafel)
 
 add_executable(basicElasticity BasicLinearElasticity/main.cpp)
 target_link_libraries(basicElasticity yafel)
+
+add_executable(basicAdvection BasicAdvection_DG/main.cpp)
+target_link_libraries(basicAdvection yafel)

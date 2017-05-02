@@ -9,6 +9,7 @@
 #include "element/Element.hpp"
 #include "element/ElementFactory.hpp"
 #include "fe_system/FESystem.hpp"
+#include "assembly/AssemblyRequirement.hpp"
 
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Dense>
@@ -17,13 +18,6 @@
 
 YAFEL_NAMESPACE_OPEN
 
-enum class AssemblyRequirement : int
-{
-    Residual,
-    Tangent,
-    DtMass,
-    DtDtMass
-};
 
 template<typename Physics>
 constexpr bool hasLocalResidual()
@@ -117,10 +111,10 @@ void CGAssembly(FESystem &feSystem,
 
 
             auto local_dofs = E.localMesh.nNodes() * dof_per_node;
-            if (static_cast<int>(local_tangent_buffer.size()) < local_dofs * local_dofs) {
+            if (assemble_tangent && static_cast<int>(local_tangent_buffer.size()) < local_dofs * local_dofs) {
                 local_tangent_buffer.resize(local_dofs * local_dofs, 0.0);
             }
-            if (static_cast<int>(local_residual_buffer.size()) < local_dofs) {
+            if (assemble_residual && static_cast<int>(local_residual_buffer.size()) < local_dofs) {
                 local_residual_buffer.resize(local_dofs, 0.0);
             }
 

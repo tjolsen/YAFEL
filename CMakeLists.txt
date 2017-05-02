@@ -21,7 +21,9 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${VIENNACL_CXX_FLAGS} -O
 set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra")
 
 set(SOURCE_FILES
+        include/assembly/AssemblyRequirement.hpp
         include/assembly/CGAssembly.hpp
+        include/assembly/DGAssembly.hpp
 
         include/boundary_conditions/DirichletBC.hpp
 

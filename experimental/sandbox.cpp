@@ -4,14 +4,8 @@
 
 #include "yafel_globals.hpp"
 #include "assembly/CGAssembly.hpp"
-#include "element/element_boundary_nodes.hpp"
 #include "boundary_conditions/DirichletBC.hpp"
-
 #include "output/SimulationOutput.hpp"
-//#include "output/OutputData.hpp"
-//#include "output/OutputMesh.hpp"
-//#include "output/OutputFrame.hpp"
-//#include "output/VTUBackend.hpp"
 
 #include <eigen3/Eigen/IterativeLinearSolvers>
 #include <iostream>
