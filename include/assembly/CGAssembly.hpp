@@ -87,7 +87,7 @@ void CGAssembly(FESystem &feSystem,
     std::vector<Eigen::Triplet<double>> tangent_triplets;
     int total_triplets{0};
 
-    #pragma omp parallel shared(tangent_triplets, GlobalResidual)
+    #pragma omp parallel shared(tangent_triplets, GlobalResidual, dofm)
     {// open parallel block
         //storage buffers
         std::vector<double> local_tangent_buffer;
@@ -144,7 +144,6 @@ void CGAssembly(FESystem &feSystem,
 
 
             //Assemble into global
-//#pragma omp critical
             for (auto A : IRange(0, local_dofs)) {
                 auto GA = global_dof_buffer[A];
                 if (assemble_tangent || assemble_dt_mass || assemble_dtdt_mass) {

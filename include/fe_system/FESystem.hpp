@@ -23,8 +23,8 @@ public:
             : dofm(dofm), simulation_dimension(dim), time(0)
     {
         int ndofs = dofm.dof_nodes.size() * dofm.dof_per_node;
-        global_residual.resize(ndofs);
-        solution_vector.resize(ndofs);
+        global_residual = Eigen::VectorXd::Constant(ndofs, 0.0);
+        solution_vector = Eigen::VectorXd::Constant(ndofs, 0.0);
         global_tangent.resize(ndofs, ndofs);
     }
 

@@ -23,6 +23,8 @@ YAFEL_NAMESPACE_OPEN
  * The procedure involves looping over mesh faces and
  * computing fluxes between elements.
  *
+ * Designed for use with explicit time stepping,
+ *
  * @tparam Physics
  * @param feSystem
  * @param requirements
@@ -36,6 +38,8 @@ void DGAssembly(FESystem &feSystem,
 
     //Unpack the FESystem
     auto &GlobalResidual = feSystem.getGlobalResidual();
+    auto &GlobalSolution = feSystem.getSolution();
+    GlobalResidual *= 0;
     auto &dofm = feSystem.getDoFManager();
     auto dof_per_node = dofm.dof_per_node;
     double time = feSystem.currentTime();
@@ -61,7 +65,7 @@ void DGAssembly(FESystem &feSystem,
         }
     }
 
-#pragma omp parallel
+//#pragma omp parallel shared(GlobalResidual, tangent_triplets, dofm)
     {
         //Define thread-local variables
 
@@ -69,24 +73,177 @@ void DGAssembly(FESystem &feSystem,
         std::vector<double> local_tangent_buffer;
         std::vector<double> local_dtmass_buffer;
         std::vector<double> local_residual_buffer;
-        std::vector<int> global_dof_buffer;
+        std::vector<double> local_solution_buffer;
+        std::vector<int> global_dof_buffer_l;
+        std::vector<int> global_dof_buffer_r;
+        std::vector<Eigen::Triplet<double>> local_triplets;
+        Eigen::VectorXd private_residual = Eigen::VectorXd::Constant(GlobalResidual.rows(), 0.0);
 
+        // Need two different element factories because
+        // only a single Element of a given type is instantiated
+        // in either one. In order to do element boundary flux
+        // calculations, you need two separate elements simultaneously.
+        ElementFactory EF_L(dofm.dof_per_node);
+        ElementFactory EF_R(dofm.dof_per_node);
 
 
         // Boundary Fluxes
 
-        for()
+        for (int fi = 0; fi < dofm.interior_faces.size(); ++fi) {
+            auto &F = dofm.interior_faces[fi];
+            if (F.left < 0 || F.right < 0) {
+
+
+            } else {
+
+                int e_left = F.left;
+                int fl_l = F.left_flocal;
+                int fr_l = F.left_rot;
+
+                int e_right = F.right;
+                int fl_r = F.right_flocal;
+                int fr_r = F.right_rot;
+
+                dofm.getGlobalDofs(e_left, global_dof_buffer_l);
+                dofm.getGlobalDofs(e_right, global_dof_buffer_r);
+
+                auto &EL = EF_L.getElement(dofm.element_types[e_left]);
+                auto &ER = EF_R.getElement(dofm.element_types[e_right]);
+
+                auto &left_nodes = EL.face_perm[fl_l][fr_l][0];
+                auto &right_nodes = EL.face_perm[fl_r][fr_r][1];
+
+                Eigen::VectorXd R_l = Eigen::VectorXd::Constant(left_nodes.size(), 0.0);
+                Eigen::VectorXd R_r = Eigen::VectorXd::Constant(right_nodes.size(), 0.0);
+
+                for(int fqpi=0; fqpi < EL.nFQP(); ++fqpi) {
+                    auto nl = EL.face_update<Physics::nsd()>(e_left, fqpi, F, dofm);
+                    auto nr = ER.face_update<Physics::nsd()>(e_right, fqpi, F, dofm);
+
+                    coordinate<> xqp{0,0,0};
+                    double Uleft{0};
+                    double Uright{0};
+
+                    for(int i=0; i<left_nodes.size(); ++i) {
+                        xqp = dofm.dof_nodes[global_dof_buffer_l[left_nodes[i]]]*EL.boundaryShapeValues[fqpi](i);
+                        Uleft += GlobalSolution(global_dof_buffer_l[left_nodes[i]])*EL.boundaryShapeValues[fqpi](i);
+                        Uright += GlobalSolution(global_dof_buffer_r[right_nodes[i]])*ER.boundaryShapeValues[fqpi](i);
+                    }
+
+                    double fluxVal = Physics::Flux(nl,xqp,time,Uleft,Uright);
+
+                    for(int i=0; i<left_nodes.size(); ++i) {
+                        int li = left_nodes[i];
+                        int gli = global_dof_buffer_l[li];
+                        int ri = right_nodes[i];
+                        int gri = global_dof_buffer_r[ri];
+
+
+                        GlobalResidual(gli) -= EL.boundaryShapeValues[fqpi](i)*fluxVal*EL.jxw;
+                        GlobalResidual(gri) += ER.boundaryShapeValues[fqpi](i)*fluxVal*ER.jxw;
+                    }
+                }
+
+
+            }
+        }
 
 
         // Element-level fluxes
+        for (int elnum = 0; elnum < dofm.nCells(); ++elnum) {
+
+            auto et = dofm.element_types[elnum];
+            if (et.topoDim != simulation_dimension) {
+                continue;
+            }
+            auto &E = EF_L.getElement(et);
+            dofm.getGlobalDofs(elnum, global_dof_buffer_l);
+
+            auto local_dofs = E.localMesh.nNodes() * dof_per_node;
+            if (assemble_tangent && static_cast<int>(local_tangent_buffer.size()) < local_dofs * local_dofs) {
+                local_tangent_buffer.resize(local_dofs * local_dofs, 0.0);
+            }
+            if (assemble_dt_mass && static_cast<int>(local_dtmass_buffer.size()) < local_dofs * local_dofs) {
+                local_dtmass_buffer.resize(local_dofs * local_dofs, 0.0);
+            }
+            if (assemble_residual && static_cast<int>(local_residual_buffer.size()) < local_dofs) {
+                local_residual_buffer.resize(local_dofs, 0.0);
+            }
+            if (static_cast<int>(local_solution_buffer.size()) < local_dofs) {
+                local_solution_buffer.resize(local_dofs, 0.0);
+            }
+
+            for (auto &x : local_tangent_buffer) {
+                x = 0;
+            }
+            for (auto &x : local_dtmass_buffer) {
+                x = 0;
+            }
+            for (auto &x : local_residual_buffer) {
+                x = 0;
+            }
+            for (auto &x : local_solution_buffer) {
+                x = 0;
+            }
+
+            Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> local_tangent(
+                    local_tangent_buffer.data(), local_dofs, local_dofs);
+            Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> local_dt_mass(
+                    local_dtmass_buffer.data(), local_dofs, local_dofs);
+            Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> local_residual(local_residual_buffer.data(),
+                                                                                local_dofs);
+            Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> local_solution(local_solution_buffer.data(),
+                                                                                local_dofs);
+
+            //copy element solution values into local_solution
+            for(int i=0; i<global_dof_buffer_l.size(); ++i) {
+                local_solution(i) = GlobalSolution(global_dof_buffer_l[i]);
+                local_residual(i) = GlobalResidual(global_dof_buffer_l[i]);
+            }
 
 
-    }
+            auto nqp = E.nQP();
+            for (int qpi = 0; qpi < nqp; ++qpi) {
+                E.update<Physics::nsd()>(elnum, qpi, dofm);
+
+                if (assemble_tangent) {
+                    //Physics::LocalTangent(E, qpi, time, local_tangent);
+                }
+                if (assemble_residual) {
+                    Physics::LocalResidual(E, qpi, time, local_solution, local_residual);
+                }
+                if (assemble_dt_mass) {
+                    Physics::LocalMass(E, qpi, time, local_dt_mass);
+                }
+            }
+
+
+            //Invert local mass matrix and solve the local_residual
+            auto MLU = local_dt_mass.lu();
+            local_residual = MLU.solve(local_residual);
+
+            //Assemble into global
+            for (auto A : IRange(0, local_dofs)) {
+                auto GA = global_dof_buffer_l[A];
+                if (assemble_tangent) {
+                    for (auto B : IRange(0, local_dofs)) {
+                        auto GB = global_dof_buffer_l[B];
+                        local_triplets.emplace_back(GA, GB, local_tangent(A, B));
+                    }
+                }
+                if (assemble_residual) {
+                    GlobalResidual(GA) += local_residual(A);
+                }
+            }
+
+        } //end elnum loop
+
+
+
+    } // end parallel block
 
 
 }
-
-
 
 
 YAFEL_NAMESPACE_CLOSE

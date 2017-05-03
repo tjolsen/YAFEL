@@ -24,7 +24,8 @@ struct PoissonEquation
     static constexpr int nsd() { return NSD; }
 
     static void
-    LocalResidual(const Element &E, int qpi, double, Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &R_el)
+    LocalResidual(const Element &E, int qpi, double,
+                  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &R_el)
     {
 
         R_el += (10.0*E.jxw) * E.shapeValues[qpi];
