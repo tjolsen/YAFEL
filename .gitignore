@@ -40,6 +40,8 @@
 #paraview (VTK) output files
 *.vtu
 *.pvd
+*.h5
+*.xmf
 
 #movie files saved from paraview
 *.avi

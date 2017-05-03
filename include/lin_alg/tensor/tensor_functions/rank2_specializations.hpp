@@ -83,7 +83,7 @@ Tensor<D, 2, dt> skw(const TensorExpression<TE, D, 2, dt, b> &te)
 //=====================================================================
 template<typename T1, typename T2, int D, int R, typename dt1, typename dt2, bool b1, bool b2,
         typename=typename std::enable_if<R == 1 || R == 2>::type>
-auto operator*(const TensorExpression<T1, D, 2, dt1, b1> &lhs,
+inline auto operator*(const TensorExpression<T1, D, 2, dt1, b1> &lhs,
                const TensorExpression<T2, D, R, dt2, b2> &rhs)
 {
     return contract<1>(lhs, rhs);
@@ -94,7 +94,7 @@ auto operator*(const TensorExpression<T1, D, 2, dt1, b1> &lhs,
 // Identity Tensor
 //=====================================================================
 template<int D, typename dt=double>
-Tensor<3, 2, dt> TensorEye()
+inline Tensor<D, 2, dt> TensorEye()
 {
     Tensor<D, 2, dt> ret;
     for (auto i : IRange(0, D))
@@ -108,13 +108,13 @@ Tensor<3, 2, dt> TensorEye()
 // Tensor determinant
 //===================================================================
 template<typename dt=double>
-dt determinant(const Tensor<2, 2, dt> &A)
+inline dt determinant(const Tensor<2, 2, dt> &A)
 {
     return A(0, 0) * A(1, 1) - A(0, 1) * A(1, 0);
 }
 
 template<typename dt=double>
-dt determinant(const Tensor<3, 2, dt> &A)
+inline dt determinant(const Tensor<3, 2, dt> &A)
 {
     return A(0, 0) * (A(1, 1) * A(2, 2) - A(1, 2) * A(2, 1))
            - A(0, 1) * (A(1, 0) * A(2, 2) - A(2, 0) * A(0, 2))
@@ -126,7 +126,7 @@ dt determinant(const Tensor<3, 2, dt> &A)
 // Tensor inverse
 //===================================================================
 template<typename dt=double>
-Tensor<2, 2, dt> inverse(const Tensor<2, 2, dt> &A)
+inline Tensor<2, 2, dt> inverse(const Tensor<2, 2, dt> &A)
 {
     dt detAinv = 1.0 / determinant(A);
     Tensor<2, 2, dt> Ainv;
@@ -139,7 +139,7 @@ Tensor<2, 2, dt> inverse(const Tensor<2, 2, dt> &A)
 
 
 template<typename dt=double>
-Tensor<3, 2, dt> inverse(const Tensor<3, 2, dt> &A)
+inline Tensor<3, 2, dt> inverse(const Tensor<3, 2, dt> &A)
 {
     auto detAinv = 1.0 / determinant(A);
 

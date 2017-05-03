@@ -87,7 +87,7 @@ void CGAssembly(FESystem &feSystem,
     std::vector<Eigen::Triplet<double>> tangent_triplets;
     int total_triplets{0};
 
-#pragma omp parallel shared(tangent_triplets, GlobalResidual)
+    #pragma omp parallel shared(tangent_triplets, GlobalResidual)
     {// open parallel block
         //storage buffers
         std::vector<double> local_tangent_buffer;
@@ -133,7 +133,6 @@ void CGAssembly(FESystem &feSystem,
             auto nqp = E.nQP();
             for (auto qpi : IRange(0, nqp)) {
                 E.update<Physics::nsd()>(elnum, qpi, dofm);
-
                 if (assemble_tangent) {
                     Physics::LocalTangent(E, qpi, time, local_tangent);
                 }
@@ -145,6 +144,7 @@ void CGAssembly(FESystem &feSystem,
 
 
             //Assemble into global
+//#pragma omp critical
             for (auto A : IRange(0, local_dofs)) {
                 auto GA = global_dof_buffer[A];
                 if (assemble_tangent || assemble_dt_mass || assemble_dtdt_mass) {
@@ -154,7 +154,7 @@ void CGAssembly(FESystem &feSystem,
                     }
                 }
                 if (assemble_residual) {
-                    private_residual(GA) = local_residual(A);
+                    private_residual(GA) += local_residual(A);
                 }
             }
 
@@ -170,6 +170,7 @@ void CGAssembly(FESystem &feSystem,
         {
             tangent_triplets.reserve(total_triplets);
         }
+#pragma omp barrier
 #pragma omp critical
         {
             for (auto &trip : local_triplets) {

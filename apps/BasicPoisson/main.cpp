@@ -14,7 +14,7 @@
 
 #include <viennacl/linalg/cg.hpp>
 #include <iostream>
-
+#include <eigen3/Eigen/IterativeLinearSolvers>
 
 using namespace yafel;
 
@@ -27,10 +27,10 @@ struct PoissonEquation
     LocalResidual(const Element &E, int qpi, double, Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &R_el)
     {
 
-        R_el += 10*E.shapeValues[qpi]*E.jxw;
+        R_el += (10.0*E.jxw) * E.shapeValues[qpi];
         /*
         for (auto A : IRange(0, static_cast<int>(R_el.rows()))) {
-            R_el(A) += 10*E.shapeValues[qpi](A) * E.jxw;
+            R_el(A) = 10*E.jxw*E.shapeValues[qpi](A);
         }*/
 
     }
@@ -38,7 +38,7 @@ struct PoissonEquation
     static void LocalTangent(const Element &E, int, double,
                              Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> &K_el)
     {
-        K_el -= E.shapeGrad*E.shapeGrad.transpose()*E.jxw;
+        K_el -= E.shapeGrad * (E.shapeGrad.transpose() * E.jxw);
         /*
         for (auto A: IRange(0, static_cast<int>(K_el.rows()))) {
             auto grad_Ai = make_TensorMap<NSD,1>(&E.shapeGrad(A,0));
@@ -54,6 +54,8 @@ struct PoissonEquation
 
 Eigen::VectorXd solveSystem(const Eigen::SparseMatrix<double> &A, const Eigen::VectorXd &rhs)
 {
+
+    std::cout << "Norm0 = " << rhs.norm() << std::endl;
 
 
     viennacl::vector<double> vcl_rhs(rhs.rows());
@@ -71,24 +73,30 @@ Eigen::VectorXd solveSystem(const Eigen::SparseMatrix<double> &A, const Eigen::V
     Eigen::VectorXd result(rhs.rows());
     viennacl::copy(vcl_result, result);
 
+
+    //Eigen::ConjugateGradient<Eigen::SparseMatrix<double>, Eigen::Upper | Eigen::Lower> solver;
+    //solver.compute(A);
+    //Eigen::VectorXd result = solver.solve(rhs);
+    std::cout << "new norm = " << (A * result - rhs).norm() << std::endl;
+
     return result;
 }
 
 int main()
 {
     Mesh M("mesh.msh");
-    int p = 1;
+    int p = 2;
     int dofpn = 1;
     DoFManager dofm(M, DoFManager::ManagerType::CG, p, dofpn);
     FESystem feSystem(dofm);
     BasicTimer timer;
     timer.tic();
-    CGAssembly<PoissonEquation<2>>(feSystem);
+    CGAssembly<PoissonEquation<3>>(feSystem);
     timer.toc();
 
     std::cout << "Assembly time: " << timer.duration<std::chrono::microseconds>() << " us" << std::endl;
 
-    DirichletBC bc0(dofm, [](const coordinate<> &x,double){return x(0)*x(0)/4;});
+    DirichletBC bc0(dofm, 0.0);
     bc0.selectByFunction([](const coordinate<> &x) { return std::abs(x(0)) < 1.0e-6; });
 
     DirichletBC bc1(dofm, 0.0);
@@ -101,7 +109,7 @@ int main()
     U = solveSystem(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
 
 
-    SimulationOutput simulationOutput("output",BackendType::HDF5);
+    SimulationOutput simulationOutput("output", BackendType::HDF5);
     simulationOutput.captureFrame(feSystem);
 
     return 0;

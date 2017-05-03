@@ -127,17 +127,17 @@ void Element::update(int elnum, int qpi, const DoFManager &dofm)
     double detJ = determinant(Jacobian);
     jxw = detJ * quadratureRule.weights[qpi];
     Tensor<NSD, 2> Jinv = inverse(Jacobian);
-    Tensor<NSD, 2> JinvT = Jinv.template perm<1, 0>();
-    shapeGrad = Eigen::MatrixXd::Constant(nodes.size(), NSD, 0);
+
+    if(shapeGrad.rows() != nodes.size() || shapeGrad.cols() != NSD) {
+        shapeGrad.resize(nodes.size(), NSD);
+    }
 
     for (auto A : IRange(0, static_cast<int>(nodes.size()))) {
         for (auto d : IRange(0, NSD)) {
-            shapeGrad(A, d) = 0;
-            double s = dot(make_TensorMap<NSD, 1>(&shapeGradXi[qpi](A, 0)), JinvT(d, colon()));
+            double s = dot(make_TensorMap<NSD, 1>(&shapeGradXi[qpi](A, 0)), Jinv(colon(), d));
             shapeGrad(A, d) = s;
         }
     }
-
 
 }
 
