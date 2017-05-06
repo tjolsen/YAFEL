@@ -28,7 +28,7 @@ struct PoissonEquation
                   Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &R_el)
     {
 
-        R_el += (10.0*E.jxw) * E.shapeValues[qpi];
+        R_el += (100.0*E.jxw) * E.shapeValues[qpi];
         /*
         for (auto A : IRange(0, static_cast<int>(R_el.rows()))) {
             R_el(A) = 10*E.jxw*E.shapeValues[qpi](A);

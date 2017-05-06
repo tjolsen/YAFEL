@@ -92,7 +92,46 @@ void DGAssembly(FESystem &feSystem,
         for (int fi = 0; fi < dofm.interior_faces.size(); ++fi) {
             auto &F = dofm.interior_faces[fi];
             if (F.left < 0 || F.right < 0) {
+                int el{-1};
+                int fl{-1};
+                int fr{-1};
+                int rl_idx{-1};
+                if (F.left >= 0) {
+                    el = F.left;
+                    fl = F.left_flocal;
+                    fr = F.left_rot;
+                    rl_idx = 0;
+                } else {
+                    el = F.right;
+                    fl = F.right_flocal;
+                    fr = F.right_rot;
+                    rl_idx = 1;
+                }
 
+                auto &E = EF_L.getElement(dofm.element_types[el]);
+                dofm.getGlobalDofs(el, global_dof_buffer_l);
+                auto &face_nodes = E.face_perm[fl][fr][rl_idx];
+
+                for(int fqpi=0; fqpi < E.nFQP(); ++fqpi) {
+                    auto nl = E.face_update<Physics::nsd()>(el, fqpi, F, dofm);
+                    coordinate<> xqp;
+                    double U{0};
+                    for (int i = 0; i < face_nodes.size(); ++i) {
+                        xqp += dofm.dof_nodes[global_dof_buffer_l[face_nodes[i]]] * E.boundaryShapeValues[fqpi](i);
+                        U += GlobalSolution(global_dof_buffer_l[face_nodes[i]]) * E.boundaryShapeValues[fqpi](i);
+                    }
+                    if (rl_idx == 1) {
+                        nl = -nl;
+                    }
+
+                    double fluxVal = Physics::BoundaryFlux(nl, xqp, time, U);
+
+                    for(int A=0; A<face_nodes.size(); ++A) {
+                        double val = E.boundaryShapeValues[fqpi](A)*fluxVal*E.jxw;
+                        GlobalResidual(global_dof_buffer_l[face_nodes[A]]) -= val;
+                    }
+
+                }
 
             } else {
 
@@ -116,31 +155,31 @@ void DGAssembly(FESystem &feSystem,
                 Eigen::VectorXd R_l = Eigen::VectorXd::Constant(left_nodes.size(), 0.0);
                 Eigen::VectorXd R_r = Eigen::VectorXd::Constant(right_nodes.size(), 0.0);
 
-                for(int fqpi=0; fqpi < EL.nFQP(); ++fqpi) {
+                for (int fqpi = 0; fqpi < EL.nFQP(); ++fqpi) {
                     auto nl = EL.face_update<Physics::nsd()>(e_left, fqpi, F, dofm);
                     auto nr = ER.face_update<Physics::nsd()>(e_right, fqpi, F, dofm);
 
-                    coordinate<> xqp{0,0,0};
+                    coordinate<> xqp{0, 0, 0};
                     double Uleft{0};
                     double Uright{0};
 
-                    for(int i=0; i<left_nodes.size(); ++i) {
-                        xqp = dofm.dof_nodes[global_dof_buffer_l[left_nodes[i]]]*EL.boundaryShapeValues[fqpi](i);
-                        Uleft += GlobalSolution(global_dof_buffer_l[left_nodes[i]])*EL.boundaryShapeValues[fqpi](i);
-                        Uright += GlobalSolution(global_dof_buffer_r[right_nodes[i]])*ER.boundaryShapeValues[fqpi](i);
+                    for (int i = 0; i < left_nodes.size(); ++i) {
+                        xqp = xqp + dofm.dof_nodes[global_dof_buffer_l[left_nodes[i]]] * EL.boundaryShapeValues[fqpi](i);
+                        Uleft += GlobalSolution(global_dof_buffer_l[left_nodes[i]]) * EL.boundaryShapeValues[fqpi](i);
+                        Uright += GlobalSolution(global_dof_buffer_r[right_nodes[i]]) * ER.boundaryShapeValues[fqpi](i);
                     }
 
-                    double fluxVal = Physics::Flux(nl,xqp,time,Uleft,Uright);
+                    double fluxVal = Physics::Flux(nl, xqp, time, Uleft, Uright);
 
-                    for(int i=0; i<left_nodes.size(); ++i) {
+                    for (int i = 0; i < left_nodes.size(); ++i) {
                         int li = left_nodes[i];
                         int gli = global_dof_buffer_l[li];
                         int ri = right_nodes[i];
                         int gri = global_dof_buffer_r[ri];
 
 
-                        GlobalResidual(gli) -= EL.boundaryShapeValues[fqpi](i)*fluxVal*EL.jxw;
-                        GlobalResidual(gri) += ER.boundaryShapeValues[fqpi](i)*fluxVal*ER.jxw;
+                        GlobalResidual(gli) -= EL.boundaryShapeValues[fqpi](i) * fluxVal * EL.jxw;
+                        GlobalResidual(gri) += ER.boundaryShapeValues[fqpi](i) * fluxVal * ER.jxw;
                     }
                 }
 
@@ -196,7 +235,7 @@ void DGAssembly(FESystem &feSystem,
                                                                                 local_dofs);
 
             //copy element solution values into local_solution
-            for(int i=0; i<global_dof_buffer_l.size(); ++i) {
+            for (int i = 0; i < global_dof_buffer_l.size(); ++i) {
                 local_solution(i) = GlobalSolution(global_dof_buffer_l[i]);
                 local_residual(i) = GlobalResidual(global_dof_buffer_l[i]);
             }

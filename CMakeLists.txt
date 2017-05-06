@@ -9,14 +9,15 @@ find_package(HDF5 COMPONENTS C HL REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(${HDF5_INCLUDE_DIRS})
 
+
 #include_directories(${ViennaCL_INCLUDE_DIRS})
 
 set(OPT_FLAGS
         "-march=native -mtune=native -ffast-math -funroll-loops -fopenmp -ftree-coalesce-vars -fvariable-expansion-in-unroller -finline-limit=1000000 ")
 
-set(VIENNACL_CXX_FLAGS "-DVIENNACL_WITH_OPENCL")
+set(VIENNACL_CXX_FLAGS "-DVIENNACL_WITH_OPENMP")
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${VIENNACL_CXX_FLAGS} -O3 -g -Wall -Wextra -DNDEBUG ${OPT_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${VIENNACL_CXX_FLAGS} -O3 -Wall -Wextra -DNDEBUG ${OPT_FLAGS}")
 
 set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra")
 
