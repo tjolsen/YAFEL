@@ -6,6 +6,7 @@
 #include "assembly/DGAssembly.hpp"
 #include "fe_system/FESystem.hpp"
 #include "output/SimulationOutput.hpp"
+#include "time_integration/DGRK4.hpp"
 
 using namespace yafel;
 
@@ -15,29 +16,31 @@ struct AdvectionPhysics
     std::vector<Eigen::PartialPivLU<Eigen::MatrixXd>> inverse_mass_matrices;
     bool mass_constructed{false};
 
-    static constexpr int nsd()
-    { return NSD; }
+    static constexpr int nsd() { return NSD; }
 
     static double initial_condition(const coordinate<> &x)
     {
 
-        double r0 = 0.15;
-        double r = norm(x - coordinate<>{1.5, 1});
-        return std::exp(-(r / r0) * (r / r0));
+        coordinate<> dx = x - coordinate<>{1.25, 1};
+
+        int mask = dx(0)>0 && dx(0)<.5 && dx(1) > 0 && dx(1) <.5;
+        double pi = 4*std::atan(1.0);
+        return mask*std::sin(2*pi*dx(0))*std::sin(2*pi*dx(1));
+
     }
 
     static Tensor<NSD, 1> convection_velocity(coordinate<> x, double)
     {
 
-        //double omega = 0.10;
-        //coordinate<> dx = x - coordinate<>{1, 1, x(2)};
+        double omega = 3.14159;
+        coordinate<> dx = x - coordinate<>{1, 1, x(2)};
 
-        //double r = norm(dx);
-        //double theta = std::atan2(dx(1), dx(0));
+        double r = norm(dx);
+        double theta = std::atan2(dx(1), dx(0));
 
-        //Tensor<NSD, 1> v{-r * omega * std::sin(theta), r * omega * std::cos(theta)};
-        //return v;
-        return {-1, .5};
+        Tensor<NSD, 1> v{-r * omega * std::sin(theta), r * omega * std::cos(theta)};
+        return v;
+        //return {-1, .5};
     };
 
     static double source(const coordinate<> &, double)
@@ -45,19 +48,17 @@ struct AdvectionPhysics
         return 0.0;
     }
 
-    static void LocalResidual(const Element &E, int qpi, double time,
-                              Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &U_el,
-                              Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &R_el)
+    template<typename TU, typename TR>
+    static void LocalResidual(const Element &E, int qpi,
+                              coordinate<> xqp, double time,
+                              Eigen::MatrixBase<TU> &U_el,
+                              Eigen::MatrixBase<TR> &R_el)
     {
-        coordinate<> xqp(0);
-        for (int i = 0; i < E.nQP(); ++i) {
-            xqp += E.shapeValues[qpi](i) * E.localMesh.getGeometryNodes()[i];
-        }
         auto c = convection_velocity(xqp, time);
 
         double U{0};
-        for(int A=0; A<U_el.rows(); ++A) {
-            U += U_el(A)*E.shapeValues[qpi](A);
+        for (int A = 0; A < U_el.rows(); ++A) {
+            U += U_el(A) * E.shapeValues[qpi](A);
         }
 
         for (int i = 0; i < R_el.rows(); ++i) {
@@ -79,11 +80,10 @@ struct AdvectionPhysics
     static double BoundaryFlux(Tensor<NSD, 1> n, coordinate<> x, double t, double U)
     {
         auto vdotn = dot(n, convection_velocity(x, t));
-        if(vdotn > 0) {
-            return vdotn*U;
-        }
-        else {
-            return 0;
+        if (vdotn > 0) {
+            return vdotn * U;
+        } else {
+            return vdotn * U;
         }
     }
 
@@ -96,16 +96,12 @@ struct AdvectionPhysics
 };
 
 
-void frame_capture() {
-
-}
-
 int main()
 {
     constexpr int NSD = 2;
     Mesh M("mesh.msh");
     M.buildInternalFaces();
-    int p = 2;
+    int p = 3;
     int dofpn = 1;
 
     AdvectionPhysics<NSD> AP;
@@ -130,15 +126,12 @@ int main()
 
     simulationOutput.captureFrame(feSystem);
 
+    DGRK4 dgrk4(dt);
+
     int NT = static_cast<int>(Tfinal / dt);
     for (int ti = 1; ti <= NT; ++ti) {
         std::cout << ti << " / " << NT << std::endl;
-        feSystem.currentTime() = ti * dt;
-
-        DGAssembly<AdvectionPhysics<NSD>>(feSystem, AP,
-                                          {AssemblyRequirement::Residual,
-                                           AssemblyRequirement::DtMass});
-        feSystem.getSolution() += dt * feSystem.getGlobalResidual();
+        dgrk4.step(feSystem,AP);
 
         if (ti % output_freq == 0) {
             simulationOutput.captureFrame(feSystem);

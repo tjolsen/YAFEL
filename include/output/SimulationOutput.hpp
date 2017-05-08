@@ -48,11 +48,6 @@ public:
     void captureFrame(T &fesystem_maybe, std::function<void(T&,OutputFrame&)> captureFunction = default_capture<T>());
 
 
-private:
-    std::string fname_base;
-
-    std::unique_ptr<OutputBackend> backend;
-
     /**
      * Default frame capture function. Copy each component into scalar data
      * and add separately. Attempts to detect cell/point data automatically,
@@ -98,6 +93,12 @@ private:
 
         };
     }
+
+
+private:
+    std::string fname_base;
+
+    std::unique_ptr<OutputBackend> backend;
 };
 
 

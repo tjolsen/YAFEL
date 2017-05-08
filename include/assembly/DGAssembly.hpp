@@ -256,13 +256,19 @@ void DGAssembly(FESystem &feSystem,
 
             auto nqp = E.nQP();
             for (int qpi = 0; qpi < nqp; ++qpi) {
+
+                coordinate<> xqp;
+                for(int A=0; A<global_dof_buffer_l.size(); ++A) {
+                    xqp += dofm.dof_nodes[global_dof_buffer_l[A]]*E.shapeValues[qpi](A);
+                }
+
                 E.update<Physics::nsd()>(elnum, qpi, dofm);
 
                 if (assemble_tangent) {
                     //Physics::LocalTangent(E, qpi, time, local_tangent);
                 }
                 if (assemble_residual) {
-                    Physics::LocalResidual(E, qpi, time, local_solution, local_residual);
+                    Physics::LocalResidual(E, qpi, xqp, time, local_solution, local_residual);
                 }
                 if (assemble_dt_mass) {
                     Physics::LocalMass(E, qpi, time, local_dt_mass);

@@ -84,6 +84,8 @@ set(SOURCE_FILES
         include/quadrature/LobattoPoints1D.hpp
         include/quadrature/QuadratureRule.hpp
 
+        include/time_integration/DGRK4.hpp
+
         include/utils/BasicTimer.hpp
         include/utils/ConcurrentQueue.hpp
         include/utils/old_DirBC.hpp
@@ -125,6 +127,8 @@ set(SOURCE_FILES
         src/quadrature/QuadratureRule.cpp
         src/quadrature/TriangleQuadratureRules.cpp
         src/quadrature/TetrahedronQuadratureRules.cpp
+
+        src/time_integration/DGRK4.cpp
 
         src/utils/DoFManager.cpp
         )
