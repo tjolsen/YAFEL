@@ -68,8 +68,9 @@ struct AdvectionPhysics
         }
     }
 
+    template<typename T>
     static void LocalMass(const Element &E, int qpi, double,
-                          Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> &M_el)
+                          Eigen::MatrixBase<T> &M_el)
     {
         M_el += (E.jxw * E.shapeValues[qpi]) * E.shapeValues[qpi].transpose();
     }
@@ -82,7 +83,7 @@ struct AdvectionPhysics
             return vdotn*U;
         }
         else {
-            return vdotn*U;
+            return 0;
         }
     }
 

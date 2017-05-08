@@ -237,8 +237,11 @@ void DGAssembly(FESystem &feSystem,
 
             Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> local_tangent(
                     local_tangent_buffer.data(), local_dofs, local_dofs);
-            Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> local_dt_mass(
-                    local_dtmass_buffer.data(), local_dofs, local_dofs);
+            //Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> local_dt_mass(
+            //local_dtmass_buffer.data(), local_dofs, local_dofs);
+
+            Eigen::MatrixXd local_dt_mass = Eigen::MatrixXd::Constant(local_dofs, local_dofs, 0.0);
+
             Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> local_residual(local_residual_buffer.data(),
                                                                                 local_dofs);
             Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> local_solution(local_solution_buffer.data(),
@@ -263,9 +266,12 @@ void DGAssembly(FESystem &feSystem,
                 }
                 if (assemble_dt_mass) {
                     Physics::LocalMass(E, qpi, time, local_dt_mass);
-                    Eigen::PartialPivLU<Eigen::MatrixXd> MLU(local_dt_mass);
-                    physics.inverse_mass_matrices.push_back(MLU);
                 }
+            }
+
+            if(assemble_dt_mass){
+                Eigen::PartialPivLU<Eigen::MatrixXd> MLU(local_dt_mass);
+                physics.inverse_mass_matrices.push_back(MLU);
             }
 
 
