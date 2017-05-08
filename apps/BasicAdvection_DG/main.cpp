@@ -12,6 +12,9 @@ using namespace yafel;
 template<int NSD>
 struct AdvectionPhysics
 {
+    std::vector<Eigen::PartialPivLU<Eigen::MatrixXd>> inverse_mass_matrices;
+    bool mass_constructed{false};
+
     static constexpr int nsd()
     { return NSD; }
 
@@ -100,6 +103,7 @@ int main()
     int p = 2;
     int dofpn = 1;
 
+    AdvectionPhysics<NSD> AP;
 
     double Tfinal = 1;
     double dt = .001;
@@ -126,7 +130,7 @@ int main()
         std::cout << ti << " / " << NT << std::endl;
         feSystem.currentTime() = ti * dt;
 
-        DGAssembly<AdvectionPhysics<NSD>>(feSystem,
+        DGAssembly<AdvectionPhysics<NSD>>(feSystem, AP,
                                           {AssemblyRequirement::Residual,
                                            AssemblyRequirement::DtMass});
         feSystem.getSolution() += dt * feSystem.getGlobalResidual();

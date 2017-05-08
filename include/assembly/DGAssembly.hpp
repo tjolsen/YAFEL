@@ -31,6 +31,7 @@ YAFEL_NAMESPACE_OPEN
  */
 template<typename Physics>
 void DGAssembly(FESystem &feSystem,
+                Physics &physics,
                 std::vector<AssemblyRequirement> requirements = {AssemblyRequirement::Residual})
 {
 
@@ -64,6 +65,14 @@ void DGAssembly(FESystem &feSystem,
                 break;
         }
     }
+
+    if (physics.mass_constructed)
+        assemble_dt_mass = false;
+    else if (assemble_dt_mass && !physics.mass_constructed) {
+        physics.inverse_mass_matrices.reserve(dofm.nCells());
+        physics.mass_constructed = true;
+    }
+
 
 //#pragma omp parallel shared(GlobalResidual, tangent_triplets, dofm)
     {
@@ -112,7 +121,7 @@ void DGAssembly(FESystem &feSystem,
                 dofm.getGlobalDofs(el, global_dof_buffer_l);
                 auto &face_nodes = E.face_perm[fl][fr][rl_idx];
 
-                for(int fqpi=0; fqpi < E.nFQP(); ++fqpi) {
+                for (int fqpi = 0; fqpi < E.nFQP(); ++fqpi) {
                     auto nl = E.face_update<Physics::nsd()>(el, fqpi, F, dofm);
                     coordinate<> xqp;
                     double U{0};
@@ -126,8 +135,8 @@ void DGAssembly(FESystem &feSystem,
 
                     double fluxVal = Physics::BoundaryFlux(nl, xqp, time, U);
 
-                    for(int A=0; A<face_nodes.size(); ++A) {
-                        double val = E.boundaryShapeValues[fqpi](A)*fluxVal*E.jxw;
+                    for (int A = 0; A < face_nodes.size(); ++A) {
+                        double val = E.boundaryShapeValues[fqpi](A) * fluxVal * E.jxw;
                         GlobalResidual(global_dof_buffer_l[face_nodes[A]]) -= val;
                     }
 
@@ -164,7 +173,8 @@ void DGAssembly(FESystem &feSystem,
                     double Uright{0};
 
                     for (int i = 0; i < left_nodes.size(); ++i) {
-                        xqp = xqp + dofm.dof_nodes[global_dof_buffer_l[left_nodes[i]]] * EL.boundaryShapeValues[fqpi](i);
+                        xqp = xqp +
+                              dofm.dof_nodes[global_dof_buffer_l[left_nodes[i]]] * EL.boundaryShapeValues[fqpi](i);
                         Uleft += GlobalSolution(global_dof_buffer_l[left_nodes[i]]) * EL.boundaryShapeValues[fqpi](i);
                         Uright += GlobalSolution(global_dof_buffer_r[right_nodes[i]]) * ER.boundaryShapeValues[fqpi](i);
                     }
@@ -253,12 +263,14 @@ void DGAssembly(FESystem &feSystem,
                 }
                 if (assemble_dt_mass) {
                     Physics::LocalMass(E, qpi, time, local_dt_mass);
+                    Eigen::PartialPivLU<Eigen::MatrixXd> MLU(local_dt_mass);
+                    physics.inverse_mass_matrices.push_back(MLU);
                 }
             }
 
 
             //Invert local mass matrix and solve the local_residual
-            auto MLU = local_dt_mass.lu();
+            auto &MLU = physics.inverse_mass_matrices[elnum];
             local_residual = MLU.solve(local_residual);
 
             //Assemble into global
