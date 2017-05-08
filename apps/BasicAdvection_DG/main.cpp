@@ -96,6 +96,10 @@ struct AdvectionPhysics
 };
 
 
+void frame_capture() {
+
+}
+
 int main()
 {
     constexpr int NSD = 2;
