@@ -29,27 +29,30 @@ struct AdvectionPhysics
 
     }
 
-    static Tensor<NSD, 1> convection_velocity(coordinate<> x, double)
+    static inline Tensor<NSD, 1> convection_velocity(coordinate<> x, double)
     {
 
-        double omega = 3.14159;
-        coordinate<> dx = x - coordinate<>{1, 1, x(2)};
+        //double omega = 3.14159;
+        //coordinate<> dx = x - coordinate<>{1, 1, x(2)};
 
-        double r = norm(dx);
-        double theta = std::atan2(dx(1), dx(0));
+        //double r = norm(dx);
+        //double theta = std::atan2(dx(1), dx(0));
 
-        Tensor<NSD, 1> v{-r * omega * std::sin(theta), r * omega * std::cos(theta)};
-        return v;
-        //return {-1, .5};
+        //Tensor<NSD, 1> v{-r * omega * std::sin(theta), r * omega * std::cos(theta)};
+
+        //return Tensor<NSD,1>{-dx(1)/r, dx(0)/r};
+
+        //return v;
+        return {-.75, .75};
     };
 
-    static double source(const coordinate<> &, double)
+    static inline double source(const coordinate<> &, double)
     {
         return 0.0;
     }
 
     template<typename TU, typename TR>
-    static void LocalResidual(const Element &E, int qpi,
+    static inline void LocalResidual(const Element &E, int qpi,
                               coordinate<> xqp, double time,
                               Eigen::MatrixBase<TU> &U_el,
                               Eigen::MatrixBase<TR> &R_el)
@@ -87,7 +90,7 @@ struct AdvectionPhysics
         }
     }
 
-    static double Flux(Tensor<NSD, 1> n, coordinate<> x, double t, double Uplus, double Uminus)
+    static inline double Flux(Tensor<NSD, 1> n, coordinate<> x, double t, double Uplus, double Uminus)
     {
         auto vdotn = dot(n, convection_velocity(x, t));
         return 0.5 * (vdotn * (Uplus + Uminus) + std::abs(vdotn) * (Uplus - Uminus));

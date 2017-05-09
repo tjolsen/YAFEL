@@ -51,7 +51,7 @@ public:
     //Element data at a quadrature point
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> shapeGrad;
     double jxw;
-    std::vector<int> globalDofs;
+    std::vector<int> globalNodes;
 
 
     // update element values at a quadrature point
@@ -113,9 +113,12 @@ void Element::update(int elnum, int qpi, const DoFManager &dofm)
     Tensor<NSD, 2> Jacobian(0);
 
     if (NSD == elementType.topoDim) {
-        for (auto A : IRange(0, static_cast<int>(nodes.size()))) {
-            for (auto j : IRange(0, static_cast<int>(elementType.topoDim))) {
-                for (auto i : IRange(0, NSD)) {
+        //for (auto A : IRange(0, static_cast<int>(nodes.size()))) {
+        for (int A = 0; A < nodes.size(); ++A) {
+            //for (auto j : IRange(0, static_cast<int>(elementType.topoDim))) {
+            for (int j = 0; j < elementType.topoDim; ++j) {
+                //for (auto i : IRange(0, NSD)) {
+                for(int i=0; i<NSD; ++i) {
                     Jacobian(i, j) += dofm.dof_nodes[nodes[A]](i) * shapeGradXi[qpi](A, j);
                 }
             }
@@ -126,16 +129,20 @@ void Element::update(int elnum, int qpi, const DoFManager &dofm)
 
     double detJ = determinant(Jacobian);
     jxw = detJ * quadratureRule.weights[qpi];
-    Tensor<NSD, 2> Jinv = inverse(Jacobian);
+    alignas(32) Tensor<NSD, 2> JinvT = inverse(Jacobian).template perm<1,0>();
 
-    if(shapeGrad.rows() != nodes.size() || shapeGrad.cols() != NSD) {
+    if (shapeGrad.rows() != nodes.size() || shapeGrad.cols() != NSD) {
         shapeGrad.resize(nodes.size(), NSD);
     }
 
-    for (auto A : IRange(0, static_cast<int>(nodes.size()))) {
-        for (auto d : IRange(0, NSD)) {
-            double s = dot(make_TensorMap<NSD, 1>(&shapeGradXi[qpi](A, 0)), Jinv(colon(), d));
-            shapeGrad(A, d) = s;
+    //for (auto A : IRange(0, static_cast<int>(nodes.size()))) {
+    for(int A=0; A<static_cast<int>(nodes.size()); ++A) {
+        alignas(32) Tensor<NSD,1> tmpgrad = make_TensorMap<NSD, 1>(&shapeGradXi[qpi](A, 0));
+        Tensor<NSD,1> tmpgrad2 = JinvT*tmpgrad;
+        //for (auto d : IRange(0, NSD)) {
+        for(int d=0; d<NSD; ++d) {
+            //double s = dot(tmpgrad, JinvT(d,colon()));
+            shapeGrad(A, d) = tmpgrad2(d);
         }
     }
 
@@ -145,8 +152,7 @@ template<int NSD>
 Tensor<NSD, 1> Element::face_update(int elnum, int fqpi, const CellFace &F, const DoFManager &dofm)
 {
     int fTopoDim = elementType.topoDim - 1;
-    std::vector<int> nodes;
-    dofm.getGlobalNodes(elnum, nodes);
+    dofm.getGlobalNodes(elnum, globalNodes);
 
     int flocal{-1};
     int frot{-1};
@@ -160,19 +166,23 @@ Tensor<NSD, 1> Element::face_update(int elnum, int fqpi, const CellFace &F, cons
         frot = F.right_rot;
         lr_flag = 1;
     } else {
+#ifndef NDEBUG
         throw std::runtime_error("Error: Non-corresponding elnum/CellFace in Element::face_update<NSD>");
+#endif
     }
 
     auto &local_fnodes = face_perm[flocal][frot][lr_flag];
     std::vector<int> fnodes;
     fnodes.reserve(local_fnodes.size());
     for (auto fn : local_fnodes) {
-        fnodes.push_back(nodes[fn]);
+        fnodes.push_back(globalNodes[fn]);
     }
 
+#ifndef NDEBUG
     if (fTopoDim == NSD) {
         throw std::runtime_error("Error: Using elements of higher topoDim than spatial dim.");
     }
+#endif
 
     Tensor<NSD, 2> Jacobian;
     if (fTopoDim == NSD - 1) {
@@ -185,6 +195,7 @@ Tensor<NSD, 1> Element::face_update(int elnum, int fqpi, const CellFace &F, cons
             }
         }
     } else {
+#ifndef NDEBUG
         throw std::runtime_error(
                 std::string("Element::face_update: Invalid combination (NSD,fTopoDim) = (")
                 + std::to_string(NSD)
@@ -192,6 +203,7 @@ Tensor<NSD, 1> Element::face_update(int elnum, int fqpi, const CellFace &F, cons
                 + std::to_string(fTopoDim)
                 + ")"
         );
+#endif
     }
 
 
@@ -202,9 +214,6 @@ Tensor<NSD, 1> Element::face_update(int elnum, int fqpi, const CellFace &F, cons
 
     return normal;
 }
-
-template<int NSD>
-Tensor<NSD, 1> getUnscaledNormal(Tensor<NSD, 2> Jacobian);
 
 YAFEL_NAMESPACE_CLOSE
 #endif //YAFEL_ELEMENT_HPP
