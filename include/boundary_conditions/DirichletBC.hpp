@@ -50,8 +50,7 @@ private:
     const DoFManager &dofm;
     int component;
     std::vector<int> bc_nodes;
-    std::function<double(const coordinate<> &, double)>
-    value_func;
+    std::function<double(const coordinate<> &, double)> value_func;
 };
 
 

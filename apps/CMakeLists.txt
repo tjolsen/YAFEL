@@ -9,3 +9,6 @@ target_link_libraries(basicElasticity yafel)
 
 add_executable(basicAdvection BasicAdvection_DG/main.cpp)
 target_link_libraries(basicAdvection yafel)
+
+add_executable(shellProject 2081_CG_Shell/main.cpp)
+target_link_libraries(shellProject yafel)
