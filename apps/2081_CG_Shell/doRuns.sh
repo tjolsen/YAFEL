@@ -1,16 +1,27 @@
 #!/bin/bash
 
 EXEC="$(pwd)/../../cmake-build-release/apps/shellProject"
-MESH="thinPlate_"
-OUTBASE="output_"
+MESH="thinPlate"
+OUTBASE="output"
 
+p=1
+$EXEC $p "$MESH""_4.msh" "$OUTBASE"_4
+$EXEC $p "$MESH""_10.msh" "$OUTBASE"_10
+$EXEC $p "$MESH""_20.msh" "$OUTBASE"_20
+$EXEC $p "$MESH""_100.msh" "$OUTBASE"_100
 
-for p in $(echo "1 2 3 4"); do
+p=2
+$EXEC $p "$MESH""_4.msh" "$OUTBASE"_4
+$EXEC $p "$MESH""_10.msh" "$OUTBASE"_10
+$EXEC $p "$MESH""_20.msh" "$OUTBASE"_20
 
-    for N in $(echo "4 10 20 100"); do
+p=3
+$EXEC $p "$MESH""_4.msh" "$OUTBASE"_4
+$EXEC $p "$MESH""_10.msh" "$OUTBASE"_10
+$EXEC $p "$MESH""_20.msh" "$OUTBASE"_20
 
-	$EXEC $p "$MESH"$N".msh" "$OUTBASE"$N
-	
-    done
-    
-done
+p=4
+$EXEC $p "$MESH""_4.msh" "$OUTBASE"_4
+$EXEC $p "$MESH""_10.msh" "$OUTBASE"_10
+$EXEC $p "$MESH""_20.msh" "$OUTBASE"_20
+

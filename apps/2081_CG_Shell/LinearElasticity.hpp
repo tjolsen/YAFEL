@@ -43,7 +43,7 @@ struct LinearElasticity
 
         //note permuted indices in tensor functor. this is so that the "j" and "l"
         // indices are adjacent in memory, which is necessary for the later operations
-        Tensor<NSD, 4> Cikjl = make_TensorFunctor<NSD, 4, double>(
+        Tensor<NSD, 4> Cikjl = 0.5*make_TensorFunctor<NSD, 4, double>(
                 [](int i, int k, int j, int l) {
                     auto lambda = LinearElasticity<NSD>::lambda;
                     auto mu = LinearElasticity<NSD>::mu;
@@ -72,7 +72,6 @@ struct LinearElasticity
                 for (int Bnode = Anode + 1; Bnode < nNodes; ++Bnode) {
                     auto grad_Bl = make_TensorMap<NSD, 1>(&E.shapeGrad(Bnode, 0));
                     auto tmp = otimes(grad_Aj, grad_Bl).eval();
-                    //for (auto k : IRange(0, NSD)) {
                     for (int k = 0; k < NSD; ++k) {
                         K_el(A, B) -= dot(Cikjl(i, k, colon(), colon()).eval(), tmp) * E.jxw;
                         K_el(B, A) = K_el(A, B);
