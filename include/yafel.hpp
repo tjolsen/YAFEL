@@ -17,10 +17,8 @@
 
 
 // Utils
-#include "utils/old_DirBC.hpp"
 #include "utils/DoFManager.hpp"
 #include "utils/DualNumber.hpp"
-#include "utils/ElementType.hpp"
 #include "quadrature/QuadratureRule.hpp"
 #include "utils/SpatialFunction.hpp"
 
@@ -36,14 +34,7 @@
 #include "element/ShapeFunctionUtils.hpp"
 
 // Output
-#include "output/VTKObject.hpp"
-#include "output/VTKOutput.hpp"
-#include "output/VTKScalarData.hpp"
-#include "output/VTKVectorData.hpp"
-#include "output/VTKTensorData.hpp"
-#include "output/VTKMesh.hpp"
-#include "output/VTKDGMesh.hpp"
-#include "output/VTKTimeOutput.hpp"
-#include "output/MatrixVisualization.hpp"
+#include "output/SimulationOutput.hpp"
+//#include "output/MatrixVisualization.hpp"
 
 #endif

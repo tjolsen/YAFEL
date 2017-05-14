@@ -66,7 +66,7 @@ int main(int argc, char **argv)
     int dofpn = NSD;
     std::string mesh_fname("thinPlate_4.msh");
     std::string output_fname("output_4");
-    int polyOrder = 4;
+    int polyOrder = 2;
     if (argc >= 4) {
         polyOrder = atoi(argv[1]);
         mesh_fname = argv[2];

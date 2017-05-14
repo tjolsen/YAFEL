@@ -1,9 +1,0 @@
-prefix=$YAFELDIR
-includedir=${prefix}/include/
-libdir=${prefix}/lib/
-
-Name: yafel
-Description: Yet Another Finite Element Library
-Version: 0.1
-CXXflags: -I${includedir} -O3 -march=native
-Libs: -L${libdir} -lyafel

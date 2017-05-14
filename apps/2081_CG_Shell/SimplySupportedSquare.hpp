@@ -32,8 +32,6 @@ auto SimplySupportedSquare(const DoFManager &dofm, double L = 1.0)
             }
         }
     }
-
-
     return bcs;
 }
 

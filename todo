@@ -1,5 +1,0 @@
-mesh:
-	Mesh generation functions. make {1,2,3}-D rectillinear meshes without gmsh.
-	Include options to have boundary elements included to facilitate BC application.
-
-documentation: all
