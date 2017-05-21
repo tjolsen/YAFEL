@@ -28,6 +28,9 @@ public:
 
     void getGlobalNodes(int elnum, std::vector<int> &container) const;
 
+    //void getGlobalFaceDofs(int elnum, std::vector<int> &container) const;
+    //void getGlobalFaceNodes(int elnum, std::vector<int> &container) const;
+
     ElementType CellType_to_ElementType(CellType ct, int polyOrder) const;
 
     inline int nCells() const { return static_cast<int>(element_types.size()); }
@@ -40,7 +43,12 @@ public:
     std::vector<int> elements;
     std::vector<ElementType> element_types;
     std::vector<int> cell_region_idx;
+
     std::vector<CellFace> interior_faces;
+    std::vector<int> face_offsets;
+    std::vector<int> face_left_local_nodes;
+    std::vector<int> face_right_local_nodes;
+
 
     std::vector<int> mesh_corner_idxs;
     std::vector<int> mesh_corner_offsets;
@@ -49,7 +57,7 @@ private:
 
     void make_dg_dofs(const Mesh &M);
 
-    int make_raw_dofs(const Mesh &M);
+    int make_raw_dofs(const Mesh &M, bool match_face_dofs = false);
 
     coordinate<> interpolate_from_corners(coordinate<> xlocal,
                                           const std::vector<coordinate<>> &corners,

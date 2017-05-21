@@ -119,7 +119,7 @@ void DoFManager::make_dg_dofs(const Mesh &M)
 }
 
 
-int DoFManager::make_raw_dofs(const Mesh &M)
+int DoFManager::make_raw_dofs(const Mesh &M, bool match_face_dofs)
 {
 
     int ncells = M.nCells();

@@ -11,7 +11,7 @@ include_directories(${HDF5_INCLUDE_DIRS})
 
 
 set(OPT_FLAGS
-        "-march=native -mtune=native -ffast-math -fopenmp -finline-limit=1000000")
+        "-mtune=native -malign-data=cacheline -ffast-math -fopenmp -finline-limit=1000000")
 
 set(VIENNACL_CXX_FLAGS "-DVIENNACL_WITH_OPENCL")
 set(CMAKE_CXX_STANDARD 14)
@@ -86,7 +86,6 @@ set(SOURCE_FILES
 
         include/utils/BasicTimer.hpp
         include/utils/ConcurrentQueue.hpp
-        include/utils/old_DirBC.hpp
         include/utils/DoFManager.hpp
         include/utils/DualNumber.hpp
         include/utils/ElementVtkType.hpp

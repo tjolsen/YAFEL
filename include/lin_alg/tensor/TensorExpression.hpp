@@ -85,6 +85,9 @@ public:
 
     TE &self() { return static_cast<TE &>(*this); }
 
+    // Return a non-assignable const reference
+    auto const& asConst() const { return static_cast<TensorExpression<TE,D,R,dataType,false> const&>(*this);}
+
     // Evaluate the current expression into a Tensor<D,R,dataType>
     auto eval() const noexcept
     {
@@ -305,7 +308,7 @@ template<template<typename, int, int, typename, bool, typename> class TE, typena
         int R, typename dt, bool b, typename enabled, int ...IDX_PERM>
 auto const_permute(const TE<T, D, R, dt, b, enabled> &te, sequence<IDX_PERM...>)
 {
-    return TensorPermutation<T, D, R, dt, b, IDX_PERM...>(te, sequence<IDX_PERM...>());
+    return TensorPermutation<T, D, R, dt, false, IDX_PERM...>(te.asConst(), sequence<IDX_PERM...>());
 }
 
 YAFEL_NAMESPACE_CLOSE

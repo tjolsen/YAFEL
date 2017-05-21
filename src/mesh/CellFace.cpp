@@ -24,16 +24,16 @@ CellFace CellFace::canonicalCellFace(CellType ct, int localFnum)
             ret.n_nodes = 3;
             switch (localFnum) {
                 case 0:
-                    ret.nodes = {{1, 3, 2}};
+                    ret.nodes = {{1, 2, 3}};
                     break;
                 case 1:
-                    ret.nodes = {{0, 2, 3}};
+                    ret.nodes = {{0, 3, 2}};
                     break;
                 case 2:
-                    ret.nodes = {{0, 3, 1}};
+                    ret.nodes = {{0, 1, 3}};
                     break;
                 case 3:
-                    ret.nodes = {{0, 1, 2}};
+                    ret.nodes = {{0, 2, 1}};
                     break;
                 default:
                     break; //bad news bears if you got here
@@ -44,19 +44,19 @@ CellFace CellFace::canonicalCellFace(CellType ct, int localFnum)
             ret.n_nodes = 4;
             switch (localFnum) {
                 case 0:
-                    ret.nodes = {{0, 3, 7, 4}};
+                    ret.nodes = {{0, 4, 7, 3}};
                     break;
                 case 1:
-                    ret.nodes = {{1, 5, 6, 2}};
+                    ret.nodes = {{1, 2, 6, 5}};
                     break;
                 case 2:
-                    ret.nodes = {{0, 4, 5, 1}};
+                    ret.nodes = {{0, 1, 5, 4}};
                     break;
                 case 3:
-                    ret.nodes = {{3, 2, 6, 7}};
+                    ret.nodes = {{2, 3, 7, 6}};
                     break;
                 case 4:
-                    ret.nodes = {{0, 1, 2, 3}};
+                    ret.nodes = {{0, 3, 2, 1}};
                     break;
                 case 5:
                     ret.nodes = {{5, 4, 7, 6}};

@@ -84,7 +84,7 @@ Tensor<D, 2, dt> skw(const TensorExpression<TE, D, 2, dt, b> &te)
 template<typename T1, typename T2, int D, int R, typename dt1, typename dt2, bool b1, bool b2,
         typename=typename std::enable_if<R == 1 || R == 2>::type>
 inline auto operator*(const TensorExpression<T1, D, 2, dt1, b1> &lhs,
-               const TensorExpression<T2, D, R, dt2, b2> &rhs)
+                      const TensorExpression<T2, D, R, dt2, b2> &rhs)
 {
     return contract<1>(lhs, rhs);
 }
@@ -158,7 +158,20 @@ inline Tensor<3, 2, dt> inverse(const Tensor<3, 2, dt> &A)
     Ainv(2, 2) = (A(0, 0) * A(1, 1) - A(0, 1) * A(1, 0)) * detAinv;
 
     return Ainv;
-};
+}
+
+/**
+ * Transpose a rank-2 tensor. In practice, the compiler
+ * generates far superior code when "eval()" is called
+ * after the perm<1,0>(). For this reason, it is put here
+ * in the low-level code rather than leaving it to the user.
+ * @return A^T
+ */
+template<int D, int R, typename dt>
+Tensor<D,2,dt> transpose(Tensor<D,R,dt> &A)
+{
+    return (A.template perm<1, 0>()).eval();
+}
 
 YAFEL_NAMESPACE_CLOSE
 
