@@ -46,7 +46,7 @@ public:
 
 
     // Permutation arrays for face nodes
-    std::vector<std::vector<std::vector<std::vector<int>>>> face_perm;
+    //std::vector<std::vector<std::vector<std::vector<int>>>> face_perm;
     std::vector<std::vector<int>> face_nodes;
 
     //Element data at a quadrature point
@@ -150,7 +150,7 @@ void Element::update(int elnum, int qpi, const DoFManager &dofm)
     }
 
 }
-
+/*
 template<int NSD>
 Tensor<NSD, 1> Element::face_update(int elnum, int fqpi, const CellFace &F, const DoFManager &dofm)
 {
@@ -217,6 +217,6 @@ Tensor<NSD, 1> Element::face_update(int elnum, int fqpi, const CellFace &F, cons
 
     return normal;
 }
-
+*/
 YAFEL_NAMESPACE_CLOSE
 #endif //YAFEL_ELEMENT_HPP

@@ -7,10 +7,11 @@
 
 YAFEL_NAMESPACE_OPEN
 
-std::vector<int> match_face_nodes(const Mesh &elementMesh,
-                                  const std::vector<coordinate<>> &boundary_face_coords,
-                                  std::function<bool(coordinate<>)> isBoundary,
-                                  std::function<coordinate<>(coordinate<>)> faceCoordMapping)
+static std::vector<int> match_face_nodes(
+        const Mesh &elementMesh,
+        const std::vector<coordinate<>> &boundary_face_coords,
+        std::function<bool(coordinate<>)> &isBoundary,
+        std::function<coordinate<>(coordinate<>)> &faceCoordMapping)
 {
 
     std::vector<int> boundary_nodes;
@@ -55,9 +56,9 @@ void Element::build_element_faces()
         boundary_functions.emplace_back([](coordinate<> x) { return std::abs(x(0) + x(1) - 1) < 1.0e-6; });
         boundary_functions.emplace_back([](coordinate<> x) { return std::abs(x(0)) < 1.0e-6; });
 
-        boundary_mappings.emplace_back([](coordinate<> x) { return coordinate<>{2*x(0) - 1, 0, 0}; });
-        boundary_mappings.emplace_back([](coordinate<> x) { return coordinate<>{2*x(1) - 1, 0, 0}; });
-        boundary_mappings.emplace_back([](coordinate<> x) { return coordinate<>{2*(1 - x(1)) - 1, 0}; });
+        boundary_mappings.emplace_back([](coordinate<> x) { return coordinate<>{2 * x(0) - 1, 0, 0}; });
+        boundary_mappings.emplace_back([](coordinate<> x) { return coordinate<>{2 * x(1) - 1, 0, 0}; });
+        boundary_mappings.emplace_back([](coordinate<> x) { return coordinate<>{2 * (1 - x(1)) - 1, 0}; });
 
     } else if (elementType.elementTopology == ElementTopology::Simplex && elementType.topoDim == 3) {
 

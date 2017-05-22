@@ -132,7 +132,7 @@ void Element::make_simplex()
                                     shapeValues,
                                     shapeGradXi);
 
-        triangle_shape_functions(localMesh.getGeometryNodes(),
+        triangle_shape_functions(boundaryNodes,
                                  boundaryQuadratureRule.nodes,
                                  elementType.polyOrder,
                                  boundaryShapeValues,

@@ -116,10 +116,12 @@ void DoFManager::make_dg_dofs(const Mesh &M)
     //make a raw mesh
     make_raw_dofs(M);
 
+    //Match nodes on mesh faces
+    match_face_nodes();
 }
 
 
-int DoFManager::make_raw_dofs(const Mesh &M, bool match_face_dofs)
+int DoFManager::make_raw_dofs(const Mesh &M)
 {
 
     int ncells = M.nCells();
@@ -172,6 +174,71 @@ int DoFManager::make_raw_dofs(const Mesh &M, bool match_face_dofs)
     element_offsets[ncells] = offset;
 
     return max_td;
+}
+
+void DoFManager::match_face_nodes()
+{
+
+    int nFaces = interior_faces.size();
+    std::vector<int> left_global_nodes;
+    std::vector<int> right_global_nodes;
+
+    ElementFactory EF(1);
+
+
+    for (int f = 0; f < nFaces; ++f) {
+        face_offsets.push_back(face_left_local_nodes.size());
+        auto &F = interior_faces[f];
+        int left_elem = F.left;
+        int left_flocal = F.left_flocal;
+
+        int right_elem = F.right;
+        int right_flocal = F.right_flocal;
+
+        if (left_elem < 0) {
+            auto &ER = EF.getElement(element_types[right_elem]);
+            for (auto nr : ER.face_nodes[right_flocal]) {
+                face_left_local_nodes.push_back(-1);
+                face_right_local_nodes.push_back(nr);
+            }
+            continue;
+
+        } else if (right_elem < 0) {
+            auto &EL = EF.getElement(element_types[left_elem]);
+            for (auto nl : EL.face_nodes[left_flocal]) {
+                face_left_local_nodes.push_back(nl);
+                face_right_local_nodes.push_back(-1);
+            }
+            continue;
+        }
+
+
+        getGlobalNodes(left_elem, left_global_nodes);
+        getGlobalNodes(right_elem, right_global_nodes);
+
+        auto &EL = EF.getElement(element_types[left_elem]);
+        auto &ER = EF.getElement(element_types[right_elem]);
+
+        auto &left_local_nodes = EL.face_nodes[left_flocal];
+        auto &right_local_nodes = ER.face_nodes[right_flocal];
+
+
+        for (auto nl : left_local_nodes) {
+            face_left_local_nodes.push_back(nl);
+            auto &xl = dof_nodes[left_global_nodes[nl]];
+
+            for (auto nr : right_local_nodes) {
+                auto &xr = dof_nodes[right_global_nodes[nr]];
+                if (norm(xl - xr) < 1.0e-6) {
+                    face_right_local_nodes.push_back(nr);
+                    break;
+                }
+            }
+        }
+
+    }
+    face_offsets.push_back(face_left_local_nodes.size());
+
 }
 
 coordinate<> DoFManager::interpolate_from_corners(coordinate<> xlocal,

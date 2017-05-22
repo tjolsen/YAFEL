@@ -104,8 +104,8 @@ set(SOURCE_FILES
         src/element/ElementFactory.cpp
         src/element/ShapeFunctionUtils.cpp
         src/element/element_boundary.cpp
-        src/element/build_tet_faces.cpp
-        src/element/build_topodim2_faces.cpp
+        #src/element/build_tet_faces.cpp
+        #src/element/build_topodim2_faces.cpp
         src/element/make_tensorproduct_element.cpp
         src/element/make_simplex_element.cpp
 
@@ -126,7 +126,7 @@ set(SOURCE_FILES
         src/quadrature/TriangleQuadratureRules.cpp
         src/quadrature/TetrahedronQuadratureRules.cpp
 
-        src/time_integration/DGRK4.cpp
+        #src/time_integration/DGRK4.cpp
 
         src/utils/DoFManager.cpp
         )

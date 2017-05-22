@@ -6,6 +6,7 @@
 #include "lin_alg/tensor/tensors.hpp"
 #include "utils/DualNumber.hpp"
 #include <element/ElementFactory.hpp>
+#include "utils/DoFManager.hpp"
 
 #include <eigen3/Eigen/IterativeLinearSolvers>
 #include <iostream>
@@ -19,17 +20,18 @@ using std::endl;
 int main()
 {
 
-    ElementFactory EF(1);
-    ElementType et(ElementTopology::Simplex,3,1);
+    Mesh M("twoQuads.msh");
+    M.buildInternalFaces();
+    DoFManager dofm(M,DoFManager::ManagerType::DG,1);
 
-    auto &E = EF.getElement(et);
 
-    for(auto &FN : E.face_nodes) {
-        for(auto n : FN) {
-            cout << n << "  ";
-        }
-        cout << endl;
+    for(auto &F : dofm.interior_faces) {
+
+
+
     }
+
+
     return 0;
 }
 

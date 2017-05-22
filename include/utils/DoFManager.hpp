@@ -57,7 +57,9 @@ private:
 
     void make_dg_dofs(const Mesh &M);
 
-    int make_raw_dofs(const Mesh &M, bool match_face_dofs = false);
+    int make_raw_dofs(const Mesh &M);
+
+    void match_face_nodes();
 
     coordinate<> interpolate_from_corners(coordinate<> xlocal,
                                           const std::vector<coordinate<>> &corners,
