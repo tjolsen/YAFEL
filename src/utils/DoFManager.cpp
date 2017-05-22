@@ -64,6 +64,45 @@ void DoFManager::getGlobalNodes(int elnum, std::vector<int> &container) const
     }
 }
 
+void DoFManager::getGlobalFaceNodes(int fnum, std::vector<int> &container) const
+{
+    int ndofs = face_offsets[fnum+1] - face_offsets[fnum];
+    container.clear();
+    container.reserve(ndofs);
+
+    for(auto idx : IRange(face_offsets[fnum], face_offsets[fnum+1])) {
+        container.push_back(idx);
+    }
+}
+
+void DoFManager::getGlobalFaceDofs(int fnum, std::vector<int> &container) const
+{
+
+    int ndofs = dof_per_node * (face_offsets[fnum+1] - face_offsets[fnum]);
+    container.clear();
+    container.reserve(ndofs);
+
+    for(auto idx : IRange(face_offsets[fnum], face_offsets[fnum+1])) {
+        for(auto dof : IRange(0,dof_per_node)) {
+            container.push_back(dof_per_node*idx + dof);
+        }
+    }
+}
+
+void DoFManager::getLocalFaceNodes(
+        int fnum,
+        std::vector<int> &container,
+        const std::vector<int> &source_container) const
+{
+    int ndofs = face_offsets[fnum+1] - face_offsets[fnum];
+    container.clear();
+    container.reserve(ndofs);
+
+    for(auto idx : IRange(face_offsets[fnum], face_offsets[fnum+1])) {
+        container.push_back(source_container[idx]);
+    }
+}
+
 
 ElementType DoFManager::CellType_to_ElementType(CellType ct, int polyOrder) const
 {

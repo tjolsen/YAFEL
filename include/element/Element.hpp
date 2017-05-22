@@ -61,9 +61,11 @@ public:
 
     // update element values at a face quadrature
     // Returns the surface normal vector at that point
-    template<int NSD>
-    Tensor<NSD, 1> face_update(int elnum, int fqpi, const CellFace &F, const DoFManager &dofm);
+    //template<int NSD>
+    //Tensor<NSD, 1> face_update(int elnum, int fqpi, const CellFace &F, const DoFManager &dofm);
 
+    template<int NSD>
+    Tensor<NSD, 1> face_update(int elnum, int fqpi, const std::vector<int> &local_fnodes, const DoFManager &dofm);
 
     // useful getters for an element
     inline int dofPerNode() const { return dof_per_node; }
@@ -86,11 +88,11 @@ private:
 
     void build_element_faces();
 
-    void build_tet_faces();
+    //void build_tet_faces();
 
-    void build_tri_faces();
+    //void build_tri_faces();
 
-    void build_quad_faces();
+    //void build_quad_faces();
 
     inline Tensor<3, 1> getUnscaledNormal(Tensor<3, 2> Jacobian)
     {
@@ -109,20 +111,16 @@ private:
 template<int NSD>
 void Element::update(int elnum, int qpi, const DoFManager &dofm)
 {
-
-    std::vector<int> nodes;
-    dofm.getGlobalNodes(elnum, nodes);
+    dofm.getGlobalNodes(elnum, globalNodes);
 
     Tensor<NSD, 2> Jacobian(0);
 
     if (NSD == elementType.topoDim) {
-        //for (auto A : IRange(0, static_cast<int>(nodes.size()))) {
-        for (int A = 0; A < nodes.size(); ++A) {
-            //for (auto j : IRange(0, static_cast<int>(elementType.topoDim))) {
+        for (int A = 0; A < globalNodes.size(); ++A) {
+            auto x = dofm.dof_nodes[globalNodes[A]];
             for (int j = 0; j < elementType.topoDim; ++j) {
-                //for (auto i : IRange(0, NSD)) {
                 for(int i=0; i<NSD; ++i) {
-                    Jacobian(i, j) += dofm.dof_nodes[nodes[A]](i) * shapeGradXi[qpi](A, j);
+                    Jacobian(i, j) += x(i) * shapeGradXi[qpi](A, j);
                 }
             }
         }
@@ -134,12 +132,12 @@ void Element::update(int elnum, int qpi, const DoFManager &dofm)
     jxw = detJ * quadratureRule.weights[qpi];
     alignas(32) Tensor<NSD, 2> JinvT = inverse(Jacobian).template perm<1,0>();
 
-    if (shapeGrad.rows() != nodes.size() || shapeGrad.cols() != NSD) {
-        shapeGrad.resize(nodes.size(), NSD);
+    if (shapeGrad.rows() != globalNodes.size() || shapeGrad.cols() != NSD) {
+        shapeGrad.resize(globalNodes.size(), NSD);
     }
 
     //for (auto A : IRange(0, static_cast<int>(nodes.size()))) {
-    for(int A=0; A<static_cast<int>(nodes.size()); ++A) {
+    for(int A=0; A<static_cast<int>(globalNodes.size()); ++A) {
         alignas(32) Tensor<NSD,1> tmpgrad = make_TensorMap<NSD, 1>(&shapeGradXi[qpi](A, 0));
         Tensor<NSD,1> tmpgrad2 = JinvT*tmpgrad;
         //for (auto d : IRange(0, NSD)) {
@@ -150,13 +148,13 @@ void Element::update(int elnum, int qpi, const DoFManager &dofm)
     }
 
 }
-/*
+
 template<int NSD>
-Tensor<NSD, 1> Element::face_update(int elnum, int fqpi, const CellFace &F, const DoFManager &dofm)
+Tensor<NSD, 1> Element::face_update(int elnum, int fqpi, const std::vector<int> &local_fnodes, const DoFManager &dofm)
 {
     int fTopoDim = elementType.topoDim - 1;
     dofm.getGlobalNodes(elnum, globalNodes);
-
+    /*
     int flocal{-1};
     int frot{-1};
     int lr_flag{-1};
@@ -164,6 +162,7 @@ Tensor<NSD, 1> Element::face_update(int elnum, int fqpi, const CellFace &F, cons
         flocal = F.left_flocal;
         frot = F.left_rot;
         lr_flag = 0;
+
     } else if (F.right == elnum) {
         flocal = F.right_flocal;
         frot = F.right_rot;
@@ -172,9 +171,9 @@ Tensor<NSD, 1> Element::face_update(int elnum, int fqpi, const CellFace &F, cons
 #ifndef NDEBUG
         throw std::runtime_error("Error: Non-corresponding elnum/CellFace in Element::face_update<NSD>");
 #endif
-    }
+    }*/
 
-    auto &local_fnodes = face_perm[flocal][frot][lr_flag];
+    // auto &local_fnodes = face_perm[flocal][frot][lr_flag];
     std::vector<int> fnodes;
     fnodes.reserve(local_fnodes.size());
     for (auto fn : local_fnodes) {
@@ -217,6 +216,6 @@ Tensor<NSD, 1> Element::face_update(int elnum, int fqpi, const CellFace &F, cons
 
     return normal;
 }
-*/
+
 YAFEL_NAMESPACE_CLOSE
 #endif //YAFEL_ELEMENT_HPP

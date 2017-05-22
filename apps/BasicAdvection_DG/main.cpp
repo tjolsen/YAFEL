@@ -43,7 +43,7 @@ struct AdvectionPhysics
         //return Tensor<NSD,1>{-dx(1)/r, dx(0)/r};
 
         //return v;
-        return {-.75, .75};
+        return {-1., 0.};
     };
 
     static inline double source(const coordinate<> &, double)
@@ -86,7 +86,7 @@ struct AdvectionPhysics
         if (vdotn > 0) {
             return vdotn * U;
         } else {
-            return vdotn * U;
+            return 0*vdotn * U;
         }
     }
 

@@ -126,7 +126,7 @@ set(SOURCE_FILES
         src/quadrature/TriangleQuadratureRules.cpp
         src/quadrature/TetrahedronQuadratureRules.cpp
 
-        #src/time_integration/DGRK4.cpp
+        src/time_integration/DGRK4.cpp
 
         src/utils/DoFManager.cpp
         )
