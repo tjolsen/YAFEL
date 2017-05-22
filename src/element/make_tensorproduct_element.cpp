@@ -142,13 +142,6 @@ void Element::make_tensorProduct()
                                    boundaryShapeValues,
                                    boundaryShapeGradXi);
 
-    if (elementType.topoDim == 2) {
-        build_quad_faces();
-
-    }
-    if (elementType.topoDim == 3) {
-        //build_hex_faces();
-    }
 }
 
 

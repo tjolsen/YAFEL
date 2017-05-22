@@ -25,6 +25,8 @@ Element::Element(ElementType et, int dofpn)
             //null element. used for points/unsupported types
             break;
     }
+
+    build_element_faces();
 }
 
 

@@ -15,7 +15,7 @@ set(OPT_FLAGS
 
 set(VIENNACL_CXX_FLAGS "-DVIENNACL_WITH_OPENCL")
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${VIENNACL_CXX_FLAGS} -O3 -Wall -DNDEBUG -DEIGEN_DEFAULT_INDEX_TYPE=int ${OPT_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${VIENNACL_CXX_FLAGS} -O3 -Wall -Wno-sign-compare -DNDEBUG -DEIGEN_DEFAULT_INDEX_TYPE=int ${OPT_FLAGS}")
 
 set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra")
 
@@ -103,6 +103,7 @@ set(SOURCE_FILES
         src/element/Element.cpp
         src/element/ElementFactory.cpp
         src/element/ShapeFunctionUtils.cpp
+        src/element/element_boundary.cpp
         src/element/build_tet_faces.cpp
         src/element/build_topodim2_faces.cpp
         src/element/make_tensorproduct_element.cpp

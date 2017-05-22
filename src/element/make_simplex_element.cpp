@@ -125,7 +125,6 @@ void Element::make_simplex()
                                        boundaryShapeValues,
                                        boundaryShapeGradXi);
 
-        build_tri_faces();
     } else if (elementType.topoDim == 3) {
         tetrahedron_shape_functions(localMesh.getGeometryNodes(),
                                     quadratureRule.nodes,
@@ -139,7 +138,6 @@ void Element::make_simplex()
                                  boundaryShapeValues,
                                  boundaryShapeGradXi);
 
-        //build_tet_faces();
     }
 }
 

@@ -47,6 +47,7 @@ public:
 
     // Permutation arrays for face nodes
     std::vector<std::vector<std::vector<std::vector<int>>>> face_perm;
+    std::vector<std::vector<int>> face_nodes;
 
     //Element data at a quadrature point
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> shapeGrad;
@@ -81,13 +82,15 @@ public:
 private:
     void make_simplex();
 
+    void make_tensorProduct();
+
+    void build_element_faces();
+
     void build_tet_faces();
 
     void build_tri_faces();
 
     void build_quad_faces();
-
-    void make_tensorProduct();
 
     inline Tensor<3, 1> getUnscaledNormal(Tensor<3, 2> Jacobian)
     {

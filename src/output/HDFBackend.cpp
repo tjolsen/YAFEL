@@ -271,6 +271,7 @@ int ElementType_to_XDMFType(ElementType et)
             return 1;
     }
 
+    return -1;
 }
 
 YAFEL_NAMESPACE_CLOSE

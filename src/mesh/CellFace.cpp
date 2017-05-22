@@ -59,7 +59,7 @@ CellFace CellFace::canonicalCellFace(CellType ct, int localFnum)
                     ret.nodes = {{0, 3, 2, 1}};
                     break;
                 case 5:
-                    ret.nodes = {{5, 4, 7, 6}};
+                    ret.nodes = {{4, 5, 6, 7}};
                     break;
                 default:
                     break; //bad news...
