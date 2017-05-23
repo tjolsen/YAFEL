@@ -106,38 +106,24 @@ void DGAssembly(FESystem &feSystem,
                 auto &F = dofm.interior_faces[fi];
                 if (F.left < 0 || F.right < 0) {
                     int el{-1};
-                    int fl{-1};
-                    int fr{-1};
-                    int rl_idx{-1};
                     if (F.left >= 0) {
                         el = F.left;
-                        //fl = F.left_flocal;
-                        //fr = F.left_rot;
-                        //rl_idx = 0;
                         dofm.getLeftFaceNodes(fi,face_nodes);
                     } else {
                         el = F.right;
-                        //fl = F.right_flocal;
-                        //fr = F.right_rot;
-                        //rl_idx = 1;
                         dofm.getRightFaceNodes(fi,face_nodes);
                     }
 
                     auto &E = EF_L.getElement(dofm.element_types[el]);
                     dofm.getGlobalDofs(el, global_dof_buffer_l);
-                    //auto &face_nodes = E.face_perm[fl][fr][rl_idx];
 
                     for (int fqpi = 0; fqpi < E.nFQP(); ++fqpi) {
-                        //auto nl = E.face_update<Physics::nsd()>(el, fqpi, F, dofm);
                         auto nl = E.face_update<Physics::nsd()>(el, fqpi, face_nodes, dofm);
                         coordinate<> xqp;
                         double U{0};
                         for (int i = 0; i < face_nodes.size(); ++i) {
                             xqp += dofm.dof_nodes[global_dof_buffer_l[face_nodes[i]]] * E.boundaryShapeValues[fqpi](i);
                             U += GlobalSolution(global_dof_buffer_l[face_nodes[i]]) * E.boundaryShapeValues[fqpi](i);
-                        }
-                        if (rl_idx == 1) {
-                            //nl = -nl;
                         }
 
                         double fluxVal = Physics::BoundaryFlux(nl, xqp, time, U);
@@ -152,12 +138,7 @@ void DGAssembly(FESystem &feSystem,
                 } else {
 
                     int e_left = F.left;
-                    int fl_l = F.left_flocal;
-                    //int fr_l = F.left_rot;
-
                     int e_right = F.right;
-                    int fl_r = F.right_flocal;
-                    //int fr_r = F.right_rot;
 
                     dofm.getGlobalDofs(e_left, global_dof_buffer_l);
                     dofm.getGlobalDofs(e_right, global_dof_buffer_r);
@@ -165,8 +146,6 @@ void DGAssembly(FESystem &feSystem,
                     auto &EL = EF_L.getElement(dofm.element_types[e_left]);
                     auto &ER = EF_R.getElement(dofm.element_types[e_right]);
 
-                    //auto &left_nodes = EL.face_perm[fl_l][fr_l][0];
-                    //auto &right_nodes = EL.face_perm[fl_r][fr_r][1];
 
                     dofm.getLeftFaceNodes(fi,left_local_nodes);
                     dofm.getRightFaceNodes(fi,right_local_nodes);
@@ -175,8 +154,6 @@ void DGAssembly(FESystem &feSystem,
                     Eigen::VectorXd R_r = Eigen::VectorXd::Constant(right_local_nodes.size(), 0.0);
 
                     for (int fqpi = 0; fqpi < EL.nFQP(); ++fqpi) {
-                        //auto nl = EL.face_update<Physics::nsd()>(e_left, fqpi, F, dofm);
-                        //auto nr = ER.face_update<Physics::nsd()>(e_right, fqpi, F, dofm);
                         auto nl = EL.face_update<Physics::nsd()>(e_left, fqpi, left_local_nodes, dofm);
                         auto nr = ER.face_update<Physics::nsd()>(e_right, fqpi, right_local_nodes, dofm);
 

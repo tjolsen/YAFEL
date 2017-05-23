@@ -11,7 +11,7 @@ include_directories(${HDF5_INCLUDE_DIRS})
 
 
 set(OPT_FLAGS
-        "-mtune=native -malign-data=cacheline -ffast-math -fopenmp -finline-limit=1000000")
+        "-march=native -malign-data=cacheline -ffast-math -fopenmp -finline-limit=1000000")
 
 set(VIENNACL_CXX_FLAGS "-DVIENNACL_WITH_OPENCL")
 set(CMAKE_CXX_STANDARD 14)

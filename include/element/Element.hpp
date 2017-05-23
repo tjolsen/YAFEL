@@ -118,8 +118,8 @@ void Element::update(int elnum, int qpi, const DoFManager &dofm)
     if (NSD == elementType.topoDim) {
         for (int A = 0; A < globalNodes.size(); ++A) {
             auto x = dofm.dof_nodes[globalNodes[A]];
-            for (int j = 0; j < elementType.topoDim; ++j) {
-                for(int i=0; i<NSD; ++i) {
+            for(int i=0; i<NSD; ++i) {
+                for (int j = 0; j < NSD; ++j) {
                     Jacobian(i, j) += x(i) * shapeGradXi[qpi](A, j);
                 }
             }
@@ -154,24 +154,6 @@ Tensor<NSD, 1> Element::face_update(int elnum, int fqpi, const std::vector<int> 
 {
     int fTopoDim = elementType.topoDim - 1;
     dofm.getGlobalNodes(elnum, globalNodes);
-    /*
-    int flocal{-1};
-    int frot{-1};
-    int lr_flag{-1};
-    if (F.left == elnum) {
-        flocal = F.left_flocal;
-        frot = F.left_rot;
-        lr_flag = 0;
-
-    } else if (F.right == elnum) {
-        flocal = F.right_flocal;
-        frot = F.right_rot;
-        lr_flag = 1;
-    } else {
-#ifndef NDEBUG
-        throw std::runtime_error("Error: Non-corresponding elnum/CellFace in Element::face_update<NSD>");
-#endif
-    }*/
 
     // auto &local_fnodes = face_perm[flocal][frot][lr_flag];
     std::vector<int> fnodes;
@@ -191,7 +173,7 @@ Tensor<NSD, 1> Element::face_update(int elnum, int fqpi, const std::vector<int> 
         //only going to use the first topoDim-1 columns of Jacobian
         for (int A = 0; A < fnodes.size(); ++A) {
             for (int i = 0; i < NSD; ++i) {
-                for (int j = 0; j < fTopoDim; ++j) {
+                for (int j = 0; j < NSD-1; ++j) {
                     Jacobian(i, j) += dofm.dof_nodes[fnodes[A]](i) * boundaryShapeGradXi[fqpi](A, j);
                 }
             }
