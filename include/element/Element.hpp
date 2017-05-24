@@ -88,12 +88,6 @@ private:
 
     void build_element_faces();
 
-    //void build_tet_faces();
-
-    //void build_tri_faces();
-
-    //void build_quad_faces();
-
     inline Tensor<3, 1> getUnscaledNormal(Tensor<3, 2> Jacobian)
     {
         return cross(Jacobian(colon(), 0), Jacobian(colon(), 1));

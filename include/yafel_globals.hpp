@@ -1,5 +1,5 @@
-#ifndef _YAFEL_GLOBALS_HPP
-#define _YAFEL_GLOBALS_HPP
+#ifndef YAFEL_GLOBALS_HPP
+#define YAFEL_GLOBALS_HPP
 
 #include<cstddef>
 
@@ -20,4 +20,4 @@ using size_type = int;
 
 } // end namespace yafel
 
-#endif // end #ifndef _YAFEL_GLOBAL_HPP
+#endif // end #ifndef YAFEL_GLOBALS_HPP

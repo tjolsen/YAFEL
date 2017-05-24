@@ -24,7 +24,7 @@ int main()
     M.buildInternalFaces();
 
     int p = 5; // set polynomial interpolation order ( p <= 5 for now if using triangle elements )
-    DoFManager dofm(M, DoFManager::ManagerType::CG, p);
+    DoFManager dofm(M, DoFManager::ManagerType::DG, p);
     double area{0};
 
     ElementFactory EF(1);
@@ -42,6 +42,7 @@ int main()
 
     // Surface area (i.e. perimeter) calculation
     double Perimeter{0};
+    std::vector<int> local_fnodes;
     for (int fi = 0; fi < M.getInternalFaces().size(); ++fi) {
         auto F = M.getInternalFaces()[fi];
         if (!(F.left < 0 || F.right < 0)) {
@@ -51,16 +52,18 @@ int main()
         int elem{-1};
         if (F.left >= 0) {
             elem = F.left;
+            dofm.getLeftFaceNodes(fi, local_fnodes);
         }
 
         if (F.right >= 0) {
             elem = F.right;
+            dofm.getRightFaceNodes(fi,local_fnodes);
         }
 
         auto &E = EF.getElement(dofm.element_types[elem]);
 
         for (auto fqpi : IRange(0, E.nFQP())) {
-            E.face_update<2>(elem, fqpi, F, dofm);
+            E.face_update<2>(elem, fqpi, local_fnodes, dofm);
 
             Perimeter += E.jxw;
         }
