@@ -34,6 +34,8 @@ public:
 
     inline auto &getSolution() { return solution_vector; }
 
+    inline auto &getSolutionGradient() { return solution_gradient; }
+
     inline auto &getDoFManager() { return dofm; }
 
     inline auto &getDimension() { return simulation_dimension; }
@@ -47,6 +49,7 @@ protected:
     Eigen::SparseMatrix<double, Eigen::RowMajor> global_tangent;
     Eigen::VectorXd global_residual;
     Eigen::VectorXd solution_vector;
+    Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic, Eigen::RowMajor> solution_gradient;
 
     int simulation_dimension;
     double time;

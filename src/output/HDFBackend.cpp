@@ -139,7 +139,7 @@ void HDFBackend::write_data(const OutputData &data, double time)
                 "HDFBackend::write_data: Too many components in OutputData::dof_mask: data = " + data.name));
     }
 
-    if (data.data->rows() % data.dof_mask.size() != 0) {
+    if (data.data->size() % data.dof_mask.size() != 0) {
         throw (std::runtime_error(
                 "HDFBackend::write_data: Incompatible dof_mask length. "
                         "Data length must be a multiple of dof_mask length: data = " +

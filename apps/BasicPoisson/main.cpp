@@ -4,6 +4,7 @@
 
 #include "yafel_globals.hpp"
 #include "assembly/CGAssembly.hpp"
+#include "assembly/LocalSmoothingGradient.hpp"
 #include "boundary_conditions/DirichletBC.hpp"
 #include "output/SimulationOutput.hpp"
 #include "utils/BasicTimer.hpp"
@@ -21,14 +22,15 @@ using namespace yafel;
 template<int NSD>
 struct PoissonEquation
 {
-    static constexpr int nsd() { return NSD; }
+    static constexpr int nsd()
+    { return NSD; }
 
     static void
     LocalResidual(const Element &E, int qpi, double,
                   Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &R_el)
     {
 
-        R_el += (100.0*E.jxw) * E.shapeValues[qpi];
+        R_el += (100.0 * E.jxw) * E.shapeValues[qpi];
         /*
         for (auto A : IRange(0, static_cast<int>(R_el.rows()))) {
             R_el(A) = 10*E.jxw*E.shapeValues[qpi](A);
@@ -109,9 +111,34 @@ int main()
     auto &U = feSystem.getSolution();
     U = solveSystem(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
 
+    LocalSmoothingGradient<PoissonEquation<3>>(feSystem);
+
+    std::function<void(FESystem&,OutputFrame&)> captureFunc = [](FESystem &feSys, OutputFrame &frame) {
+        frame.time = 0;
+        OutputData::DataLocation dataLocation = OutputData::DataLocation::Point;
+        std::string sol_name = "U";
+        OutputData::DataType dt = OutputData::DataType::Scalar;
+        auto dat = std::make_shared<OutputData>(feSys.getSolution(),
+                                                sol_name, dataLocation, dt, std::vector<int>{1});
+
+
+        frame.addData(dat);
+
+        int nsd = feSys.getSolutionGradient().cols();
+        auto & gradient = feSys.getSolutionGradient();
+
+        auto grad_dat = std::make_shared<OutputData>(
+                gradient,
+                "gradU",
+                OutputData::DataLocation::Point,
+                OutputData::DataType::Vector,
+                std::vector<int>(nsd, 1));
+
+        frame.addData(grad_dat);
+    };
 
     SimulationOutput simulationOutput("output", BackendType::HDF5);
-    simulationOutput.captureFrame(feSystem);
+    simulationOutput.captureFrame(feSystem, captureFunc);
 
     return 0;
 }

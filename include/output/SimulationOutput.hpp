@@ -50,7 +50,7 @@ public:
 
     /**
      * Default frame capture function. Copy each component into scalar data
-     * and add separately. Attempts to detect cell/point data automatically,
+     * and add separately. AtNSD * tempts to detect cell/point data automatically,
      * defaulting to point data.
      * @tparam T FESystem type. Leaving the door open for non-virtual polymorphism
      * @return return a function that will capture an output frame

@@ -18,26 +18,6 @@
 
 YAFEL_NAMESPACE_OPEN
 
-
-template<typename Physics>
-constexpr bool hasLocalResidual()
-{
-    using namespace Eigen;
-    return std::is_same<void,
-            typename std::result_of<decltype(&Physics::LocalResidual)(Element const &, int, double,
-            Map<Matrix<double, Dynamic, 1>> &)>::type > ::value;
-
-}
-
-template<typename Physics>
-constexpr bool hasLocalTangent()
-{
-    using namespace Eigen;
-    return std::is_same<void, typename std::result_of<decltype(&Physics::LocalTangent)(Element const &, int, double,
-            Map<Matrix<double, Dynamic, Dynamic, RowMajor>> &)>::type > ::value;
-}
-
-
 /**
  *
  * \brief General-purpose Continuous-Galerkin finite element assembly
@@ -49,9 +29,6 @@ void CGAssembly(FESystem &feSystem,
                 std::vector<AssemblyRequirement> requirements = {AssemblyRequirement::Residual,
                                                                  AssemblyRequirement::Tangent})
 {
-    static_assert(hasLocalResidual<Physics>(), "Must Implement static void method 'LocalResidual' in Physics class");
-    static_assert(hasLocalTangent<Physics>(), "Must Implement static void method 'LocalTangent' in Physics class");
-
 
     // Unpack the FESystem
     auto &GlobalTangent = feSystem.getGlobalTangent();
@@ -87,7 +64,7 @@ void CGAssembly(FESystem &feSystem,
     std::vector<Eigen::Triplet<double>> tangent_triplets;
     int total_triplets{0};
 
-    #pragma omp parallel shared(tangent_triplets, GlobalResidual, dofm)
+#pragma omp parallel shared(tangent_triplets, GlobalResidual, dofm)
     {// open parallel block
         //storage buffers
         std::vector<double> local_tangent_buffer;
