@@ -53,6 +53,9 @@ void LocalSmoothingGradient(FESystem &feSystem)
         }
 
         Eigen::Map<Eigen::VectorXd> local_solution(local_solution_buffer.data(), n_local_dofs);
+        for(int i=0; i<n_local_dofs; ++i) {
+            local_solution(i) = Solution(global_dof_buffer[i]);
+        }
 
         auto nqp = E.nQP();
 
@@ -82,7 +85,9 @@ void LocalSmoothingGradient(FESystem &feSystem)
 
     for(auto A : IRange(0,static_cast<int>(VolTimesGrad.rows()))) {
         for(auto i : IRange(0,NSD)) {
-            SolutionGradient(A,i) = VolTimesGrad(A,i)/Volume(A);
+            auto vol = Volume(A);
+            auto val = VolTimesGrad(A,i)/Volume(A);
+            SolutionGradient(A,i) = val;
         }
     }
 

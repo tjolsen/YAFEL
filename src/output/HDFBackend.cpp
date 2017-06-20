@@ -139,7 +139,7 @@ void HDFBackend::write_data(const OutputData &data, double time)
                 "HDFBackend::write_data: Too many components in OutputData::dof_mask: data = " + data.name));
     }
 
-    if (data.data->size() % data.dof_mask.size() != 0) {
+    if (data.data.size() % data.dof_mask.size() != 0) {
         throw (std::runtime_error(
                 "HDFBackend::write_data: Incompatible dof_mask length. "
                         "Data length must be a multiple of dof_mask length: data = " +
@@ -148,7 +148,7 @@ void HDFBackend::write_data(const OutputData &data, double time)
 
 
     int ncomps{0};
-    int n_locs = data.data->rows() / data.dof_mask.size();
+    int n_locs = data.data.rows() / data.dof_mask.size();
     std::string AttrType = "";
     std::string DataLoc = "";
     if (data.dataType == OutputData::DataType::Scalar) {
@@ -189,7 +189,7 @@ void HDFBackend::write_data(const OutputData &data, double time)
     int idx{0};
     for (int loc = 0; loc < n_locs; ++loc) {
         for(auto c : comps) {
-            tmp_data[idx++] = (*data.data)(loc*dof_per_loc + c);
+            tmp_data[idx++] = data.data(loc*dof_per_loc + c);
         }
     }
 

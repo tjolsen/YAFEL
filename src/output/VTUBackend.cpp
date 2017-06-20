@@ -87,11 +87,11 @@ void VTUBackend::write_frame(OutputFrame &frame)
             int idx{0};
             for (int c : IRange(0, static_cast<int>(frame.outputMesh->local_cells_per_cell.size()))) {
                 for (int i : IRange(0, frame.outputMesh->local_cells_per_cell[c])) {
-                    tmp(idx++) = (*(cd->data))(c);
+                    tmp(idx++) = (cd->data)(c);
                 }
             }
             OutputData tmp_data(*cd);
-            tmp_data.data = &tmp;
+            tmp_data.data = Eigen::Map<Eigen::VectorXd>(tmp.data(), tmp.size());
             write_data(tmp_data);
         }
         outfile << "</CellData>\n";
@@ -124,7 +124,7 @@ void VTUBackend::write_data(const OutputData &data,double)
                 "VTUBackend::write_data: Too many components in OutputData::dof_mask: data = " + data.name));
     }
 
-    if (data.data->rows() % data.dof_mask.size() != 0) {
+    if (data.data.rows() % data.dof_mask.size() != 0) {
         throw (std::runtime_error(
                 "VTUBackend::write_data: Incompatible dof_mask length. "
                         "Data length must be a multiple of dof_mask length: data = " +
@@ -132,9 +132,9 @@ void VTUBackend::write_data(const OutputData &data,double)
     }
 
     //number of data locations (points/cells)
-    int n_locs = data.data->rows() / data.dof_mask.size();
+    int n_locs = data.data.rows() / data.dof_mask.size();
     int dof_per_loc = data.dof_mask.size();
-    auto &V = *data.data;
+    auto &V = data.data;
 
     //characters for separating vector/tensor components
     std::vector<char> v_sep{' ', ' ', '\n'};

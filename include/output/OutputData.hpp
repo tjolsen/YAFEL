@@ -38,16 +38,24 @@ public:
         Cell
     };
 
-    OutputData(const Eigen::VectorXd &d, const std::string &name);
+    //template<typename T>
+    OutputData(Eigen::VectorXd &d, const std::string &name);
 
-    OutputData(const Eigen::VectorXd &d,
+    template<typename T>
+    OutputData(Eigen::PlainObjectBase<T> &d,
                const std::string &name,
                DataLocation dL,
                DataType dT,
-               const std::vector<int> &mask);
+               const std::vector<int> &mask)
+            : data(Eigen::Map<Eigen::VectorXd>(d.data(),d.size())),
+              dof_mask(mask),
+              name(name),
+              dataType(dT),
+              dataLocation(dL)
+    {}
 
 
-    const Eigen::VectorXd *data;
+    Eigen::Map<Eigen::VectorXd> data;
     std::vector<int> dof_mask;
     std::string name;
     DataType dataType;
