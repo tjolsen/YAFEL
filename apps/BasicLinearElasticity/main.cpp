@@ -147,7 +147,7 @@ int main()
     timer.toc();
 
     std::cout <<"Mesh import time: " << timer.duration<>() << " ms" << std::endl;
-    int p = 1;
+    int p = 2;
     int dofpn = NSD;
 
     timer.tic();
