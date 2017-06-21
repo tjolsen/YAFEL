@@ -32,7 +32,7 @@ void LocalSmoothingGradient(FESystem &feSystem)
             Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>::Constant(Solution.rows(), NSD, 0.0);
     Eigen::VectorXd Volume = Eigen::VectorXd::Constant(Solution.rows(), 0.0);
 
-    ElementFactory EF;
+    ElementFactory EF(feSystem.getDoFManager().dof_per_node);
     std::vector<int> global_dof_buffer;
     std::vector<double> local_solution_buffer;
     Eigen::MatrixXd qp_grad = Eigen::MatrixXd::Constant(dofm.dof_per_node, NSD, 0.0);

@@ -2,7 +2,7 @@
 #define _YAFEL_SPATIALFUNCTION_HPP
 
 #include "yafel_globals.hpp"
-#include "lin_alg/tensor/Tensor.hpp"
+#include "lin_alg/tensor/tensors.hpp"
 
 #include <functional>
 

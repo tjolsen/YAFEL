@@ -45,7 +45,7 @@ public:
      * \brief Capture an output frame and write it to file
      */
     template<typename T>
-    void captureFrame(T &fesystem_maybe, std::function<void(T&,OutputFrame&)> &captureFunction = default_capture<T>());
+    void captureFrame(T &fesystem_maybe, const std::function<void(T&,OutputFrame&)> &captureFunction = default_capture<T>());
 
 
     /**
@@ -106,7 +106,7 @@ private:
 // Implementation of captureFrame
 //--------------------------------------------------------
 template<typename T>
-void SimulationOutput::captureFrame(T &feSystem, std::function<void(T&,OutputFrame&)> &captureFunction)
+void SimulationOutput::captureFrame(T &feSystem, const std::function<void(T&,OutputFrame&)> &captureFunction)
 {
 
     OutputMesh outputMesh(feSystem.getDoFManager());

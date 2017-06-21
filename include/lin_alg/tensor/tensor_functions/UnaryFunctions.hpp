@@ -44,6 +44,12 @@ auto round(const TensorExpression<T,D,R,dt,b> &te) noexcept
     return TensorCwiseUnaryOp<T,D,R,dt,b,Round>(te);
 }
 
+template<typename T, int D, int R, typename dt, bool b>
+auto abs(const TensorExpression<T,D,R,dt,b> &te) noexcept
+{
+    return TensorCwiseUnaryOp<T,D,R,dt,b,Abs>(te);
+};
+
 YAFEL_NAMESPACE_CLOSE
 
 #endif //YAFEL_UNARYFUNCTIONS_HPP

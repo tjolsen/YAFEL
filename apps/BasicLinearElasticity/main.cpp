@@ -5,12 +5,8 @@
 #include "yafel_globals.hpp"
 #include "assembly/CGAssembly.hpp"
 #include "boundary_conditions/DirichletBC.hpp"
-
-#include "output/OutputData.hpp"
-#include "output/OutputMesh.hpp"
-#include "output/OutputFrame.hpp"
-#include "output/VTUBackend.hpp"
-
+#include "assembly/LocalSmoothingGradient.hpp"
+#include "output/SimulationOutput.hpp"
 #include "utils/BasicTimer.hpp"
 
 #include <eigen3/Eigen/Core>
@@ -23,7 +19,7 @@
 #include <viennacl/linalg/cg.hpp>
 #include <iostream>
 
-
+#include "UniaxialTension.hpp"
 
 /**
  * \file
@@ -168,7 +164,7 @@ int main()
 
     std::cout << "Assembly time: " << timer.duration<>() << " ms" << std::endl;
 
-
+    /*
     DirichletBC bc00(dofm, 0.0, 0);
     bc00.selectByFunction([](const coordinate<> &x) { return std::abs(x(0)) < 1.0e-6; });
     DirichletBC bc01(dofm, 0.0, 1);
@@ -186,9 +182,11 @@ int main()
         return (twist_angle*Tensor<3,1>(0, -r*std::sin(theta), r*std::cos(theta))).eval();
     };
 
-    DirichletBC bc10(dofm, 0.0, 0);
-    DirichletBC bc11(dofm, [twist](auto x, double){return twist(x)(1);}, 1);
-    DirichletBC bc12(dofm, [twist](auto x, double){return twist(x)(2);}, 2);
+    auto bc_func = twist;
+
+    DirichletBC bc10(dofm, [bc_func](auto x, double){return bc_func(x)(0);}, 0);
+    DirichletBC bc11(dofm, [bc_func](auto x, double){return bc_func(x)(1);}, 1);
+    DirichletBC bc12(dofm, [bc_func](auto x, double){return bc_func(x)(2);}, 2);
     bc10.selectByFunction([](const coordinate<> &x) { return std::abs(x(0) - 2) < 1.0e-6; });
     bc11.selectByFunction([](const coordinate<> &x) { return std::abs(x(0) - 2) < 1.0e-6; });
     bc12.selectByFunction([](const coordinate<> &x) { return std::abs(x(0) - 2) < 1.0e-6; });
@@ -199,28 +197,63 @@ int main()
     bc10.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
     bc11.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
     bc12.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
+    */
+
+    auto bcs = UniaxialTension(dofm, 2, .01);
+    for(auto &bc : bcs) {
+        bc.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
+    }
 
     timer.tic();
-    Eigen::VectorXd U(feSystem.getGlobalResidual().rows());
-    U = solveSystem(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
+    feSystem.getSolution() = solveSystem(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
     timer.toc();
     std::cout <<"Solution time: " << timer.duration<>() << " ms" << std::endl;
 
-    OutputMesh outputMesh(dofm);
-    OutputData data(
-            U,
-            "Solution",
-            OutputData::DataLocation::Point,
-            OutputData::DataType::Vector,
-            std::vector<int>(NSD,1)
-    );
-    OutputFrame frame(outputMesh);
-    frame.point_data.push_back(&data);
+    LocalSmoothingGradient<LinearElasticity<3>>(feSystem);
 
-    VTUBackend vtuBackend;
-    vtuBackend.initialize("basic_elasticity");
-    vtuBackend.write_frame(frame);
-    vtuBackend.finalize();
+    SimulationOutput simulationOutput("output", BackendType::HDF5);
+    std::function<void(FESystem&,OutputFrame&)> captureFunc = [](FESystem &feSys, OutputFrame &frame) {
+        frame.time = 0;
+        OutputData::DataLocation dataLocation = OutputData::DataLocation::Point;
+        std::string sol_name = "U";
+        OutputData::DataType dt = OutputData::DataType::Vector;
+        auto dat = std::make_shared<OutputData>(feSys.getSolution(),
+                                                sol_name, dataLocation, dt, std::vector<int>(NSD,1));
+
+
+        frame.addData(dat);
+
+        int nsd = feSys.getSolutionGradient().cols();
+        auto & gradient = feSys.getSolutionGradient();
+
+        std::vector<int> uxmask{1,1,1,0,0,0,0,0,0};
+        std::vector<int> uymask{0,0,0,1,1,1,0,0,0};
+        std::vector<int> uzmask{0,0,0,0,0,0,1,1,1};
+
+        auto gradUx_dat = std::make_shared<OutputData>(
+                gradient,
+                "gradUx",
+                OutputData::DataLocation::Point,
+                OutputData::DataType::Vector,
+                uxmask);
+        auto gradUy_dat = std::make_shared<OutputData>(
+                gradient,
+                "gradUy",
+                OutputData::DataLocation::Point,
+                OutputData::DataType::Vector,
+                uymask);
+        auto gradUz_dat = std::make_shared<OutputData>(
+                gradient,
+                "gradUz",
+                OutputData::DataLocation::Point,
+                OutputData::DataType::Vector,
+                uzmask);
+
+        frame.addData(gradUx_dat);
+        frame.addData(gradUy_dat);
+        frame.addData(gradUz_dat);
+    };
+    simulationOutput.captureFrame(feSystem,captureFunc);
 
     return 0;
 }

@@ -20,7 +20,7 @@
 #include "utils/DoFManager.hpp"
 #include "utils/DualNumber.hpp"
 #include "quadrature/QuadratureRule.hpp"
-#include "utils/SpatialFunction.hpp"
+//#include "utils/SpatialFunction.hpp"
 
 // Mesh
 #include "mesh/mesh_typedefs.hpp"

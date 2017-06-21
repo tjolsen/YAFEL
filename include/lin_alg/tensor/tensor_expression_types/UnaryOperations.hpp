@@ -69,6 +69,13 @@ struct Round
     static auto UnaryOp(T t) { return std::round(t); }
 };
 
+template<typename T>
+struct Abs
+{
+    using result_type = decltype(std::abs(std::declval<T>()));
+    static auto UnaryOp(T t) { using std::abs; return abs(t); }
+};
+
 YAFEL_NAMESPACE_CLOSE
 
 #endif //YAFEL_UNARYOPERATIONS_HPP
