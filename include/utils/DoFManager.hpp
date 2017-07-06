@@ -29,12 +29,14 @@ public:
     void getGlobalNodes(int elnum, std::vector<int> &container) const;
 
     void getGlobalFaceDofs(int fnum, std::vector<int> &container) const;
+
     void getGlobalFaceNodes(int fnum, std::vector<int> &container) const;
 
     inline void getLeftFaceNodes(int fnum, std::vector<int> &container) const
     {
         getLocalFaceNodes(fnum, container, face_left_local_nodes);
     }
+
     inline void getRightFaceNodes(int fnum, std::vector<int> &container) const
     {
         getLocalFaceNodes(fnum, container, face_right_local_nodes);
@@ -44,6 +46,8 @@ public:
     ElementType CellType_to_ElementType(CellType ct, int polyOrder) const;
 
     inline int nCells() const { return static_cast<int>(element_types.size()); }
+
+    inline int nNodes() const { return static_cast<int>(dof_nodes.size()); }
 
     int dof_per_node;
     int polyOrder;
@@ -70,6 +74,7 @@ private:
     int make_raw_dofs(const Mesh &M);
 
     void match_face_nodes();
+
     void recombine_all_duplicates();
 
     void getLocalFaceNodes(

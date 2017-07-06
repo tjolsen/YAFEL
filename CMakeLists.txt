@@ -24,6 +24,7 @@ set(SOURCE_FILES
         include/assembly/CGAssembly.hpp
         include/assembly/DGAssembly.hpp
         include/assembly/LocalSmoothingGradient.hpp
+        include/assembly/ZZGradientRecovery.hpp
 
         include/boundary_conditions/DirichletBC.hpp
 

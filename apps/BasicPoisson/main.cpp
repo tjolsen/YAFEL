@@ -4,7 +4,7 @@
 
 #include "yafel_globals.hpp"
 #include "assembly/CGAssembly.hpp"
-#include "assembly/LocalSmoothingGradient.hpp"
+#include "assembly/ZZGradientRecovery.hpp"
 #include "boundary_conditions/DirichletBC.hpp"
 #include "output/SimulationOutput.hpp"
 #include "utils/BasicTimer.hpp"
@@ -87,14 +87,15 @@ Eigen::VectorXd solveSystem(const Eigen::SparseMatrix<double> &A, const Eigen::V
 
 int main()
 {
+    constexpr int nsd = 2;
     Mesh M("mesh.msh");
-    int p = 2;
+    int p = 1;
     int dofpn = 1;
     DoFManager dofm(M, DoFManager::ManagerType::CG, p, dofpn);
     FESystem feSystem(dofm);
     BasicTimer timer;
     timer.tic();
-    CGAssembly<PoissonEquation<3>>(feSystem);
+    CGAssembly<PoissonEquation<nsd>>(feSystem);
     timer.toc();
 
     std::cout << "Assembly time: " << timer.duration<std::chrono::microseconds>() << " us" << std::endl;
@@ -111,7 +112,7 @@ int main()
     auto &U = feSystem.getSolution();
     U = solveSystem(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
 
-    LocalSmoothingGradient<PoissonEquation<3>>(feSystem);
+    ZZGradientRecovery<PoissonEquation<nsd>>(feSystem);
 
     std::function<void(FESystem&,OutputFrame&)> captureFunc = [](FESystem &feSys, OutputFrame &frame) {
         frame.time = 0;

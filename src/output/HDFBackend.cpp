@@ -148,7 +148,7 @@ void HDFBackend::write_data(const OutputData &data, double time)
 
 
     int ncomps{0};
-    int n_locs = data.data.rows() / data.dof_mask.size();
+    int n_locs = data.data.size() / data.dof_mask.size();
     std::string AttrType = "";
     std::string DataLoc = "";
     if (data.dataType == OutputData::DataType::Scalar) {
@@ -186,10 +186,10 @@ void HDFBackend::write_data(const OutputData &data, double time)
 
     std::vector<double> tmp_data(n_locs * ncomps, 0);
 
-    int idx{0};
+    //int idx{0};
     for (int loc = 0; loc < n_locs; ++loc) {
         for(auto c : comps) {
-            tmp_data[idx++] = data.data(loc*dof_per_loc + c);
+            tmp_data[loc*ncomps + c] = data.data(loc*dof_per_loc + c);
         }
     }
 
