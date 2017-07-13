@@ -111,11 +111,25 @@ T1 &operator+=(TensorExpression<T1, D, R, dt1, true> &&lhs, dt2 rhs)
 
 //-----------------------------------------------------------------
 template<typename T1, typename T2, int D, int R, typename dt1, typename dt2, bool b2>
+auto operator-=(TensorExpression<T1, D, R, dt1, true> &lhs,
+                const TensorExpression<T2, D, R, dt2, b2> &rhs)
+{
+    return update_assign(lhs,rhs, Subtraction<dt1, dt2>());
+}
+
+template<typename T1, typename T2, int D, int R, typename dt1, typename dt2, bool b2>
 auto operator-=(TensorExpression<T1, D, R, dt1, true> &&lhs,
                 const TensorExpression<T2, D, R, dt2, b2> &rhs)
 {
     return update_assign(std::forward<TensorExpression<T1, D, R, dt1, true>>(lhs),
                          rhs, Subtraction<dt1, dt2>());
+}
+
+template<typename T1, int D, int R, typename dt1, typename dt2,
+        typename=typename std::enable_if<ScalarTraits<dt2>::isYafelScalar()>::type>
+T1 &operator-=(TensorExpression<T1, D, R, dt1, true> &lhs, dt2 rhs)
+{
+    return update_assign(lhs, rhs, Subtraction<dt1, dt2>());
 }
 
 template<typename T1, int D, int R, typename dt1, typename dt2,
