@@ -73,6 +73,17 @@ auto norm(const TensorExpression <TE, D, R, dt, b> &x)
     return sqrt(dot(x, x));
 };
 
+/**
+ * \brief Compute the squared norm of a tensor
+ *
+ * Compute the L2 squared norm of a tensor by calling dot(x,x)
+ */
+template<typename TE, int D, int R, typename dt, bool b>
+auto norm2(const TensorExpression <TE, D, R, dt, b> &x)
+{
+    return dot(x, x);
+};
+
 YAFEL_NAMESPACE_CLOSE
 
 #endif //YAFEL_TENSOR_DOT_HPP
