@@ -5,7 +5,8 @@ Linux, OSX: [![Build Status](https://api.travis-ci.org/tjolsen/YAFEL.svg?branch=
 
 Yet Another Finite Element Library
 
-YAFEL is a general-purpose finite element library written entirely in C++14.
+YAFEL is a general-purpose finite element library written entirely in C++14
+(c++17 necessary if using task scheduler).
 It is being developed primarily as a learning exercise and research code.
 Since this library is primarily for personal use, features are added as
 the need for them arises. If you have any good ideas for something to add, please get in
