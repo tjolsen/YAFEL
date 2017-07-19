@@ -14,6 +14,7 @@
 #include <type_traits>
 #include <atomic>
 #include <vector>
+#include <tuple>
 
 /**
  * \class TaskScheduler
@@ -36,16 +37,16 @@ public:
     using lock_t = std::unique_lock<std::mutex>;
 
     constexpr static int spin_count{32};
-    const unsigned count;
+    const int count;
 
     std::vector<std::thread> workers;
     std::vector<std::deque<std::function<void()>>> tq;
     std::vector<std::mutex> mtxs;
     std::vector<std::condition_variable> cvs;
     std::vector<bool> done;
-    std::atomic<unsigned> _index;
+    std::atomic<int> _index;
 
-    inline TaskScheduler(unsigned nthreads = std::thread::hardware_concurrency())
+    inline TaskScheduler(int nthreads = std::thread::hardware_concurrency())
             : count(nthreads),
               workers(nthreads),
               tq(nthreads),
@@ -54,14 +55,14 @@ public:
               done(nthreads, false),
               _index(0)
     {
-        for (unsigned i = 0; i < nthreads; ++i) {
+        for (int i = 0; i < nthreads; ++i) {
             workers[i] = std::thread([i, this]() { run(i); });
         }
     }
 
     inline ~TaskScheduler()
     {
-        for (unsigned i = 0; i < count; ++i) {
+        for (int i = 0; i < count; ++i) {
             {
                 std::unique_lock<std::mutex> lock{mtxs[i]};
                 done[i] = true;
@@ -81,13 +82,19 @@ public:
         using ret_type = typename std::result_of<F(Args...)>::type;
 
         auto task = std::make_shared<std::packaged_task<ret_type()> >
-                (std::bind(std::forward<F>(f), std::forward<Args>(args)...));
+                (
+                        [f=std::forward<F>(f),
+                         args = std::make_tuple(std::forward<Args>(args)...)]() {
+                            return std::apply(f,args);
+                        }
+                );
+                //(std::bind(std::forward<F>(f), std::forward<Args>(args)...));
 
         auto ret = task->get_future();
         auto i = _index++;
 
         //try to push without blocking
-        for (unsigned n = 0; n != count * spin_count; ++n) {
+        for (int n = 0; n != count * spin_count; ++n) {
             auto idx = (i + n) % count;
             {
                 lock_t lock{mtxs[idx], std::try_to_lock};
@@ -99,15 +106,15 @@ public:
             return ret;
         }
         {
-            lock_t lock{mtxs[i]};
-            tq[i].emplace_back([task]() { (*task)(); });
+            int idx = i%count;
+            lock_t lock{mtxs[idx]};
+            tq[idx].emplace_back([task]() { (*task)(); });
         }
-        cvs[i].notify_one();
+        cvs[i%count].notify_one();
         return ret;
     }
 
 private:
-
 
     void run(unsigned i)
     {
@@ -115,7 +122,7 @@ private:
         while (true) {
             std::function<void()> f;
             bool try_failure = true;
-            for (unsigned n = 0; n != count * spin_count; ++n) {
+            for (int n = 0; n != count * spin_count; ++n) {
                 auto idx = (i + n) % count;
                 lock_t lock{mtxs[idx], std::try_to_lock};
 
