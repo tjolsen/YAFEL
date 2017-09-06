@@ -96,7 +96,9 @@ set(SOURCE_FILES
         include/utils/Range.hpp
         include/utils/ScalarTraits.hpp
         include/utils/SpatialFunction.hpp
-        include/utils/TaskScheduler.hpp
+        include/utils/parallel/TaskScheduler.hpp
+        include/utils/parallel/barrier.hpp
+        include/utils/parallel/parfor.hpp
         include/utils/ThreadPool.hpp
         include/yafel.hpp
         include/yafel_globals.hpp

@@ -3,7 +3,7 @@
 //
 
 #include "yafel_globals.hpp"
-#include "utils/TaskScheduler.hpp"
+#include "utils/parallel/TaskScheduler.hpp"
 #include "utils/BasicTimer.hpp"
 #include <iostream>
 
