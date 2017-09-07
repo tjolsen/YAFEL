@@ -18,6 +18,12 @@
  * this provides a synchronization primitive to wait until all
  * futures in the vector return.
  *
+ * WARNING: This function will essentially eat a core trying to
+ * find a completed task, so be aware that it will be evicting
+ * worker threads when it runs. It is designed to be called from
+ * the "master" thread (ie the one that is spawning tasks for the
+ * workers to execute via the TaskScheduler).
+ *
  * @tparam T future type
  * @param futures vector of future<T> objects
  */

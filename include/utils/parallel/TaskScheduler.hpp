@@ -5,6 +5,7 @@
  * \file
  */
 
+#include "yafel_globals.hpp"
 
 #include <thread>
 #include <mutex>
@@ -15,6 +16,19 @@
 #include <atomic>
 #include <vector>
 #include <tuple>
+
+//Platform-specific
+#include <pthread.h>
+#include <sched.h>
+
+YAFEL_NAMESPACE_OPEN
+
+
+namespace worker_global {
+
+thread_local int worker_id{-1};
+
+}
 
 /**
  * \class TaskScheduler
@@ -55,8 +69,28 @@ public:
               done(nthreads, false),
               _index(0)
     {
+        cpu_set_t cpus;
+
         for (int i = 0; i < nthreads; ++i) {
-            workers[i] = std::thread([i, this]() { run(i); });
+            workers[i] = std::thread([i, this]() {
+                // Set thread-local "global" worker id.
+                // Supposed to be accessible by functions run by workers.
+                // Useful for "reduction" operations that accumulate into
+                // multiple buffers (eg: summing vector entries into a vector of partial sums,
+                // which is subsequently reduced later).
+                worker_global::worker_id = i;
+                run(i);
+            });
+
+            //Set thread affinity. Modulo just in case some idiot decides to spawn more threads than cores.
+            // Wraparound to zero seems the most sensible way to handle this without yelling at the user
+            // too much.
+            CPU_ZERO(&cpus);
+            CPU_SET(i % std::thread::hardware_concurrency(),&cpus);
+            auto ret = pthread_setaffinity_np(workers[i].native_handle(), sizeof(cpu_set_t), &cpus);
+            if(ret != 0) {
+                throw std::runtime_error("Failed to set thread affinity");
+            }
         }
     }
 
@@ -84,7 +118,7 @@ public:
         auto task = std::make_shared<std::packaged_task<ret_type()> >
                 (
                         [f=std::forward<F>(f),
-                         args = std::make_tuple(std::forward<Args>(args)...)]() {
+                         args = std::forward_as_tuple(args...)/*std::make_tuple(std::forward<Args>(args)...)*/]() {
                             return std::apply(f,args);
                         }
                 );
@@ -152,5 +186,6 @@ private:
 
 };
 
+YAFEL_NAMESPACE_CLOSE
 
 #endif
