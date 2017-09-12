@@ -20,8 +20,8 @@ int main()
 
     TaskScheduler TS(8);
     BasicTimer timer;
-    int N = 1000000;
-    std::size_t BS = 32;
+    int N = 10;
+    std::size_t BS = 1;
     std::vector<std::size_t> partial_sums(TS.workers.size(), 0);
 
     /*

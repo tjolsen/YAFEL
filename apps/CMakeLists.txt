@@ -15,3 +15,6 @@ target_link_libraries(hdg_poisson yafel)
 
 add_executable(shellProject 2081_CG_Shell/main.cpp)
 target_link_libraries(shellProject yafel)
+
+add_executable(finiteVolume FiniteVolume/main.cpp)
+target_link_libraries(finiteVolume yafel)

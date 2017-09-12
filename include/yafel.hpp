@@ -16,11 +16,25 @@
 #include "lin_alg/tensor/tensors.hpp" // <-- already a convenience header
 
 
+// Assembly routines
+#include "assembly/CGAssembly.hpp"
+#include "assembly/DGAssembly.hpp"
+#include "assembly/LocalSmoothingGradient.hpp"
+#include "assembly/ZZGradientRecovery.hpp"
+
+#include "boundary_conditions/DirichletBC.hpp"
+#include "fe_system/FESystem.hpp"
+
+#include "quadrature/LobattoPoints1D.hpp"
+#include "quadrature/QuadratureRule.hpp"
+
 // Utils
 #include "utils/DoFManager.hpp"
 #include "utils/DualNumber.hpp"
-#include "quadrature/QuadratureRule.hpp"
-//#include "utils/SpatialFunction.hpp"
+#include "utils/parallel/TaskScheduler.hpp"
+#include "utils/parallel/parfor.hpp"
+#include "utils/parallel/wait_all.hpp"
+#include "utils/parallel/wait_any.hpp"
 
 // Mesh
 #include "mesh/mesh_typedefs.hpp"

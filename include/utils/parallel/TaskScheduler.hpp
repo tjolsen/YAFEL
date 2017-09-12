@@ -26,7 +26,7 @@ YAFEL_NAMESPACE_OPEN
 
 namespace worker_global {
 
-thread_local int worker_id{-1};
+thread_local int worker_id{0};
 
 }
 
@@ -58,7 +58,7 @@ public:
     std::vector<std::mutex> mtxs;
     std::vector<std::condition_variable> cvs;
     std::vector<bool> done;
-    std::atomic<int> _index;
+    std::atomic<std::size_t> _index;
 
     inline TaskScheduler(int nthreads = std::thread::hardware_concurrency())
             : count(nthreads),
@@ -86,9 +86,9 @@ public:
             // Wraparound to zero seems the most sensible way to handle this without yelling at the user
             // too much.
             CPU_ZERO(&cpus);
-            CPU_SET(i % std::thread::hardware_concurrency(),&cpus);
+            CPU_SET(i % std::thread::hardware_concurrency(), &cpus);
             auto ret = pthread_setaffinity_np(workers[i].native_handle(), sizeof(cpu_set_t), &cpus);
-            if(ret != 0) {
+            if (ret != 0) {
                 throw std::runtime_error("Failed to set thread affinity");
             }
         }
@@ -115,14 +115,15 @@ public:
 
         using ret_type = typename std::result_of<F(Args...)>::type;
 
+
         auto task = std::make_shared<std::packaged_task<ret_type()> >
                 (
-                        [f=std::forward<F>(f),
-                         args = std::forward_as_tuple(args...)/*std::make_tuple(std::forward<Args>(args)...)*/]() {
-                            return std::apply(f,args);
+                        [f = std::forward<F>(f),
+                                args = std::forward_as_tuple(args...)]() {
+                            return std::apply(f, args);
                         }
                 );
-                //(std::bind(std::forward<F>(f), std::forward<Args>(args)...));
+
 
         auto ret = task->get_future();
         auto i = _index++;
@@ -134,17 +135,17 @@ public:
                 lock_t lock{mtxs[idx], std::try_to_lock};
                 if (!lock) continue;
 
-                tq[idx].emplace_back([task]() { (*task)(); });
+                tq[idx].emplace_back([task = std::move(task)]() { (*task)(); });
             }
             cvs[idx].notify_one();
             return ret;
         }
         {
-            int idx = i%count;
+            auto idx = i % count;
             lock_t lock{mtxs[idx]};
-            tq[idx].emplace_back([task]() { (*task)(); });
+            tq[idx].emplace_back([task = std::move(task)]() { (*task)(); });
         }
-        cvs[i%count].notify_one();
+        cvs[i % count].notify_one();
         return ret;
     }
 
@@ -154,7 +155,7 @@ private:
     {
 
         while (true) {
-            std::function<void()> f;
+            std::function < void() > f;
             bool try_failure = true;
             for (int n = 0; n != count * spin_count; ++n) {
                 auto idx = (i + n) % count;

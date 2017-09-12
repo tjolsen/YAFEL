@@ -8,6 +8,7 @@
 #include "yafel_globals.hpp"
 #include "utils/parallel/TaskScheduler.hpp"
 #include <vector>
+#include <iostream>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -44,25 +45,37 @@ auto parfor(std::size_t idx_start,
                   "Loop body must return void");
 
     auto loopLen = (idx_end - idx_start);
-    std::size_t Nblocks = loopLen / blockSize + ((loopLen % blockSize == 0) ? 0 : 1);
+
+    auto full_blocks = loopLen / blockSize;
+    auto cleanup_start = full_blocks * blockSize + idx_start;
+    auto Nblocks = full_blocks + ((cleanup_start < idx_end) ? 1 : 0);
+
+    std::cout << "Parfor: idx_start=" << idx_start
+              << "  idx_end=" << idx_end
+              << "  blockSize=" << blockSize
+              << "  full_blocks=" << full_blocks
+              << "  cleanup_start=" << cleanup_start
+              << "  NBlocks = " << Nblocks << std::endl;
 
     //lambda to execute a chunk of the loop
-    auto loopChunk = [&loopBody](auto istart, auto iend) {
-        for (auto i = istart; i < iend; ++i) {
-            loopBody(i);
-        }
-    };
+    //const auto loopChunk =
 
 
     std::vector<std::future<void>> futs;
     futs.reserve(Nblocks);
 
     for (std::size_t iblock = 0; iblock < Nblocks; ++iblock) {
+
+        std::size_t i_start = idx_start + iblock * blockSize;
+        std::size_t i_end = i_start + blockSize;
+        i_end = (i_end < idx_end) ? i_end : idx_end;
         futs.push_back(
-                scheduler.enqueue(loopChunk,
-                                  iblock * blockSize,
-                                  std::min((iblock + 1) * blockSize, idx_end))
-        );
+                scheduler.enqueue(
+                        [&loopBody, i_start, i_end]() {
+                            for (auto i = i_start; i < i_end; ++i) {
+                                loopBody(i);
+                            }
+                        }));
 
     }
 
