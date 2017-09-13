@@ -26,6 +26,13 @@ YAFEL_NAMESPACE_OPEN
 
 namespace worker_global {
 
+/**
+ * thread-local integer that is set to the index of a worker
+ * thread within the TaskScheduler::workers vector. This is
+ * useful for identifying which worker thread a task is running on,
+ * and is essential for implementing other cross-task, thread-local
+ * variables (like large reduction variables).
+ */
 thread_local int worker_id{0};
 
 }
