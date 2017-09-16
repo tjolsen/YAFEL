@@ -6,6 +6,8 @@
  */
 
 #include "yafel_globals.hpp"
+#include "utils/parallel/Task.hpp"
+
 
 #include <thread>
 #include <mutex>
@@ -61,7 +63,7 @@ public:
     const int count;
 
     std::vector<std::thread> workers;
-    std::vector<std::deque<std::function<void()>>> tq;
+    std::vector<std::deque<std::shared_ptr<Task<>>>> tq;
     std::vector<std::mutex> mtxs;
     std::vector<std::condition_variable> cvs;
     std::vector<bool> done;
@@ -115,6 +117,42 @@ public:
             w.join();
     }
 
+
+
+    template<typename F, typename ...Args>
+    auto createTask(F &&f, Args &&...args) {
+        auto task = std::make_shared<Task<>>(*this);
+        auto fut = task->create(std::forward<F>(f), std::forward<Args>(args)...);
+        return std::make_pair(std::move(task),std::move(fut));
+    };
+
+
+    void enqueue(std::shared_ptr<Task<>> &task_ptr)
+    {
+        auto i = _index++;
+
+        //try to push without blocking
+        for (int n = 0; n != count * spin_count; ++n) {
+            auto idx = (i + n) % count;
+            {
+                lock_t lock{mtxs[idx], std::try_to_lock};
+                if (!lock) continue;
+
+                tq[idx].push_back(std::move(task_ptr));
+                return;
+            }
+            cvs[idx].notify_one();
+        }
+        {
+            auto idx = i % count;
+            lock_t lock{mtxs[idx]};
+            tq[idx].push_back(std::move(task_ptr));
+        }
+        cvs[i % count].notify_one();
+    }
+
+
+    /*
     template<typename F, typename ...Args>
     auto enqueue(F &&f, Args &&...args)
     -> std::future<typename std::result_of<F(Args...)>::type>
@@ -154,7 +192,7 @@ public:
         }
         cvs[i % count].notify_one();
         return ret;
-    }
+    }*/
 
 private:
 
@@ -162,7 +200,7 @@ private:
     {
 
         while (true) {
-            std::function < void() > f;
+            std::shared_ptr<Task<>> f;
             bool try_failure = true;
             for (int n = 0; n != count * spin_count; ++n) {
                 auto idx = (i + n) % count;
@@ -186,7 +224,7 @@ private:
             }
             if (!f) break;
 
-            f();
+            (*f)();
         } //end while
 
     }//end run

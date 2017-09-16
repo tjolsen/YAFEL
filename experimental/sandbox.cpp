@@ -19,56 +19,22 @@ int main()
 {
 
     TaskScheduler TS(8);
-    BasicTimer timer;
-    int N = 10;
-    std::size_t BS = 1;
-    std::vector<std::size_t> partial_sums(TS.workers.size(), 0);
 
-    /*
-    std::vector<std::future<size_t>> futs;
-    timer.tic();
-    for(size_t i=0; i<N; ++i) {
+    auto [task, fut] = TS.createTask([](){cout << "Parent!\n"; return 0;});
 
-        futs.push_back(TS.enqueue([](size_t i1, size_t i2) {
-            size_t sum{0};
-            for(size_t i=i1; i<i2; ++i) {
-                sum += i;
-            }
+    auto [kid, kidfut] = task->addChild([](){cout << "Child!\n"; return 1;});
 
-            return sum;
-        }, i, i+N));
+    auto [kid2, kidfut2] = kid->addChild([](){cout << "Grandchild!\n"; return 1;});
 
-    }
-    long unsigned int bigsum{0};
-    for(auto &fut : futs) {
-        bigsum += fut.get();
-    }
-    timer.toc();*/
+    TS.enqueue(task);
 
+    int par_res = fut.get();
+    int kid_res = kidfut.get();
+    int gcres = kidfut2.get();
 
-    timer.tic();
-    auto futs = parfor(0, N,
-                       [&partial_sums,N](std::size_t idx) {
-                           auto me = worker_global::worker_id;
-                           std::size_t sum{0};
-                           for (std::size_t i = idx; i < idx+N; ++i) {
-                               sum += i;
-                           }
-                           partial_sums[me] += sum;
-                       },
-                       TS, BS);
-
-    wait_all(futs);
-
-    std::size_t bigsum{0};
-    for(auto ps : partial_sums) {
-        bigsum += ps;
-    }
-    timer.toc();
-
-    std::cout << "Sum = " << bigsum << "  timer = "
-              << timer.duration() << " ms" << std::endl;
-
+    cout << "Parent result:" << par_res << endl;
+    cout << "kid result: " << kid_res << endl;
+    cout << "grandkid result: " << gcres << endl;
     return 0;
 }
 

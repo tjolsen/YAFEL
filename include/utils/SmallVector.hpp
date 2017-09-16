@@ -8,6 +8,7 @@
 #include "yafel_globals.hpp"
 #include <algorithm>
 #include <type_traits>
+#include <stdexcept>
 
 YAFEL_NAMESPACE_OPEN
 

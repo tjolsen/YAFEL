@@ -97,6 +97,7 @@ set(SOURCE_FILES
         include/utils/ScalarTraits.hpp
         include/utils/SpatialFunction.hpp
         include/utils/parallel/TaskScheduler.hpp
+        include/utils/parallel/Task.hpp
         include/utils/parallel/wait_all.hpp
         include/utils/parallel/wait_any.hpp
         include/utils/parallel/parfor.hpp
