@@ -139,16 +139,18 @@ public:
                 if (!lock) continue;
 
                 tq[idx].push_back(std::move(task_ptr));
+                cvs[idx].notify_one();
                 return;
             }
-            cvs[idx].notify_one();
+
         }
         {
             auto idx = i % count;
             lock_t lock{mtxs[idx]};
             tq[idx].push_back(std::move(task_ptr));
+            cvs[idx].notify_one();
         }
-        cvs[i % count].notify_one();
+
     }
 
 
