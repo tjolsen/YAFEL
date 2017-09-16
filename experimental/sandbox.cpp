@@ -17,24 +17,18 @@ using std::endl;
 
 int main()
 {
-
     TaskScheduler TS(8);
 
-    auto [task, fut] = TS.createTask([](){cout << "Parent!\n"; return 0;});
+    auto [task, fut] = TS.createTask([](){cout << "Parent!\n";});
 
     auto [kid, kidfut] = task->addChild([](){cout << "Child!\n"; return 1;});
 
-    auto [kid2, kidfut2] = kid->addChild([](){cout << "Grandchild!\n"; return 1;});
+    auto [kid2, kidfut2] = task->addChild([](){cout << "Grandchild!\n"; return 1;});
 
     TS.enqueue(task);
 
-    int par_res = fut.get();
-    int kid_res = kidfut.get();
-    int gcres = kidfut2.get();
+    wait_all(fut,kidfut,kidfut2);
 
-    cout << "Parent result:" << par_res << endl;
-    cout << "kid result: " << kid_res << endl;
-    cout << "grandkid result: " << gcres << endl;
     return 0;
 }
 

@@ -10,7 +10,6 @@
 #include <future>
 #include <memory>
 #include <type_traits>
-#include <iostream>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -51,23 +50,46 @@ private:
         std::promise<ret_type> task_promise;
         auto fut = task_promise.get_future();
 
-        auto task_func =
-                [this, task_promise=std::move(task_promise),
-                        f = std::forward<F>(f),
-                        args = std::forward_as_tuple(args...)]() mutable {
+        if constexpr (!std::is_void_v<ret_type>) {
+            auto task_func =
+                    [this, task_promise=std::move(task_promise),
+                            f = std::forward<F>(f),
+                            args = std::forward_as_tuple(args...)]() mutable {
 
-                    auto ret = std::apply(f,args);
-                    task_promise.set_value(std::move(ret));
+                        task_promise.set_value(std::apply(f, args));
 
-                    //Enqueue any children
-                    for(auto &child : this->children) {
-                        std::cout << "enqueueing child" << "\n";
-                        this->TS.enqueue(child);
-                    }
-                };
+                        //Enqueue any children
+                        for(auto &child : this->children) {
+                            this->TS.enqueue(child);
+                        }
+                    };
 
 
-        internal_task = std::make_unique<TaskImpl<decltype(task_func)> >(std::move(task_func));
+            internal_task = std::make_unique<TaskImpl<decltype(task_func)> >(std::move(task_func));
+
+        }
+        else {
+
+            auto task_func =
+                    [this, task_promise=std::move(task_promise),
+                            f = std::forward<F>(f),
+                            args = std::forward_as_tuple(args...)]() mutable {
+
+                        std::apply(f,args);
+                        task_promise.set_value();
+
+                        //Enqueue any children
+                        for(auto &child : this->children) {
+                            this->TS.enqueue(child);
+                        }
+                    };
+
+
+            internal_task = std::make_unique<TaskImpl<decltype(task_func)> >(std::move(task_func));
+
+
+
+        }
 
 
 
