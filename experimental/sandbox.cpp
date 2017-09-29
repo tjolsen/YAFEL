@@ -5,7 +5,7 @@
 #include "yafel_globals.hpp"
 #include "utils/parallel/TaskScheduler.hpp"
 #include "utils/parallel/parfor.hpp"
-#include "utils/parallel/wait_all.hpp"
+#include "utils/parallel/ReductionVariable.hpp"
 #include "utils/BasicTimer.hpp"
 #include <iostream>
 
@@ -17,17 +17,14 @@ using std::endl;
 
 int main()
 {
-    TaskScheduler TS(8);
+    struct alignas(32) my_reducers {
+        double x[8];
+        //int y;
+    };
 
-    auto [task, fut] = TS.createTask([](){cout << "Parent!\n";});
+    ReductionVariable<my_reducers> RV;
 
-    auto [kid, kidfut] = task->addChild([](){cout << "Child!\n"; return 1;});
-
-    auto [kid2, kidfut2] = task->addChild([](){cout << "Grandchild!\n"; return 1;});
-
-    TS.enqueue(task);
-
-    wait_all(fut,kidfut,kidfut2);
+    cout << sizeof(RV) << endl << alignof(RV) << endl;
 
     return 0;
 }

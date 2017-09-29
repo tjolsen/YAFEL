@@ -101,10 +101,13 @@ set(SOURCE_FILES
         include/utils/parallel/wait_all.hpp
         include/utils/parallel/wait_any.hpp
         include/utils/parallel/parfor.hpp
+        include/utils/parallel/ReductionVariable.hpp
         include/utils/ThreadPool.hpp
+
         include/yafel.hpp
         include/yafel_globals.hpp
         include/yafel_typedefs.hpp
+        include/yafel_config.hpp
 
         src/boundary_conditions/DirichletBC.cpp
 
