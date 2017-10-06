@@ -326,7 +326,7 @@ protected:
         }
     }
 
-    char buffer[sizeof(T) * N]{};
+    typename std::aligned_storage_t<sizeof(T), alignof(T)> buffer[N];
 };
 
 

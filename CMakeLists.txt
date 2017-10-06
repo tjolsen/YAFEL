@@ -95,6 +95,7 @@ set(SOURCE_FILES
         include/utils/ElementVtkType.hpp
         include/utils/Range.hpp
         include/utils/ScalarTraits.hpp
+        include/utils/SmallVector.hpp
         include/utils/SpatialFunction.hpp
         include/utils/parallel/TaskScheduler.hpp
         include/utils/parallel/Task.hpp
