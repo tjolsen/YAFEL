@@ -75,7 +75,10 @@ public:
     void reserve(std::size_t newCapacity)
     {
         if (newCapacity > _capacity) {
-            auto ptr = reinterpret_cast<T *>(new char[sizeof(T) * newCapacity]);
+
+
+
+            auto ptr = reinterpret_cast<T *>(new std::aligned_storage_t<sizeof(T),alignof(T)>[newCapacity]);
             if (ptr) {
                 std::move(p_begin, p_end, ptr);
                 auto oldSize = size();
@@ -87,7 +90,7 @@ public:
                 if (isSmall()) {
                     _isSmall = false;
                 } else {
-                    delete[] reinterpret_cast<char *>(oldBuffer);
+                    delete[] reinterpret_cast<std::aligned_storage_t<sizeof(T), alignof(T)>*>(oldBuffer);
                 }
             }
         }
@@ -138,7 +141,7 @@ public:
     void pop_back()
     {
         if (size() > 0) {
-            if(!std::is_trivially_destructible<T>::value) {
+            if constexpr (!std::is_trivially_destructible<T>::value) {
                 --p_end->~T();
             } else {
                 --p_end;
