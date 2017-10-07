@@ -6,6 +6,7 @@
 #define YAFEL_SMALLVECTOR_HPP
 
 #include "yafel_globals.hpp"
+#include <initializer_list>
 #include <algorithm>
 #include <type_traits>
 #include <stdexcept>
@@ -182,7 +183,6 @@ public:
             : SmallVectorImpl<T>(reinterpret_cast<T *>(&buffer[0]),
                                  reinterpret_cast<T *>(&buffer[0]), N, true) {}
 
-
     SmallVector(std::size_t n)
             : SmallVectorImpl<T>(reinterpret_cast<T *>(&buffer[0]),
                                  reinterpret_cast<T *>(&buffer[0]), N, true)
@@ -194,6 +194,13 @@ public:
     {
         for(auto it = this->begin(); it < this->end(); ++it) {
             new(it) T(val);
+        }
+    }
+
+    SmallVector(std::initializer_list<T> L) : SmallVector() {
+        this->reserve(L.size());
+        for(auto const& l : L) {
+            this->push_back(l);
         }
     }
 

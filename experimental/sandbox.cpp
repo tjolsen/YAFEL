@@ -3,10 +3,7 @@
 //
 
 #include "yafel_globals.hpp"
-#include "utils/parallel/TaskScheduler.hpp"
-#include "utils/parallel/parfor.hpp"
-#include "utils/parallel/ReductionVariable.hpp"
-#include "utils/BasicTimer.hpp"
+#include "utils/SmallVector.hpp"
 #include <iostream>
 
 
@@ -17,14 +14,28 @@ using std::endl;
 
 int main()
 {
-    struct alignas(32) my_reducers {
-        double x[8];
-        //int y;
+    struct alignas(16) Tp
+    {
+        double a, b, c;
+
+        Tp(double x) : a(x), b(x), c(x)
+        {}
     };
+    SmallVector<Tp, 2> V;
 
-    ReductionVariable<my_reducers> RV;
+    V.push_back(1.0);
+    V.push_back(2.0);
 
-    cout << sizeof(RV) << endl << alignof(RV) << endl;
+    int a = 0;
+
+    V.push_back(3.0);
+    V.push_back(4.0);
+
+    cout << a << endl;
+
+    for (auto x : V) {
+        cout << x.a << endl;
+    }
 
     return 0;
 }
