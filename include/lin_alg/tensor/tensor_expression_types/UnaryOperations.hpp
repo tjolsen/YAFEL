@@ -76,6 +76,13 @@ struct Abs
     static auto UnaryOp(T t) { using std::abs; return abs(t); }
 };
 
+template<typename T>
+struct IsNan
+{
+    using result_type = bool;
+    static auto UnaryOp(T t) { using std::isnan; return isnan(t); }
+};
+
 YAFEL_NAMESPACE_CLOSE
 
 #endif //YAFEL_UNARYOPERATIONS_HPP

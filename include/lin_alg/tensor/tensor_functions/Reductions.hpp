@@ -33,27 +33,36 @@ auto full_reduction(const TensorExpression<T, D, R, dt, b> &A)
         accumulation = BinaryOpType<dt, dt>::BinaryOp(accumulation, x);
     }
     return accumulation;
-};
+}
 
 
 template<typename T, int D, int R, typename dt, bool b>
 auto sum(const TensorExpression<T, D, R, dt, b> &A)
 {
     return full_reduction<T, D, R, dt, b, Addition>(A);
-};
+}
 
 template<typename T, int D, int R, typename dt, bool b>
 auto max(const TensorExpression<T, D, R, dt, b> &A)
 {
     return full_reduction<T, D, R, dt, b, Max>(A);
-};
+}
 
 template<typename T, int D, int R, typename dt, bool b>
 auto min(const TensorExpression<T, D, R, dt, b> &A)
 {
     return full_reduction<T, D, R, dt, b, Min>(A);
-};
+}
 
+template<typename T, int D, int R, typename dt, bool b>
+auto all(const TensorExpression<T,D,R,dt,b> &A) {
+    return full_reduction<T,D,R,dt,b,LogicalAnd>(A);
+}
+
+template<typename T, int D, int R, typename dt, bool b>
+auto any(const TensorExpression<T,D,R,dt,b> &A){
+    return full_reduction<T,D,R,dt,b,LogicalOr>(A);
+}
 
 YAFEL_NAMESPACE_CLOSE
 

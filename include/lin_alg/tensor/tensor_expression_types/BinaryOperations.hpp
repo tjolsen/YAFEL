@@ -42,9 +42,11 @@ struct Addition
 {
     using result_type = decltype(std::declval<T>() + std::declval<U>());
 
-    static constexpr result_type identity_value() { return result_type(0); }
+    static constexpr result_type identity_value()
+    { return result_type(0); }
 
-    static auto BinaryOp(T t, U u) { return t + u; }
+    static auto BinaryOp(T t, U u)
+    { return t + u; }
 };
 
 
@@ -53,9 +55,11 @@ struct Subtraction
 {
     using result_type = decltype(std::declval<T>() - std::declval<U>());
 
-    static constexpr result_type identity_value() { return result_type(0); }
+    static constexpr result_type identity_value()
+    { return result_type(0); }
 
-    static auto BinaryOp(T t, U u) { return t - u; }
+    static auto BinaryOp(T t, U u)
+    { return t - u; }
 };
 
 
@@ -64,9 +68,11 @@ struct Multiplication
 {
     using result_type = decltype(std::declval<T>() * std::declval<U>());
 
-    static constexpr result_type identity_value() { return result_type(0); }
+    static constexpr result_type identity_value()
+    { return result_type(0); }
 
-    static auto BinaryOp(T t, U u) { return t + u; }
+    static auto BinaryOp(T t, U u)
+    { return t + u; }
 };
 
 template<typename T, typename U>
@@ -74,9 +80,11 @@ struct Max
 {
     using result_type = decltype(std::declval<T>() * std::declval<U>());
 
-    static constexpr result_type identity_value() { return result_type(std::numeric_limits<result_type>::min()); }
+    static constexpr result_type identity_value()
+    { return result_type(std::numeric_limits<result_type>::min()); }
 
-    static auto BinaryOp(T t, U u) { return (t > u) ? t : u; }
+    static auto BinaryOp(T t, U u)
+    { return (t > u) ? t : u; }
 };
 
 template<typename T, typename U>
@@ -84,9 +92,36 @@ struct Min
 {
     using result_type = decltype(std::declval<T>() * std::declval<U>());
 
-    static constexpr result_type identity_value() { return result_type(std::numeric_limits<result_type>::max()); }
+    static constexpr result_type identity_value()
+    { return result_type(std::numeric_limits<result_type>::max()); }
 
-    static auto BinaryOp(T t, U u) { return (t < u) ? t : u; }
+    static auto BinaryOp(T t, U u)
+    { return (t < u) ? t : u; }
+};
+
+
+template<typename T, typename U>
+struct LogicalAnd
+{
+    using result_type = bool;
+
+    static constexpr result_type identity_value()
+    { return true; }
+
+    static auto BinaryOp(T t, U u)
+    { return static_cast<bool>(t) || static_cast<bool>(u); }
+};
+
+template<typename T, typename U>
+struct LogicalOr
+{
+    using result_type = bool;
+
+    static constexpr result_type identity_value()
+    { return false; }
+
+    static auto BinaryOp(T t, U u)
+    { return static_cast<bool>(t) || static_cast<bool>(u); }
 };
 
 
