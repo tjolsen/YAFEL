@@ -6,6 +6,7 @@
  */
 
 #include "yafel_globals.hpp"
+#include "yafel_config.hpp"
 #include "utils/parallel/Task.hpp"
 
 
@@ -102,6 +103,28 @@ public:
             }
         }
     }
+
+    /**
+     * TaskScheduler is a non-copyable type
+     */
+    TaskScheduler(const TaskScheduler&) = delete;
+
+    /**
+     * TaskScheduler is a non-copyable type
+     */
+    TaskScheduler& operator=(const TaskScheduler&) = delete;
+
+    /**
+     * TaskScheduler is non-movable
+     */
+    TaskScheduler(TaskScheduler&&) = delete;
+
+
+    /**
+     * TaskScheduler is non-movable
+     */
+    TaskScheduler* operator=(TaskScheduler&&) = delete;
+
 
     inline ~TaskScheduler()
     {
@@ -233,6 +256,16 @@ private:
 
 
 };
+
+namespace {
+
+TaskScheduler GlobalTS(config::num_cores);
+
+} // end anon namespace
+
+inline auto& getGlobalScheduler() {
+    return GlobalTS;
+}
 
 YAFEL_NAMESPACE_CLOSE
 

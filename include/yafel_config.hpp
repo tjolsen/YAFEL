@@ -17,6 +17,11 @@ namespace config {
  */
 constexpr int cacheline_bytes = 64;
 
+/**
+ * Number of cores on the machine. Used in initializing the
+ * global TaskScheduler.
+ */
+constexpr int num_cores = 8;
 
 } //end namespace config
 
