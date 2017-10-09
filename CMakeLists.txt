@@ -142,6 +142,7 @@ set(SOURCE_FILES
         src/time_integration/DGRK4.cpp
 
         src/utils/DoFManager.cpp
+        src/utils/parallel/TaskScheduler.cpp
         )
 
 link_libraries("OpenCL")

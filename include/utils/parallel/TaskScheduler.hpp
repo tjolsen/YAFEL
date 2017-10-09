@@ -36,7 +36,7 @@ namespace worker_global {
  * and is essential for implementing other cross-task, thread-local
  * variables (like large reduction variables).
  */
-thread_local int worker_id{0};
+extern thread_local int worker_id;
 
 }
 
@@ -257,15 +257,9 @@ private:
 
 };
 
-namespace {
 
-TaskScheduler GlobalTS(config::num_cores);
-
-} // end anon namespace
-
-inline auto& getGlobalScheduler() {
-    return GlobalTS;
-}
+//Function to get the global task scheduler
+TaskScheduler& getGlobalScheduler();
 
 YAFEL_NAMESPACE_CLOSE
 

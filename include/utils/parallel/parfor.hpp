@@ -50,16 +50,14 @@ auto parfor(std::size_t idx_start,
     auto cleanup_start = full_blocks * blockSize + idx_start;
     auto Nblocks = full_blocks + ((cleanup_start < idx_end) ? 1 : 0);
 
+    /*
     std::cout << "Parfor: idx_start=" << idx_start
               << "  idx_end=" << idx_end
               << "  blockSize=" << blockSize
               << "  full_blocks=" << full_blocks
               << "  cleanup_start=" << cleanup_start
               << "  NBlocks = " << Nblocks << std::endl;
-
-    //lambda to execute a chunk of the loop
-    //const auto loopChunk =
-
+              */
 
     std::vector<std::future<void>> futs;
     futs.reserve(Nblocks);
@@ -69,13 +67,14 @@ auto parfor(std::size_t idx_start,
         std::size_t i_start = idx_start + iblock * blockSize;
         std::size_t i_end = i_start + blockSize;
         i_end = (i_end < idx_end) ? i_end : idx_end;
-        futs.push_back(
-                scheduler.enqueue(
-                        [&loopBody, i_start, i_end]() {
-                            for (auto i = i_start; i < i_end; ++i) {
-                                loopBody(i);
-                            }
-                        }));
+
+        auto [task, fut] = scheduler.createTask([&loopBody, i_start, i_end](){
+            for (auto i = i_start; i < i_end; ++i) {
+                loopBody(i);
+            }
+        });
+        scheduler.enqueue(task);
+        futs.push_back(std::move(fut));
 
     }
 
