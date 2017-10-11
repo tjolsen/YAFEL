@@ -50,14 +50,6 @@ auto parfor(std::size_t idx_start,
     auto cleanup_start = full_blocks * blockSize + idx_start;
     auto Nblocks = full_blocks + ((cleanup_start < idx_end) ? 1 : 0);
 
-    /*
-    std::cout << "Parfor: idx_start=" << idx_start
-              << "  idx_end=" << idx_end
-              << "  blockSize=" << blockSize
-              << "  full_blocks=" << full_blocks
-              << "  cleanup_start=" << cleanup_start
-              << "  NBlocks = " << Nblocks << std::endl;
-              */
 
     std::vector<std::future<void>> futs;
     futs.reserve(Nblocks);

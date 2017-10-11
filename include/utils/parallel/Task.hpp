@@ -115,6 +115,7 @@ private:
     struct TaskBase
     {
         virtual void operator()() = 0;
+        virtual ~TaskBase() = default;
     };
 
     template<typename F>

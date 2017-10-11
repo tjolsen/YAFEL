@@ -4,6 +4,7 @@
 
 #include "yafel_globals.hpp"
 #include "utils/SmallVector.hpp"
+#include "utils/parallel/yafel_parallel.hpp"
 #include <iostream>
 
 
@@ -14,29 +15,15 @@ using std::endl;
 
 int main()
 {
-    struct alignas(16) Tp
-    {
-        double a, b, c;
 
-        Tp(double x) : a(x), b(x), c(x)
-        {}
-    };
-    SmallVector<Tp, 2> V;
+    auto& TS = getGlobalScheduler();
 
-    V.push_back(1.0);
-    V.push_back(2.0);
 
-    int a = 0;
+    auto [task,fut] = TS.createTask([](){std::cout << "In Task" << std::endl;});
 
-    V.push_back(3.0);
-    V.push_back(4.0);
+    TS.enqueue(task);
 
-    cout << a << endl;
-
-    for (auto x : V) {
-        cout << x.a << endl;
-    }
-
+    fut.get();
     return 0;
 }
 

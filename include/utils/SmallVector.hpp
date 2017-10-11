@@ -45,9 +45,11 @@ protected:
         }
     }
 
-    inline static void destroyRange(iterator it_start, iterator it_end) {
-        if constexpr (!std::is_trivially_destructible<T>::value) {
-            while(it_end != it_start) {
+    inline static void destroyRange(iterator it_start, iterator it_end)
+    {
+        if constexpr (!std::is_trivially_destructible<T>::value)
+        {
+            while (it_end != it_start) {
                 --it_end;
                 it_end->~T();
             }
@@ -77,9 +79,7 @@ public:
     {
         if (newCapacity > _capacity) {
 
-
-
-            auto ptr = reinterpret_cast<T *>(new std::aligned_storage_t<sizeof(T),alignof(T)>[newCapacity]);
+            auto ptr = reinterpret_cast<T *>(new std::aligned_storage_t<sizeof(T), alignof(T)>[newCapacity]);
             if (ptr) {
                 std::move(p_begin, p_end, ptr);
                 auto oldSize = size();
@@ -91,7 +91,7 @@ public:
                 if (isSmall()) {
                     _isSmall = false;
                 } else {
-                    delete[] reinterpret_cast<std::aligned_storage_t<sizeof(T), alignof(T)>*>(oldBuffer);
+                    delete[] reinterpret_cast<std::aligned_storage_t<sizeof(T), alignof(T)> *>(oldBuffer);
                 }
             }
         }
@@ -99,8 +99,12 @@ public:
 
     void resize(std::size_t newSize)
     {
+        auto old_size = this->size();
         reserve(newSize);
         p_end = p_begin + newSize;
+        if (newSize < old_size) {
+            destroyRange(p_end, p_begin + old_size);
+        }
     }
 
     void resize(std::size_t newSize, const T &fillElement)
@@ -131,7 +135,8 @@ public:
     }
 
     template<typename ...Args>
-    void emplace_back(Args ...args) {
+    void emplace_back(Args ...args)
+    {
         if (size() >= capacity()) {
             reserve(2 * _capacity);
         }
@@ -142,7 +147,8 @@ public:
     void pop_back()
     {
         if (size() > 0) {
-            if constexpr (!std::is_trivially_destructible<T>::value) {
+            if constexpr (!std::is_trivially_destructible<T>::value)
+            {
                 --p_end->~T();
             } else {
                 --p_end;
@@ -151,7 +157,11 @@ public:
         throw std::runtime_error("Bad pop on empty SmallVector");
     }
 
-    std::size_t size() const { return cend() - cbegin(); }
+    std::size_t size() const
+    {
+        return (reinterpret_cast<std::size_t>(p_end)
+                - reinterpret_cast<std::size_t>(p_begin)) / sizeof(T);
+    }
 
     std::size_t &capacity() { return _capacity; }
 
@@ -192,14 +202,15 @@ public:
 
     SmallVector(std::size_t n, const T &val) : SmallVector(n)
     {
-        for(auto it = this->begin(); it < this->end(); ++it) {
+        for (auto it = this->begin(); it < this->end(); ++it) {
             new(it) T(val);
         }
     }
 
-    SmallVector(std::initializer_list<T> L) : SmallVector() {
+    SmallVector(std::initializer_list<T> L) : SmallVector()
+    {
         this->reserve(L.size());
-        for(auto const& l : L) {
+        for (auto const &l : L) {
             this->push_back(l);
         }
     }
@@ -250,10 +261,10 @@ public:
                 this->p_begin = reinterpret_cast<T *>(&buffer[0]);
                 this->_capacity = N;
                 this->_isSmall = true;
-                std::copy(rhs.cbegin(), rhs.cend(), this->begin());
+                std::move(rhs.cbegin(), rhs.cend(), this->begin());
             } else {
                 this->resize(rhs.size());
-                std::copy(rhs.cbegin(), rhs.cend(), this->begin());
+                std::move(rhs.cbegin(), rhs.cend(), this->begin());
             }
         } else {
             //move from rhs vector
@@ -286,7 +297,7 @@ public:
     template<std::size_t N2>
     SmallVector<T, N> &operator=(SmallVector<T, N2> &&rhs)
     {
-        this->move(std::forward<SmallVector<T,N2>>(rhs));
+        this->move(std::forward<SmallVector<T, N2>>(rhs));
         return *this;
     }
 
@@ -314,13 +325,14 @@ protected:
     }
 
     template<std::size_t N2>
-    void move(SmallVector<T,N2> &&rhs) {
-        if(rhs.isSmall()) {
+    void move(SmallVector<T, N2> &&rhs)
+    {
+        if (rhs.isSmall()) {
             copy(rhs);
         } else {
             //clean up current buffer and free if (!this->isSmall())
             this->destroyRange(this->begin(), this->end());
-            if(!this->isSmall()) {
+            if (!this->isSmall()) {
                 this->freeBuffer();
             }
 
