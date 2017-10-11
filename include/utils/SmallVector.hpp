@@ -157,11 +157,7 @@ public:
         throw std::runtime_error("Bad pop on empty SmallVector");
     }
 
-    std::size_t size() const
-    {
-        return (reinterpret_cast<std::size_t>(p_end)
-                - reinterpret_cast<std::size_t>(p_begin)) / sizeof(T);
-    }
+    std::size_t size() const { return p_end - p_begin; }
 
     std::size_t &capacity() { return _capacity; }
 
