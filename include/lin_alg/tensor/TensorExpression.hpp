@@ -89,7 +89,7 @@ public:
     auto const& asConst() const { return static_cast<TensorExpression<TE,D,R,dataType,false> const&>(*this);}
 
     // Evaluate the current expression into a Tensor<D,R,dataType>
-    auto eval() const noexcept
+    YAFEL_ALWAYS_INLINE auto eval() const noexcept
     {
         return Tensor<D, R, dataType>(self());
     }
@@ -97,26 +97,26 @@ public:
 
     // Compute linear index of a (i,j,k...) component
     template<int S, typename INT>
-    inline int index(sequence<S>, INT i) const noexcept
+    YAFEL_ALWAYS_INLINE int index(sequence<S>, INT i) const noexcept
     {
         return i * S;
     }
 
     template<int S, int ...SS, typename INT, typename ...Args>
-    inline int index(sequence<S, SS...>, INT i, Args ...args) const noexcept
+    YAFEL_ALWAYS_INLINE int index(sequence<S, SS...>, INT i, Args ...args) const noexcept
     {
         return S * i + index(sequence<SS...>(), args...);
     }
 
 
     // Access tensor via linear indexing
-    inline dataType linearIndexing(int idx) const noexcept
+    YAFEL_ALWAYS_INLINE dataType linearIndexing(int idx) const noexcept
     {
         return self().linearIndexing(idx);
     }
 
     template<bool dummy_bool = assignable, typename = typename std::enable_if<dummy_bool>::type>
-    inline dataType &linearIndexing(int idx) noexcept
+    YAFEL_ALWAYS_INLINE dataType &linearIndexing(int idx) noexcept
     {
         return self().linearIndexing(idx);
     }
@@ -125,20 +125,20 @@ public:
     // Parenthesis indexing operator
     template<typename ...Args,
             typename=typename std::enable_if<all_of_type<int>(type_list<Args...>())>::type>
-    dataType operator()(Args... args) const noexcept { return linearIndexing(index(stride_sequence(), args...)); }
+    YAFEL_ALWAYS_INLINE dataType operator()(Args... args) const noexcept { return linearIndexing(index(stride_sequence(), args...)); }
 
 
     template<bool dummy_bool = assignable, typename = typename std::enable_if<dummy_bool>::type,
             typename ...Args,
             typename=typename std::enable_if<all_of_type<int>(type_list<Args...>())>::type>
-    dataType &operator()(Args... args) noexcept { return linearIndexing(index(stride_sequence(), args...)); }
+    YAFEL_ALWAYS_INLINE dataType &operator()(Args... args) noexcept { return linearIndexing(index(stride_sequence(), args...)); }
 
 
     //Slicing indexing operator
     template<typename ...Args,
             typename=typename std::enable_if<contains<slice_sentinel>(type_list<Args...>())>::type
     >
-    auto operator()(Args ...args) noexcept
+    YAFEL_ALWAYS_INLINE auto operator()(Args ...args) noexcept
     {
         return make_slice(*this,
                           make_slice_offset(stride_sequence(), args...),
@@ -148,7 +148,7 @@ public:
     template<typename ...Args,
             typename=typename std::enable_if<contains<slice_sentinel>(type_list<Args...>())>::type
     >
-    auto operator()(Args ...args) const noexcept
+    YAFEL_ALWAYS_INLINE auto operator()(Args ...args) const noexcept
     {
         return make_const_slice(*this,
                                 make_slice_offset(stride_sequence(), args...),
@@ -160,13 +160,13 @@ public:
      * @return
      */
     template<int ...IDXS>
-    auto perm() const noexcept
+    YAFEL_ALWAYS_INLINE auto perm() const noexcept
     {
         return const_permute(*this, sequence<IDXS...>());
     }
 
     template<int ...IDXS>
-    auto perm() noexcept
+    YAFEL_ALWAYS_INLINE auto perm() noexcept
     {
         return permute(*this, sequence<IDXS...>());
     }
@@ -184,30 +184,30 @@ public:
         TensorExpressionIterator(TensorExpression<TE, D, R, dataType, assignable> &te, int off)
                 : te_ref(te.self()), offset(off) {}
 
-        inline bool operator!=(const TensorExpressionIterator &other)
+        YAFEL_ALWAYS_INLINE bool operator!=(const TensorExpressionIterator &other)
         {
             return offset != other.offset;
         }
 
-        inline bool operator==(const TensorExpressionIterator &other)
+        YAFEL_ALWAYS_INLINE bool operator==(const TensorExpressionIterator &other)
         {
             return offset == other.offset;
         }
 
-        inline auto operator++()
+        YAFEL_ALWAYS_INLINE auto operator++()
         {
             ++offset;
             return *this;
         }
 
 
-        inline dataType operator*() const noexcept
+        YAFEL_ALWAYS_INLINE dataType operator*() const noexcept
         {
             return te_ref.linearIndexing(offset);
         }
 
         template<bool dummy_bool = assignable, typename = typename std::enable_if<dummy_bool>::type>
-        inline dataType &operator*() noexcept
+        YAFEL_ALWAYS_INLINE dataType &operator*() noexcept
         {
             return te_ref.linearIndexing(offset);
         }
@@ -228,49 +228,49 @@ public:
         ConstTensorExpressionIterator(const TensorExpression<TE, D, R, dataType, assignable> &te, int off)
                 : te_ref(te.self()), offset(off) {}
 
-        inline bool operator!=(const ConstTensorExpressionIterator &other) const noexcept
+        YAFEL_ALWAYS_INLINE bool operator!=(const ConstTensorExpressionIterator &other) const noexcept
         {
             return offset != other.offset;
         }
-        inline bool operator==(const ConstTensorExpressionIterator &other) const noexcept
+        YAFEL_ALWAYS_INLINE bool operator==(const ConstTensorExpressionIterator &other) const noexcept
         {
             return offset == other.offset;
         }
 
-        inline auto operator++()
+        YAFEL_ALWAYS_INLINE auto operator++()
         {
             ++offset;
             return *this;
         }
 
-        dataType operator*() const noexcept
+        YAFEL_ALWAYS_INLINE dataType operator*() const noexcept
         {
             return te_ref.linearIndexing(offset);
         }
 
         template<bool dummy_bool = assignable, typename = typename std::enable_if<dummy_bool>::type>
-        dataType const &operator*() const noexcept
+        YAFEL_ALWAYS_INLINE dataType const &operator*() const noexcept
         {
             return te_ref.linearIndexing(offset);
         }
     };
 
-    ConstTensorExpressionIterator begin() const noexcept
+    YAFEL_ALWAYS_INLINE ConstTensorExpressionIterator begin() const noexcept
     {
         return ConstTensorExpressionIterator(*this, 0);
     }
 
-    ConstTensorExpressionIterator end() const noexcept
+    YAFEL_ALWAYS_INLINE ConstTensorExpressionIterator end() const noexcept
     {
         return ConstTensorExpressionIterator(*this, tensor_storage(R));
     }
 
-    auto begin() noexcept
+    YAFEL_ALWAYS_INLINE auto begin() noexcept
     {
         return TensorExpressionIterator(*this, 0);
     }
 
-    auto end() noexcept
+    YAFEL_ALWAYS_INLINE auto end() noexcept
     {
         return TensorExpressionIterator(*this, tensor_storage(R));
     }

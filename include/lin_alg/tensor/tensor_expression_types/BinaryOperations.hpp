@@ -58,7 +58,7 @@ struct Subtraction
     static constexpr result_type identity_value()
     { return result_type(0); }
 
-    static auto BinaryOp(T t, U u)
+    YAFEL_ALWAYS_INLINE static auto BinaryOp(T t, U u)
     { return t - u; }
 };
 
@@ -71,7 +71,7 @@ struct Multiplication
     static constexpr result_type identity_value()
     { return result_type(0); }
 
-    static auto BinaryOp(T t, U u)
+    YAFEL_ALWAYS_INLINE static auto BinaryOp(T t, U u)
     { return t + u; }
 };
 
@@ -83,7 +83,7 @@ struct Max
     static constexpr result_type identity_value()
     { return result_type(std::numeric_limits<result_type>::min()); }
 
-    static auto BinaryOp(T t, U u)
+    YAFEL_ALWAYS_INLINE static auto BinaryOp(T t, U u)
     { return (t > u) ? t : u; }
 };
 
@@ -95,7 +95,7 @@ struct Min
     static constexpr result_type identity_value()
     { return result_type(std::numeric_limits<result_type>::max()); }
 
-    static auto BinaryOp(T t, U u)
+    YAFEL_ALWAYS_INLINE static auto BinaryOp(T t, U u)
     { return (t < u) ? t : u; }
 };
 
@@ -108,7 +108,7 @@ struct LogicalAnd
     static constexpr result_type identity_value()
     { return true; }
 
-    static auto BinaryOp(T t, U u)
+    YAFEL_ALWAYS_INLINE static auto BinaryOp(T t, U u)
     { return static_cast<bool>(t) || static_cast<bool>(u); }
 };
 
@@ -120,7 +120,7 @@ struct LogicalOr
     static constexpr result_type identity_value()
     { return false; }
 
-    static auto BinaryOp(T t, U u)
+    YAFEL_ALWAYS_INLINE static auto BinaryOp(T t, U u)
     { return static_cast<bool>(t) || static_cast<bool>(u); }
 };
 

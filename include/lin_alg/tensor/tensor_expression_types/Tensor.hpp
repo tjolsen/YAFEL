@@ -38,7 +38,7 @@ public:
 
     // Construct from a TensorExpression
     template<typename TE, typename dt2, bool b, typename=typename std::enable_if<std::is_convertible<dataType, dt2>::value>::type>
-    Tensor(const TensorExpression <TE, D, R, dt2, b> &rhs)
+    YAFEL_ALWAYS_INLINE Tensor(const TensorExpression <TE, D, R, dt2, b> &rhs)
     {
 
         auto rit = rhs.begin();
@@ -49,12 +49,12 @@ public:
     }
 
     //implement indexing operations
-    dataType linearIndexing(int idx) const noexcept
+    YAFEL_ALWAYS_INLINE dataType linearIndexing(int idx) const noexcept
     {
         return data[idx];
     }
 
-    dataType &linearIndexing(int idx) noexcept
+    YAFEL_ALWAYS_INLINE dataType &linearIndexing(int idx) noexcept
     {
         return data[idx];
     }

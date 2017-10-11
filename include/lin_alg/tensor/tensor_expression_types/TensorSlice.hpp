@@ -35,7 +35,7 @@ public:
     }
 
     template<typename TT, typename dt2, bool Tb>
-    auto& operator=(const TensorExpression<TT,D,R,dt2,Tb> &rhs) noexcept
+    YAFEL_ALWAYS_INLINE auto& operator=(const TensorExpression<TT,D,R,dt2,Tb> &rhs) noexcept
     {
         auto rit=rhs.begin();
         for(auto it=super::begin(); it!=super::end(); ++it, ++rit) {
@@ -45,21 +45,21 @@ public:
     }
 
 
-    inline dataType linearIndexing(int idx) const noexcept
+    YAFEL_ALWAYS_INLINE dataType linearIndexing(int idx) const noexcept
     {
         return te_ref.linearIndexing(offset+local_to_parent(idx,typename super::stride_sequence(), parent_strides()));
     }
 
     template<bool dummy_bool=assignable, typename=typename std::enable_if<dummy_bool>::type>
-    inline dataType &linearIndexing(int idx) noexcept
+    YAFEL_ALWAYS_INLINE dataType &linearIndexing(int idx) noexcept
     {
         return te_ref.linearIndexing(offset+local_to_parent(idx,typename super::stride_sequence(), parent_strides()));
     }
 
-    inline int local_to_parent(int, sequence<>, sequence<>) const noexcept { return 0; }
+    YAFEL_ALWAYS_INLINE int local_to_parent(int, sequence<>, sequence<>) const noexcept { return 0; }
 
     template<int S, int ...SS, int P, int ...PP>
-    inline int local_to_parent(int idx, sequence<S,SS...>, sequence<P, PP...>) const noexcept
+    YAFEL_ALWAYS_INLINE int local_to_parent(int idx, sequence<S,SS...>, sequence<P, PP...>) const noexcept
     {
         return P*(idx/S) + local_to_parent(idx%S, sequence<SS...>(), sequence<PP...>());
     }
@@ -86,16 +86,16 @@ public:
     }
 
 
-    inline dataType linearIndexing(int idx) const noexcept
+    YAFEL_ALWAYS_INLINE dataType linearIndexing(int idx) const noexcept
     {
         return te_ref.linearIndexing(offset+local_to_parent(idx,typename super::stride_sequence(), parent_strides()));
     }
 
 
-    inline int local_to_parent(int, sequence<>, sequence<>) const noexcept { return 0; }
+    YAFEL_ALWAYS_INLINE int local_to_parent(int, sequence<>, sequence<>) const noexcept { return 0; }
 
     template<int S, int ...SS, int P, int ...PP>
-    inline int local_to_parent(int idx, sequence<S,SS...>, sequence<P, PP...>) const noexcept
+    YAFEL_ALWAYS_INLINE int local_to_parent(int idx, sequence<S,SS...>, sequence<P, PP...>) const noexcept
     {
         return P*(idx/S) + local_to_parent(idx%S, sequence<SS...>(), sequence<PP...>());
     }

@@ -27,7 +27,7 @@ public:
                         const TensorExpression<T2, D, R, dt2, b2> &rhs)
             : lhs_(lhs.self()), rhs_(rhs.self()) {}
 
-    inline result_type linearIndexing(int idx) const noexcept
+    YAFEL_ALWAYS_INLINE result_type linearIndexing(int idx) const noexcept
     {
         return BinaryOpType<dt1, dt2>::BinaryOp(lhs_.linearIndexing(idx), rhs_.linearIndexing(idx));
     }
