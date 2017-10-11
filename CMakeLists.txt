@@ -1,14 +1,24 @@
 cmake_minimum_required(VERSION 3.5)
 project(YAFEL)
+#==========================================
 
+option(USE_HDF5 "Enable HDF5 Output" OFF)
+
+set(VIENNACL_BACKEND OPENMP CACHE STRINGS "OPENMP OPENCL" FORCE)
+
+
+
+#==========================================
 find_package(OpenMP REQUIRED)
 find_package(OpenCL REQUIRED)
 find_package (Eigen3 REQUIRED NO_MODULE)
-find_package(HDF5 COMPONENTS C HL REQUIRED)
 
 include_directories(${EIGEN3_INCLUDE_DIR})
-include_directories(${HDF5_INCLUDE_DIRS})
 
+if(USE_HDF5 STREQUAL "ON")
+    find_package(HDF5 COMPONENTS C HL REQUIRED)
+    include_directories(${HDF5_INCLUDE_DIRS})
+endif()
 
 set(OPT_FLAGS
         "-march=native -malign-data=cacheline -ffast-math -fopenmp -finline-limit=1000000")

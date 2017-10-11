@@ -6,6 +6,8 @@
 #include <output/OutputMesh.hpp>
 #include "output/HDFBackend.hpp"
 
+#ifdef USE_HDF5
+
 #include <hdf5/serial/hdf5.h>
 #include <hdf5/serial/hdf5_hl.h>
 
@@ -250,6 +252,7 @@ void HDFBackend::write_mesh(OutputMesh *outputMesh)
 }
 
 
+
 // For element type numbering, see documentation
 // http://www.xdmf.org/index.php/XDMF_Model_and_Format#Topology
 int ElementType_to_XDMFType(ElementType et)
@@ -275,3 +278,5 @@ int ElementType_to_XDMFType(ElementType et)
 }
 
 YAFEL_NAMESPACE_CLOSE
+
+#endif

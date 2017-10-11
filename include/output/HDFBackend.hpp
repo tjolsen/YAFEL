@@ -8,7 +8,11 @@
 #include "yafel_globals.hpp"
 #include "output/OutputBackend.hpp"
 
+#ifdef USE_HDF5
 #include <hdf5/serial/hdf5.h>
+#else
+#define hid_t int
+#endif
 #include <fstream>
 
 YAFEL_NAMESPACE_OPEN
