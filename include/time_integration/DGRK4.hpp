@@ -8,7 +8,7 @@
 #include "yafel_globals.hpp"
 #include "fe_system/FESystem.hpp"
 #include "assembly/DGAssembly.hpp"
-#include <Eigen/Dense>
+#include <eigen3/Eigen/Dense>
 
 YAFEL_NAMESPACE_OPEN
 

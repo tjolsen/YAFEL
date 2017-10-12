@@ -7,33 +7,40 @@ option(COMPILE_APPS "Compile application directory" OFF)
 set(VIENNACL_BACKEND OPENMP CACHE STRINGS "OPENMP OPENCL" FORCE)
 
 
-
 #==========================================
 find_package(OpenMP REQUIRED)
-find_package (Eigen3 REQUIRED NO_MODULE)
+if(OPENMP_FOUND)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
 
-include_directories(${EIGEN3_INCLUDE_DIR})
+find_package(Eigen3 REQUIRED NO_MODULE)
+include_directories(${Eigen3_INCLUDE_DIR})
 
-if(USE_HDF5 STREQUAL "ON")
+
+if (USE_HDF5 STREQUAL  "ON")
     find_package(HDF5 COMPONENTS C HL REQUIRED)
     include_directories(${HDF5_INCLUDE_DIRS})
-endif()
+endif ()
 
-if(VIENNACL_BACKEND STREQUAL "OPENCL")
+if (VIENNACL_BACKEND STREQUAL "OPENCL")
     set(USE_OPENCL 1)
     find_package(OpenCL REQUIRED)
-endif()
+    set(VIENNACL_CXX_FLAGS "-DVIENNACL_WITH_OPENCL")
+else ()
+    set(VIENNACL_CXX_FLAGS "-DVIENNACL_WITH_OPENMP")
+endif ()
 
-    set(OPT_FLAGS
+set(OPT_FLAGS
         "-march=native -malign-data=cacheline -ffast-math -fopenmp -finline-limit=1000000")
 
-set(VIENNACL_CXX_FLAGS "-DVIENNACL_WITH_OPENCL")
+
 #set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread -std=c++17")
 
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${VIENNACL_CXX_FLAGS} -O3 -Wall -Wno-sign-compare -DNDEBUG -DEIGEN_DEFAULT_INDEX_TYPE=int ${OPT_FLAGS}")
 
-set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -fno-omit-frame-pointer")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fopenmp -Wall -Wextra -fno-omit-frame-pointer")
 
 set(SOURCE_FILES
         include/assembly/AssemblyRequirement.hpp
@@ -159,23 +166,24 @@ set(SOURCE_FILES
         src/utils/parallel/TaskScheduler.cpp
         )
 
-if(USE_OPENCL)
-link_libraries("OpenCL")
-endif()
+if (USE_OPENCL)
+    link_libraries("OpenCL")
+endif ()
 
-if(USE_HDF5 STREQUAL "ON")
+if (USE_HDF5 STREQUAL "ON")
     link_libraries(${HDF5_C_LIBRARIES})
     link_libraries(${HDF5_C_HL_LIBRARIES})
-endif()
+endif ()
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 add_library(yafel ${SOURCE_FILES})
+target_link_libraries(yafel pthread)
 
 add_executable(sandbox experimental/sandbox.cpp)
 target_link_libraries(sandbox yafel)
 
 
 # Add any subdirectories to the project
-if(COMPILE_APPS STREQUAL "ON")
+if (COMPILE_APPS STREQUAL "ON")
     add_subdirectory(apps)
-endif()
+endif ()
