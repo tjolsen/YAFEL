@@ -1,13 +1,17 @@
 cmake_minimum_required(VERSION 3.5)
-project(YAFEL)
+project(YAFEL VERSION 0.1 LANGUAGES CXX)
 #==========================================
+include(ProcessorCount)
+ProcessorCount(NATIVE_CORE_COUNT)
 
 option(USE_HDF5 "Enable HDF5 Output" ON)
 option(COMPILE_APPS "Compile application directory" ON)
 set(VIENNACL_BACKEND OPENMP CACHE STRINGS "OPENMP OPENCL" FORCE)
-set(CORE_COUNT 8 CACHE STRING "Number of cores to make YAFEL aware of")
+set(CORE_COUNT ${NATIVE_CORE_COUNT} CACHE STRING "Number of cores to make YAFEL aware of")
+#add_definitions(-DNUM_CPU_CORES=${CORE_COUNT})
 
-add_definitions(-DNUM_CPU_CORES=${CORE_COUNT})
+
+
 
 #==========================================
 find_package(OpenMP REQUIRED)
