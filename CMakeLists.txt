@@ -5,7 +5,9 @@ project(YAFEL)
 option(USE_HDF5 "Enable HDF5 Output" ON)
 option(COMPILE_APPS "Compile application directory" ON)
 set(VIENNACL_BACKEND OPENMP CACHE STRINGS "OPENMP OPENCL" FORCE)
+set(CORE_COUNT 8 CACHE STRING "Number of cores to make YAFEL aware of")
 
+add_definitions(-DNUM_CPU_CORES=${CORE_COUNT})
 
 #==========================================
 find_package(OpenMP REQUIRED)
