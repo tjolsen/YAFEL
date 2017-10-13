@@ -21,7 +21,12 @@ constexpr int cacheline_bytes = 64;
  * Number of cores on the machine. Used in initializing the
  * global TaskScheduler.
  */
+#ifndef NUM_CPU_CORES
+#define NUM_CPU_CORES 8
 constexpr int num_cores = 8;
+#else
+constexpr int num_cores = NUM_CPU_CORES;
+#endif
 
 } //end namespace config
 
