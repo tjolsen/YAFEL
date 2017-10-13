@@ -150,9 +150,9 @@ public:
     };
 
 
-    void enqueue(std::shared_ptr<Task<>> &task_ptr)
+    void enqueue(std::shared_ptr<Task<>> task_ptr)
     {
-        auto i = _index++;
+        std::size_t i = _index++;
 
         //try to push without blocking
         for (int n = 0; n != count * spin_count; ++n) {

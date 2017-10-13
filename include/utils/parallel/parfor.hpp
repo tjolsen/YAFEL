@@ -60,7 +60,7 @@ auto parfor(std::size_t idx_start,
         std::size_t i_end = i_start + blockSize;
         i_end = (i_end < idx_end) ? i_end : idx_end;
 
-        auto [task, fut] = scheduler.createTask([&loopBody, i_start, i_end](){
+        auto [task, fut] = scheduler.createTask([&loopBody, i_start, i_end]() mutable {
             for (auto i = i_start; i < i_end; ++i) {
                 loopBody(i);
             }

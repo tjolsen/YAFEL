@@ -3,7 +3,7 @@ project(YAFEL)
 #==========================================
 
 option(USE_HDF5 "Enable HDF5 Output" OFF)
-option(COMPILE_APPS "Compile application directory" OFF)
+option(COMPILE_APPS "Compile application directory" ON)
 set(VIENNACL_BACKEND OPENMP CACHE STRINGS "OPENMP OPENCL" FORCE)
 
 
@@ -14,13 +14,21 @@ if(OPENMP_FOUND)
     set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
+# Eigen is required
 find_package(Eigen3 REQUIRED NO_MODULE)
 include_directories(${Eigen3_INCLUDE_DIR})
 
+# OpenMP is required
+find_package(OpenMP REQUIRED)
+if(OPENMP_FOUND)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+endif()
 
-if (USE_HDF5 STREQUAL  "ON")
+if (USE_HDF5)
     find_package(HDF5 COMPONENTS C HL REQUIRED)
     include_directories(${HDF5_INCLUDE_DIRS})
+    add_definitions(-DUSE_HDF5)
 endif ()
 
 if (VIENNACL_BACKEND STREQUAL "OPENCL")
@@ -103,6 +111,8 @@ set(SOURCE_FILES
         include/output/OutputMesh.hpp
         include/output/SimulationOutput.hpp
         include/output/VTUBackend.hpp
+
+        include/PDE/PDEBase.hpp
 
         include/quadrature/LobattoPoints1D.hpp
         include/quadrature/QuadratureRule.hpp

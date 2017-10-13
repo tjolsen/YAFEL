@@ -31,10 +31,15 @@
 // Utils
 #include "utils/DoFManager.hpp"
 #include "utils/DualNumber.hpp"
-#include "utils/parallel/TaskScheduler.hpp"
-#include "utils/parallel/parfor.hpp"
-#include "utils/parallel/wait_all.hpp"
-#include "utils/parallel/wait_any.hpp"
+#include "utils/parallel/yafel_parallel.hpp"
+
+//PDE (I'm hoping to put interesting auto-generating stuff in here at some point)
+// CRTP + expr templates to build up a PDE?
+// Could look like: Div(K*Grad(u)) + F = 0
+// u <-- FunctionSpace(polyOrder, Continuous/Discontinuous)
+//
+// Look to Fenics for inspiration. In the meantime, it's a pretty empty header.
+#include "PDE/PDEBase.hpp"
 
 // Mesh
 #include "mesh/mesh_typedefs.hpp"

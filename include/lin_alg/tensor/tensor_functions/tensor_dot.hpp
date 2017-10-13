@@ -37,7 +37,7 @@ YAFEL_NAMESPACE_OPEN
  * @return Full Contraction (scalar product) of lhs and rhs.
  */
 template<typename T1, typename T2, int D, int R, typename dt1, typename dt2, bool b1, bool b2>
-decltype(dt1() * dt2()) dot(const TensorExpression <T1, D, R, dt1, b1> &lhs,
+YAFEL_ALWAYS_INLINE decltype(dt1() * dt2()) dot(const TensorExpression <T1, D, R, dt1, b1> &lhs,
                             const TensorExpression <T2, D, R, dt2, b2> &rhs)
 {
 

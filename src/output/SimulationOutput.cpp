@@ -16,9 +16,11 @@ SimulationOutput::SimulationOutput(std::string fname_base, BackendType backendTy
         case BackendType::VTU:
             backend = std::make_unique<VTUBackend>();
             break;
+#ifdef USE_HDF5
         case BackendType::HDF5:
             backend = std::make_unique<HDFBackend>();
             break;
+#endif
     }
 
 

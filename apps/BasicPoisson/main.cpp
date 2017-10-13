@@ -60,7 +60,6 @@ Eigen::VectorXd solveSystem(const Eigen::SparseMatrix<double> &A, const Eigen::V
 
     std::cout << "Norm0 = " << rhs.norm() << std::endl;
 
-
     viennacl::vector<double> vcl_rhs(rhs.rows());
     viennacl::compressed_matrix<double> vcl_A(A.rows(), A.cols());
     viennacl::copy(rhs, vcl_rhs);

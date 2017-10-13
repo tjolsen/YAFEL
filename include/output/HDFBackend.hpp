@@ -17,6 +17,8 @@
 
 YAFEL_NAMESPACE_OPEN
 
+
+#ifdef USE_HDF5
 /**
  * \class HDFBackend
  * Output backend for the XDMF + HDF5 supported by Paraview.
@@ -45,7 +47,7 @@ private:
     bool mesh_is_written{false};
 };
 
-
+#endif
 YAFEL_NAMESPACE_CLOSE
 
 #endif //YAFEL_HDFBACKEND_HPP

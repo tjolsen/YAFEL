@@ -18,3 +18,6 @@ target_link_libraries(shellProject yafel)
 
 add_executable(finiteVolume FiniteVolume/main.cpp)
 target_link_libraries(finiteVolume yafel)
+
+add_executable(supg supg_learning/main.cpp supg_learning/supg_advection.hpp)
+target_link_libraries(supg yafel)

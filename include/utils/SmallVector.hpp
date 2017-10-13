@@ -27,10 +27,14 @@ public:
     using reference = T &;
     using const_reference = T const &;
 
+
+
 protected:
     T *p_begin, *p_end;
     std::size_t _capacity{0};
     bool _isSmall{false};
+    using storage_type = std::aligned_storage_t<sizeof(T), alignof(T)>;
+
 
     SmallVectorImpl() : p_begin(nullptr), p_end(nullptr) {}
 
@@ -41,7 +45,7 @@ protected:
     void freeBuffer()
     {
         if (p_begin) {
-            delete[] reinterpret_cast<char *>(p_begin);
+            delete[] reinterpret_cast<storage_type *>(p_begin);
         }
     }
 
@@ -79,7 +83,7 @@ public:
     {
         if (newCapacity > _capacity) {
 
-            auto ptr = reinterpret_cast<T *>(new std::aligned_storage_t<sizeof(T), alignof(T)>[newCapacity]);
+            auto ptr = reinterpret_cast<T *>(new storage_type[newCapacity]);
             if (ptr) {
                 std::move(p_begin, p_end, ptr);
                 auto oldSize = size();
@@ -91,7 +95,7 @@ public:
                 if (isSmall()) {
                     _isSmall = false;
                 } else {
-                    delete[] reinterpret_cast<std::aligned_storage_t<sizeof(T), alignof(T)> *>(oldBuffer);
+                    delete[] reinterpret_cast<storage_type *>(oldBuffer);
                 }
             }
         }
@@ -182,7 +186,7 @@ public:
 template<typename T, std::size_t N>
 class SmallVector : public SmallVectorImpl<T>
 {
-
+    using storage_type = typename SmallVectorImpl<T>::storage_type;
 public:
 
     SmallVector()
@@ -344,7 +348,7 @@ protected:
         }
     }
 
-    typename std::aligned_storage_t<sizeof(T), alignof(T)> buffer[N];
+    storage_type buffer[N];
 };
 
 

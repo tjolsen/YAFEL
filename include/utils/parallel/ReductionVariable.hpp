@@ -33,6 +33,10 @@ constexpr int required_padding(int S) {
  */
 template<typename T, int RP = detail::required_padding(sizeof(T))>
 struct alignas(alignof(T)) ReductionVariable : public T {
+public:
+    template<typename ...Args>
+    ReductionVariable(Args && ...args) : T(std::forward<Args>(args)...) {}
+
 private:
     int8_t padding[detail::required_padding(sizeof(T))];
 };

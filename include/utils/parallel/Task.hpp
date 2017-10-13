@@ -66,7 +66,6 @@ private:
 
 
             internal_task = std::make_unique<TaskImpl<decltype(task_func)> >(std::move(task_func));
-
         }
         else {
 
@@ -84,11 +83,7 @@ private:
                         }
                     };
 
-
             internal_task = std::make_unique<TaskImpl<decltype(task_func)> >(std::move(task_func));
-
-
-
         }
 
 
@@ -130,7 +125,6 @@ private:
 
         F callable;
     };
-
 
     std::unique_ptr<TaskBase> internal_task;
 };
