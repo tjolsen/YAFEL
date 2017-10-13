@@ -34,10 +34,9 @@ public:
 
         if constexpr (flag == Transient)
         {
-            int A = 0;
             for (int Anode = 0; Anode < E.localMesh.nNodes(); ++Anode) {
-                for (int i = 0; i < NSD; ++i, ++A) {
-                    gradPhi(i) += E.shapeGrad(Anode, i) * U_el(A);
+                for (int i = 0; i < NSD; ++i) {
+                    gradPhi(i) += E.shapeGrad(Anode, i) * U_el(Anode);
                 }
             }
         }
