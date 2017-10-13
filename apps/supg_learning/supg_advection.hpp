@@ -78,7 +78,7 @@ public:
     constexpr static double Q{0.0};
     constexpr static double k{0.01};
     constexpr static double alpha = 1.0;
-    constexpr static double h = 0.025;
+    constexpr static double h = 0.1;
 
     static Tensor<NSD,1,double> advectionVelocity(coordinate<> x) {
         Tensor<NSD,1,double> ret(0); ret(0) = 1;

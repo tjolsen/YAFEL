@@ -23,7 +23,7 @@ int main() {
 
     constexpr int nsd = 2;
     Mesh M("mesh.msh");
-    int p=1;
+    int p=2;
     int dofpn = 1;
 
     DoFManager dofm(M,DoFManager::ManagerType::CG, p, dofpn);
