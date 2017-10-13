@@ -14,7 +14,7 @@ auto solveSystem(const MatType &A, const Eigen::VectorXd &b) {
 
     Eigen::BiCGSTAB<MatType> solver;
     solver.compute(A);
-    Eigen::VectorXd x = solver.solve(b);
+    Eigen::VectorXd x = solver.solveWithGuess(b,b);
     return x;
 }
 
@@ -28,7 +28,7 @@ int main() {
 
     DoFManager dofm(M,DoFManager::ManagerType::CG, p, dofpn);
     FESystem feSystem(dofm);
-    CGAssembly<AdvectionDiffusionSUPG<nsd>>(feSystem);
+    CGAssembly<AdvectionDiffusionSUPG<nsd,Steady>>(feSystem);
 
     DirichletBC bc0(dofm,0.0);
     bc0.selectByFunction([](auto x){return std::abs(x(0)) < 1.0e-6;});
@@ -37,9 +37,6 @@ int main() {
 
     bc0.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
     bc1.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
-
-    //std::cout << feSystem.getGlobalTangent() << std::endl;
-    feSystem.getSolution() = Eigen::VectorXd(feSystem.getGlobalResidual().rows());
     feSystem.getSolution() = solveSystem(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
 
     SimulationOutput simulationOutput("output", BackendType::VTU);

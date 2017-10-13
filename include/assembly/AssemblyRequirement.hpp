@@ -14,6 +14,7 @@ enum class AssemblyRequirement : int
     Residual,
     Tangent,
     DtMass,
+    LumpedDtMassInverse,
     DtDtMass
 };
 

@@ -6,69 +6,102 @@
 #define YAFEL_SUPG_ADVECTION_HPP
 
 #include "yafel.hpp"
+#include <cmath>
 
 YAFEL_NAMESPACE_OPEN
 
-template<int NSD>
+enum TransientFlag
+{
+    Steady,
+    Transient
+};
+
+template<int NSD, TransientFlag flag = Steady>
 class AdvectionDiffusionSUPG : PDEBase<NSD>
 {
 public:
     static constexpr int nsd() { return NSD; }
 
-    static void LocalResidual(const Element &E, int qpi, double,
-                              Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &R_el)
+    template<typename TU, typename TR>
+    static void LocalResidual(const Element &E, int qpi, coordinate<> const &xqp, double,
+                              Eigen::DenseBase<TU> &U_el, //Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &U_el,
+                              Eigen::DenseBase<TR> &R_el) //Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &R_el)
     {
         //Sign convention because moving it over to other side of equation
-        auto dof_per_elem = E.dofPerNode()*E.localMesh.nNodes();
 
-        coordinate<> xqp(0);
-        for(int i=0; i<E.localMesh.nNodes(); ++i) {
-            xqp += E.shapeValues[qpi](i)*E.localMesh.getGeometryNodes()[i];
+        Tensor<NSD, 1> gradPhi(0);
+        double alpha = alphaImpl();
+
+        if constexpr (flag == Transient)
+        {
+            int A = 0;
+            for (int Anode = 0; Anode < E.localMesh.nNodes(); ++Anode) {
+                for (int i = 0; i < NSD; ++i, ++A) {
+                    gradPhi(i) += E.shapeGrad(Anode, i) * U_el(A);
+                }
+            }
         }
+        //Actual velocity
         auto U = advectionVelocity(xqp);
-        U = (alpha*h/2)*U/norm(U);
 
+        //Total diffusion tensor
+        Tensor<NSD, 2> K = TensorEye<NSD, double>() * k + (alpha * h / 2) * otimes(U, U) / norm(U);
 
-        for(int A=0; A<dof_per_elem; ++A) {
-            auto Anode = E.getNode(A);
-            auto Acomp = E.getComp(A);
+        //Diffusion residual
+        Tensor<NSD, 1> diffusionR = K * gradPhi;
 
-            R_el(A) -= (E.shapeValues[qpi](Anode)*Q + U(Acomp)*E.shapeGrad(Anode,Acomp))*E.jxw;
+        //Rescale velocity
+        auto normU = norm(U);
+
+        Tensor<NSD, 1> Uhat = (normU>0) ? ((alpha * h / 2) * U / normU).eval() : (U*0).eval();
+
+        for (int Anode = 0; Anode < E.localMesh.nNodes(); ++Anode) {
+            for (int Acomp = 0; Acomp < NSD; ++Acomp) {
+
+                R_el(Anode) -= (E.shapeValues[qpi](Anode) * Q + Uhat(Acomp) * E.shapeGrad(Anode, Acomp)) * E.jxw;
+
+                if constexpr (flag == Transient)
+                {
+                    R_el(Anode) -= (E.shapeValues[qpi](Anode) * U(Acomp) * gradPhi(Acomp) +
+                                E.shapeGrad(Anode, Acomp) * diffusionR(Acomp)) * E.jxw;
+                }
+            }
         }
 
     }
 
-    static void LocalTangent(const Element &E, int qpi, double,
+    template<typename TU>
+    static void LocalTangent(const Element &E, int qpi, coordinate<> const &xqp, double,
+                             Eigen::DenseBase<TU> &U_el, //Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &U_el,
                              Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> &K_el)
     {
 
-        auto dof_per_elem = E.dofPerNode()*E.localMesh.nNodes();
-
-        coordinate<> xqp(0);
-        for(int i=0; i<E.localMesh.nNodes(); ++i) {
-            xqp += E.shapeValues[qpi](i)*E.localMesh.getGeometryNodes()[i];
-        }
-
-
         //advection velocity at quadrature point
         auto U = advectionVelocity(xqp);
+        double alpha = alphaImpl();
+
+        auto normU = norm(U);
 
         //Total diffusion tensor
-        Tensor<NSD,2> K = TensorEye<NSD,double>()*k + (alpha*h/2)*otimes(U,U)/norm(U);
+        Tensor<NSD, 2> K = TensorEye<NSD, double>() * k;
+        if(normU > 0) {
+            K += (alpha * h / (normU*2)) * otimes(U, U) ;
+        }
 
-        for(int A=0; A<dof_per_elem; ++A) {
-            auto Anode = E.getNode(A);
-            auto Acomp = E.getComp(A);
+        for (int Anode = 0; Anode < E.localMesh.nNodes(); ++Anode) {
+            for(int Acomp=0; Acomp < NSD; ++Acomp) {
 
-            for(int B=0; B<dof_per_elem; ++B) {
-                auto Bnode = E.getNode(B);
-                auto Bcomp = E.getComp(B);
+                for (int Bnode = 0; Bnode < E.localMesh.nNodes(); ++Bnode) {
+                    for(int Bcomp=0; Bcomp < NSD; ++Bcomp) {
 
-                K_el(A,B) += (
-                        E.shapeValues[qpi](Anode)*U(Bcomp)*E.shapeGrad(Bnode,Bcomp) //advection term
-                        + E.shapeGrad(Anode,Acomp)*E.shapeGrad(Bnode,Bcomp)*K(Acomp,Bcomp) //diffusion term (includes supg)
-                )*E.jxw;
-
+                        K_el(Anode, Bnode) += (
+                                              E.shapeValues[qpi](Anode) * U(Bcomp) *
+                                              E.shapeGrad(Bnode, Bcomp) //advection term
+                                              + E.shapeGrad(Anode, Acomp) * E.shapeGrad(Bnode, Bcomp) *
+                                                K(Acomp, Bcomp) //diffusion term (includes supg)
+                                      ) * E.jxw;
+                    }
+                }
             }
         }
 
@@ -76,12 +109,25 @@ public:
 
 
     constexpr static double Q{0.0};
-    constexpr static double k{0.01};
-    constexpr static double alpha = 1.0;
+    constexpr static double k{0.1};
     constexpr static double h = 0.1;
+    constexpr static double U0 = 1.0;
+    static double alphaImpl() {
+        double Pe = U0*h/(2*k);
+        if(Pe == 0) {
+            return 0.0;
+        }
+        else {
+            return std::cosh(Pe)/std::sinh(Pe) - 1.0/Pe;
+        }
+    }
 
-    static Tensor<NSD,1,double> advectionVelocity(coordinate<> x) {
-        Tensor<NSD,1,double> ret(0); ret(0) = 1;
+    // Pe = Uh/(2*k) < 1
+
+    static Tensor<NSD, 1, double> advectionVelocity(coordinate<> const &x)
+    {
+        Tensor<NSD, 1, double> ret(0);
+        ret(0) = U0;
         return ret;
     };
 };

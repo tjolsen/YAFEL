@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 project(YAFEL)
 #==========================================
 
-option(USE_HDF5 "Enable HDF5 Output" OFF)
+option(USE_HDF5 "Enable HDF5 Output" ON)
 option(COMPILE_APPS "Compile application directory" ON)
 set(VIENNACL_BACKEND OPENMP CACHE STRINGS "OPENMP OPENCL" FORCE)
 
