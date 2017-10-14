@@ -8,8 +8,10 @@ YAFEL_NAMESPACE_OPEN
 
 namespace config {
 
+const int num_cores = @NUM_CPU_CORES@;
 
-
+const char[] VERSION = "$@VERSION@";
+const char[] BUILD_TYPE = "@CMAKE_BUILD_TYPE@";
 
 } //end namespace config
 
