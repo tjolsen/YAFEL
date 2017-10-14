@@ -1,0 +1,17 @@
+//
+// Created by tyler on 10/13/17.
+//
+
+#include "yafel_config.hpp"
+
+YAFEL_NAMESPACE_OPEN
+
+namespace config {
+
+
+
+
+} //end namespace config
+
+
+YAFEL_NAMESPACE_CLOSE
