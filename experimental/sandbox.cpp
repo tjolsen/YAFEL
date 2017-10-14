@@ -15,6 +15,11 @@ using std::endl;
 
 int main()
 {
+    cout << "Num cores: " << config::num_cores << endl
+         << "VERSION " << config::VERSION << endl
+         << "BUILD TYPE: " << config::BUILD_TYPE << endl
+         << "Git Revision: " << config::GIT_REVISION << endl;
+
     return 0;
 }
 

@@ -8,6 +8,8 @@
   It deliberately includes headers that are not meant to be user-facing
   as a convenience to library developers (aka me!).
  */
+//Project configuration and settings
+#include "yafel_config.hpp"
 
 // Library-wide global declarations
 #include "yafel_globals.hpp"

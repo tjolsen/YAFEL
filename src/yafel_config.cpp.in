@@ -8,11 +8,11 @@ YAFEL_NAMESPACE_OPEN
 
 namespace config {
 
-const int num_cores = @NUM_CPU_CORES@;
+const int num_cores = @CORE_COUNT@;
 
-const char[] VERSION = "$@VERSION@";
-const char[] BUILD_TYPE = "@CMAKE_BUILD_TYPE@";
-
+const char VERSION[] = "@YAFEL_VERSION@";
+const char BUILD_TYPE[] = "@CMAKE_BUILD_TYPE@";
+const char GIT_REVISION[] = "@YAFEL_GIT_HASH@";
 } //end namespace config
 
 

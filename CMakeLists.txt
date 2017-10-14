@@ -14,6 +14,16 @@ set(CORE_COUNT ${NATIVE_CORE_COUNT} CACHE STRING "Number of cores to make YAFEL 
 
 
 #==========================================
+# Get git revision version
+execute_process(
+        COMMAND "${CMAKE_SOURCE_DIR}/cmake/get_git_hash.sh"
+        RESULT_VARIABLE YAFEL_GIT_HASH
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
+message(${YAFEL_GIT_HASH})
+
+
+# Load OpenMP
 find_package(OpenMP REQUIRED)
 if(OPENMP_FOUND)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -194,6 +204,10 @@ endif ()
 include_directories(${PROJECT_SOURCE_DIR}/include)
 add_library(yafel ${SOURCE_FILES})
 target_link_libraries(yafel pthread)
+
+configure_file(src/yafel_config.cpp.in src/yafel_config.cpp)
+target_sources(yafel PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/src/yafel_config.cpp)
+
 
 add_executable(sandbox experimental/sandbox.cpp)
 target_link_libraries(sandbox yafel)
