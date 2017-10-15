@@ -6,7 +6,7 @@ ProcessorCount(NATIVE_CORE_COUNT)
 
 option(USE_HDF5 "Enable HDF5 Output" ON)
 option(COMPILE_APPS "Compile application directory" ON)
-set(VIENNACL_BACKEND OPENCL CACHE STRING "OPENMP OPENCL")
+set(VIENNACL_BACKEND OPENCL CACHE STRING "Valid ViennaCL backend options: OPENMP OPENCL")
 set(CORE_COUNT ${NATIVE_CORE_COUNT} CACHE STRING "Number of cores to make YAFEL aware of")
 
 #==========================================
@@ -26,28 +26,10 @@ if(OPENMP_FOUND)
     set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-# Eigen is required
-find_package(Eigen3 REQUIRED NO_MODULE)
-include_directories(${EIGEN3_INCLUDE_DIR})
-
-if (VIENNACL_BACKEND STREQUAL "OPENCL")
-    set(USE_OPENCL 1)
-    find_package(OpenCL REQUIRED)
-    set(VIENNACL_CXX_FLAGS "-DVIENNACL_WITH_OPENCL")
-else ()
-    set(VIENNACL_CXX_FLAGS "-DVIENNACL_WITH_OPENMP")
-endif ()
-
-set(OPT_FLAGS
-        "-march=native -malign-data=cacheline -ffast-math -finline-limit=1000000")
-
 
 #set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${VIENNACL_CXX_FLAGS} -O3 -Wall -Wno-sign-compare -DNDEBUG -DEIGEN_DEFAULT_INDEX_TYPE=int ${OPT_FLAGS}")
-
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fopenmp -Wall -Wextra -fno-omit-frame-pointer")
+#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${VIENNACL_CXX_FLAGS} -Wall -Wno-sign-compare -DNDEBUG ${OPT_FLAGS}")
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -fno-omit-frame-pointer")
 
 set(SOURCE_FILES
         include/assembly/AssemblyRequirement.hpp
@@ -177,7 +159,18 @@ set(SOURCE_FILES
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 add_library(yafel ${SOURCE_FILES})
+target_compile_options(yafel PUBLIC $<$<CONFIG:RELEASE>:-march=native; -ffast-math>)
+target_compile_options(yafel PUBLIC $<$<CONFIG:DEBUG>:-fno-omit-frame-pointer>)
+target_compile_options(yafel PUBLIC -std=c++17; -Wall)
+
 target_link_libraries(yafel LINK_PUBLIC pthread)
+set(CMAKE_VERBOSE_MAKEFILE 1)
+
+
+find_package(Eigen3 REQUIRED)
+add_library(Eigen3 IMPORTED INTERFACE)
+target_link_libraries(yafel INTERFACE Eigen3)
+target_compile_definitions(yafel INTERFACE "EIGEN_DEFAULT_INDEX_TYPE=int")
 
 
 if (USE_HDF5 STREQUAL "ON")
@@ -189,13 +182,15 @@ if (USE_HDF5 STREQUAL "ON")
     target_link_libraries(yafel INTERFACE ${HDF5_LIBRARIES})
 endif ()
 
-if (USE_OPENCL)
+if(VIENNACL_BACKEND STREQUAL "OPENCL")
     find_package(OpenCL)
     add_library(OpenCL IMPORTED SHARED)
     set_property(TARGET OpenCL PROPERTY
-            INTERFACE_INCLUDE_DIRECTORIES ${OpenCL_INCLUDE_DIRS}
-            )
+            INTERFACE_INCLUDE_DIRECTORIES ${OpenCL_INCLUDE_DIRS})
+    target_compile_definitions(yafel INTERFACE VIENNACL_WITH_OPENCL)
     #target_link_libraries(yafel LINK_PUBLIC "OpenCL")
+elseif(VIENNACL_BACKEND STREQUAL "OPENMP")
+    target_compile_definitions(yafel INTERFACE VIENNACL_WITH_OPENMP)
 endif ()
 
 configure_file(${CMAKE_SOURCE_DIR}/src/yafel_config.cpp.in src/yafel_config.cpp)
@@ -203,7 +198,7 @@ target_sources(yafel PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/src/yafel_config.cpp)
 
 
 add_executable(sandbox experimental/sandbox.cpp)
-target_link_libraries(sandbox yafel)
+target_link_libraries(sandbox PRIVATE yafel)
 
 
 # Add any subdirectories to the project
