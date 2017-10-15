@@ -1,2 +1,3 @@
 #!/bin/bash
-echo $(git log | head -n1 | cut -d' ' -f2)
+gitstr=$(echo $(git log | head -n1 | cut -d' ' -f2))
+echo \"$gitstr\"

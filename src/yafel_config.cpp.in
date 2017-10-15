@@ -11,9 +11,8 @@ namespace config {
 const int num_cores = @CORE_COUNT@;
 
 const char VERSION[] = "@YAFEL_VERSION@";
-const char BUILD_TYPE[] = "@CMAKE_BUILD_TYPE@";
-
-const char GIT_REVISION[] = "${YAFEL_GIT_REVISION}";
+const char BUILD_TYPE[] = "${CMAKE_BUILD_TYPE}";
+const char GIT_REVISION[] = ${YAFEL_GIT_REVISION};
 } //end namespace config
 
 
