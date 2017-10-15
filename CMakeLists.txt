@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(YAFEL VERSION 0.1 LANGUAGES CXX C)
 #==========================================
+set(CMAKE_CXX_STANDARD 17)
+
+
 include(ProcessorCount)
 ProcessorCount(NATIVE_CORE_COUNT)
 
@@ -27,9 +30,6 @@ if(OPENMP_FOUND)
 endif()
 
 
-#set(CMAKE_CXX_STANDARD 17)
-#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${VIENNACL_CXX_FLAGS} -Wall -Wno-sign-compare -DNDEBUG ${OPT_FLAGS}")
-#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -fno-omit-frame-pointer")
 
 set(SOURCE_FILES
         include/assembly/AssemblyRequirement.hpp
@@ -161,11 +161,12 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 add_library(yafel ${SOURCE_FILES})
 target_compile_options(yafel PUBLIC $<$<CONFIG:RELEASE>:-march=native; -ffast-math>)
 target_compile_options(yafel PUBLIC $<$<CONFIG:DEBUG>:-fno-omit-frame-pointer>)
-target_compile_options(yafel PUBLIC -std=c++17; -Wall)
+target_compile_options(yafel PUBLIC -Wall)
 
 target_link_libraries(yafel LINK_PUBLIC pthread)
 set(CMAKE_VERBOSE_MAKEFILE 1)
-
+set_target_properties(yafel PROPERTIES
+        CMAKE_CXX_STANDARD 17)
 
 find_package(Eigen3 REQUIRED)
 add_library(Eigen3 IMPORTED INTERFACE)
