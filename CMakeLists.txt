@@ -6,7 +6,7 @@ ProcessorCount(NATIVE_CORE_COUNT)
 
 option(USE_HDF5 "Enable HDF5 Output" ON)
 option(COMPILE_APPS "Compile application directory" ON)
-set(VIENNACL_BACKEND OPENCL CACHE STRING "OPENMP OPENCL" FORCE)
+set(VIENNACL_BACKEND OPENCL CACHE STRING "OPENMP OPENCL")
 set(CORE_COUNT ${NATIVE_CORE_COUNT} CACHE STRING "Number of cores to make YAFEL aware of")
 
 #==========================================
