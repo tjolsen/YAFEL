@@ -6,21 +6,17 @@ ProcessorCount(NATIVE_CORE_COUNT)
 
 option(USE_HDF5 "Enable HDF5 Output" ON)
 option(COMPILE_APPS "Compile application directory" ON)
-set(VIENNACL_BACKEND OPENMP CACHE STRINGS "OPENMP OPENCL" FORCE)
+set(VIENNACL_BACKEND OPENCL CACHE STRING "OPENMP OPENCL" FORCE)
 set(CORE_COUNT ${NATIVE_CORE_COUNT} CACHE STRING "Number of cores to make YAFEL aware of")
-#add_definitions(-DNUM_CPU_CORES=${CORE_COUNT})
-
-
-
 
 #==========================================
 # Get git revision version
 execute_process(
         COMMAND "${CMAKE_SOURCE_DIR}/cmake/get_git_hash.sh"
-        RESULT_VARIABLE YAFEL_GIT_HASH
+        OUTPUT_VARIABLE YAFEL_GIT_HASH
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
-message(${YAFEL_GIT_HASH})
+message("Git Revision: ${YAFEL_GIT_HASH}")
 
 
 # Load OpenMP
@@ -32,20 +28,7 @@ endif()
 
 # Eigen is required
 find_package(Eigen3 REQUIRED NO_MODULE)
-include_directories(${Eigen3_INCLUDE_DIR})
-
-# OpenMP is required
-find_package(OpenMP REQUIRED)
-if(OPENMP_FOUND)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-endif()
-
-if (USE_HDF5)
-    find_package(HDF5 COMPONENTS C HL REQUIRED)
-    include_directories(${HDF5_INCLUDE_DIRS})
-    add_definitions(-DUSE_HDF5)
-endif ()
+include_directories(${EIGEN3_INCLUDE_DIR})
 
 if (VIENNACL_BACKEND STREQUAL "OPENCL")
     set(USE_OPENCL 1)
@@ -56,11 +39,11 @@ else ()
 endif ()
 
 set(OPT_FLAGS
-        "-march=native -malign-data=cacheline -ffast-math -fopenmp -finline-limit=1000000")
+        "-march=native -malign-data=cacheline -ffast-math -finline-limit=1000000")
 
 
 #set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread -std=c++17")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${VIENNACL_CXX_FLAGS} -O3 -Wall -Wno-sign-compare -DNDEBUG -DEIGEN_DEFAULT_INDEX_TYPE=int ${OPT_FLAGS}")
 
@@ -192,18 +175,28 @@ set(SOURCE_FILES
         src/utils/parallel/TaskScheduler.cpp
         )
 
-if (USE_OPENCL)
-    link_libraries("OpenCL")
-endif ()
-
-if (USE_HDF5 STREQUAL "ON")
-    link_libraries(${HDF5_C_LIBRARIES})
-    link_libraries(${HDF5_C_HL_LIBRARIES})
-endif ()
-
 include_directories(${PROJECT_SOURCE_DIR}/include)
 add_library(yafel ${SOURCE_FILES})
-target_link_libraries(yafel pthread)
+target_link_libraries(yafel LINK_PUBLIC pthread)
+
+
+if (USE_HDF5 STREQUAL "ON")
+    find_package(HDF5 COMPONENTS C HL REQUIRED)
+    add_library(HDF5 IMPORTED SHARED)
+    set_property(TARGET HDF5 PROPERTY
+            INTERFACE_INCLUDE_DIRECTORIES ${HDF5_INCLUDE_DIRS})
+    target_compile_definitions(yafel INTERFACE USE_HDF5)
+    target_link_libraries(yafel INTERFACE ${HDF5_LIBRARIES})
+endif ()
+
+if (USE_OPENCL)
+    find_package(OpenCL)
+    add_library(OpenCL IMPORTED SHARED)
+    set_property(TARGET OpenCL PROPERTY
+            INTERFACE_INCLUDE_DIRECTORIES ${OpenCL_INCLUDE_DIRS}
+            )
+    #target_link_libraries(yafel LINK_PUBLIC "OpenCL")
+endif ()
 
 configure_file(src/yafel_config.cpp.in src/yafel_config.cpp)
 target_sources(yafel PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/src/yafel_config.cpp)

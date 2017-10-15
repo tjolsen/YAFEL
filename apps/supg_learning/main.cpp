@@ -39,6 +39,6 @@ int main() {
     bc1.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
     feSystem.getSolution() = solveSystem(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
 
-    SimulationOutput simulationOutput("output", BackendType::VTU);
+    SimulationOutput simulationOutput("output", BackendType::HDF5);
     simulationOutput.captureFrame(feSystem);
 }
