@@ -45,11 +45,18 @@ if(APP_SHELL_PROJECT)
     target_link_libraries(shellProject yafel)
 endif()
 
-cmake_dependent_option(APP_FINITE_VOLUME "Compile FiniteVolume" OFF
+cmake_dependent_option(APP_FINITE_VOLUME "Compile FiniteVolume" ON
         "COMPILE_APPS" OFF)
 if(APP_FINITE_VOLUME)
-    add_executable(finiteVolume FiniteVolume/main.cpp)
+    add_executable(finiteVolume
+            FiniteVolume/main.cpp
+            FiniteVolume/FVDofm.cpp
+            FiniteVolume/FVDofm.hpp
+            FiniteVolume/CellToNodeMap.hpp
+            FiniteVolume/cell_centroids.hpp
+            )
     target_link_libraries(finiteVolume yafel)
+    target_compile_options(finiteVolume PRIVATE -fopenmp)
 endif()
 
 cmake_dependent_option(APP_SUPG "Compile SUPG" OFF

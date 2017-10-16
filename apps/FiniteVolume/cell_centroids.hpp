@@ -12,10 +12,7 @@ YAFEL_NAMESPACE_OPEN
 template<int NSD>
 auto CellCentroidsVolumes(const DoFManager &dofm)
 {
-
-
-    TaskScheduler TS(4);
-
+    auto& TS = getGlobalScheduler();
     std::vector<ElementFactory> EFs(TS.workers.size());
     //ElementFactory EF;
     std::vector<coordinate<>> centroids(dofm.nCells(), coordinate<>(0));
@@ -61,12 +58,8 @@ auto CellCentroidsVolumes(const DoFManager &dofm)
 
     };
 
-    auto futures = parfor(0, centroids.size(), loop_body, TS, 1);
-    for (auto &f : futures) {
-        f.wait();
-    }
-
-
+    auto futures = parfor(0, centroids.size(), loop_body, TS, 128);
+    wait_all(futures);
     return std::make_pair(std::move(centroids), std::move(cell_measure));
 }
 

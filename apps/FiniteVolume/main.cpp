@@ -10,7 +10,9 @@ using namespace yafel;
 
 int main() {
 
+
     Mesh M("channel.msh");
+    M.buildInternalFaces();
     constexpr int NSD = 2;
 
 
@@ -20,12 +22,17 @@ int main() {
     DoFManager dofm(M, DoFManager::ManagerType::CG, 1, NSD+1);
     FESystem feSystem(dofm);
 
+
+    BasicTimer timer;
+    timer.tic();
     auto [centroids, volumes] = CellCentroidsVolumes<NSD>(dofm);
+    timer.toc();
 
     int i{0};
     for(auto c : centroids) {
-
         std::cout << c(0) << ' ' << c(1) << ' ' << volumes[i++] << '\n';
-
     }
+
+
+    std::cout << timer.duration<std::chrono::microseconds>() << std::endl;
 }

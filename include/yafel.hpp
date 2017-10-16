@@ -31,6 +31,8 @@
 #include "quadrature/QuadratureRule.hpp"
 
 // Utils
+#include "utils/BasicTimer.hpp"
+#include "utils/DualNumber.hpp"
 #include "utils/DoFManager.hpp"
 #include "utils/DualNumber.hpp"
 #include "utils/parallel/yafel_parallel.hpp"

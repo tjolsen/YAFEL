@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.8)
-project(YAFEL VERSION 0.1 LANGUAGES CXX C)
+project(YAFEL)
 #==========================================
+set(YAFEL_VERSION_MAJOR 0)
+set(YAFEL_VERSION_MINOR 1)
+set(VERSION "${YAFEL_VERSION_MAJOR}.${YAFEL_VERSION_MINOR}")
+
 set(CMAKE_CXX_STANDARD 17)
 
 
@@ -21,15 +25,6 @@ execute_process(
 )
 #strip trailing newline from echo command in get_git_hash.sh
 string(REGEX REPLACE "\n$" "" YAFEL_GIT_REVISION "${YAFEL_GIT_REVISION}")
-
-# Load OpenMP
-find_package(OpenMP REQUIRED)
-if(OPENMP_FOUND)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
-
-
 
 set(SOURCE_FILES
         include/assembly/AssemblyRequirement.hpp
@@ -162,6 +157,18 @@ add_library(yafel ${SOURCE_FILES})
 target_compile_options(yafel PUBLIC $<$<CONFIG:RELEASE>:-march=native; -ffast-math>)
 target_compile_options(yafel PUBLIC $<$<CONFIG:DEBUG>:-fno-omit-frame-pointer>)
 target_compile_options(yafel PUBLIC -Wall)
+
+
+# Load OpenMP
+find_package(OpenMP REQUIRED)
+if(OPENMP_FOUND)
+    target_compile_options(yafel INTERFACE -fopenmp)
+    target_link_libraries(yafel INTERFACE -fopenmp)
+    #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    #set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
+
+
 
 target_link_libraries(yafel LINK_PUBLIC pthread)
 set(CMAKE_VERBOSE_MAKEFILE 1)
