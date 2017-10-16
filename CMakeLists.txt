@@ -164,8 +164,6 @@ find_package(OpenMP REQUIRED)
 if(OPENMP_FOUND)
     target_compile_options(yafel INTERFACE -fopenmp)
     target_link_libraries(yafel INTERFACE -fopenmp)
-    #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    #set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
 

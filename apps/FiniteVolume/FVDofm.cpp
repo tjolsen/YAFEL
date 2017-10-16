@@ -30,17 +30,18 @@ FVDofm::FVDofm(DoFManager &dofm_, int8_t NSD)
         }
     }
 
+    /*
     switch(NSD) {
         case 1:
-            auto [tmp_centroids, tmp_volumes] = cell_cenetroids<1>(); break;
+            auto [tmp_centroids, tmp_volumes] = cell_centroids<1>(); break;
         case 2:
-            auto [tmp_centroids, tmp_volumes] = cell_cenetroids<2>(); break;
+            auto [tmp_centroids, tmp_volumes] = cell_centroids<2>(); break;
         case 3:
-            auto [tmp_centroids, tmp_volumes] = cell_cenetroids<3>(); break;
+            auto [tmp_centroids, tmp_volumes] = cell_centroids<3>(); break;
     }
     centroids = std::move(tmp_centroids);
     volumes = std::move(tmp_volumes);
-
+*/
 }
 
 

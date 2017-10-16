@@ -34,5 +34,5 @@ int main() {
     }
 
 
-    std::cout << timer.duration<std::chrono::microseconds>() << std::endl;
+    std::cout << timer.duration<std::chrono::milliseconds>() << std::endl;
 }
