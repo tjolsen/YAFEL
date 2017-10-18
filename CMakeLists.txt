@@ -161,11 +161,10 @@ target_compile_options(yafel PUBLIC -Wall)
 
 # Load OpenMP
 find_package(OpenMP REQUIRED)
-if(OPENMP_FOUND)
-    target_compile_options(yafel INTERFACE -fopenmp)
-    target_link_libraries(yafel INTERFACE -fopenmp)
+if(OPENMP_CXX_FOUND)
+    target_compile_options(yafel INTERFACE ${OpenMP_CXX_FLAGS})
+    target_link_libraries(yafel INTERFACE ${OpenMP_CXX_LIBS})
 endif()
-
 
 
 target_link_libraries(yafel LINK_PUBLIC pthread)
@@ -177,7 +176,7 @@ find_package(Eigen3 REQUIRED)
 add_library(Eigen3 IMPORTED INTERFACE)
 target_link_libraries(yafel INTERFACE Eigen3)
 target_compile_definitions(yafel INTERFACE "EIGEN_DEFAULT_INDEX_TYPE=int")
-
+target_compile_definitions(yafel INTERFACE "VIENNACL_HAVE_EIGEN")
 
 if (USE_HDF5 STREQUAL "ON")
     find_package(HDF5 COMPONENTS C HL REQUIRED)
@@ -190,11 +189,8 @@ endif ()
 
 if(VIENNACL_BACKEND STREQUAL "OPENCL")
     find_package(OpenCL)
-    add_library(OpenCL IMPORTED SHARED)
-    set_property(TARGET OpenCL PROPERTY
-            INTERFACE_INCLUDE_DIRECTORIES ${OpenCL_INCLUDE_DIRS})
+    target_link_libraries(yafel PUBLIC OpenCL::OpenCL)
     target_compile_definitions(yafel INTERFACE VIENNACL_WITH_OPENCL)
-    #target_link_libraries(yafel LINK_PUBLIC "OpenCL")
 elseif(VIENNACL_BACKEND STREQUAL "OPENMP")
     target_compile_definitions(yafel INTERFACE VIENNACL_WITH_OPENMP)
 endif ()
