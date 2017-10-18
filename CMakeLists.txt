@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD 17)
 include(ProcessorCount)
 ProcessorCount(NATIVE_CORE_COUNT)
 
-option(USE_HDF5 "Enable HDF5 Output" ON)
+option(ENABLE_HDF5 "Enable HDF5 Output" ON)
 option(COMPILE_APPS "Compile application directory" ON)
 set(VIENNACL_BACKEND OPENCL CACHE STRING "Valid ViennaCL backend options: OPENMP OPENCL")
 set(CORE_COUNT ${NATIVE_CORE_COUNT} CACHE STRING "Number of cores to make YAFEL aware of")
@@ -178,7 +178,7 @@ target_link_libraries(yafel INTERFACE Eigen3)
 target_compile_definitions(yafel INTERFACE "EIGEN_DEFAULT_INDEX_TYPE=int")
 target_compile_definitions(yafel INTERFACE "VIENNACL_HAVE_EIGEN")
 
-if (USE_HDF5 STREQUAL "ON")
+if (ENABLE_HDF5)
     find_package(HDF5 COMPONENTS C HL REQUIRED)
     add_library(HDF5 IMPORTED SHARED)
     set_property(TARGET HDF5 PROPERTY
