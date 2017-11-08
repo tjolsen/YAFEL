@@ -47,6 +47,14 @@ void parfor(std::size_t idx_start,
 
     auto loopLen = (idx_end - idx_start);
 
+    //Execute short loops in serial
+    if(loopLen < 10*blockSize) {
+        for(std::size_t i=0; i<loopLen; ++i) {
+            loopBody(i);
+        }
+        return;
+    }
+
     auto full_blocks = loopLen / blockSize;
     auto cleanup_start = full_blocks * blockSize + idx_start;
     auto Nblocks = full_blocks + ((cleanup_start < idx_end) ? 1 : 0);
