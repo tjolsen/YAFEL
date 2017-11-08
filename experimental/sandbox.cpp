@@ -17,7 +17,7 @@ using std::endl;
 
 int main()
 {
-    int N = 10000000;
+    int N = 100;
     Eigen::VectorXd A, B;
     A = Eigen::VectorXd::Constant(N, 1.0);
     B = Eigen::VectorXd::Constant(N, 1.0);

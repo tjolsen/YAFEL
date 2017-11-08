@@ -49,7 +49,7 @@ void parfor(std::size_t idx_start,
 
     //Execute short loops in serial
     if(loopLen < 10*blockSize) {
-        for(std::size_t i=0; i<loopLen; ++i) {
+        for(std::size_t i=idx_start; i<idx_end; ++i) {
             loopBody(i);
         }
         return;

@@ -16,13 +16,15 @@ YAFEL_NAMESPACE_OPEN
 
 /**
  * \brief parallel assignment function for eigen vectorXd's
- * using the parfor infrastructure
+ * using the parfor infrastructure.
+ * Warning: Assumes no aliasing of A and B.
  */
 template<typename V1, typename V2, int BLK = 4>
 auto parassign(Eigen::MatrixBase<V1> & A, Eigen::MatrixBase<V2> const& B, int chunkSize = 1024) {
 
+
     if(A.rows() < 10*chunkSize) {
-        A = B;
+        A.noalias() = B;
         return A;
     }
 
