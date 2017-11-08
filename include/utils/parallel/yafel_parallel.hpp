@@ -13,6 +13,8 @@
 #include "utils/parallel/wait_all.hpp"
 #include "utils/parallel/wait_any.hpp"
 #include "utils/parallel/parfor.hpp"
+#include "utils/parallel/pardot.hpp"
+#include "utils/parallel/parassign.hpp"
 #include "utils/parallel/ReductionVariable.hpp"
 
 #endif //YAFEL_YAFEL_PARALLEL_HPP

@@ -5,8 +5,10 @@
 #include "yafel_globals.hpp"
 #include "utils/SmallVector.hpp"
 #include "utils/parallel/yafel_parallel.hpp"
+#include "utils/parallel/pardot.hpp"
 #include "lin_alg/tensor/tensors.hpp"
 #include <iostream>
+#include <eigen3/Eigen/Dense>
 
 
 using namespace yafel;
@@ -15,11 +17,15 @@ using std::endl;
 
 int main()
 {
-    cout << "Num cores: " << config::num_cores << endl
-         << "VERSION " << config::VERSION << endl
-         << "BUILD TYPE: " << config::BUILD_TYPE << endl
-         << "Git Revision: " << config::GIT_REVISION << endl;
+    int N = 10000000;
+    Eigen::VectorXd A, B;
+    A = Eigen::VectorXd::Constant(N, 1.0);
+    B = Eigen::VectorXd::Constant(N, 1.0);
 
+    auto val = pardot(A,B);
+
+
+    std::cout << val << std::endl;
     return 0;
 }
 

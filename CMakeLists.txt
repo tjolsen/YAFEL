@@ -109,6 +109,8 @@ set(SOURCE_FILES
         include/utils/parallel/wait_all.hpp
         include/utils/parallel/wait_any.hpp
         include/utils/parallel/parfor.hpp
+        include/utils/parallel/pardot.hpp
+        include/utils/parallel/parassign.hpp
         include/utils/parallel/ReductionVariable.hpp
         include/utils/ThreadPool.hpp
 
