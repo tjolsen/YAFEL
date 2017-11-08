@@ -152,12 +152,23 @@ set(SOURCE_FILES
         src/utils/parallel/TaskScheduler.cpp
         )
 
-include_directories(${PROJECT_SOURCE_DIR}/include)
+#include_directories(${PROJECT_SOURCE_DIR}/include)
 add_library(yafel ${SOURCE_FILES})
+target_include_directories(yafel PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/>
+        $<INSTALL_INTERFACE:include/yafel>)
+
 target_compile_options(yafel PUBLIC $<$<CONFIG:RELEASE>:-march=native; -ffast-math>)
 target_compile_options(yafel PUBLIC $<$<CONFIG:DEBUG>:-fno-omit-frame-pointer>)
 target_compile_options(yafel PUBLIC -Wall)
 
+install(TARGETS yafel EXPORT yafelConfig
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
+install(DIRECTORY include/
+        DESTINATION include/yafel
+        FILES_MATCHING PATTERN "*.hpp")
+install(EXPORT yafelConfig DESTINATION cmake)
 
 # Load OpenMP
 find_package(OpenMP REQUIRED)
@@ -174,7 +185,7 @@ set_target_properties(yafel PROPERTIES
 
 find_package(Eigen3 REQUIRED)
 add_library(Eigen3 IMPORTED INTERFACE)
-target_link_libraries(yafel INTERFACE Eigen3)
+target_link_libraries(yafel PUBLIC Eigen3)
 target_compile_definitions(yafel INTERFACE "EIGEN_DEFAULT_INDEX_TYPE=int")
 target_compile_definitions(yafel INTERFACE "VIENNACL_HAVE_EIGEN")
 
@@ -189,14 +200,14 @@ endif ()
 
 if(VIENNACL_BACKEND STREQUAL "OPENCL")
     find_package(OpenCL)
-    target_link_libraries(yafel PUBLIC OpenCL::OpenCL)
+    target_link_libraries(yafel INTERFACE OpenCL::OpenCL)
     target_compile_definitions(yafel INTERFACE VIENNACL_WITH_OPENCL)
 elseif(VIENNACL_BACKEND STREQUAL "OPENMP")
     target_compile_definitions(yafel INTERFACE VIENNACL_WITH_OPENMP)
 endif ()
 
 configure_file(${CMAKE_SOURCE_DIR}/src/yafel_config.cpp.in src/yafel_config.cpp)
-target_sources(yafel PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/src/yafel_config.cpp)
+target_sources(yafel PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src/yafel_config.cpp)
 
 
 add_executable(sandbox experimental/sandbox.cpp)

@@ -59,12 +59,13 @@ class TaskScheduler
 {
 public:
     using lock_t = std::unique_lock<std::mutex>;
+    class Task;//defined below
 
     constexpr static int spin_count{32};
     const int count;
 
     std::vector<std::thread> workers;
-    std::vector<std::deque<std::shared_ptr<Task<>>>> tq;
+    std::vector<std::deque<std::shared_ptr<TaskScheduler::Task>>> tq;
     std::vector<std::mutex> mtxs;
     std::vector<std::condition_variable> cvs;
     std::vector<bool> done;
@@ -144,13 +145,13 @@ public:
 
     template<typename F, typename ...Args>
     auto createTask(F &&f, Args &&...args) {
-        auto task = std::make_shared<Task<>>(*this);
+        auto task = std::make_shared<Task>(*this);
         auto fut = task->create(std::forward<F>(f), std::forward<Args>(args)...);
         return std::make_pair(std::move(task),std::move(fut));
     };
 
 
-    void enqueue(std::shared_ptr<Task<>> task_ptr)
+    void enqueue(std::shared_ptr<Task> task_ptr)
     {
         std::size_t i = _index++;
 
@@ -219,13 +220,120 @@ public:
         return ret;
     }*/
 
+
+    class Task
+    {
+    public:
+        Task(TaskScheduler &ts) : TS(ts) {}
+
+        template<typename F, typename ...Args>
+        inline auto addChild(F &&f, Args &&...args)
+        {
+            auto [task,fut] = TS.createTask(std::forward<F>(f), std::forward<Args>(args)...);
+
+            children.push_back(task);
+
+            return std::make_pair(std::move(task),std::move(fut));
+        };
+
+        inline void operator()() {
+            (*internal_task)();
+        }
+
+    private:
+        // TaskScheduler is the one that actually handles task creation.
+        // The create method is private and will be called by the scheduler
+        // via its friend access.
+        //friend class TaskScheduler;
+
+
+
+        template<typename F, typename ...Args>
+        auto create(F &&f, Args &&...args) {
+            using ret_type = std::result_of_t<F(Args...)>;
+
+            std::promise<ret_type> task_promise;
+            auto fut = task_promise.get_future();
+
+            if constexpr (!std::is_void_v<ret_type>) {
+                auto task_func =
+                        [this, task_promise=std::move(task_promise),
+                                f = std::forward<F>(f),
+                                args = std::forward_as_tuple(args...)]() mutable {
+
+                            task_promise.set_value(std::apply(f, args));
+
+                            //Enqueue any children
+                            for(auto &child : this->children) {
+                                this->TS.enqueue(child);
+                            }
+                        };
+
+
+                internal_task = std::make_unique<TaskImpl<decltype(task_func)> >(std::move(task_func));
+            }
+            else {
+
+                auto task_func =
+                        [this, task_promise=std::move(task_promise),
+                                f = std::forward<F>(f),
+                                args = std::forward_as_tuple(args...)]() mutable {
+
+                            std::apply(f,args);
+                            task_promise.set_value();
+
+                            //Enqueue any children
+                            for(auto &child : this->children) {
+                                this->TS.enqueue(child);
+                            }
+                        };
+
+                internal_task = std::make_unique<TaskImpl<decltype(task_func)> >(std::move(task_func));
+            }
+
+
+
+
+
+            return fut;
+        }
+
+    private:
+        static constexpr int ReservedChildren = 2;
+        SmallVector<std::shared_ptr<Task>, ReservedChildren> children;
+        TaskScheduler& TS;
+
+        //----------------------------------------------------
+        // Internal structures for a type-erased callable type that acts like a void() type.
+        // Replacing the std::function, since I can't quite get into its guts the way I'd like to.
+        struct TaskBase
+        {
+            virtual void operator()() = 0;
+            virtual ~TaskBase() = default;
+        };
+
+        template<typename F>
+        struct TaskImpl : public TaskBase
+        {
+
+            TaskImpl(F &&f) : callable(std::forward<F>(f)) {}
+
+            void operator()() {
+                callable();
+            }
+
+            F callable;
+        };
+
+        std::unique_ptr<TaskBase> internal_task;
+    };
 private:
 
     void run(unsigned i)
     {
 
         while (true) {
-            std::shared_ptr<Task<>> f;
+            std::shared_ptr<Task> f;
             bool try_failure = true;
             for (int n = 0; n != count * spin_count; ++n) {
                 auto idx = (i + n) % count;

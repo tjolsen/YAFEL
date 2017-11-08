@@ -13,6 +13,8 @@
 
 YAFEL_NAMESPACE_OPEN
 
+
+/*
 class TaskScheduler;
 
 template<typename TASKSCHEDULER = TaskScheduler>
@@ -93,16 +95,10 @@ private:
         return fut;
     }
 
-
-
-
 private:
     static constexpr int ReservedChildren = 2;
     SmallVector<std::shared_ptr<Task>, ReservedChildren> children;
     TASKSCHEDULER& TS;
-
-
-
 
     //----------------------------------------------------
     // Internal structures for a type-erased callable type that acts like a void() type.
@@ -129,7 +125,7 @@ private:
     std::unique_ptr<TaskBase> internal_task;
 };
 
-
+*/
 YAFEL_NAMESPACE_CLOSE
 
 
