@@ -160,15 +160,6 @@ target_include_directories(yafel PUBLIC
 
 target_compile_options(yafel PUBLIC $<$<CONFIG:RELEASE>:-march=native; -ffast-math>)
 target_compile_options(yafel PUBLIC $<$<CONFIG:DEBUG>:-fno-omit-frame-pointer>)
-target_compile_options(yafel PUBLIC -Wall)
-
-install(TARGETS yafel EXPORT yafelConfig
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib)
-install(DIRECTORY include/
-        DESTINATION include/yafel
-        FILES_MATCHING PATTERN "*.hpp")
-install(EXPORT yafelConfig DESTINATION cmake)
 
 # Load OpenMP
 find_package(OpenMP REQUIRED)
@@ -218,3 +209,12 @@ target_link_libraries(sandbox PRIVATE yafel)
 if (COMPILE_APPS STREQUAL "ON")
     add_subdirectory(apps)
 endif ()
+
+
+install(TARGETS yafel EXPORT yafelConfig
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
+install(DIRECTORY include/
+        DESTINATION include/yafel
+        FILES_MATCHING PATTERN "*.hpp")
+install(EXPORT yafelConfig DESTINATION cmake)

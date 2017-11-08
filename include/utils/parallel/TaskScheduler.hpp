@@ -7,8 +7,10 @@
 
 #include "yafel_globals.hpp"
 #include "yafel_config.hpp"
-#include "utils/parallel/Task.hpp"
-
+#include "utils/SmallVector.hpp"
+#include <future>
+#include <memory>
+#include <type_traits>
 
 #include <thread>
 #include <mutex>
@@ -244,7 +246,7 @@ public:
         // TaskScheduler is the one that actually handles task creation.
         // The create method is private and will be called by the scheduler
         // via its friend access.
-        //friend class TaskScheduler;
+        friend class TaskScheduler;
 
 
 
