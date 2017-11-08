@@ -7,6 +7,7 @@
 
 #include "yafel_globals.hpp"
 #include "utils/parallel/TaskScheduler.hpp"
+#include "utils/parallel/wait_all.hpp"
 #include <vector>
 #include <iostream>
 
@@ -35,7 +36,7 @@ struct parfor_body
  * @param blockSize
  */
 template<typename Lambda>
-auto parfor(std::size_t idx_start,
+void parfor(std::size_t idx_start,
             std::size_t idx_end,
             Lambda &&loopBody,
             TaskScheduler &scheduler,
@@ -70,8 +71,8 @@ auto parfor(std::size_t idx_start,
 
     }
 
-
-    return futs;
+    wait_all(futs);
+    //return futs;
 }
 
 
