@@ -43,13 +43,16 @@ void Mesh::parse_gmsh(const std::string &fname)
     action_t currentAction = ACTION_UNSET;
 
     int offset{0};
+    std::string line;
+    std::vector<std::string> words;
     while (!in.eof()) {
-        std::string line;
+
         std::getline(in, line);
         if (in.eof()) {
             break;
         }
-        std::vector<std::string> words;
+
+        words.clear();
         string_split(line, ' ', words);
 
         if (words[0]=="$Nodes") {

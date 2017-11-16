@@ -14,11 +14,8 @@ auto CellCentroidsVolumes(const DoFManager &dofm)
 {
     auto& TS = getGlobalScheduler();
     std::vector<ElementFactory> EFs(TS.workers.size());
-    //ElementFactory EF;
     std::vector<coordinate<>> centroids(dofm.nCells(), coordinate<>(0));
     std::vector<double> cell_measure(dofm.nCells(), 0);
-
-    std::mutex mtx_1;
 
     struct thread_local_variables {
         ElementFactory EF;
@@ -27,7 +24,7 @@ auto CellCentroidsVolumes(const DoFManager &dofm)
 
     std::vector<thread_local_variables> local_variables(TS.workers.size(), {ElementFactory(1)});
 
-    auto loop_body = [&local_variables, &centroids, &cell_measure, &mtx_1, &dofm](std::size_t elnum) {
+    auto loop_body = [&local_variables, &centroids, &cell_measure, &dofm](std::size_t elnum) {
 
         auto &EF = local_variables[worker_global::worker_id].EF;
         double Volume{0};
@@ -58,8 +55,7 @@ auto CellCentroidsVolumes(const DoFManager &dofm)
 
     };
 
-    auto futures = parfor(0, centroids.size(), loop_body, TS, 128);
-    wait_all(futures);
+    parfor(0, centroids.size(), loop_body, TS, 128);
     return std::make_pair(std::move(centroids), std::move(cell_measure));
 }
 

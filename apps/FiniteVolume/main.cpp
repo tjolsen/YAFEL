@@ -10,9 +10,18 @@ using namespace yafel;
 
 int main() {
 
-
+    BasicTimer timer;
+    timer.tic();
     Mesh M("channel.msh");
+    timer.toc();
+
+    std::cout << "Time to read mesh: " << timer.duration<>() << " ms\n";
+
+    timer.tic();
     M.buildInternalFaces();
+    timer.toc();
+    std::cout << "Internal face time: " << timer.duration<>() << "ms\n";
+
     constexpr int NSD = 2;
 
 
@@ -23,15 +32,9 @@ int main() {
     FESystem feSystem(dofm);
 
 
-    BasicTimer timer;
     timer.tic();
     auto [centroids, volumes] = CellCentroidsVolumes<NSD>(dofm);
     timer.toc();
-
-    int i{0};
-    for(auto c : centroids) {
-        std::cout << c(0) << ' ' << c(1) << ' ' << volumes[i++] << '\n';
-    }
 
 
     std::cout << timer.duration<std::chrono::milliseconds>() << std::endl;
