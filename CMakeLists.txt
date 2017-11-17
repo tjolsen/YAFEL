@@ -100,6 +100,7 @@ set(SOURCE_FILES
         include/utils/DoFManager.hpp
         include/utils/DualNumber.hpp
         include/utils/ElementVtkType.hpp
+        include/utils/Printing.hpp
         include/utils/Range.hpp
         include/utils/ScalarTraits.hpp
         include/utils/SmallVector.hpp
@@ -166,8 +167,9 @@ target_compile_options(yafel PUBLIC $<$<CONFIG:DEBUG>:-fno-omit-frame-pointer>)
 # Load OpenMP
 find_package(OpenMP REQUIRED)
 if(OPENMP_CXX_FOUND)
-    target_compile_options(yafel INTERFACE ${OpenMP_CXX_FLAGS})
-    target_link_libraries(yafel INTERFACE ${OpenMP_CXX_LIBS})
+    target_compile_options(yafel PUBLIC ${OpenMP_CXX_FLAGS})
+    target_link_libraries(yafel PUBLIC ${OpenMP_CXX_LIBS})
+    target_link_libraries(yafel PUBLIC ${OpenMP_CXX_FLAGS})
 endif()
 
 

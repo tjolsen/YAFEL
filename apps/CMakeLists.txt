@@ -56,7 +56,8 @@ if(APP_FINITE_VOLUME)
             FiniteVolume/cell_centroids.hpp
             )
     target_link_libraries(finiteVolume yafel)
-    target_compile_options(finiteVolume PRIVATE -fopenmp)
+    install(TARGETS finiteVolume
+            RUNTIME DESTINATION bin)
 endif()
 
 cmake_dependent_option(APP_SUPG "Compile SUPG" OFF

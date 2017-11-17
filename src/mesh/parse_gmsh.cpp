@@ -58,7 +58,6 @@ auto svtoi(std::string_view s) {
         return val;
     }
     while(pos < s.end()) {
-
         val = 10*val + (*pos - '0');
         ++pos;
     }
@@ -89,14 +88,14 @@ void Mesh::parse_gmsh(const std::string &fname)
         throw (std::runtime_error("Mesh::parse_gmsh: bad std::istream"));
     }
 
-    typedef enum action
+    enum class ParsingAction
     {
         ACTION_UNSET,
         PARSE_NODES,
         PARSE_ELEMENTS
-    } action_t;
+    };
 
-    action_t currentAction = ACTION_UNSET;
+    ParsingAction currentAction = ParsingAction::ACTION_UNSET;
 
     int offset{0};
     std::string line;
@@ -112,16 +111,16 @@ void Mesh::parse_gmsh(const std::string &fname)
         string_split(line, ' ', words);
 
         if (words[0]=="$Nodes") {
-            currentAction = PARSE_NODES;
+            currentAction = ParsingAction::PARSE_NODES;
             std::getline(in, line);
             int nNodes = std::stoi(line);
             geometryNodes_.resize(nNodes);
             continue;
         } else if (words[0] == "$EndNodes") {
-            currentAction = ACTION_UNSET;
+            currentAction = ParsingAction::ACTION_UNSET;
             continue;
         } else if (words[0] == "$Elements") {
-            currentAction = PARSE_ELEMENTS;
+            currentAction = ParsingAction::PARSE_ELEMENTS;
             std::getline(in, line);
             int nElems = std::stoi(line);
             cellNodes_.reserve(4 * nElems); //decent guess?
@@ -130,16 +129,16 @@ void Mesh::parse_gmsh(const std::string &fname)
             cellTypes_.resize(nElems);
             continue;
         } else if (words[0] == "$EndElements") {
-            currentAction = ACTION_UNSET;
+            currentAction = ParsingAction::ACTION_UNSET;
             continue;
         }
 
         int id = -1;
         switch (currentAction) {
-            case ACTION_UNSET:
+            case ParsingAction::ACTION_UNSET:
                 break;
 
-            case PARSE_NODES: {
+            case ParsingAction::PARSE_NODES: {
                 id = svtoi(words[0]);
                 coordinate<> node;
                 for (auto i : IRange(0,3)) {
@@ -148,7 +147,7 @@ void Mesh::parse_gmsh(const std::string &fname)
                 geometryNodes_[id - 1] = node;
                 break;
             }
-            case PARSE_ELEMENTS: {
+            case ParsingAction::PARSE_ELEMENTS: {
                 id = svtoi(words[0]);
                 cellTypes_[id - 1] = gmsh_to_CellType(svtoi(words[1]));
                 int ntags = svtoi(words[2]);

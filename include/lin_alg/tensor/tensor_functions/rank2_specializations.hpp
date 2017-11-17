@@ -108,6 +108,13 @@ inline Tensor<D, 2, dt> TensorEye()
 // Tensor determinant
 //===================================================================
 template<typename dt=double>
+inline dt determinant(const Tensor<1, 2, dt> &A)
+{
+    return A(0, 0);
+}
+
+
+template<typename dt=double>
 inline dt determinant(const Tensor<2, 2, dt> &A)
 {
     return A(0, 0) * A(1, 1) - A(0, 1) * A(1, 0);
@@ -125,6 +132,15 @@ inline dt determinant(const Tensor<3, 2, dt> &A)
 //===================================================================
 // Tensor inverse
 //===================================================================
+template<typename dt=double>
+inline auto inverse(const Tensor<1, 2, dt> &A)
+{
+    Tensor<1, 2, dt> Ainv;
+    Ainv(0,0) = 1.0/A(0,0);
+    return Ainv;
+};
+
+
 template<typename dt=double>
 inline Tensor<2, 2, dt> inverse(const Tensor<2, 2, dt> &A)
 {

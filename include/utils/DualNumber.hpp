@@ -5,9 +5,6 @@
 #include "utils/ScalarTraits.hpp"
 #include <cmath>
 
-// to provide an ostream<< operator
-#include <iostream>
-
 YAFEL_NAMESPACE_OPEN
 
 template<typename T>
@@ -168,12 +165,6 @@ DualNumber<T> pow(DualNumber<T> x, U exponent)
     return DualNumber<T>(pow(x.first, exponent), x.second*exponent*pow(x.first,exponent-1));
 };
 
-template<typename T>
-std::ostream & operator<<(std::ostream & out, DualNumber<T> x)
-{
-    out << "{(" << x.first << ") + (" << x.second << ")eps}";
-    return out;
-}
 
 
 YAFEL_NAMESPACE_CLOSE

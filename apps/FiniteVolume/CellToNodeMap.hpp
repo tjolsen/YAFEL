@@ -9,6 +9,7 @@
 #include "FVDofm.hpp"
 
 #include <eigen3/Eigen/Sparse>
+#include <eigen3/Eigen/Core>
 
 YAFEL_NAMESPACE_OPEN
 
@@ -18,10 +19,18 @@ class CellToNodeMap {
 public:
     CellToNodeMap(FVDofm const& fvdofm) : fvDofm(fvdofm) { construct(); }
 
+    void interpolateToNodes(Eigen::VectorXd const& src, Eigen::VectorXd &dst) {
+        if(!is_constructed) {
+            construct();
+        }
+        dst.noalias() = interpolation_matrix*src;
+    }
+
 private:
     const FVDofm & fvDofm;
     Eigen::SparseMatrix<double,Eigen::RowMajor> interpolation_matrix;
     void construct();
+    bool is_constructed{false};
 };
 
 
@@ -34,19 +43,21 @@ void CellToNodeMap<NSD>::construct()
 
     std::vector<int> element_container;
     for(int cell=0; cell < fvDofm.centroids.size(); ++cell) {
-        auto Vinv_cell = 1.0/fvDofm.volumes[cell];
-        fvDofm.dofm.getGlobalNodes(fvDofm.original_cell_index[cell], element_container);
+        auto cell_idx = fvDofm.original_cell_index[cell];
+        auto v = fvDofm.volumes[cell_idx];
+        auto Vinv_cell = 1.0/(v == 0.0 ? -1.0 : v);
+        fvDofm.dofm.getGlobalNodes(cell_idx, element_container);
         for(auto n : element_container) {
-            auto& triplet = adjacentTriplets.emplace_back(cell, n, Vinv_cell);
+            auto& triplet = adjacentTriplets.emplace_back(n, cell_idx, Vinv_cell);
             node_adjacent_inverse_volumes[n] += Vinv_cell;
         }
     }
 
-    for(auto &t : adjacentTriplets) {
-        t.value() /= node_adjacent_inverse_volumes[t.col()];
+    for(auto& t : adjacentTriplets) {
+        t = Eigen::Triplet<double>{t.row(), t.col(), t.value()/node_adjacent_inverse_volumes[t.row()]};
     }
 
-    interpolation_matrix.resize(fvDofm.volumes.size(), node_adjacent_inverse_volumes.size());
+    interpolation_matrix.resize(node_adjacent_inverse_volumes.size(), fvDofm.volumes.size());
     interpolation_matrix.setFromTriplets(adjacentTriplets.begin(), adjacentTriplets.end());
 }
 

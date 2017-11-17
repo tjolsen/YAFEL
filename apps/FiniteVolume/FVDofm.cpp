@@ -13,16 +13,16 @@ FVDofm::FVDofm(DoFManager &dofm_, int8_t NSD)
 
     reverse_index_map.resize(dofm.nCells(), -1);
     int n_FV_cells{0};
-    for(auto i=0; i<dofm.nCells(); ++i) {
-        if(dofm.element_types[i].topoDim == NSD) {
+    for (auto i = 0; i < dofm.nCells(); ++i) {
+        if (dofm.element_types[i].topoDim == NSD) {
             ++n_FV_cells;
         }
     }
 
     original_cell_index.resize(n_FV_cells);
     int idx{0};
-    for(int i=0; i<dofm.nCells(); ++i) {
-        if(dofm.element_types[i].topoDim == NSD) {
+    for (int i = 0; i < dofm.nCells(); ++i) {
+        if (dofm.element_types[i].topoDim == NSD) {
             original_cell_index[idx] = i;
             reverse_index_map[i] = idx;
 
@@ -30,18 +30,28 @@ FVDofm::FVDofm(DoFManager &dofm_, int8_t NSD)
         }
     }
 
-    /*
-    switch(NSD) {
-        case 1:
-            auto [tmp_centroids, tmp_volumes] = cell_centroids<1>(); break;
-        case 2:
-            auto [tmp_centroids, tmp_volumes] = cell_centroids<2>(); break;
-        case 3:
-            auto [tmp_centroids, tmp_volumes] = cell_centroids<3>(); break;
+
+    switch (NSD) {
+        case 1: {
+            auto[tmp_centroids, tmp_volumes] = CellCentroidsVolumes<1>(dofm);
+            centroids = std::move(tmp_centroids);
+            volumes = std::move(tmp_volumes);
+            break;
+        }
+        case 2: {
+            auto[tmp_centroids, tmp_volumes] = CellCentroidsVolumes<2>(dofm);
+            centroids = std::move(tmp_centroids);
+            volumes = std::move(tmp_volumes);
+            break;
+        }
+        case 3: {
+            auto[tmp_centroids, tmp_volumes] = CellCentroidsVolumes<3>(dofm);
+            centroids = std::move(tmp_centroids);
+            volumes = std::move(tmp_volumes);
+            break;
+        }
     }
-    centroids = std::move(tmp_centroids);
-    volumes = std::move(tmp_volumes);
-*/
+
 }
 
 

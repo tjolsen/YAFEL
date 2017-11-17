@@ -8,7 +8,6 @@
 #include "utils/Range.hpp"
 
 #include <eigen3/Eigen/Dense>
-#include <iostream>
 #include <cmath>
 
 YAFEL_NAMESPACE_OPEN

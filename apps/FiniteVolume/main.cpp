@@ -3,39 +3,69 @@
 //
 #include "yafel.hpp"
 #include "cell_centroids.hpp"
+#include "FVDofm.hpp"
+#include "CellToNodeMap.hpp"
 
 using namespace yafel;
 
 
-
-int main() {
+int main()
+{
 
     BasicTimer timer;
-    timer.tic();
     Mesh M("channel.msh");
-    timer.toc();
 
-    std::cout << "Time to read mesh: " << timer.duration<>() << " ms\n";
 
-    timer.tic();
     M.buildInternalFaces();
-    timer.toc();
-    std::cout << "Internal face time: " << timer.duration<>() << "ms\n";
 
     constexpr int NSD = 2;
+
+
 
 
     // p=1 DoFManager, since p=0 doesn't really work. I will
     // manage my own DoFs so that a "node" lives at the centroid
     // of a cell.
-    DoFManager dofm(M, DoFManager::ManagerType::CG, 1, NSD+1);
+    int p = 1;
+    int dofpn = 1;
+    DoFManager dofm(M, DoFManager::ManagerType::CG, p, dofpn);
     FESystem feSystem(dofm);
+    auto[centroids, volumes] = CellCentroidsVolumes<NSD>(dofm);
 
+    FVDofm fvDofm(dofm, NSD);
 
-    timer.tic();
-    auto [centroids, volumes] = CellCentroidsVolumes<NSD>(dofm);
-    timer.toc();
+    Eigen::VectorXd phi_cells = Eigen::VectorXd::Constant(fvDofm.centroids.size(), 0.0);
+    CellToNodeMap<NSD> cellToNodeMap(fvDofm);
 
+    auto phi_func = [](coordinate<> &x) { return x(0)*x(1); };
+    int idx{0};
+    for (auto &x : fvDofm.centroids) {
+        phi_cells(idx++) = phi_func(x);
+    }
 
-    std::cout << timer.duration<std::chrono::milliseconds>() << std::endl;
+    Eigen::VectorXd exactSolution = Eigen::VectorXd::Constant(dofm.nNodes(), 0.0);
+    Eigen::VectorXd error;
+    idx = 0;
+    for (auto &x : dofm.dof_nodes) {
+        exactSolution(idx++) = phi_func(x);
+    }
+
+    cellToNodeMap.interpolateToNodes(phi_cells, feSystem.getSolution());
+
+    SimulationOutput simulationOutput("output", BackendType::VTU);
+    simulationOutput.captureFrame(feSystem,
+                                  std::function<void(FESystem&, OutputFrame&)>(
+                                  [&exactSolution, &error](auto &sys, auto &frame) {
+
+                                      OutputData::DataType dt = OutputData::DataType::Scalar;
+                                      OutputData::DataLocation dL = OutputData::DataLocation::Point;
+
+                                      error = sys.getSolution() - exactSolution;
+
+                                      frame.addData(std::make_shared<OutputData>(sys.getSolution(), "interpolated"));
+                                      frame.addData(std::make_shared<OutputData>(exactSolution, "exact"));
+                                      frame.addData(std::make_shared<OutputData>(error, "error"));
+
+                                  }));
+
 }
