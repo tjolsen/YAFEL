@@ -8,8 +8,8 @@
 #include "yafel_globals.hpp"
 #include "utils/DoFManager.hpp"
 
-#include <eigen3/Eigen/Core>
-#include <eigen3/Eigen/Sparse>
+#include <Eigen/Core>
+#include <Eigen/Sparse>
 #include <vector>
 #include <functional>
 #include <type_traits>

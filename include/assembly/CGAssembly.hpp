@@ -11,9 +11,9 @@
 #include "fe_system/FESystem.hpp"
 #include "assembly/AssemblyRequirement.hpp"
 
-#include <eigen3/Eigen/Core>
-#include <eigen3/Eigen/Dense>
-#include <eigen3/Eigen/Sparse>
+#include <Eigen/Core>
+#include <Eigen/Dense>
+#include <Eigen/Sparse>
 #include <vector>
 
 YAFEL_NAMESPACE_OPEN

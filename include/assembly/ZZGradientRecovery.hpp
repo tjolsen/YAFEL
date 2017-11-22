@@ -10,7 +10,7 @@
 #include "fe_system/FESystem.hpp"
 #include "utils/DoFManager.hpp"
 
-#include <eigen3/Eigen/QR>
+#include <Eigen/QR>
 #include <vector>
 #include <set>
 

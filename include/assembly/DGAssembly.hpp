@@ -10,8 +10,8 @@
 #include "fe_system/FESystem.hpp"
 #include "assembly/AssemblyRequirement.hpp"
 
-#include <eigen3/Eigen/Core>
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Core>
+#include <Eigen/Dense>
 #include <vector>
 
 

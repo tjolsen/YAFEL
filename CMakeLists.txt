@@ -180,9 +180,9 @@ set_target_properties(yafel PROPERTIES
 
 find_package(Eigen3 REQUIRED)
 add_library(Eigen3 IMPORTED INTERFACE)
-target_link_libraries(yafel PUBLIC Eigen3)
-target_compile_definitions(yafel INTERFACE "EIGEN_DEFAULT_INDEX_TYPE=int")
-target_compile_definitions(yafel INTERFACE "VIENNACL_HAVE_EIGEN")
+target_link_libraries(yafel PUBLIC Eigen3::Eigen)
+target_compile_definitions(yafel PUBLIC "EIGEN_DEFAULT_INDEX_TYPE=int")
+target_compile_definitions(yafel PUBLIC "VIENNACL_HAVE_EIGEN")
 
 if (ENABLE_HDF5)
     find_package(HDF5 COMPONENTS C HL REQUIRED)

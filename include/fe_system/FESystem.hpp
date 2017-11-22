@@ -7,7 +7,7 @@
 
 #include "yafel_globals.hpp"
 #include "utils/DoFManager.hpp"
-#include <eigen3/Eigen/Sparse>
+#include <Eigen/Sparse>
 
 YAFEL_NAMESPACE_OPEN
 

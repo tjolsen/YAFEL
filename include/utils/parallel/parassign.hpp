@@ -9,7 +9,7 @@
 #include "yafel_globals.hpp"
 #include "utils/parallel/TaskScheduler.hpp"
 #include "utils/parallel/parfor.hpp"
-#include <eigen3/Eigen/Core>
+#include <Eigen/Core>
 #include <type_traits>
 
 YAFEL_NAMESPACE_OPEN

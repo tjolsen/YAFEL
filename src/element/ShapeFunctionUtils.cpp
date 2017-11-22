@@ -7,7 +7,7 @@
 #include "utils/DualNumber.hpp"
 #include "utils/Range.hpp"
 
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 #include <cmath>
 
 YAFEL_NAMESPACE_OPEN

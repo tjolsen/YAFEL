@@ -7,7 +7,7 @@
 
 #include "yafel_globals.hpp"
 
-#include <eigen3/Eigen/Core>
+#include <Eigen/Core>
 #include <vector>
 #include <string>
 

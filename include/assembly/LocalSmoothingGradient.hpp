@@ -12,7 +12,7 @@
 #include "fe_system/FESystem.hpp"
 #include "assembly/AssemblyRequirement.hpp"
 
-#include <eigen3/Eigen/Core>
+#include <Eigen/Core>
 #include <vector>
 
 YAFEL_NAMESPACE_OPEN

@@ -18,7 +18,7 @@
 #include "yafel_globals.hpp"
 #include "yafel_typedefs.hpp"
 #include "utils/Range.hpp"
-#include <eigen3/Eigen/Core>
+#include <Eigen/Core>
 #include <vector>
 
 YAFEL_NAMESPACE_OPEN
