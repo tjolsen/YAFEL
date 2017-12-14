@@ -8,8 +8,8 @@
 #include "yafel_globals.hpp"
 #include "FVDofm.hpp"
 
-#include <eigen3/Eigen/Sparse>
-#include <eigen3/Eigen/Core>
+#include <Eigen/Sparse>
+#include <Eigen/Core>
 
 YAFEL_NAMESPACE_OPEN
 

@@ -15,7 +15,7 @@
 
 #include <viennacl/linalg/cg.hpp>
 #include <iostream>
-#include <eigen3/Eigen/IterativeLinearSolvers>
+#include <Eigen/IterativeLinearSolvers>
 
 using namespace yafel;
 

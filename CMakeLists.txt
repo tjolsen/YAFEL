@@ -179,10 +179,15 @@ set_target_properties(yafel PROPERTIES
         CMAKE_CXX_STANDARD 17)
 
 find_package(Eigen3 REQUIRED)
-add_library(Eigen3 IMPORTED INTERFACE)
+#add_library(Eigen3 IMPORTED INTERFACE)
 target_link_libraries(yafel PUBLIC Eigen3::Eigen)
 target_compile_definitions(yafel PUBLIC "EIGEN_DEFAULT_INDEX_TYPE=int")
 target_compile_definitions(yafel PUBLIC "VIENNACL_HAVE_EIGEN")
+
+find_package(ViennaCL REQUIRED)
+target_include_directories(yafel PUBLIC "${VIENNACL_INCLUDE_DIRS}")
+target_link_libraries(yafel PUBLIC "${VIENNACL_LIBRARIES}")
+
 
 if (ENABLE_HDF5)
     find_package(HDF5 COMPONENTS C HL REQUIRED)

@@ -9,12 +9,12 @@
 #include "output/SimulationOutput.hpp"
 #include "utils/BasicTimer.hpp"
 
-#include <eigen3/Eigen/Core>
-#include <eigen3/Eigen/IterativeLinearSolvers>
+#include <Eigen/Core>
+#include <Eigen/IterativeLinearSolvers>
 
-#ifndef VIENNACL_WITH_EIGEN
-#define VIENNACL_WITH_EIGEN 1
-#endif
+//#ifndef VIENNACL_WITH_EIGEN
+//#define VIENNACL_WITH_EIGEN 1
+//#endif
 
 #include <viennacl/linalg/cg.hpp>
 #include <iostream>
