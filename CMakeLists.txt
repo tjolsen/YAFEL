@@ -184,9 +184,11 @@ target_link_libraries(yafel PUBLIC Eigen3::Eigen)
 target_compile_definitions(yafel PUBLIC "EIGEN_DEFAULT_INDEX_TYPE=int")
 target_compile_definitions(yafel PUBLIC "VIENNACL_HAVE_EIGEN")
 
-find_package(ViennaCL REQUIRED)
-target_include_directories(yafel PUBLIC "${VIENNACL_INCLUDE_DIRS}")
-target_link_libraries(yafel PUBLIC "${VIENNACL_LIBRARIES}")
+find_package(ViennaCL QUIET)
+if(VIENNACL_FOUND)
+    target_include_directories(yafel PUBLIC "${VIENNACL_INCLUDE_DIRS}")
+    target_link_libraries(yafel PUBLIC "${VIENNACL_LIBRARIES}")
+endif()
 
 
 if (ENABLE_HDF5)

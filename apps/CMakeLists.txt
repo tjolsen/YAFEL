@@ -9,15 +9,15 @@ if(APP_MESH_AREA)
 endif()
 
 
-cmake_dependent_option(APP_BASIC_POISSON "Compile BasicPoisson" OFF
-        "COMPILE_APPS" OFF)
+cmake_dependent_option(APP_BASIC_POISSON "Compile BasicPoisson" ON
+        "COMPILE_APPS" ON)
 if(APP_BASIC_POISSON)
     add_executable(basicPoisson BasicPoisson/main.cpp)
     target_link_libraries(basicPoisson yafel)
 endif()
 
-cmake_dependent_option(APP_BASIC_ELASTICITY "Compile BasicElasticity" OFF
-        "COMPILE_APPS" OFF)
+cmake_dependent_option(APP_BASIC_ELASTICITY "Compile BasicElasticity" ON
+        "COMPILE_APPS" ON)
 if(APP_BASIC_ELASTICITY)
     add_executable(basicElasticity BasicLinearElasticity/main.cpp)
     target_link_libraries(basicElasticity yafel)

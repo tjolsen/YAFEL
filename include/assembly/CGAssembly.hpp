@@ -93,6 +93,7 @@ void CGAssembly(FESystem &feSystem,
             auto &E = EF.getElement(et);
             dofm.getGlobalDofs(elnum, global_dof_buffer);
 
+            dofm.getGlobalNodes(elnum, E.globalNodes);
 
             auto local_dofs = E.localMesh.nNodes() * dof_per_node;
             if (assemble_tangent && static_cast<int>(local_tangent_buffer.size()) < local_dofs * local_dofs) {
@@ -128,8 +129,8 @@ void CGAssembly(FESystem &feSystem,
             auto nqp = E.nQP();
             for (auto qpi : IRange(0, nqp)) {
                 coordinate<> xqp;
-                for(int A=0; A<global_dof_buffer.size(); ++A) {
-                    xqp += dofm.dof_nodes[global_dof_buffer[A]]*E.shapeValues[qpi](A);
+                for(int A=0; A<E.globalNodes.size(); ++A) {
+                    xqp += dofm.dof_nodes[E.globalNodes[A]]*E.shapeValues[qpi](A);
                 }
 
                 E.update<Physics::nsd()>(elnum, qpi, dofm);

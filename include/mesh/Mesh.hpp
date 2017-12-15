@@ -90,6 +90,7 @@ public:
 
     inline void setCellTypes(const std::vector<CellType> &ct) { cellTypes_ = ct; }
 
+    inline void setCellTags(const std::vector<std::vector<int>> &tags) { cellTags_ = tags; }
 
     /**
      * Getters for internal structures

@@ -50,15 +50,17 @@ struct LinearElasticity
 
 
     static void
-    LocalResidual(const Element &E, int qpi, double, Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &R_el)
+    LocalResidual(const Element &E, int qpi, coordinate<> &, double,
+                  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &u_el,
+                  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &R_el)
     {
-        return;
         for (auto A : IRange(0, static_cast<int>(R_el.rows()))) {
-            R_el(A) += 0 * E.shapeValues[qpi](A / NSD) * E.jxw;
+            R_el(A) += 10 * E.shapeValues[qpi](A / NSD) * E.jxw;
         }
     }
 
-    static void LocalTangent(const Element &E, int, double,
+    static void LocalTangent(const Element &E, int, coordinate<> &, double,
+                             Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &u_el,
                              Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> &K_el)
     {
 
@@ -76,25 +78,25 @@ struct LinearElasticity
         const int nNodes = K_el.rows() / NSD;
         //loops attempting strength reduction by inserting more loops!
         int A{0};
-        for(int Anode=0; Anode < nNodes; ++Anode) {
+        for (int Anode = 0; Anode < nNodes; ++Anode) {
             auto grad_Aj = make_TensorMap<NSD, 1>(&E.shapeGrad(Anode, 0));
 
-            for(int i=0; i<NSD; ++i) {
+            for (int i = 0; i < NSD; ++i) {
                 int B{Anode * NSD};
 
                 //Diagonal block
                 auto tmp = otimes(grad_Aj, grad_Aj).eval();
-                for(int k=0; k<NSD; ++k){
+                for (int k = 0; k < NSD; ++k) {
                     K_el(A, B) -= dot(Cikjl(i, k, colon(), colon()).eval(), tmp) * E.jxw;
                     ++B;
                 }
 
                 //Off-diagonal blocks
-                for(int Bnode = Anode+1; Bnode<nNodes; ++Bnode) {
+                for (int Bnode = Anode + 1; Bnode < nNodes; ++Bnode) {
                     auto grad_Bl = make_TensorMap<NSD, 1>(&E.shapeGrad(Bnode, 0));
                     auto tmp = otimes(grad_Aj, grad_Bl).eval();
                     //for (auto k : IRange(0, NSD)) {
-                    for(int k=0; k<NSD; ++k) {
+                    for (int k = 0; k < NSD; ++k) {
                         K_el(A, B) -= dot(Cikjl(i, k, colon(), colon()).eval(), tmp) * E.jxw;
                         K_el(B, A) = K_el(A, B);
 
@@ -113,6 +115,7 @@ Eigen::VectorXd solveSystem(const Eigen::SparseMatrix<double, Eigen::RowMajor> &
 {
     std::cout << "Starting solve...\n" << std::endl;
 
+    /*
     viennacl::vector<double> vcl_rhs(rhs.rows());
     viennacl::compressed_matrix<double> vcl_A(A.rows(), A.cols());
     viennacl::copy(rhs, vcl_rhs);
@@ -129,11 +132,12 @@ Eigen::VectorXd solveSystem(const Eigen::SparseMatrix<double, Eigen::RowMajor> &
     viennacl::copy(vcl_result, result);
 
     return result;
+     */
 
 
-    //Eigen::ConjugateGradient<Eigen::SparseMatrix<double,Eigen::RowMajor>, Eigen::Upper | Eigen::Lower> solver;
-    //solver.compute(A);
-    //return solver.solve(rhs);
+    Eigen::ConjugateGradient<Eigen::SparseMatrix<double,Eigen::RowMajor>, Eigen::Upper | Eigen::Lower> solver;
+    solver.compute(A);
+    return solver.solve(rhs);
 }
 
 int main()
@@ -143,92 +147,57 @@ int main()
     BasicTimer timer;
 
     timer.tic();
-    Mesh M("mesh.msh");
+    Mesh M("plateWithHole.msh");
     timer.toc();
+    double L = 2.0;
 
-    std::cout <<"Mesh import time: " << timer.duration<>() << " ms" << std::endl;
-    int p = 2;
+    std::cout << "Mesh import time: " << timer.duration<>() << " ms" << std::endl;
+    int p = 1;
     int dofpn = NSD;
 
     timer.tic();
     DoFManager dofm(M, DoFManager::ManagerType::CG, p, dofpn);
     timer.toc();
-    std::cout <<"dofm creation time: " << timer.duration<>() << " ms" << std::endl;
+    std::cout << "dofm creation time: " << timer.duration<>() << " ms" << std::endl;
 
     FESystem feSystem(dofm);
-
 
     timer.tic();
     CGAssembly<LinearElasticity<NSD>>(feSystem);
     timer.toc();
-
     std::cout << "Assembly time: " << timer.duration<>() << " ms" << std::endl;
 
-    /*
-    DirichletBC bc00(dofm, 0.0, 0);
-    bc00.selectByFunction([](const coordinate<> &x) { return std::abs(x(0)) < 1.0e-6; });
-    DirichletBC bc01(dofm, 0.0, 1);
-    bc01.selectByFunction([](const coordinate<> &x) { return std::abs(x(0)) < 1.0e-6; });
-    DirichletBC bc02(dofm, 0.0, 2);
-    bc02.selectByFunction([](const coordinate<> &x) { return std::abs(x(0)) < 1.0e-6; });
 
-    double twist_angle = 0.1; // angle in radians
-    auto twist = [twist_angle](auto x) {
-        x(0) = 0;
-        Tensor<3,1> dx = x - Tensor<3,1>{0,1,1};
-        auto r = norm(dx);
-        auto theta = std::atan2(dx(2), dx(1));
-
-        return (twist_angle*Tensor<3,1>(0, -r*std::sin(theta), r*std::cos(theta))).eval();
-    };
-
-    auto bc_func = twist;
-
-    DirichletBC bc10(dofm, [bc_func](auto x, double){return bc_func(x)(0);}, 0);
-    DirichletBC bc11(dofm, [bc_func](auto x, double){return bc_func(x)(1);}, 1);
-    DirichletBC bc12(dofm, [bc_func](auto x, double){return bc_func(x)(2);}, 2);
-    bc10.selectByFunction([](const coordinate<> &x) { return std::abs(x(0) - 2) < 1.0e-6; });
-    bc11.selectByFunction([](const coordinate<> &x) { return std::abs(x(0) - 2) < 1.0e-6; });
-    bc12.selectByFunction([](const coordinate<> &x) { return std::abs(x(0) - 2) < 1.0e-6; });
-
-    bc00.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
-    bc01.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
-    bc02.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
-    bc10.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
-    bc11.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
-    bc12.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
-    */
-
-    auto bcs = UniaxialTension(dofm, 2, .01);
-    for(auto &bc : bcs) {
+    auto bcs = UniaxialTension(dofm, L, .01);
+    for (auto &bc : bcs) {
         bc.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
     }
 
     timer.tic();
     feSystem.getSolution() = solveSystem(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
     timer.toc();
-    std::cout <<"Solution time: " << timer.duration<>() << " ms" << std::endl;
+    std::cout << "Solution time: " << timer.duration<>() << " ms" << std::endl;
 
-    LocalSmoothingGradient<LinearElasticity<3>>(feSystem);
+    LocalSmoothingGradient<LinearElasticity<NSD>>(feSystem);
 
-    SimulationOutput simulationOutput("output", BackendType::HDF5);
-    std::function<void(FESystem&,OutputFrame&)> captureFunc = [](FESystem &feSys, OutputFrame &frame) {
+    SimulationOutput simulationOutput("output", BackendType::VTU);
+    std::function<void(FESystem &, OutputFrame &)> captureFunc = [](FESystem &feSys, OutputFrame &frame) {
         frame.time = 0;
         OutputData::DataLocation dataLocation = OutputData::DataLocation::Point;
         std::string sol_name = "U";
         OutputData::DataType dt = OutputData::DataType::Vector;
         auto dat = std::make_shared<OutputData>(feSys.getSolution(),
-                                                sol_name, dataLocation, dt, std::vector<int>(NSD,1));
+                                                sol_name, dataLocation, dt, std::vector<int>(NSD, 1));
 
 
         frame.addData(dat);
 
         int nsd = feSys.getSolutionGradient().cols();
-        auto & gradient = feSys.getSolutionGradient();
+        auto &gradient = feSys.getSolutionGradient();
 
-        std::vector<int> uxmask{1,1,1,0,0,0,0,0,0};
-        std::vector<int> uymask{0,0,0,1,1,1,0,0,0};
-        std::vector<int> uzmask{0,0,0,0,0,0,1,1,1};
+        std::vector<int> uxmask{1, 1, 1, 0, 0, 0, 0, 0, 0};
+        std::vector<int> uymask{0, 0, 0, 1, 1, 1, 0, 0, 0};
+        std::vector<int> uzmask{0, 0, 0, 0, 0, 0, 1, 1, 1};
 
         auto gradUx_dat = std::make_shared<OutputData>(
                 gradient,
@@ -253,7 +222,7 @@ int main()
         frame.addData(gradUy_dat);
         frame.addData(gradUz_dat);
     };
-    simulationOutput.captureFrame(feSystem,captureFunc);
+    simulationOutput.captureFrame(feSystem, captureFunc);
 
     return 0;
 }

@@ -244,7 +244,11 @@ void tetrahedron_shape_functions(const std::vector<coordinate<>> &localPoints,
 
     std::vector<coordinate<>> localPoints_bumped(localPoints);
     for (auto &x : localPoints_bumped) {
-        x(2) = std::min(.999999999, x(1));
+        x(2) = std::min(.999999999, x(2));
+        if(x(1) + x(2) == 0) {
+            x(1) += 0.00000001;
+            x(2) += 0.00000001;
+        }
     }
 
     Eigen::MatrixXd V;
@@ -275,14 +279,14 @@ void tetrahedron_shape_functions(const std::vector<coordinate<>> &localPoints,
 
     V = make_vandermonde(localPoints_bumped, shape_func);
     rhs.resize(V.rows());
-    gradRhs.resize(V.rows(), 2);
+    gradRhs.resize(V.rows(), 3);
     auto VTLU = V.transpose().lu();
 
     for (auto i : IRange(0, static_cast<int>(quadPoints.size()))) {
 
         for (auto j : IRange(0, (int) V.rows())) {
             rhs(j) = shape_func(j, quadPoints[i]);
-            for (auto d : IRange(0, 2)) {
+            for (auto d : IRange(0, 3)) {
                 coordinate<DualNumber<double>> xi;
                 for (auto di : IRange(0, xi.dim())) {
                     xi(di) = make_dual(quadPoints[i](di));

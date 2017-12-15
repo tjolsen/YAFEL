@@ -26,7 +26,8 @@ struct PoissonEquation
     { return NSD; }
 
     static void
-    LocalResidual(const Element &E, int qpi, double,
+    LocalResidual(const Element &E, int qpi, coordinate<>&, double,
+                  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &u_el,
                   Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &R_el)
     {
 
@@ -38,7 +39,8 @@ struct PoissonEquation
 
     }
 
-    static void LocalTangent(const Element &E, int, double,
+    static void LocalTangent(const Element &E, int, coordinate<>&, double,
+                             Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &u_el,
                              Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> &K_el)
     {
         K_el -= E.shapeGrad * (E.shapeGrad.transpose() * E.jxw);
@@ -86,8 +88,8 @@ Eigen::VectorXd solveSystem(const Eigen::SparseMatrix<double> &A, const Eigen::V
 
 int main()
 {
-    constexpr int nsd = 2;
-    Mesh M("mesh.msh");
+    constexpr int nsd = 3;
+    Mesh M("plateWithHole.msh");
     int p = 1;
     int dofpn = 1;
     DoFManager dofm(M, DoFManager::ManagerType::CG, p, dofpn);
@@ -103,13 +105,14 @@ int main()
     bc0.selectByFunction([](const coordinate<> &x) { return std::abs(x(0)) < 1.0e-6; });
 
     DirichletBC bc1(dofm, 0.0);
-    bc1.selectByFunction([](const coordinate<> &x) { return std::abs(x(0) - 2) < 1.0e-6; });
+    bc1.selectByFunction([](const coordinate<> &x) { return std::abs(x(1)) < 1.0e-6; });
 
     bc0.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
     bc1.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
 
     auto &U = feSystem.getSolution();
     U = solveSystem(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
+
 
     ZZGradientRecovery<PoissonEquation<nsd>>(feSystem);
 
@@ -137,7 +140,7 @@ int main()
         frame.addData(grad_dat);
     };
 
-    SimulationOutput simulationOutput("output", BackendType::HDF5);
+    SimulationOutput simulationOutput("output", BackendType::VTU);
     simulationOutput.captureFrame(feSystem, captureFunc);
 
     return 0;

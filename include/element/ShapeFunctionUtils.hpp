@@ -91,7 +91,8 @@ Eigen::MatrixXd make_vandermonde(const std::vector<coordinate<>> &localPoints, F
 
     for (auto i : IRange(0, N)) {
         for (auto j : IRange(0, N)) {
-            V(i, j) = func(j, localPoints[i]);
+            auto vij = func(j, localPoints[i]);
+            V(i, j) = vij;
         }
     }
 
