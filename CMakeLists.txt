@@ -196,8 +196,8 @@ if (ENABLE_HDF5)
     add_library(HDF5 IMPORTED SHARED)
     set_property(TARGET HDF5 PROPERTY
             INTERFACE_INCLUDE_DIRECTORIES ${HDF5_INCLUDE_DIRS})
-    target_compile_definitions(yafel INTERFACE USE_HDF5)
-    target_link_libraries(yafel INTERFACE ${HDF5_LIBRARIES})
+    target_compile_definitions(yafel PUBLIC USE_HDF5)
+    target_link_libraries(yafel INTERFACE ${HDF5_LIBRARIES} ${HDF5_C_LIBRARY_hdf5_hl})
 endif ()
 
 if(VIENNACL_BACKEND STREQUAL "OPENCL")

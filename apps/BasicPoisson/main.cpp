@@ -39,12 +39,12 @@ struct PoissonEquation
 
     }
 
-    static void LocalTangent(const Element &E, int, coordinate<>&, double,
+    static void LocalTangent(const Element &E, int qpi, coordinate<>&, double,
                              Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>> &u_el,
                              Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> &K_el)
     {
-        K_el -= E.shapeGrad * (E.shapeGrad.transpose() * E.jxw);
-        /*
+        //K_el -= E.shapeGrad* (E.shapeGrad.transpose() * E.jxw);
+
         for (auto A: IRange(0, static_cast<int>(K_el.rows()))) {
             auto grad_Ai = make_TensorMap<NSD,1>(&E.shapeGrad(A,0));
             for (auto B: IRange(A, static_cast<int>(K_el.rows()))) {
@@ -53,13 +53,13 @@ struct PoissonEquation
                 K_el(B, A) = K_el(A, B);
             }
 
-        }*/
+        }
     }
 };
 
 Eigen::VectorXd solveSystem(const Eigen::SparseMatrix<double> &A, const Eigen::VectorXd &rhs)
 {
-
+    /*
     std::cout << "Norm0 = " << rhs.norm() << std::endl;
 
     viennacl::vector<double> vcl_rhs(rhs.rows());
@@ -76,11 +76,12 @@ Eigen::VectorXd solveSystem(const Eigen::SparseMatrix<double> &A, const Eigen::V
     //Copy back
     Eigen::VectorXd result(rhs.rows());
     viennacl::copy(vcl_result, result);
+     */
 
 
-    //Eigen::ConjugateGradient<Eigen::SparseMatrix<double>, Eigen::Upper | Eigen::Lower> solver;
-    //solver.compute(A);
-    //Eigen::VectorXd result = solver.solve(rhs);
+    Eigen::ConjugateGradient<Eigen::SparseMatrix<double>, Eigen::Upper | Eigen::Lower> solver;
+    solver.compute(A);
+    Eigen::VectorXd result = solver.solve(rhs);
     std::cout << "new norm = " << (A * result - rhs).norm() << std::endl;
 
     return result;
@@ -88,8 +89,8 @@ Eigen::VectorXd solveSystem(const Eigen::SparseMatrix<double> &A, const Eigen::V
 
 int main()
 {
-    constexpr int nsd = 3;
-    Mesh M("plateWithHole.msh");
+    constexpr int nsd = 2;
+    Mesh M("mesh.msh");
     int p = 1;
     int dofpn = 1;
     DoFManager dofm(M, DoFManager::ManagerType::CG, p, dofpn);
@@ -104,15 +105,16 @@ int main()
     DirichletBC bc0(dofm, 0.0);
     bc0.selectByFunction([](const coordinate<> &x) { return std::abs(x(0)) < 1.0e-6; });
 
-    DirichletBC bc1(dofm, 0.0);
-    bc1.selectByFunction([](const coordinate<> &x) { return std::abs(x(1)) < 1.0e-6; });
+    //DirichletBC bc1(dofm, 0.0);
+    //bc1.selectByFunction([](const coordinate<> &x) { return std::abs(x(1)) < 1.0e-6; });
 
     bc0.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
-    bc1.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
+    //bc1.apply(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
 
     auto &U = feSystem.getSolution();
     U = solveSystem(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
 
+    std::cout << "Nnodes = " << dofm.nNodes() << std::endl;
 
     ZZGradientRecovery<PoissonEquation<nsd>>(feSystem);
 
@@ -140,8 +142,10 @@ int main()
         frame.addData(grad_dat);
     };
 
-    SimulationOutput simulationOutput("output", BackendType::VTU);
+    SimulationOutput simulationOutput("output", BackendType::HDF5);
     simulationOutput.captureFrame(feSystem, captureFunc);
+
+    std::cout << feSystem.getGlobalTangent() << std::endl << std::endl << feSystem.getGlobalResidual() << std::endl;
 
     return 0;
 }

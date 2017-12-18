@@ -142,12 +142,25 @@ ElementType DoFManager::CellType_to_ElementType(CellType ct, int polyOrder) cons
 
 void DoFManager::make_cg_dofs(const Mesh &M)
 {
-    //make a raw mesh
-    make_raw_dofs(M);
+    if(polyOrder > 1) {
+        //make a raw mesh
+        make_raw_dofs(M);
 
-    //recombine duplicate nodes and update triangulation
-    recombine_all_duplicates();
+        //recombine duplicate nodes and update triangulation
+        recombine_all_duplicates();
+    }
 
+    else if (polyOrder == 1) {
+        this->elements = M.getCellVector();
+        this->element_offsets = M.getOffsetVector();
+        this->dof_nodes = M.getGeometryNodes();
+        this->element_types.resize(M.nCells());
+        for(int i=0; i<M.nCells(); ++i) {
+            element_types[i] = CellType_to_ElementType(M.getCellType(i), polyOrder);
+        }
+    } else {
+        throw std::runtime_error("DoFManager: Invalid polynomial order");
+    }
 }
 
 void DoFManager::make_dg_dofs(const Mesh &M)
@@ -287,11 +300,14 @@ coordinate<> DoFManager::interpolate_from_corners(coordinate<> xlocal,
 
     switch (ct) {
         case CellType::Tri3:
-            return (1 - xlocal(0) - xlocal(1)) * corners[0] + xlocal(0) * corners[1] + xlocal(1) * corners[2];
+            return (1 - xlocal(0) - xlocal(1)) * corners[0]
+                   + xlocal(0) * corners[1]
+                   + xlocal(1) * corners[2];
 
         case CellType::Tet4:
             return (1 - xlocal(0) - xlocal(1) - xlocal(2)) * corners[0]
-                   + xlocal(0) * corners[1] + xlocal(1) * corners[2]
+                   + xlocal(0) * corners[1]
+                   + xlocal(1) * corners[2]
                    + xlocal(2) * corners[3];
 
         case CellType::Quad4:
@@ -316,7 +332,7 @@ coordinate<> DoFManager::interpolate_from_corners(coordinate<> xlocal,
 
 
         default:
-            return coordinate<>();
+            return coordinate<>{};
     }
 
 }
