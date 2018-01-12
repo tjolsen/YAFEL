@@ -9,7 +9,8 @@
 #include "output/OutputBackend.hpp"
 
 #ifdef USE_HDF5
-#include <hdf5/serial/hdf5.h>
+//#include <hdf5/serial/hdf5.h>
+#include <hdf5.h>
 #else
 #define hid_t int
 #endif

@@ -20,10 +20,12 @@ using namespace yafel;
 
 int main()
 {
+    constexpr int NSD = 3;
+
     Mesh M("2x2square.msh");
     M.buildInternalFaces();
 
-    int p = 5; // set polynomial interpolation order ( p <= 5 for now if using triangle elements )
+    int p = 1; // set polynomial interpolation order ( p <= 5 for now if using triangle elements )
     DoFManager dofm(M, DoFManager::ManagerType::DG, p);
     double area{0};
 
@@ -31,14 +33,20 @@ int main()
 
     for (auto c : IRange(0, M.nCells())) {
         auto et = dofm.CellType_to_ElementType(M.getCellType(c), p);
+
+	if(et.topoDim != NSD) {
+	    continue;
+	}
+	
         auto &E = EF.getElement(et);
         for (auto qpi : IRange(0, E.nQP())) {
-            E.update<2>(c, qpi, dofm);
+            E.update<3>(c, qpi, dofm);
             area += E.jxw;
+
+	    std::cout << "E.jxw = " << E.jxw << "\n";
         }
     }
     std::cout << "A = " << area << std::endl;
-
 
     // Surface area (i.e. perimeter) calculation
     double Perimeter{0};
@@ -63,7 +71,7 @@ int main()
         auto &E = EF.getElement(dofm.element_types[elem]);
 
         for (auto fqpi : IRange(0, E.nFQP())) {
-            E.face_update<2>(elem, fqpi, local_fnodes, dofm);
+            E.face_update<NSD>(elem, fqpi, local_fnodes, dofm);
 
             Perimeter += E.jxw;
         }
