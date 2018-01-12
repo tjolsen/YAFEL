@@ -124,7 +124,8 @@ void Element::update(int elnum, int qpi, const DoFManager &dofm)
 
     double detJ = determinant(Jacobian);
     jxw = detJ * quadratureRule.weights[qpi];
-    alignas(32) Tensor<NSD, 2> JinvT = inverse(Jacobian).template perm<1,0>();
+    Tensor<NSD,2> Jinv = inverse(Jacobian);
+    Tensor<NSD, 2> JinvT = transpose(Jinv);
 
     if (shapeGrad.rows() != globalNodes.size() || shapeGrad.cols() != NSD) {
         shapeGrad.resize(globalNodes.size(), NSD);
