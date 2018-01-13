@@ -25,11 +25,11 @@ int main()
     Mesh M("2x2square.msh");
     M.buildInternalFaces();
 
-    int p = 1; // set polynomial interpolation order ( p <= 5 for now if using triangle elements )
+    int p = 3; // set polynomial interpolation order ( p <= 5 for now if using triangle elements )
     DoFManager dofm(M, DoFManager::ManagerType::DG, p);
     double area{0};
 
-    ElementFactory EF(1);
+    ElementFactory EF(1,1);
 
     for (auto c : IRange(0, M.nCells())) {
         auto et = dofm.CellType_to_ElementType(M.getCellType(c), p);
@@ -42,8 +42,6 @@ int main()
         for (auto qpi : IRange(0, E.nQP())) {
             E.update<3>(c, qpi, dofm);
             area += E.jxw;
-
-	    std::cout << "E.jxw = " << E.jxw << "\n";
         }
     }
     std::cout << "A = " << area << std::endl;
@@ -67,8 +65,13 @@ int main()
             elem = F.right;
             dofm.getRightFaceNodes(fi,local_fnodes);
         }
+        auto et = dofm.element_types[elem];
+        if(et.topoDim != NSD) {
+            //this "internal face" is likely actually an internal edge.
+            continue;
+        }
 
-        auto &E = EF.getElement(dofm.element_types[elem]);
+        auto &E = EF.getElement(et);
 
         for (auto fqpi : IRange(0, E.nFQP())) {
             E.face_update<NSD>(elem, fqpi, local_fnodes, dofm);

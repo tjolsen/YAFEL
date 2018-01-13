@@ -115,7 +115,7 @@ Eigen::VectorXd solveSystem(const Eigen::SparseMatrix<double, Eigen::RowMajor> &
 {
     std::cout << "Starting solve...\n" << std::endl;
 
-    /*
+
     viennacl::vector<double> vcl_rhs(rhs.rows());
     viennacl::compressed_matrix<double> vcl_A(A.rows(), A.cols());
     viennacl::copy(rhs, vcl_rhs);
@@ -132,12 +132,13 @@ Eigen::VectorXd solveSystem(const Eigen::SparseMatrix<double, Eigen::RowMajor> &
     viennacl::copy(vcl_result, result);
 
     return result;
-     */
 
 
+    /*
     Eigen::ConjugateGradient<Eigen::SparseMatrix<double,Eigen::RowMajor>, Eigen::Upper | Eigen::Lower> solver;
     solver.compute(A);
     return solver.solve(rhs);
+     */
 }
 
 int main()
@@ -149,10 +150,10 @@ int main()
     timer.tic();
     Mesh M("plateWithHole.msh");
     timer.toc();
-    double L = 2.0;
+    double L = 1.0;
 
     std::cout << "Mesh import time: " << timer.duration<>() << " ms" << std::endl;
-    int p = 1;
+    int p = 2;
     int dofpn = NSD;
 
     timer.tic();

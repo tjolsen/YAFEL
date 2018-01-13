@@ -7,14 +7,16 @@
 
 YAFEL_NAMESPACE_OPEN
 
-ElementFactory::ElementFactory(int dof_per_node)
-        : dof_per_node(dof_per_node), element_container()
+ElementFactory::ElementFactory(int dof_per_node, int quadratureOrderMultiplier)
+        : dof_per_node(dof_per_node),
+          quadratureOrderMultiplier(quadratureOrderMultiplier),
+          element_container()
 {}
 
 Element& ElementFactory::getElement(ElementType elementType)
 {
     if(element_container.count(elementType) == 0) {
-        auto eit = element_container.emplace(elementType, Element(elementType,dof_per_node));
+        auto eit = element_container.emplace(elementType, Element(elementType,dof_per_node, quadratureOrderMultiplier));
         return (*(eit.first)).second;
     }
     else {

@@ -8,10 +8,11 @@
 
 YAFEL_NAMESPACE_OPEN
 
-Element::Element(ElementType et, int dofpn)
+Element::Element(ElementType et, int dofpn, int qrm)
         : elementType(et),
           localMesh(Mesh::DefinitionScheme::Explicit),
-          dof_per_node(dofpn)
+          dof_per_node(dofpn),
+          quadratureOrderMultiplier(qrm)
 {
 
     switch (et.elementTopology) {

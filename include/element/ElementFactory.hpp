@@ -19,7 +19,7 @@ class ElementFactory
 {
 
 public:
-    ElementFactory(int dof_per_node = 1);
+    ElementFactory(int dof_per_node = 1, int quadratureOrderMultiplier = 2);
 
     Element &getElement(ElementType elementType);
 
@@ -27,6 +27,7 @@ public:
 
 private:
     int dof_per_node;
+    int quadratureOrderMultiplier;
     std::map<ElementType, Element> element_container;
 
 };

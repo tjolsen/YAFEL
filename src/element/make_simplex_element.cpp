@@ -97,15 +97,15 @@ void Element::make_simplex()
     }
 
     if (elementType.topoDim == 2) {
-        quadratureRule.get_triangle_quadrature(std::max(1, 2 * elementType.polyOrder));
+        quadratureRule.get_triangle_quadrature(std::max(1, quadratureOrderMultiplier * elementType.polyOrder));
         boundaryQuadratureRule = QuadratureRule::make_tensor_product(
                 QuadratureRule::QuadratureType::GAUSS_LEGENDRE,
                 elementType.topoDim-1,
-                2 * elementType.polyOrder);
+                quadratureOrderMultiplier * elementType.polyOrder);
 
     } else if (elementType.topoDim == 3) {
-        quadratureRule.get_tetrahedron_quadrature(std::max(1, 2 * elementType.polyOrder));
-        boundaryQuadratureRule.get_triangle_quadrature(std::max(1, 2 * elementType.polyOrder));
+        quadratureRule.get_tetrahedron_quadrature(std::max(1, quadratureOrderMultiplier * elementType.polyOrder));
+        boundaryQuadratureRule.get_triangle_quadrature(std::max(1, quadratureOrderMultiplier * elementType.polyOrder));
     }
     localMesh.setGeometryNodes(std::move(localPoints_xi));
     localMesh.setCellNodes(std::move(cellNodes));

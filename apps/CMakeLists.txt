@@ -1,8 +1,8 @@
 include(CMakeDependentOption)
 
 
-cmake_dependent_option(APP_MESH_AREA "Compile MeshArea" OFF
-        "COMPILE_APPS" OFF)
+cmake_dependent_option(APP_MESH_AREA "Compile MeshArea" ON
+        "COMPILE_APPS" ON)
 if(APP_MESH_AREA)
     add_executable(meshArea MeshArea/main.cpp)
     target_link_libraries(meshArea yafel)

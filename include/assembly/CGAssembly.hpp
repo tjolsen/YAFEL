@@ -70,7 +70,7 @@ void CGAssembly(FESystem &feSystem,
     std::vector<Eigen::Triplet<double>> tangent_triplets;
     int total_triplets{0};
 
-//#pragma omp parallel shared(tangent_triplets, GlobalResidual, dofm)
+#pragma omp parallel shared(tangent_triplets, GlobalResidual, dofm)
     {// open parallel block
         //storage buffers
         std::vector<double> local_tangent_buffer;
@@ -82,7 +82,7 @@ void CGAssembly(FESystem &feSystem,
 
         //Create an ElementFactory
         ElementFactory EF;
-//#pragma omp for
+#pragma omp for
         for (int elnum = 0; elnum < dofm.nCells(); ++elnum) {
 
             auto et = dofm.element_types[elnum];
@@ -162,17 +162,17 @@ void CGAssembly(FESystem &feSystem,
         }// end element loop
 
 
-//#pragma omp critical
+#pragma omp critical
         {
             total_triplets += static_cast<int>(local_triplets.size());
         }//end critical block
-//#pragma omp barrier
-//#pragma omp single
+#pragma omp barrier
+#pragma omp single
         {
             tangent_triplets.reserve(total_triplets);
         }
-//#pragma omp barrier
-//#pragma omp critical
+#pragma omp barrier
+#pragma omp critical
         {
             for (auto &trip : local_triplets) {
                 tangent_triplets.push_back(trip);

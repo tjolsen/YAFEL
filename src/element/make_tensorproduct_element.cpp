@@ -125,10 +125,10 @@ void Element::make_tensorProduct()
     localMesh.setCellTypes(cellTypes);
 
     quadratureRule = QuadratureRule::make_tensor_product(QuadratureRule::QuadratureType::GAUSS_LEGENDRE,
-                                                         elementType.topoDim, 2 * elementType.polyOrder);
+                                                         elementType.topoDim, quadratureOrderMultiplier * elementType.polyOrder);
 
     boundaryQuadratureRule = QuadratureRule::make_tensor_product(QuadratureRule::QuadratureType::GAUSS_LEGENDRE,
-                                                                 elementType.topoDim-1, 2 * elementType.polyOrder);
+                                                                 elementType.topoDim-1, quadratureOrderMultiplier * elementType.polyOrder);
 
     tensor_product_shape_functions(localMesh.getGeometryNodes(),
                                    quadratureRule.nodes,

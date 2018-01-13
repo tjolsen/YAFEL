@@ -179,7 +179,7 @@ int DoFManager::make_raw_dofs(const Mesh &M)
     int ncells = M.nCells();
     int8_t max_td{0};
 
-    ElementFactory EF(1);
+    ElementFactory EF(1,1);
     int offset{0};
 
     std::vector<coordinate<>> corner_coords(8);
@@ -235,7 +235,7 @@ void DoFManager::match_face_nodes()
     std::vector<int> left_global_nodes;
     std::vector<int> right_global_nodes;
 
-    ElementFactory EF(1);
+    ElementFactory EF(1,1);
 
 
     for (int f = 0; f < nFaces; ++f) {

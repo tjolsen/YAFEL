@@ -59,7 +59,7 @@ struct PoissonEquation
 
 Eigen::VectorXd solveSystem(const Eigen::SparseMatrix<double> &A, const Eigen::VectorXd &rhs)
 {
-    /*
+
     std::cout << "Norm0 = " << rhs.norm() << std::endl;
 
     viennacl::vector<double> vcl_rhs(rhs.rows());
@@ -76,21 +76,22 @@ Eigen::VectorXd solveSystem(const Eigen::SparseMatrix<double> &A, const Eigen::V
     //Copy back
     Eigen::VectorXd result(rhs.rows());
     viennacl::copy(vcl_result, result);
-     */
 
 
+    /*
     Eigen::ConjugateGradient<Eigen::SparseMatrix<double>, Eigen::Upper | Eigen::Lower> solver;
     solver.compute(A);
     Eigen::VectorXd result = solver.solve(rhs);
     std::cout << "new norm = " << (A * result - rhs).norm() << std::endl;
+     */
 
     return result;
 }
 
 int main()
 {
-    constexpr int nsd = 2;
-    Mesh M("mesh.msh");
+    constexpr int nsd = 3;
+    Mesh M("tetblock.msh");
     int p = 1;
     int dofpn = 1;
     DoFManager dofm(M, DoFManager::ManagerType::CG, p, dofpn);
@@ -142,10 +143,10 @@ int main()
         frame.addData(grad_dat);
     };
 
-    SimulationOutput simulationOutput("output", BackendType::HDF5);
+    SimulationOutput simulationOutput("output", BackendType::VTU);
     simulationOutput.captureFrame(feSystem, captureFunc);
 
-    std::cout << feSystem.getGlobalTangent() << std::endl << std::endl << feSystem.getGlobalResidual() << std::endl;
+    //std::cout << feSystem.getGlobalTangent() << std::endl << std::endl << feSystem.getGlobalResidual() << std::endl;
 
     return 0;
 }

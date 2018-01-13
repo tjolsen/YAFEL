@@ -24,7 +24,7 @@ class Element
 {
 
 public:
-    Element(ElementType et = {ElementTopology::None, 0, 0}, int dofPerNode = 1);
+    Element(ElementType et = {ElementTopology::None, 0, 0}, int dofPerNode = 1, int quadratureOrderMultiplier = 2);
 
     // Struct that holds element type
     ElementType elementType;
@@ -36,6 +36,10 @@ public:
     //Quadrature rule (ie, points and weights)
     QuadratureRule quadratureRule;
     QuadratureRule boundaryQuadratureRule;
+
+    //multiplier to select quadrature order for a given interpolation order.
+    //Defaults to 2 because is useful for Galerkin FEM
+    int quadratureOrderMultiplier;
 
     // Shape function values and gradients (in parameter space)
     std::vector<Eigen::VectorXd> shapeValues;
