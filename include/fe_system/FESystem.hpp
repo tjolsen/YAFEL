@@ -46,7 +46,7 @@ public:
 
 protected:
     DoFManager &dofm;
-    Eigen::SparseMatrix<double, Eigen::RowMajor> global_tangent;
+    Eigen::SparseMatrix<double, Eigen::ColMajor> global_tangent;
     Eigen::VectorXd global_residual;
     Eigen::VectorXd solution_vector;
     Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic, Eigen::RowMajor> solution_gradient;

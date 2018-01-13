@@ -8,6 +8,7 @@
 #include "assembly/LocalSmoothingGradient.hpp"
 #include "output/SimulationOutput.hpp"
 #include "utils/BasicTimer.hpp"
+#include "lin_alg/linear_solvers/LinearSolve.hpp"
 
 #include <Eigen/Core>
 #include <Eigen/IterativeLinearSolvers>
@@ -175,8 +176,12 @@ int main()
     }
 
     timer.tic();
-    feSystem.getSolution() = solveSystem(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
+    //feSystem.getSolution() = solveSystem(feSystem.getGlobalTangent(), feSystem.getGlobalResidual());
+
+    auto solverTag = LinearSolve::VCLConjugateGradientTag{};
+    feSystem.getSolution() = LinearSolve::solve(feSystem.getGlobalTangent(), feSystem.getGlobalResidual(),solverTag);
     timer.toc();
+
     std::cout << "Solution time: " << timer.duration<>() << " ms" << std::endl;
 
     LocalSmoothingGradient<LinearElasticity<NSD>>(feSystem);

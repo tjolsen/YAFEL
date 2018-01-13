@@ -43,6 +43,11 @@ set(SOURCE_FILES
 
         include/fe_system/FESystem.hpp
 
+        include/lin_alg/linear_solvers/LinearSolve.hpp
+        include/lin_alg/linear_solvers/solvers/EigenConjugateGradient.hpp
+        include/lin_alg/linear_solvers/solvers/EigenCholesky.hpp
+        include/lin_alg/linear_solvers/solvers/VCLConjugateGradient.hpp
+
         include/lin_alg/tensor/tensors.hpp
         include/lin_alg/tensor/TensorExpression.hpp
         include/lin_alg/tensor/mp_utils/contraction_mp_utils.hpp
