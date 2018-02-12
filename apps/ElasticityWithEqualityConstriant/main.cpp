@@ -120,11 +120,6 @@ int main()
     auto &K = feSystem.getGlobalTangent();
     auto &rhs = feSystem.getGlobalResidual();
 
-    bc0.apply(K, rhs);
-    bc1.apply(K, rhs);
-    bc2.apply(K, rhs);
-    bc3.apply(K,rhs);
-
     //std::cout << "Dirichlet BCs done\n";
 
     //Constraint: u \cdot (1,1,0) == 0 on surface 2
@@ -253,6 +248,12 @@ int main()
     }
 
     //std::cout << "Condensation done\n";
+
+
+    bc0.apply(K, rhs);
+    //bc1.apply(K, rhs);
+    bc2.apply(K, rhs);
+    //bc3.apply(K, rhs);
 
     auto solverTag = LinearSolve::VCLConjugateGradientTag{};
     feSystem.getSolution() = LinearSolve::solve(K, rhs,solverTag);
