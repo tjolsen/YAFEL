@@ -8,6 +8,7 @@
 #include "yafel_globals.hpp"
 
 #include "lin_alg/linear_solvers/solvers/EigenConjugateGradient.hpp"
+#include "lin_alg/linear_solvers/solvers/EigenBICGSTAB.hpp"
 #include "lin_alg/linear_solvers/solvers/EigenCholesky.hpp"
 #include "lin_alg/linear_solvers/solvers/VCLConjugateGradient.hpp"
 

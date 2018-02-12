@@ -66,3 +66,11 @@ if(APP_SUPG)
     add_executable(supg supg_learning/main.cpp supg_learning/supg_advection.hpp)
     target_link_libraries(supg yafel)
 endif()
+
+cmake_dependent_option(APP_ElasticityConstraint "Compile ElasticityConstraint" ON
+        "COMPILE_APPS" ON)
+if(APP_ElasticityConstraint)
+    add_executable(elasticityConstraint ElasticityWithEqualityConstriant/main.cpp ElasticityWithEqualityConstriant/LinearElasticity.hpp)
+    target_link_libraries(elasticityConstraint yafel)
+endif()
+

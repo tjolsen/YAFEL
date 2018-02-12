@@ -6,7 +6,6 @@
 #define YAFEL_VCLCONJUGATEGRADIENT_HPP
 
 #include "yafel_globals.hpp"
-#include "lin_alg/linear_solvers/LinearSolve.hpp"
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>

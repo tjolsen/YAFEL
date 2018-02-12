@@ -1,9 +1,10 @@
 //
-// Created by tyler on 1/12/18.
+// Created by tyler on 2/11/18.
 //
 
-#ifndef YAFEL_EIGENCONJUGATEGRADIENT_HPP
-#define YAFEL_EIGENCONJUGATEGRADIENT_HPP
+#ifndef YAFEL_EIGENBICGSTAB_HPP
+#define YAFEL_EIGENBICGSTAB_HPP
+
 
 #include "yafel_globals.hpp"
 #include <Eigen/IterativeLinearSolvers>
@@ -15,16 +16,16 @@ namespace LinearSolve {
 /**
  * Tag type to dispatch the Eigen Conjugate Gradient solver
  */
-struct EigenConjugateGradientTag
+struct EigenBICGSTABTag
 {
 };
 
 namespace detail {
 
 template<typename MatrixType, typename VectorType>
-void solve_impl(VectorType &result, MatrixType const &A, VectorType const &b, EigenConjugateGradientTag)
+void solve_impl(VectorType &result, MatrixType const &A, VectorType const &b, EigenBICGSTABTag&)
 {
-    Eigen::ConjugateGradient<MatrixType, Eigen::Upper | Eigen::Lower> solver;
+    Eigen::BiCGSTAB<MatrixType> solver;
     solver.compute(A);
     result = solver.solveWithGuess(b,result);
 };
@@ -36,4 +37,4 @@ void solve_impl(VectorType &result, MatrixType const &A, VectorType const &b, Ei
 
 YAFEL_NAMESPACE_CLOSE
 
-#endif //YAFEL_EIGENCONJUGATEGRADIENT_HPP
+#endif //YAFEL_EIGENBICGSTAB_HPP

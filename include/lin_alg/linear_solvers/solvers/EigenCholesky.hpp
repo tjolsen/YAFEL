@@ -6,9 +6,9 @@
 #define YAFEL_EIGENCHOLESKY_HPP
 
 #include "yafel_globals.hpp"
-#include "lin_alg/linear_solvers/LinearSolve.hpp"
 
 #include <Eigen/Cholesky>
+#include <Eigen/SparseCholesky>
 #include <stdexcept>
 
 YAFEL_NAMESPACE_OPEN

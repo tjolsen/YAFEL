@@ -17,6 +17,8 @@
 // Linear Algebra structures
 #include "lin_alg/tensor/tensors.hpp" // <-- already a convenience header
 
+//Linear system solvers
+#include "lin_alg/linear_solvers/LinearSolve.hpp"
 
 // Assembly routines
 #include "assembly/CGAssembly.hpp"
