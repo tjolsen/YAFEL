@@ -107,7 +107,7 @@ int main()
     //std::cout << "Assembly done\n";
 
     //Ordinary dirichlet BC on surface 1: u = (.01, 0, 0)
-    DirichletBC bc0(dofm, 0.025, 0);
+    DirichletBC bc0(dofm, 0.001, 0);
     bc0.selectByRegionID(1);
     DirichletBC bc1(dofm, 0, 1);
     bc1.selectByRegionID(1);
@@ -228,7 +228,7 @@ int main()
                                 value*constraints[row_entry].coefficient[l]*constraints[col_entry].inhomogeneity;
                     }
                     if(row == col)
-                        value = 1.0;
+                        value = 10000;
                     else
                         value = 0;
                 }
