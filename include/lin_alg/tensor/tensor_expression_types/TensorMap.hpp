@@ -67,6 +67,16 @@ public:
         return dataPtr[idx];
     }
 
+    template<typename TT, typename dt2, bool Tb, typename=typename std::enable_if_t<assignable>>
+    YAFEL_ALWAYS_INLINE auto& operator=(const TensorExpression<TT,D,R,dt2,Tb> &rhs) noexcept
+    {
+        auto rit=rhs.begin();
+        for(auto it=super::begin(); it!=super::end(); ++it, ++rit) {
+            *it = *rit;
+        }
+        return *this;
+    }
+
 private:
     //Pointer to mapped memory
     PtrType dataPtr;
