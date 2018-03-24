@@ -71,6 +71,10 @@ public:
 
     inline iterator end() { return p_end; }
 
+    inline const_iterator begin() const { return p_begin; }
+
+    inline const_iterator end() const { return p_end; }
+
     inline const_iterator cbegin() const { return p_begin; }
 
     inline const_iterator cend() const { return p_end; }

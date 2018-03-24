@@ -142,7 +142,6 @@ protected:
     void parse_gmsh(const std::string &fname);
 };
 
-
 YAFEL_NAMESPACE_CLOSE
 
 #endif //YAFEL_MESH_HPP

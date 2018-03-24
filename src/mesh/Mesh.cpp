@@ -9,11 +9,11 @@ YAFEL_NAMESPACE_OPEN
 
 
 Mesh::Mesh(DefinitionScheme definitionScheme,
-           const std::vector<coordinate<>> &geometryNodes,
-           const std::vector<int> &cellNodes,
-           const std::vector<int> &cellOffsets,
-           const std::vector<CellType> &cellTypes,
-           const std::vector<std::vector<int>> &cellTags)
+                   const std::vector<coordinate<>> &geometryNodes,
+                   const std::vector<int> &cellNodes,
+                   const std::vector<int> &cellOffsets,
+                   const std::vector<CellType> &cellTypes,
+                   const std::vector<std::vector<int>> &cellTags)
         : definitionScheme_(definitionScheme),
           geometryNodes_(geometryNodes),
           cellNodes_(cellNodes),
@@ -23,7 +23,7 @@ Mesh::Mesh(DefinitionScheme definitionScheme,
           internal_faces_(),
           boundary_face_idxs_()
 {
-    if(cellTags_.size() == 0) {
+    if (cellTags_.size() == 0) {
         cellTags_.resize(nCells(), {0});
     }
 }

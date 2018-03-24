@@ -57,7 +57,7 @@ void DGAssembly(FESystem &feSystem,
             case AssemblyRequirement::Tangent:
                 assemble_tangent = true;
                 break;
-            case AssemblyRequirement::DtMass: [[fallthrough]]
+            case AssemblyRequirement::DtMass: [[fallthrough]];
             case AssemblyRequirement::LumpedDtMassInverse:
                 assemble_dt_mass = true;
                 break;

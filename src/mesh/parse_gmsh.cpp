@@ -5,7 +5,6 @@
 #include "utils/Range.hpp"
 #include <fstream>
 #include <string>
-//#include <sstream>
 #include <string_view>
 //#include <charconv> //for std::from_chars, which is not yet in gcc as of v7.1
 
@@ -77,7 +76,6 @@ auto svtod(std::string_view s) {
     return val;
 }
 }
-
 
 void Mesh::parse_gmsh(const std::string &fname)
 {
