@@ -69,6 +69,9 @@ auto operator/(const TensorExpression<T1, D, R, dt, b> &lhs, const U &rhs)
     return TensorScaled<T1, result_type, D, R, dt>(lhs, result_type(1) / rhs);
 }
 
+
+
+
 //-------------------------------------------------------------------
 //              Component-wise Unary Operations
 //-------------------------------------------------------------------

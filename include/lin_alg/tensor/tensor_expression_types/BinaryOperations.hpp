@@ -99,7 +99,7 @@ struct Min
     { return (t < u) ? t : u; }
 };
 
-
+$(
 template<typename T, typename U>
 struct LogicalAnd
 {
@@ -124,6 +124,38 @@ struct LogicalOr
     { return static_cast<bool>(t) || static_cast<bool>(u); }
 };
 
+
+template<typename T, typename U>
+struct GreaterThan {
+    using result_type = bool;
+
+    YAFEL_ALWAYS_INLINE static constexpr auto BinaryOp(T t, U u)
+    { return T > U; }
+};
+
+template<typename T, typename U>
+struct GreaterThanOrEqual {
+    using result_type = bool;
+
+    YAFEL_ALWAYS_INLINE static constexpr auto BinaryOp(T t, U u)
+    { return T >= U; }
+};
+
+template<typename T, typename U>
+struct LessThan {
+    using result_type = bool;
+
+    YAFEL_ALWAYS_INLINE static constexpr auto BinaryOp(T t, U u)
+    { return T < U; }
+};
+
+template<typename T, typename U>
+struct LessThanOrEqual {
+    using result_type = bool;
+
+    YAFEL_ALWAYS_INLINE static constexpr auto BinaryOp(T t, U u)
+    { return T <= U; }
+};
 
 YAFEL_NAMESPACE_CLOSE
 

@@ -8,7 +8,9 @@
 #include "boundary_conditions/DirichletBC.hpp"
 #include "output/SimulationOutput.hpp"
 #include "utils/BasicTimer.hpp"
+#include "lin_alg/linear_solvers/LinearSolve.hpp"
 
+/*
 #ifndef VIENNACL_WITH_EIGEN
 #define VIENNACL_WITH_EIGEN 1
 #endif
@@ -16,6 +18,7 @@
 #include <viennacl/linalg/cg.hpp>
 #include <iostream>
 #include <Eigen/IterativeLinearSolvers>
+*/
 
 using namespace yafel;
 
@@ -91,7 +94,7 @@ Eigen::VectorXd solveSystem(const Eigen::SparseMatrix<double> &A, const Eigen::V
 int main()
 {
     constexpr int nsd = 3;
-    Mesh M("tetblock.msh");
+    Mesh M("mesh.msh");
     int p = 1;
     int dofpn = 1;
     DoFManager dofm(M, DoFManager::ManagerType::CG, p, dofpn);

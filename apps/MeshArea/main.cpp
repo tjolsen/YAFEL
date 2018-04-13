@@ -25,7 +25,7 @@ int main()
     Mesh M("2x2square.msh");
     M.buildInternalFaces();
 
-    int p = 3; // set polynomial interpolation order ( p <= 5 for now if using triangle elements )
+    int p = 1; // set polynomial interpolation order ( p <= 5 for now if using triangle elements )
     DoFManager dofm(M, DoFManager::ManagerType::DG, p);
     double area{0};
 
@@ -40,7 +40,7 @@ int main()
 	
         auto &E = EF.getElement(et);
         for (auto qpi : IRange(0, E.nQP())) {
-            E.update<3>(c, qpi, dofm);
+            E.update<NSD>(c, qpi, dofm);
             area += E.jxw;
         }
     }
