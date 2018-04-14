@@ -95,6 +95,11 @@ public:
                 run(i);
             });
 
+            /*
+             * Removing thread-pinning for the time being because it makes it difficult to run
+             * multiple executables on the same machine simultaneously with N/2 threads apiece,
+             * since they try to pin to the same cores.
+             *
             //Set thread affinity. Modulo just in case some idiot decides to spawn more threads than cores.
             // Wraparound to zero seems the most sensible way to handle this without yelling at the user
             // too much.
@@ -104,6 +109,7 @@ public:
             if (ret != 0) {
                 throw std::runtime_error("Failed to set thread affinity");
             }
+             */
         }
     }
 
