@@ -20,67 +20,93 @@ YAFEL_NAMESPACE_OPEN
 template<typename T>
 struct Negation
 {
-    using result_type = decltype(-T());
-
     static constexpr auto UnaryOp(T t) { return -t; }
+
+    using result_type = decltype(UnaryOp(std::declval<T>()));
 };
 
 
 template<typename T>
 struct Sqrt
 {
-    using result_type = decltype(sqrt(std::declval<T>()));
+    static auto UnaryOp(T t)
+    {
+        using std::sqrt;
+        return sqrt(t);
+    }
 
-    static auto UnaryOp(T t) { return sqrt(t); }
+    using result_type = decltype(UnaryOp(std::declval<T>()));
+
 };
 
 
 template<typename T>
 struct Sign
 {
-    //always return a signed int from this function.
-    using result_type = int;
-
     static auto UnaryOp(T t) { return (t >= 0) ? 1 : -1; }
+
+    using result_type = decltype(UnaryOp(std::declval<T>()));
 };
 
 
 template<typename T>
 struct Sin
 {
-    using result_type = decltype(sin(std::declval<T>()));
+    static auto UnaryOp(T t)
+    {
+        using std::sin;
+        return sin(t);
+    }
 
-    static auto UnaryOp(T t) { return sin(t); }
+    using result_type = decltype(UnaryOp(std::declval<T>()));
 };
 
 template<typename T>
 struct Cos
 {
-    using result_type = decltype(sin(std::declval<T>()));
+    static auto UnaryOp(T t)
+    {
+        using std::cos;
+        return cos(t);
+    }
 
-    static auto UnaryOp(T t) { return cos(t); }
+    using result_type = decltype(UnaryOp(std::declval<T>()));
 };
 
 template<typename T>
 struct Round
 {
-    using result_type = decltype(std::round(std::declval<T>()));
+    static auto UnaryOp(T t)
+    {
+        using std::round;
+        return round(t);
+    }
 
-    static auto UnaryOp(T t) { return std::round(t); }
+    using result_type = decltype(UnaryOp(std::declval<T>()));
 };
 
 template<typename T>
 struct Abs
 {
-    using result_type = decltype(std::abs(std::declval<T>()));
-    static auto UnaryOp(T t) { using std::abs; return abs(t); }
+    static auto UnaryOp(T t)
+    {
+        using std::abs;
+        return abs(t);
+    }
+
+    using result_type = decltype(UnaryOp(std::declval<T>())); //decltype(abs(std::declval<T>()));
 };
 
 template<typename T>
 struct IsNan
 {
     using result_type = bool;
-    static auto UnaryOp(T t) { using std::isnan; return isnan(t); }
+
+    static auto UnaryOp(T t)
+    {
+        using std::isnan;
+        return isnan(t);
+    }
 };
 
 YAFEL_NAMESPACE_CLOSE

@@ -25,6 +25,7 @@ class OutputMesh;
 class OutputBackend
 {
 public:
+    virtual ~OutputBackend() = default;
     virtual void initialize(const std::string & fname_base) = 0;
     virtual void finalize() = 0;
     //virtual void finalize_frame() = 0;
