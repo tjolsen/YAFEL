@@ -140,6 +140,22 @@ T1 &operator-=(TensorExpression<T1, D, R, dt1, true> &&lhs, dt2 rhs)
                          rhs, Subtraction<dt1, dt2>());
 }
 
+//------------------------------------------------------
+template<typename T1, int D, int R, typename dt1, typename dt2,
+        typename=typename std::enable_if<ScalarTraits<dt2>::isYafelScalar()>::type>
+T1 &operator*=(TensorExpression<T1, D, R, dt1, true> &lhs, dt2 rhs)
+{
+    return update_assign(lhs, rhs, Multiplication<dt1, dt2>());
+}
+
+template<typename T1, int D, int R, typename dt1, typename dt2,
+        typename=typename std::enable_if<ScalarTraits<dt2>::isYafelScalar()>::type>
+T1 &operator*=(TensorExpression<T1, D, R, dt1, true> &&lhs, dt2 rhs)
+{
+    return update_assign(std::forward<TensorExpression<T1, D, R, dt1, true>>(lhs),
+                         rhs, Multiplication<dt1, dt2>());
+}
+
 
 YAFEL_NAMESPACE_CLOSE
 
