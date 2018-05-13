@@ -41,6 +41,30 @@ public:
     }
 };
 
+//Terrible name, but maybe need a version that doesn't take a template template parameter
+template<typename TE, int D, int R, typename dt, bool b, class UnaryOpType>
+class TensorCwiseUnaryOp_2
+        : public TensorExpression<TensorCwiseUnaryOp_2<TE, D, R, dt, b, UnaryOpType>, D, R,
+                decltype(UnaryOpType::UnaryOp(std::declval<TE>().linearIndexing(0))), false>
+{
+public:
+    using super = TensorExpression<TensorCwiseUnaryOp_2<TE, D, R, dt, b, UnaryOpType>, D, R,
+            decltype(UnaryOpType::UnaryOp(std::declval<TE>().linearIndexing(0))), false>;
+    using result_type = decltype(UnaryOpType::UnaryOp(std::declval<TE>().linearIndexing(0)));
+
+    const TE & te_;
+
+    TensorCwiseUnaryOp_2(const TensorExpression<TE,D,R,dt,b> &te)
+            : te_(te.self())
+    {}
+
+
+    inline result_type linearIndexing(int idx) const noexcept
+    {
+        return UnaryOpType::UnaryOp(te_.linearIndexing(idx));
+    }
+};
+
 
 YAFEL_NAMESPACE_CLOSE
 

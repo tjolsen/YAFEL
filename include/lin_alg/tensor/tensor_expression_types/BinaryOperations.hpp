@@ -2,8 +2,8 @@
 // Created by tyler on 3/8/17.
 //
 
-#ifndef YAFEL_BINARYOPERATIONS_HPP_HPP
-#define YAFEL_BINARYOPERATIONS_HPP_HPP
+#ifndef YAFEL_BINARYOPERATIONS_HPP
+#define YAFEL_BINARYOPERATIONS_HPP
 
 /**
  * \file
@@ -70,9 +70,9 @@ struct Multiplication
 {
     using result_type = decltype(std::declval<T>() * std::declval<U>());
 
-    static constexpr result_type identity_value() { return result_type(0); }
+    static constexpr result_type identity_value() { return result_type(1); }
 
-    YAFEL_ALWAYS_INLINE static auto BinaryOp(T t, U u) { return t + u; }
+    YAFEL_ALWAYS_INLINE static auto BinaryOp(T t, U u) { return t * u; }
 };
 
 template<typename T, typename U>
@@ -95,6 +95,15 @@ struct Min
 
     static constexpr result_type identity_value() { return result_type(std::numeric_limits<result_type>::max()); }
 };
+
+template<typename T, typename U>
+struct Div
+{
+    YAFEL_ALWAYS_INLINE static auto BinaryOp(T t, U u) { return t/u; }
+
+    using result_type = decltype(BinaryOp(std::declval<T>(), std::declval<U>()));
+};
+
 
 
 template<typename T, typename U>
@@ -147,6 +156,14 @@ template<typename T, typename U>
 struct LessThanOrEqual
 {
     YAFEL_ALWAYS_INLINE static constexpr auto BinaryOp(T t, U u) { return t <= u; }
+
+    using result_type = decltype(BinaryOp(std::declval<T>(), std::declval<U>()));
+};
+
+template<typename T, typename U>
+struct Equal
+{
+    YAFEL_ALWAYS_INLINE static constexpr auto BinaryOp(T t, U u) { return t == u; }
 
     using result_type = decltype(BinaryOp(std::declval<T>(), std::declval<U>()));
 };

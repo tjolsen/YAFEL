@@ -87,20 +87,26 @@ struct Round
 
 
 template<typename T>
-struct Floor {
-    static auto UnaryOp(T t) {
+struct Floor
+{
+    static auto UnaryOp(T t)
+    {
         using std::floor;
         return floor(t);
     }
+
     using result_type = decltype(UnaryOp(std::declval<T>()));
 };
 
 template<typename T>
-struct Ceil {
-    static auto UnaryOp(T t) {
+struct Ceil
+{
+    static auto UnaryOp(T t)
+    {
         using std::ceil;
         return ceil(t);
     }
+
     using result_type = decltype(UnaryOp(std::declval<T>()));
 };
 
@@ -128,15 +134,19 @@ struct IsNan
     }
 };
 
-template<typename T>
-struct TensorCaster {
-    template<typename U>
-    struct Cast {
-        static auto UnaryOp(U u) {
 
-        }
-        using result_type = T;
-    };
+template<typename T>
+struct TensorCaster
+{
+
+    template<typename U>
+    static auto UnaryOp(U u)
+    {
+        return static_cast<T>(u);
+    }
+
+    using result_type = T;
+
 };
 
 YAFEL_NAMESPACE_CLOSE

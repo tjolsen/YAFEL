@@ -71,7 +71,8 @@ auto isnan(const TensorExpression<T,D,R,dt,b> &te) noexcept
 template<typename CastType, typename T, int D, int R, typename dt, bool b>
 auto tensor_cast(const TensorExpression<T,D,R,dt,b> &te) noexcept
 {
-    return TensorCwiseUnaryOp<T,D,R,dt,b,typename TensorCaster<CastType>::Cast>(te);
+
+    return TensorCwiseUnaryOp_2<T,D,R,dt,b,TensorCaster<CastType>>(te);
 };
 
 YAFEL_NAMESPACE_CLOSE

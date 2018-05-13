@@ -37,6 +37,26 @@ auto min(const TensorExpression<T1,D,R,dt1,b1> &lhs,
     return TensorCwiseBinaryOp<T1,T2,D,R,dt1,dt2,b1,b2,Min>(lhs,rhs);
 }
 
+/**
+ * \brief Compute component-by-component division
+ */
+template<typename T1, typename T2, int D, int R, typename dt1, typename dt2, bool b1, bool b2>
+auto cwiseDiv(const TensorExpression<T1,D,R,dt1,b1> &lhs,
+              const TensorExpression<T2,D,R,dt2,b2> &rhs)
+{
+    return TensorCwiseBinaryOp<T1,T2,D,R,dt1,dt2,b1,b2,Div>(lhs,rhs);
+}
+
+/**
+ * \brief Compute component-by-component division
+ */
+template<typename T1, typename T2, int D, int R, typename dt1, typename dt2, bool b1, bool b2>
+auto cwiseMult(const TensorExpression<T1,D,R,dt1,b1> &lhs,
+              const TensorExpression<T2,D,R,dt2,b2> &rhs)
+{
+    return TensorCwiseBinaryOp<T1,T2,D,R,dt1,dt2,b1,b2,Multiplication>(lhs,rhs);
+}
+
 
 YAFEL_NAMESPACE_CLOSE
 
