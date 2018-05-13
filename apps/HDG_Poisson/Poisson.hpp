@@ -95,10 +95,11 @@ template<typename T>
 void Poisson<NSD>::UQTangent_volume(const Element &E, int qpi, Eigen::DenseBase<T> &UQ)
 {
     for (int Anode = 0; Anode < UQ.rows(); ++Anode) {
+        int B = 0;
         for (int Bnode = 0; Bnode < UQ.cols(); ++Bnode) {
             for (int i = 0; i < NSD; ++i) {
-                int B = Bnode * NSD + i;
                 UQ(Anode, B) += E.jxw * E.shapeValues[qpi](Anode) * E.shapeGrad(Bnode, i);
+                ++B;
             }
         }
     }
@@ -150,7 +151,7 @@ void Poisson<NSD>::QUTangent_volume(const Element &E, int qpi, Eigen::DenseBase<
         for (int Bnode = 0; Bnode < E.shapeValues[qpi].rows(); ++Bnode) {
             for (int i = 0; i < NSD; ++i) {
                 int A = Anode * NSD + i;
-                QU(A, Bnode) += E.jxw * E.shapeGrade(Anode, i) * E.shapeValues[qpi](Bnode);
+                QU(A, Bnode) += E.jxw * E.shapeGrad(Anode, i) * E.shapeValues[qpi](Bnode);
 
             }
         }

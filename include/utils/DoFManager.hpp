@@ -63,6 +63,8 @@ public:
     std::vector<int> face_left_local_nodes;
     std::vector<int> face_right_local_nodes;
 
+    std::vector<int> element_faces;
+    std::vector<int> element_face_offsets;
 
     std::vector<int> mesh_corner_idxs;
     std::vector<int> mesh_corner_offsets;

@@ -45,6 +45,18 @@ auto round(const TensorExpression<T,D,R,dt,b> &te) noexcept
 }
 
 template<typename T, int D, int R, typename dt, bool b>
+auto floor(const TensorExpression<T,D,R,dt,b> &te) noexcept
+{
+    return TensorCwiseUnaryOp<T,D,R,dt,b,Floor>(te);
+}
+
+template<typename T, int D, int R, typename dt, bool b>
+auto ceil(const TensorExpression<T,D,R,dt,b> &te) noexcept
+{
+    return TensorCwiseUnaryOp<T,D,R,dt,b,Ceil>(te);
+}
+
+template<typename T, int D, int R, typename dt, bool b>
 auto abs(const TensorExpression<T,D,R,dt,b> &te) noexcept
 {
     return TensorCwiseUnaryOp<T,D,R,dt,b,Abs>(te);
@@ -56,7 +68,11 @@ auto isnan(const TensorExpression<T,D,R,dt,b> &te) noexcept
     return TensorCwiseUnaryOp<T,D,R,dt,b,IsNan>(te);
 };
 
-
+template<typename CastType, typename T, int D, int R, typename dt, bool b>
+auto tensor_cast(const TensorExpression<T,D,R,dt,b> &te) noexcept
+{
+    return TensorCwiseUnaryOp<T,D,R,dt,b,typename TensorCaster<CastType>::Cast>(te);
+};
 
 YAFEL_NAMESPACE_CLOSE
 

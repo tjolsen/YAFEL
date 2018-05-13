@@ -31,8 +31,8 @@ if(APP_BASIC_ADVECTION)
     target_link_libraries(basicAdvection yafel)
 endif()
 
-cmake_dependent_option(APP_HDG_POISSON "Compile HDG_Poisson" OFF
-        "COMPILE_APPS" OFF)
+cmake_dependent_option(APP_HDG_POISSON "Compile HDG_Poisson" ON
+        "COMPILE_APPS" ON)
 if(APP_HDG_POISSON)
     add_executable(hdg_poisson HDG_Poisson/main.cpp)
     target_link_libraries(hdg_poisson yafel)
