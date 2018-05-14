@@ -15,14 +15,13 @@
 
 YAFEL_NAMESPACE_OPEN
 
-template<typename T1, typename T2, int D, typename dT1, typename dT2, bool b1, bool b2,
-        typename=typename std::enable_if<D==3>::type>
-auto cross(const TensorExpression<T1,D,1,dT1,b1> &lhs,
-           const TensorExpression<T2,D,1,dT2,b2> &rhs)
+template<typename T1, typename T2, typename dT1, typename dT2, bool b1, bool b2>
+auto cross(const TensorExpression<T1,3,1,dT1,b1> &lhs,
+           const TensorExpression<T2,3,1,dT2,b2> &rhs)
 {
 
     using retDT = decltype(std::declval<dT1>()*std::declval<dT2>());
-    Tensor<D,1,retDT> retval;
+    Tensor<3,1,retDT> retval;
 
     retval(0) = lhs(1)*rhs(2) - lhs(2)*rhs(1);
     retval(1) = lhs(2)*rhs(0) - lhs(0)*rhs(2);

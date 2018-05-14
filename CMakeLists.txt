@@ -60,6 +60,7 @@ set(SOURCE_FILES
         include/lin_alg/tensor/mp_utils/TypeList.hpp
         include/lin_alg/tensor/tensor_expression_types/BinaryOperations.hpp
         include/lin_alg/tensor/tensor_expression_types/Tensor.hpp
+        include/lin_alg/tensor/tensor_expression_types/TensorConstant.hpp
         include/lin_alg/tensor/tensor_expression_types/TensorContraction.hpp
         include/lin_alg/tensor/tensor_expression_types/TensorCwiseBinaryOp.hpp
         include/lin_alg/tensor/tensor_expression_types/TensorCwiseUnaryOp.hpp
