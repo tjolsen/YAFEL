@@ -124,6 +124,7 @@ set(SOURCE_FILES
 
         include/yafel.hpp
         include/yafel_globals.hpp
+        include/yafel_tensors.hpp
         include/yafel_typedefs.hpp
         include/yafel_config.hpp
         include/utils/parallel/yafel_parallel.hpp
