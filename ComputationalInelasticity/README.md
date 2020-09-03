@@ -14,3 +14,11 @@ reasonably functional FEM application, complete with expressive
 input/config language (lua?). Configuration from this work may
 make its way upstream into the main library, if it proves general
 enough to belong there.
+
+1) 1D Linear elastic, return mapping, single element (python script, not FEM)
+	- Perfect plastic
+	- Isotropic hardening
+	- Kinematic hardening
+	
+2) Linear-elastic FEM with reasonable input/output, config, material specification
+
