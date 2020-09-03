@@ -236,12 +236,14 @@ public:
         std::copy(rhs.cbegin(), rhs.cend(), this->begin());
     }
 
+    /*
     SmallVector(SmallVector<T, N> &&rhs)
     {
         if (rhs.isSmall()) {
             this->p_begin = reinterpret_cast<T *>(&buffer[0]);
-            std::copy(rhs.cbegin(), rhs.cend(), this->begin());
+            std::move(rhs.cbegin(), rhs.cend(), this->begin());
             this->p_end = this->p_begin + rhs.size();
+            this->_isSmall = true;
             this->_capacity = N;
         } else {
             this->p_begin = rhs.begin();
@@ -254,6 +256,7 @@ public:
             rhs.capacity() = 0;
         }
     }
+
 
     template<std::size_t N2>
     SmallVector(SmallVector<T, N2> &&rhs)
@@ -281,7 +284,7 @@ public:
             rhs.dataEnd() = nullptr;
             rhs.capacity() = 0;
         }
-    }
+    }*/
 
     //Copy assignment
     template<std::size_t N2>
